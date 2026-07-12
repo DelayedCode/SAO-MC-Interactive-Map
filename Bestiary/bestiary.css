@@ -1,0 +1,136 @@
+:root {
+  --shell-body-bg: #111111;
+  --shell-body-color: #f4f4f4;
+  --page-max-width: 1100px;
+  --nav-button-border: #333333;
+  --nav-button-bg: #1c1c1c;
+  --nav-button-bg-hover: #303030;
+  --nav-button-color: #f4f4f4;
+  --panel-border: #2c2c2c;
+  --panel-bg: #171717;
+  --status-color: #d3d3d3;
+  --search-label-color: #bbbbbb;
+  --search-input-border: #2f2f2f;
+  --search-input-bg: #121212;
+  --search-input-color: #f4f4f4;
+  --search-input-focus-border: #8bb7ff;
+  --search-input-focus-ring: rgba(139, 183, 255, 0.15);
+}
+
+.list-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.list-tab {
+  border: 1px solid #303030;
+  background: #141414;
+  color: #e8e8e8;
+  border-radius: 999px;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+
+.list-tab.is-active {
+  border-color: #8bb7ff;
+  background: #1f2c40;
+  color: #ffffff;
+}
+
+.list-title {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  color: #f0f0f0;
+}
+
+.mob-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed #333;
+  border-radius: 10px;
+  color: #bdbdbd;
+  background: #141414;
+}
+
+.mob-card {
+  border: 1px solid #2f2f2f;
+  border-radius: 10px;
+  padding: 14px;
+  background: #1f1f1f;
+}
+
+.mob-name {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+}
+
+.mob-meta {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mob-meta p {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mob-meta span {
+  color: #bbbbbb;
+}
+
+.mob-meta strong.aggressive {
+  color: #ff6b6b;
+}
+
+.mob-meta strong.neutral {
+  color: #ffd84d;
+}
+
+.mob-meta strong.passive {
+  color: #66d17a;
+}
+
+.drops-title {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: #e6e6e6;
+}
+
+.drop-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.drop-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  background: #191919;
+}
+
+@media (max-width: 720px) {
+  .list-tabs {
+    gap: 8px;
+  }
+
+  .list-tab {
+    width: 100%;
+  }
+}

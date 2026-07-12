@@ -1,0 +1,12 @@
+:root {
+  --shell-body-bg: #14100e;
+  --shell-body-color: #f7f1ea;
+  --page-max-width: 1100px;
+  --nav-button-border: #4b3528;
+  --nav-button-bg: #2b2019;
+  --nav-button-bg-hover: #3a2a20;
+  --nav-button-color: #f7f1ea;
+  --panel-border: #4b3528;
+  --panel-bg: #211913;
+  --status-color: #d8c8bc;
+}
