@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAO Bestiary</title>
+  <title>SAO Bestiary - Floor 1</title>
   <link rel="stylesheet" href="../shared/page-shell.css">
   <link rel="stylesheet" href="bestiary.css">
 </head>
 <body>
   <div class="page">
     <div class="nav">
-      <button onclick="window.location.href='../Map/maps.html'">Maps</button>
+      <button onclick="window.location.href='../Map/maps.html?floor=floor1'">Maps</button>
       <button onclick="window.location.href='../eCompendium/ecompendium.html'">Equipment</button>
-      <button onclick="window.location.href='../Quests/quests.html'">Quests</button>
+      <button onclick="window.location.href='../Quests/quests_floor1.html'">Quests</button>
       <button onclick="window.location.href='../Patchnotes/patchnotes.html'">Patchnotes</button>
     </div>
     <div class="panel">
-      <h1>Bestiary</h1>
+      <h1>Bestiary - Floor 1</h1>
       <div class="list-tabs" role="tablist" aria-label="Bestiary categories">
         <button class="list-tab is-active" type="button" data-category="boss">Boss List</button>
         <button class="list-tab" type="button" data-category="regular">Regular Mobs List</button>
@@ -34,6 +34,8 @@
       <section id="mobList" class="mob-list" aria-live="polite"></section>
     </div>
   </div>
+  <script>window.FLOOR_NAME = "floor1";</script>
+  <script src="bestiary_floor1.js"></script>
   <script src="bestiary.js"></script>
 </body>
 </html>

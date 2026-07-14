@@ -1,79 +1,6 @@
-const CALIBRATION_MAP_SIZE = 900;
+// Floor 1 Map Data
 
-const MAP_CALIBRATION = {
-  floor1: {
-    centerPixel: { x: 450, y: 450 },
-    centerGame: { x: 2545.6, z: 2550 },
-    radiusPixel: 450,
-    radiusGame: 2498.1
-  },
-  floor2: {
-    centerPixel: { x: 450, y: 450 },
-    centerGame: { x: -1.3, z: 0.8 },
-    radiusPixel: 450,
-    radiusGame: 1072.5
-  },
-  floor3: {
-    centerPixel: { x: 450, y: 450 },
-    centerGame: { x: 597, z: 771 },
-    radiusPixel: 450,
-    radiusGame: 850
-  }
-};
-
-function getReferenceSize(dimensions) {
-  if (!dimensions) return CALIBRATION_MAP_SIZE;
-  const w = Number(dimensions.width);
-  const h = Number(dimensions.height);
-  if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) {
-    return CALIBRATION_MAP_SIZE;
-  }
-  return Math.min(w, h);
-}
-
-function rawToCalibrationPixels(rawX, rawY, dimensions) {
-  const referenceSize = getReferenceSize(dimensions);
-  const ratio = CALIBRATION_MAP_SIZE / referenceSize;
-  return {
-    x: rawX * ratio,
-    y: rawY * ratio
-  };
-}
-
-function calibrationPixelsToRaw(px, py, dimensions) {
-  const referenceSize = getReferenceSize(dimensions);
-  const ratio = referenceSize / CALIBRATION_MAP_SIZE;
-  return {
-    rawX: px * ratio,
-    rawY: py * ratio
-  };
-}
-
-function mapWebsiteCoordinates(rawX, rawY, floor, dimensions) {
-  const calibration = MAP_CALIBRATION[floor];
-  if (!calibration) return null;
-
-  const pixel = rawToCalibrationPixels(rawX, rawY, dimensions);
-  const scale = calibration.radiusGame / calibration.radiusPixel;
-
-  return {
-    x: calibration.centerGame.x + (pixel.x - calibration.centerPixel.x) * scale,
-    z: calibration.centerGame.z + (pixel.y - calibration.centerPixel.y) * scale
-  };
-}
-
-function invertMapCoordinates(x, z, floor, dimensions) {
-  const calibration = MAP_CALIBRATION[floor];
-  if (!calibration) return null;
-
-  const scale = calibration.radiusPixel / calibration.radiusGame;
-  const pixelX = calibration.centerPixel.x + (x - calibration.centerGame.x) * scale;
-  const pixelY = calibration.centerPixel.y + (z - calibration.centerGame.z) * scale;
-
-  return calibrationPixelsToRaw(pixelX, pixelY, dimensions);
-}
-
-const DATA = {
+Object.assign(DATA, {
   "swamp-putride": {
     title: "Swamp Putride",
     type: "Biome",
@@ -730,7 +657,7 @@ const DATA = {
     floor: "floor1",
     coords: { x: 3336, z: 1597 },
     drops: ["N/A"],
-    description: "Alchemist - X: 3336 Z: 1597",
+    description: "Alchemist",
   },
   "journeyman-alchemist-town": {
     title: "Alchemist",
@@ -739,7 +666,16 @@ const DATA = {
     floor: "floor1",
     coords: { x: 1773, z: 4085 },
     drops: ["N/A"],
-    description: "Alchemist, Crystallograph, Assistant to the Alchemist - X: 1773 Z: 4085",
+    description: "Alchemist, Crystallograph, Assistant to the Alchemist",
+  },
+  "journeyman-alchemist-purification": {
+    title: "Purification Alchemist",
+    type: "NPC",
+    category: "alchemist",
+    floor: "floor1",
+    coords: { x: 1813, z: 4163 },
+    drops: ["N/A"],
+    description: "Purification Alchemist",
   },
   "journeyman-lumberjack": {
     title: "Lumberjack",
@@ -748,7 +684,471 @@ const DATA = {
     floor: "floor1",
     coords: { x: 2462, z: 4287 },
     drops: ["N/A"],
-    description: "Lumberjack - X: 2462 Z: 4287",
+    description: "Lumberjack",
+  },
+  "loot-buyer-magical-icy": {
+    title: "Magical & Icy Loot Buyer",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 3295, z: 1620 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "loot-buyer-marine": {
+    title: "Marine Loot Buyer",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 1604, z: 1956 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "loot-buyer-glutinous": {
+    title: "Glutinous Loot Buyer",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 414, z: 3075 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "loot-buyer-country": {
+    title: "Country Loot Buyer",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 3132, z: 3696 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "loot-buyer-local-lumberjack": {
+    title: "Local Lumberjack",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 2464, z: 4309 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "loot-buyer-skeletal": {
+    title: "Skeletal Loot Buyer",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 1790, z: 4171 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "loot-buyer-miner-corner": {
+    title: "Miner of the Corner",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 2397, z: 3549 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "loot-buyer-local-farmer": {
+    title: "Local Farmer",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 2359, z: 3636 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "loot-buyer-forest": {
+    title: "Forest Loot Buyer",
+    type: "NPC",
+    category: "lootBuyers",
+    floor: "floor1",
+    coords: { x: 1509, z: 3418 },
+    drops: ["N/A"],
+    description: "Loot Buyer",
+  },
+  "weapon-seller-level-5": {
+    title: "Level 5 Weapon Buyer",
+    type: "NPC",
+    category: "weaponSellers",
+    floor: "floor1",
+    coords: { x: 1491, z: 3406 },
+    drops: ["N/A"],
+    description: "Weapon Seller",
+  },
+  "weapon-seller-level-1": {
+    title: "Level 1 Weapon Buyer",
+    type: "NPC",
+    category: "weaponSellers",
+    floor: "floor1",
+    coords: { x: 1787, z: 4165 },
+    drops: ["N/A"],
+    description: "Weapon Seller",
+  },
+  "traveling-merchant-3488-1319": {
+    title: "Traveling Merchant",
+    type: "NPC",
+    category: "travelingMerchants",
+    floor: "floor1",
+    coords: { x: 3488, z: 1319 },
+    drops: ["N/A"],
+    description: "Traveling Merchant",
+  },
+  "traveling-merchant-1455-1148": {
+    title: "Traveling Merchant",
+    type: "NPC",
+    category: "travelingMerchants",
+    floor: "floor1",
+    coords: { x: 1455, z: 1148 },
+    drops: ["N/A"],
+    description: "Traveling Merchant",
+  },
+  "traveling-merchant-1210-2086": {
+    title: "Traveling Merchant",
+    type: "NPC",
+    category: "travelingMerchants",
+    floor: "floor1",
+    coords: { x: 1210, z: 2086 },
+    drops: ["N/A"],
+    description: "Traveling Merchant",
+  },
+  "traveling-merchant-1415-2985": {
+    title: "Traveling Merchant",
+    type: "NPC",
+    category: "travelingMerchants",
+    floor: "floor1",
+    coords: { x: 1415, z: 2985 },
+    drops: ["N/A"],
+    description: "Traveling Merchant",
+  },
+  "traveling-merchant-588-3176": {
+    title: "Traveling Merchant",
+    type: "NPC",
+    category: "travelingMerchants",
+    floor: "floor1",
+    coords: { x: 588, z: 3176 },
+    drops: ["N/A"],
+    description: "Traveling Merchant",
+  },
+  "traveling-merchant-3600-3390": {
+    title: "Traveling Merchant",
+    type: "NPC",
+    category: "travelingMerchants",
+    floor: "floor1",
+    coords: { x: 3600, z: 3390 },
+    drops: ["N/A"],
+    description: "Traveling Merchant",
+  },
+  "traveling-merchant-2819-4830": {
+    title: "Traveling Merchant",
+    type: "NPC",
+    category: "travelingMerchants",
+    floor: "floor1",
+    coords: { x: 2819, z: 4830 },
+    drops: ["N/A"],
+    description: "Traveling Merchant",
+  },
+  "traveling-merchant-2086-3750": {
+    title: "Traveling Merchant",
+    type: "NPC",
+    category: "travelingMerchants",
+    floor: "floor1",
+    coords: { x: 2086, z: 3750 },
+    drops: ["N/A"],
+    description: "Traveling Merchant",
+  },
+  "equipment-merchant-3302-1633": {
+    title: "Equipment Merchant",
+    type: "NPC",
+    category: "equipmentMerchants",
+    floor: "floor1",
+    coords: { x: 3302, z: 1633 },
+    drops: ["N/A"],
+    description: "Equipment Merchant",
+  },
+  "equipment-merchant-1507-3399": {
+    title: "Equipment Merchant",
+    type: "NPC",
+    category: "equipmentMerchants",
+    floor: "floor1",
+    coords: { x: 1507, z: 3399 },
+    drops: ["N/A"],
+    description: "Equipment Merchant",
+  },
+  "tool-merchant-3335-1612": {
+    title: "Tool Merchant",
+    type: "NPC",
+    category: "toolMerchants",
+    floor: "floor1",
+    coords: { x: 3335, z: 1612 },
+    drops: ["N/A"],
+    description: "Tool Merchant",
+  },
+  "tool-merchant-2001-810": {
+    title: "Tool Merchant",
+    type: "NPC",
+    category: "toolMerchants",
+    floor: "floor1",
+    coords: { x: 2001, z: 810 },
+    drops: ["N/A"],
+    description: "Tool Merchant",
+  },
+  "tool-merchant-1602-1933": {
+    title: "Tool Merchant",
+    type: "NPC",
+    category: "toolMerchants",
+    floor: "floor1",
+    coords: { x: 1602, z: 1933 },
+    drops: ["N/A"],
+    description: "Tool Merchant",
+  },
+  "tool-merchant-3150-3694": {
+    title: "Tool Merchant",
+    type: "NPC",
+    category: "toolMerchants",
+    floor: "floor1",
+    coords: { x: 3150, z: 3694 },
+    drops: ["N/A"],
+    description: "Tool Merchant",
+  },
+  "tool-merchant-level-1": {
+    title: "Level 1 Tools Merchant",
+    type: "NPC",
+    category: "toolMerchants",
+    floor: "floor1",
+    coords: { x: 1786, z: 4146 },
+    drops: ["N/A"],
+    description: "Tool Merchant",
+  },
+  "accessories-merchant-3320-1598": {
+    title: "Accessories Merchant",
+    type: "NPC",
+    category: "accessoriesMerchants",
+    floor: "floor1",
+    coords: { x: 3320, z: 1598 },
+    drops: ["N/A"],
+    description: "Accessories Merchant",
+  },
+  "accessories-merchant-483-3046": {
+    title: "Accessories Merchant",
+    type: "NPC",
+    category: "accessoriesMerchants",
+    floor: "floor1",
+    coords: { x: 483, z: 3046 },
+    drops: ["N/A"],
+    description: "Accessories Merchant",
+  },
+  "occult-ringman": {
+    title: "Occult Ringman",
+    type: "NPC",
+    category: "occultMerchants",
+    floor: "floor1",
+    coords: { x: 3320, z: 1657 },
+    drops: ["N/A"],
+    description: "Occult Merchant",
+  },
+  "occult-bracelet-merchant": {
+    title: "Occult Bracelet Merchant",
+    type: "NPC",
+    category: "occultMerchants",
+    floor: "floor1",
+    coords: { x: 3349, z: 1625 },
+    drops: ["N/A"],
+    description: "Occult Merchant",
+  },
+  "merchant-of-occult-amulet": {
+    title: "Merchant of Occult Amulet",
+    type: "NPC",
+    category: "occultMerchants",
+    floor: "floor1",
+    coords: { x: 3319, z: 1713 },
+    drops: ["N/A"],
+    description: "Occult Merchant",
+  },
+  "occult-gloves-merchant": {
+    title: "Occult Gloves Merchant",
+    type: "NPC",
+    category: "occultMerchants",
+    floor: "floor1",
+    coords: { x: 3372, z: 1690 },
+    drops: ["N/A"],
+    description: "Occult Merchant",
+  },
+  "occult-artifact-merchant": {
+    title: "Occult Artifact Merchant",
+    type: "NPC",
+    category: "occultMerchants",
+    floor: "floor1",
+    coords: { x: 867, z: 4007 },
+    drops: ["N/A"],
+    description: "Occult Merchant",
+  },
+  "consumables-merchant-3323-1634": {
+    title: "Consumables Merchant",
+    type: "NPC",
+    category: "consumablesMerchants",
+    floor: "floor1",
+    coords: { x: 3323, z: 1634 },
+    drops: ["N/A"],
+    description: "Consumables Merchant",
+  },
+  "key-blacksmith-xal-zirith": {
+    title: "Manufacturer of the Key of Xal'Zirith",
+    type: "NPC",
+    category: "keyBlacksmith",
+    floor: "floor1",
+    coords: { x: 1041, z: 1157 },
+    drops: ["N/A"],
+    description: "Key Blacksmith",
+  },
+  "key-blacksmith-fallen": {
+    title: "Manufacturer of the Key to the Fallen",
+    type: "NPC",
+    category: "keyBlacksmith",
+    floor: "floor1",
+    coords: { x: 2392, z: 2405 },
+    drops: ["N/A"],
+    description: "Key Blacksmith",
+  },
+  "key-blacksmith-forest": {
+    title: "Manufacturer of the Key to the Forest",
+    type: "NPC",
+    category: "keyBlacksmith",
+    floor: "floor1",
+    coords: { x: 4270, z: 3876 },
+    drops: ["N/A"],
+    description: "Key Blacksmith",
+  },
+  "key-blacksmith-forest-1815-4164": {
+    title: "Manufacturer of the Key to the Forest",
+    type: "NPC",
+    category: "keyBlacksmith",
+    floor: "floor1",
+    coords: { x: 1815, z: 4164 },
+    drops: ["N/A"],
+    description: "Key Blacksmith",
+  },
+  "ingot-blacksmith-copper-iron": {
+    title: "Blacksmith of Copper & Iron Ingots",
+    type: "NPC",
+    category: "ingotBlacksmith",
+    floor: "floor1",
+    coords: { x: 2400, z: 3550 },
+    drops: ["N/A"],
+    description: "Ingot Blacksmith",
+  },
+  "accessories-blacksmith-aragorn-necklace": {
+    title: "Manufacturer of the Aragorn Necklace",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    floor: "floor1",
+    coords: { x: 1150, z: 1160 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith",
+  },
+  "accessories-blacksmith-glutinous-ring": {
+    title: "Manufacturer of the Glutinous Ring",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    floor: "floor1",
+    coords: { x: 388, z: 3054 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith",
+  },
+  "accessories-blacksmith-skeleton-skull": {
+    title: "Skeleton Skull Manufacturer",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    floor: "floor1",
+    coords: { x: 1165, z: 3529 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith",
+  },
+  "accessories-blacksmith-ice-bracelet": {
+    title: "Ice Bracelet Manufacturer",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    floor: "floor1",
+    coords: { x: 4212, z: 1797 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith",
+  },
+  "accessories-blacksmith-iron-copper": {
+    title: "Iron/Copper Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    floor: "floor1",
+    coords: { x: 1767, z: 4118 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith",
+  },
+  "accessories-blacksmith-wolf-gloves": {
+    title: "Manufacturer of Wolf Gloves",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    floor: "floor1",
+    coords: { x: 2494, z: 3687 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith",
+  },
+  "accessories-blacksmith-ring-leviathan": {
+    title: "Manufacturer of the Ring of Leviathan",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    floor: "floor1",
+    coords: { x: 1320, z: 2095 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith",
+    underground: true
+  },
+  "accessories-blacksmith-deer-belt": {
+    title: "Deer Belt Manufacturer",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    floor: "floor1",
+    coords: { x: 3623, z: 1326 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith",
+    underground: true
+  },
+  "weaponsmith-labyrinth": {
+    title: "Labyrinth Weaponsmith",
+    type: "NPC",
+    category: "weaponsmith",
+    floor: "floor1",
+    coords: { x: 2417, z: 2378 },
+    drops: ["N/A"],
+    description: "Weaponsmith",
+    underground: true
+  },
+  "weaponsmith-tolbana": {
+    title: "Tolbana Weaponsmith",
+    type: "NPC",
+    category: "weaponsmith",
+    floor: "floor1",
+    coords: { x: 3234, z: 1467 },
+    drops: ["N/A"],
+    description: "Weaponsmith",
+    underground: true
+  },
+  "armor-blacksmith-tolbana": {
+    title: "Tolbana Armor Blacksmith",
+    type: "NPC",
+    category: "armorBlacksmith",
+    floor: "floor1",
+    coords: { x: 3232, z: 1460 },
+    drops: ["N/A"],
+    description: "Armor Blacksmith",
+    underground: true
+  },
+  "armor-blacksmith-labyrinth": {
+    title: "Labyrinth Armor Blacksmith",
+    type: "NPC",
+    category: "armorBlacksmith",
+    floor: "floor1",
+    coords: { x: 10, z: -100 },
+    drops: ["N/A"],
+    description: "Armor Blacksmith",
   },
   "pumba-1": {
     title: "Corrupted Pumba",
@@ -974,10 +1374,81 @@ const DATA = {
     drops: ["N/A"],
     description: "A mythical snake sliding between deep currents, Nymbrea embodies the grace and treachery of calm waters. Its scales sparkle like cursed pearls, and its hypnotic gaze draws the unwary towards the abyss.",
     underground: true
-  }
+  },
+});
+
+const MOB_AREA_MOBS = {
+  "swamp-putride-mobs": [
+    { name: "Treant Warrior" },
+    { name: "Mini Treant" },
+    { name: "Elite Treant" },
+    { name: "Mage Sylvester", search: "Sylvan Mage" }
+  ],
+  "vallhat-mobs": [
+    { name: "Little Slime", search: "Small Slime" },
+    { name: "Slime Magician", search: "Mage Slime" },
+    { name: "Healer Slime" },
+    { name: "Slime Warrior" }
+  ],
+  "wild-boar-zone": [
+    { name: "Corrupted Boar" }
+  ],
+  "valley-of-wolves-mobs": [
+    { name: "Black Sinister Wolf", search: "Sinister Black Wolf" },
+    { name: "White Sinister Wolf", search: "Sinister White Wolf" }
+  ],
+  "cursed-ruins": [
+    { name: "Skeleton Swordsman" },
+    { name: "Skeleton Warrior" },
+    { name: "Skeleton Halberdier" },
+    { name: "Skeleton Archer" },
+    { name: "Skeleton Sorcerer" }
+  ],
+  "ika-archipelago-mobs": [
+    { name: "Ika" }
+  ],
+  "mizunari-fields": [
+    { name: "Nephentes" }
+  ],
+  "geldorak-mine-mobs": [
+    { name: "Robust Bandit", search: "Sturdy Bandit" },
+    { name: "Bandit Assassin" },
+    { name: "Bandit Archer" }
+  ],
+  "wild-boar-meadow": [
+    { name: "Corrupted Boar" }
+  ],
+  "lake-virelune": [
+    { name: "Shark Fish" }
+  ],
+  "arakh-nol-mobs": [
+    { name: "Forest Spider" }
+  ],
+  "tolbana-mountains": [
+    { name: "Mountain Deer", search: "Deer" }
+  ],
+  "snow-citadel-mobs": [
+    { name: "Ice Spiritist" },
+    { name: "Ice Golem" }
+  ],
+  "xal-zirith-underground-mobs": [
+    { name: "Hunting Spider" },
+    { name: "Strangling Spider", search: "Strangler Spider" },
+    { name: "Venomous Spider" }
+  ],
+  "skeleton-dungeon-underground-mobs": [
+    { name: "Archer Skeleton", search: "Skeleton Archer" },
+    { name: "Tank Skeleton", search: "Skeleton Tank" }
+  ],
+  "geldorak-mine-dungeon-underground-mobs": [
+    { name: "Treant of the Forest" },
+    { name: "Devouring Plant" },
+    { name: "Forest Brute" },
+    { name: "Forest-Bane Treant" }
+  ]
 };
 
-const MOB_AREAS = [
+MOB_AREAS.push(
   {
     id: "vallhat-mobs",
     title: "Vallhat",
@@ -1156,6 +1627,87 @@ const MOB_AREAS = [
       { x: 1560, z: 1414 },
       { x: 1492, z: 1150 }
     ]
-  }
-];
+  },
+  {
+    id: "xal-zirith-underground-mobs",
+    title: "Dungeon Sanctuary of Xal'Zirith",
+    floor: "floor1",
+    underground: true,
+    fill: "rgba(146, 103, 255, 0.26)",
+    stroke: "#b48cff",
+    corners: [
+      { x: 987, z: 1068 },
+      { x: 979, z: 1118 },
+      { x: 1029, z: 1128 },
+      { x: 1037, z: 1116 },
+      { x: 1078, z: 1137 },
+      { x: 1006, z: 1146 },
+      { x: 1000, z: 1195 },
+      { x: 1060, z: 1204 },
+      { x: 1064, z: 1252 },
+      { x: 1044, z: 1287 },
+      { x: 998, z: 1286 },
+      { x: 1029, z: 1259 },
+      { x: 1024, z: 1218 },
+      { x: 953, z: 1220 },
+      { x: 951, z: 1262 },
+      { x: 979, z: 1317 },
+      { x: 1043, z: 1307 },
+      { x: 1069, z: 1330 },
+      { x: 1070, z: 1367 },
+      { x: 1152, z: 1437 },
+      { x: 1225, z: 1440 },
+      { x: 1124, z: 1369 },
+      { x: 1094, z: 1356 },
+      { x: 1115, z: 1281 },
+      { x: 1126, z: 1200 },
+      { x: 1237, z: 1258 },
+      { x: 1395, z: 1259 },
+      { x: 1393, z: 1084 }
+    ]
+  },
+  {
+    id: "skeleton-dungeon-underground-mobs",
+    title: "Skeleton Dungeon",
+    floor: "floor1",
+    underground: true,
+    fill: "rgba(255, 120, 188, 0.26)",
+    stroke: "#ff9ad1",
+    corners: [
+      { x: 2775, z: 4203 },
+      { x: 2775, z: 4318 },
+      { x: 2692, z: 4290 },
+      { x: 2688, z: 4361 },
+      { x: 2775, z: 4340 },
+      { x: 2775, z: 4385 },
+      { x: 2802, z: 4400 },
+      { x: 2825, z: 4400 },
+      { x: 2853, z: 4385 },
+      { x: 2853, z: 4340 },
+      { x: 2869, z: 4338 },
+      { x: 2869, z: 4366 },
+      { x: 2941, z: 4366 },
+      { x: 2941, z: 4292 },
+      { x: 2869, z: 4292 },
+      { x: 2871, z: 4318 },
+      { x: 2853, z: 4318 },
+      { x: 2848, z: 4199 },
+      { x: 2778, z: 4197 }
+    ]
+  },
+  {
+    id: "geldorak-mine-dungeon-underground-mobs",
+    title: "Geldorak Mine Dungeon",
+    floor: "floor1",
+    underground: true,
+    fill: "rgba(108, 212, 128, 0.26)",
+    stroke: "#7be694",
+    corners: [
+      { x: 4275, z: 4179 },
+      { x: 4333, z: 4179 },
+      { x: 4360, z: 3836 },
+      { x: 4215, z: 3829 }
+    ]
+  },
+);
 

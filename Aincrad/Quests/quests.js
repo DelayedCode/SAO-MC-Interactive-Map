@@ -1,4 +1,4 @@
-const questEntries = [
+const defaultQuestEntries = [
   {
     npcName: "Ayaka",
     city: "Vallhat",
@@ -421,6 +421,10 @@ const questEntries = [
   }
 ];
 
+const questEntries = Array.isArray(window.QUEST_ENTRIES)
+  ? window.QUEST_ENTRIES
+  : defaultQuestEntries;
+
 const columns = [
   { key: "npcName", label: "NPC Name" },
   { key: "city", label: "City" },
@@ -532,6 +536,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const questTableRoot = document.getElementById("questTableRoot");
   const params = new URLSearchParams(window.location.search);
   const initialSearch = params.get("search") || params.get("npc") || params.get("q") || "";
+  let renderRafId = null;
+
+  function scheduleRenderFilteredQuests() {
+    if (renderRafId !== null) return;
+    renderRafId = window.requestAnimationFrame(() => {
+      renderRafId = null;
+      renderFilteredQuests();
+    });
+  }
 
   function renderFilteredQuests() {
     const query = questSearch ? questSearch.value.trim().toLowerCase() : "";
@@ -557,7 +570,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (initialSearch) {
       questSearch.value = initialSearch;
     }
-    questSearch.addEventListener("input", renderFilteredQuests);
+    questSearch.addEventListener("input", scheduleRenderFilteredQuests);
   }
 
   if (questTableRoot) {

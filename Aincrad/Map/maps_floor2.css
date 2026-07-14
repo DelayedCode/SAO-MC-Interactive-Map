@@ -55,6 +55,68 @@ main {display:flex; flex:1 1 auto; gap:0; padding:20px; width:100%; margin:auto;
 	height: 20px;
 	display: block;
 }
+.marker.craftsman-marker .craftsman-icon {
+	width: 20px;
+	height: 20px;
+	display: block;
+}
+.marker.weaponsmith-marker {
+	background: #4d607a;
+	border-color: #dbe6f8;
+}
+.marker.armorBlacksmith-marker {
+	background: #4f6788;
+	border-color: #deebff;
+}
+.marker.ingotBlacksmith-marker {
+	background: #7d5b33;
+	border-color: #f7dfb7;
+}
+.marker.keyBlacksmith-marker {
+	background: #79611f;
+	border-color: #ffefb7;
+}
+.marker.accessoriesBlacksmith-marker {
+	background: #2f5f96;
+	border-color: #d6e8ff;
+}
+.marker.market-marker .market-icon {
+	width: 20px;
+	height: 20px;
+	display: block;
+}
+.marker.lootBuyers-marker {
+	background: #7a6321;
+	border-color: #ffefb0;
+}
+.marker.weaponSellers-marker {
+	background: #4f6077;
+	border-color: #d9e7f7;
+}
+.marker.travelingMerchants-marker {
+	background: #6c5a43;
+	border-color: #f0e4ca;
+}
+.marker.equipmentMerchants-marker {
+	background: #4f6b8e;
+	border-color: #dfebff;
+}
+.marker.toolMerchants-marker {
+	background: #3f666c;
+	border-color: #d7f4f7;
+}
+.marker.accessoriesMerchants-marker {
+	background: #8a5f2d;
+	border-color: #ffe9bf;
+}
+.marker.occultMerchants-marker {
+	background: #5b3a88;
+	border-color: #eadcff;
+}
+.marker.consumablesMerchants-marker {
+	background: #8a4d3e;
+	border-color: #ffe0d4;
+}
 .marker.mob-area-marker {
 	background: var(--mob-marker-bg, #5a4ed1);
 	border-color: var(--mob-marker-contrast, #e6e2ff);
@@ -119,9 +181,11 @@ main {display:flex; flex:1 1 auto; gap:0; padding:20px; width:100%; margin:auto;
 .mob-area-entry-list {
 	list-style: none;
 	margin: 6px 0 10px;
-	padding: 0;
+	padding: 0 4px 0 0;
 	display: grid;
 	gap: 8px;
+	max-height: 260px;
+	overflow-y: auto;
 }
 .mob-area-entry-item {
 	display: flex;

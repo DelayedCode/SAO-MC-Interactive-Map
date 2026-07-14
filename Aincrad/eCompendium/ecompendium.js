@@ -25,6 +25,15 @@ function renderEquipmentList(entries) {
 document.addEventListener("DOMContentLoaded", () => {
   const status = document.getElementById("status");
   const equipmentSearch = document.getElementById("equipmentSearch");
+  let renderRafId = null;
+
+  function scheduleUpdateEquipmentList() {
+    if (renderRafId !== null) return;
+    renderRafId = window.requestAnimationFrame(() => {
+      renderRafId = null;
+      updateEquipmentList();
+    });
+  }
 
   if (status) {
     status.textContent = "Equipment compendium module ready. Add armor, weapons, and stats here.";
@@ -43,6 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderEquipmentList(visibleEntries);
   }
 
-  equipmentSearch.addEventListener("input", updateEquipmentList);
+  equipmentSearch.addEventListener("input", scheduleUpdateEquipmentList);
   updateEquipmentList();
 });

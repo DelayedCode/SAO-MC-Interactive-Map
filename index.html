@@ -127,14 +127,14 @@
     <p>Choose which gamemode info you want to view.</p>
 
     <section class="grid" aria-label="Gamemode selector">
-      <button class="mode-button aincrad" type="button" onclick="window.location.href='Map/maps.html'">
+      <button class="mode-button aincrad" type="button" onclick="window.location.href='Aincrad/Map/maps.html'">
         <h2 class="card-title">Aincrad</h2>
         <div class="card-desc">Aincrad - Open the Map menu and access Beastiary, Equipment, Quests, and more from there.</div>
       </button>
 
-      <button class="mode-button underworld" type="button" onclick="window.location.href='FracturedUnderworld/underworld.html'">
+      <button class="mode-button underworld" type="button" id="underworld-btn">
         <h2 class="card-title">Fractured Underworld</h2>
-        <div class="card-desc">Open a separate section reserved for this gamemode (placeholder for now).</div>
+        <div class="card-desc">Show release status message until this section is published.</div>
       </button>
 
       <button class="mode-button ggo" type="button" id="ggo-btn">
@@ -144,26 +144,42 @@
     </section>
   </main>
 
-  <div id="ggo-toast" class="toast" role="status" aria-live="polite">GGO is not out yet! No info to display.</div>
+  <div id="status-toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
     (() => {
       const ggoBtn = document.getElementById("ggo-btn");
-      const toast = document.getElementById("ggo-toast");
+      const underworldBtn = document.getElementById("underworld-btn");
+      const toast = document.getElementById("status-toast");
       let timerId = null;
 
-      if (!ggoBtn || !toast) return;
+      if (!toast) return;
 
-      ggoBtn.addEventListener("click", () => {
+      const showToast = (message) => {
+        toast.textContent = message;
         toast.classList.add("show");
+
         if (timerId) {
           clearTimeout(timerId);
         }
+
         timerId = setTimeout(() => {
           toast.classList.remove("show");
           timerId = null;
         }, 2500);
-      });
+      };
+
+      if (underworldBtn) {
+        underworldBtn.addEventListener("click", () => {
+          showToast("Fractured Underworld is not published yet.");
+        });
+      }
+
+      if (ggoBtn) {
+        ggoBtn.addEventListener("click", () => {
+          showToast("GGO is not out yet! No info to display.");
+        });
+      }
     })();
   </script>
 </body>

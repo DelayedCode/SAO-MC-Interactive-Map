@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAO Bestiary - Floor 2</title>
+  <link rel="stylesheet" href="../shared/page-shell.css">
+  <link rel="stylesheet" href="bestiary.css">
+</head>
+<body>
+  <div class="page">
+    <div class="nav">
+      <button onclick="window.location.href='../Map/maps.html?floor=floor2'">Maps</button>
+      <button onclick="window.location.href='../eCompendium/ecompendium.html'">Equipment</button>
+      <button onclick="window.location.href='../Quests/quests_floor2.html'">Quests</button>
+      <button onclick="window.location.href='../Patchnotes/patchnotes.html'">Patchnotes</button>
+    </div>
+    <div class="panel">
+      <h1>Bestiary - Floor 2</h1>
+      <div class="list-tabs" role="tablist" aria-label="Bestiary categories">
+        <button class="list-tab is-active" type="button" data-category="boss">Boss List</button>
+        <button class="list-tab" type="button" data-category="regular">Regular Mobs List</button>
+        <button class="list-tab" type="button" data-category="dungeonBoss">Dungeon Boss List</button>
+        <button class="list-tab" type="button" data-category="dungeonMobs">Dungeon Mobs List</button>
+      </div>
+      <div class="panel-header">
+        <p id="status">Loading...</p>
+        <label class="search-label" for="mobSearch">
+          <span>Search mobs</span>
+          <input id="mobSearch" type="search" placeholder="Search by name..." autocomplete="off">
+        </label>
+      </div>
+      <h2 id="listTitle" class="list-title">Regular Mobs List</h2>
+      <section id="mobList" class="mob-list" aria-live="polite"></section>
+    </div>
+  </div>
+  <script>window.FLOOR_NAME = "floor2";</script>
+  <script src="bestiary_floor2.js"></script>
+  <script src="bestiary.js"></script>
+</body>
+</html>

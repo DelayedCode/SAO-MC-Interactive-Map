@@ -1,86 +1,21 @@
-const REGULAR_MOB_DATA = `
-Sinister White Wolf	Wolf Fur (60%) (PB), Wolf Fangs (50%) (PB)	N/A
-Sinister Black Wolf	Wolf Fur (60%) (PB), Wolf Fangs (30%) (PB)	N/A
-Mini Treant	Sylvan Sprout (40%) (PB), Magic Wood Shard (30%) (PB)	N/A
-Treant Warrior	Titan Bark (35%) (PB), Ancestral Root (10%) (PB), Sylvan Shield (3%) (PB)	N/A
-Sylvan Mage	Enchanted Twig (30%) (PB), Spectral Cloth (30%) (PB), Wood Heart (20%) (PB), Sylvan Mage Staff (1%) (PB), Sylvan Shaman Staff (1%) (PB)	N/A
-Elite Treant	Sylvan Bark (40%) (PB), Sylvan Bowstring (25%) (PB), Sylvan Bow (1%) (PB)	N/A
-Small Slime	Slime Jelly (30%) (PB)	N/A
-Slime Warrior	Slime Jelly (30%) (PB)	N/A
-Healer Slime	Slime Jelly (30%) (PB), Slime Core (5%) (PB)	N/A
-Mage Slime	Slime Jelly (30%) (PB), Slime Core (5%) (PB)	N/A
-Skeleton Swordsman	Bone Dust (70%), Skeleton Bone (75%), Souls of the Ruins (80%), Skeletal Sword (1%), Swordsman's Scroll (50%)	3
-Skeleton Warrior	Skeletal Sword (1%), Bone Dust (70%), Skeleton Bone (75%), Souls of the Ruins (80%)	3
-Skeleton Halberdier	Reinforced Skeleton Bone (70%), Bone Dust (70%), Skeleton Bone (75%), Souls of the Ruins (80%)	3
-Skeleton Archer	Bone Dust (70%), Skeleton Bone (75%), Souls of the Ruins (80%), Archer's Scroll (50%)	3
-Shark Fish	Shark Shell (40%) (PB)	N/A
-Forest Spider	Spider Silk (50%) (PB), Spider Cloth (40%) (PB)	N/A
-Ice Spiritist	Glacial Magic Shard (35%) (PB), Frost Dust (35%) (PB)	N/A
-Ice Golem	Frost Dust (40%) (PB), Glacial Hardhide (30%) (PB)	N/A
-Deer	Mountain Deer Hide (45%) (PB)	N/A
-Ika	Ika Shell (80%) (PB)	N/A
-Nephentes	Corrupted Spore (50%) (PB), Leaf Fragment (40%) (PB)	N/A
-Bandit Archer	Worn Leather (40%) (PB), Small Pouch (10%) (PB), Bandit Crossbow (3%) (PB)	N/A
-Bandit Assassin	Worn Leather (30%) (PB), Small Pouch (15%) (PB), Bandit Dagger (3%) (PB)	N/A
-Sturdy Bandit	Worn Leather (80%) (PB), Small Pouch (15%) (PB)	N/A
-Corrupted Boar	Corrupted Crystal (75%), Boar Hide (90%), Boar Meat (50%)	1
-Skeleton Tank	Reinforced Skeleton Bone (40%) (PB), Bone Dust (30%) (PB)	N/A
-Skeleton Sorcerer	Bone Dust (70%), Skeleton Bone (75%), Souls of the Ruin (80%), Cursed Cloth (75%), Magic Staff of the Ruins (1%), Magic Staff of the Revenants (1%), Mage's Scroll (50%)	3
-Small Kobold	N/A (PB)	N/A
-The Mischievous Archer	N/A (PB)	N/A
-Kobold Warrior	N/A (PB)	N/A
-Kobold Lancer	N/A (PB)	N/A
-Kobold Sorcerer	N/A (PB)	N/A
-Kobold Sentinel (Minion)	Sentinel's Mace (0%) (PB)	N/A
-`;
+const REGULAR_MOB_DATA_SOURCE = typeof REGULAR_MOB_DATA !== "undefined" ? REGULAR_MOB_DATA : "";
+const BOSS_MOB_DATA_SOURCE = typeof BOSS_MOB_DATA !== "undefined" ? BOSS_MOB_DATA : "";
+const DUNGEON_MOB_DATA_SOURCE = typeof DUNGEON_MOB_DATA !== "undefined" ? DUNGEON_MOB_DATA : "";
+const DUNGEON_BOSS_MOB_DATA_SOURCE = typeof DUNGEON_BOSS_MOB_DATA !== "undefined" ? DUNGEON_BOSS_MOB_DATA : "";
 
-const BOSS_MOB_DATA = `
-Corrupted Pumba	Corrupted Crystal (100%), Boar Hide (100%), Boar Meat (100%), Pumba's Ring (3%)	N/A
-Albal	Wolf Fur (100%) (PB), Wolf Fangs (70%) (PB), Albal's Fangs (20%) (PB)	N/A
-Colossal Guardian	Magic Mycelium (20%) (PB), Colossus Hammer (2%) (PB)	N/A
-Gorbel	Slime Jelly (100%) (PB), Gorbel Essence (5%) (PB)	N/A
-Ice Bear	Frost Dust (80%) (PB), Bear Soul Fragment (5%) (PB)	N/A
-Nymbréa	Nymbréa's Heart (PB)	N/A
-Illfang the Kobold Lord	N/A (PB)	N/A
-Kazor	N/A (PB)	N/A
-`;
-
-const DUNGEON_MOB_DATA = `
-Treant of the Forest	N/A (PB)	N/A
-Forest-Bane Treant	N/A (PB)	N/A
-Devouring Plant	N/A (PB)	N/A
-Forest Brute	N/A (PB)	N/A
-Skeleton Archer	Bone Dust (70%), Skeleton Bone (75%), Souls of the Ruins (80%), Archer's Scroll (50%)	N/A
-Skeleton Tank	Reinforced Skeleton Bone (40%) (PB), Bone Dust (30%) (PB)	N/A
-Skeleton Sorcerer	Bone Dust (70%), Skeleton Bone (75%), Souls of the Ruin (80%), Cursed Cloth (75%), Magic Staff of the Ruins (1%), Magic Staff of the Revenants (1%), Mage's Scroll (50%)	N/A
-Fallen Soldier	Enchanted Metal Piece (20%) (PB)	N/A
-Fallen Warrior	Metal Soul Piece (25%) (PB), Enchanted Metal Piece (20%) (PB)	N/A
-Hunting Spider	N/A (PB)	N/A
-Venomous Spider	N/A (PB)	N/A
-Strangler Spider	N/A (PB)	N/A
-`;
-
-const DUNGEON_BOSS_MOB_DATA = `
-Vyrmos	N/A (PB)	N/A
-Tornak	N/A (PB)	N/A
-Narax the Cursed Skeleton	Putrefied Heart (70%) (PB), Cursed Skeleton Mage Staff (3%) (PB), Cursed Skeleton Shaman Staff (3%) (PB), Narax's Ring (1%) (PB)	N/A
-Nasgul	Spectral Mane Piece (2.5%) (PB), Cursed Hoof Shard (1%) (PB)	N/A
-Fallen Guardian	Fallen Artifact (100%) (PB), Warden's Soul (30%) (PB)	N/A
-Fallen Herald	Fallen Artifact (100%) (PB), Herald's Soul (30%) (PB)	N/A
-Fallen Reaper	Fallen Artifact (100%) (PB), Reaper's Soul (30%) (PB), Reaper's Ring (3%) (PB)	N/A
-Ornstein, Fallen Devastator	Forgotten Shield (1%) (PB)	N/A
-Smough, Fallen Devastator	Royal Halberd (1%) (PB)	N/A
-Pricilia	N/A (PB)	N/A
-Yula	N/A (PB)	N/A
-Jira	N/A (PB)	N/A
-Kamilia	N/A (PB)	N/A
-`;
+// Floor-specific mob data is loaded from the floor data scripts.
+// Each floor file defines REGULAR_MOB_DATA, BOSS_MOB_DATA, DUNGEON_MOB_DATA, and DUNGEON_BOSS_MOB_DATA.
 
 function parseDropToken(token) {
   const cleaned = token.trim();
   const groups = [...cleaned.matchAll(/\(([^)]+)\)/g)].map(match => match[1].trim());
   const notes = [];
   let chance = null;
+
+  const explicitChanceMatch = cleaned.match(/(\d+(?:\.\d+)?)%/);
+  if (explicitChanceMatch) {
+    chance = Number(explicitChanceMatch[1]);
+  }
 
   groups.forEach(group => {
     const chanceMatch = group.match(/^(\d+(?:\.\d+)?)%$/);
@@ -91,7 +26,10 @@ function parseDropToken(token) {
     notes.push(group);
   });
 
-  let item = cleaned.replace(/\([^)]*\)/g, "").trim();
+  let item = cleaned
+    .replace(/\([^)]*\)/g, "")
+    .replace(/\d+(?:\.\d+)?%/g, "")
+    .trim();
   if (!item) item = "N/A";
 
   return {
@@ -113,19 +51,17 @@ function buildMobList(rawData) {
         name: name.trim(),
         aggressiveness: "N/A",
         xp: xpRaw.trim() || "N/A",
-        drops: dropsRaw
-          .split(",")
-          .map(parseDropToken)
+        drops: dropsRaw.split(",").map(parseDropToken)
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 const MOB_GROUPS = {
-  boss: buildMobList(BOSS_MOB_DATA),
-  regular: buildMobList(REGULAR_MOB_DATA),
-  dungeonBoss: buildMobList(DUNGEON_BOSS_MOB_DATA),
-  dungeonMobs: buildMobList(DUNGEON_MOB_DATA)
+  boss: buildMobList(BOSS_MOB_DATA_SOURCE),
+  regular: buildMobList(REGULAR_MOB_DATA_SOURCE),
+  dungeonBoss: buildMobList(DUNGEON_BOSS_MOB_DATA_SOURCE),
+  dungeonMobs: buildMobList(DUNGEON_MOB_DATA_SOURCE)
 };
 
 const LIST_TITLES = {
@@ -197,7 +133,42 @@ const AGGRESSIVENESS_BY_NAME = {
   "Pricilia": "Aggressive",
   "Yula": "Aggressive",
   "Jira": "Aggressive",
-  "Kamilia": "Aggressive"
+  "Kamilia": "Aggressive",
+  "Monstrous Bull": "Aggressive",
+  "Taurus": "Aggressive",
+  "Forest Bear": "Neutral",
+  "Winnie, Man's Best Friend": "Neutral",
+  "Mountain Wolf": "Neutral",
+  "Savanes Wolf": "Neutral",
+  "Worker": "Aggressive",
+  "Dardroyal": "Aggressive",
+  "Melisara, Ruler of the Hive": "Aggressive",
+  "Fire Harpy": "Aggressive",
+  "Earthy Harpy": "Aggressive",
+  "Lightning Harpy": "Aggressive",
+  "Dazzling Fish": "Aggressive",
+  "Sanctuary Skeleton Archer": "Aggressive",
+  "Sanctuary Skeleton Shaman": "Aggressive",
+  "Sanctuary Skeleton Warrior": "Aggressive",
+  "Guardian of the Sanctuary": "Aggressive",
+  "Guardian Minion": "Aggressive",
+  "Golem of Peter": "Aggressive",
+  "Magnus, Colossus of the Veins": "Aggressive",
+  "Velindra Weaver": "Aggressive",
+  "Fire Archer Skeleton": "Aggressive",
+  "Fire Wizard Skeleton": "Aggressive",
+  "Fire Tank Skeleton": "Aggressive",
+  "Fire Lancer Skeleton": "Aggressive",
+  "Fire Skeleton": "Aggressive",
+  "Fire Swordsman Skeleton": "Aggressive",
+  "Skeleton Soul": "Aggressive",
+  "Undead Brute": "Aggressive",
+  "Undead Gargoyle": "Aggressive",
+  "Morverth the Soul Flayer": "Aggressive",
+  "Rugiboeuf, The Guardian": "Aggressive",
+  "Warrior Sand Skeleton": "Aggressive",
+  "Skeleton of the Archer Sands": "Aggressive",
+  "Guardian": "Aggressive"
 };
 
 function getAggressivenessClass(value) {
@@ -277,6 +248,22 @@ document.addEventListener("DOMContentLoaded", () => {
   if (requestedCategory && MOB_GROUPS[requestedCategory]) {
     activeCategory = requestedCategory;
   }
+  // Allow explicit override via URL hash (e.g. #dungeonMobs). This helps
+  // ensure links from the map can force the dungeon tab even if other
+  // parameters or previous state would select a different tab.
+  const hashCategory = (window.location.hash || "").replace(/^#/, "");
+  if (hashCategory && MOB_GROUPS[hashCategory]) {
+    activeCategory = hashCategory;
+  }
+  let renderRafId = null;
+
+  function scheduleRenderMobs() {
+    if (renderRafId !== null) return;
+    renderRafId = window.requestAnimationFrame(() => {
+      renderRafId = null;
+      renderMobs();
+    });
+  }
 
   function setActiveTab(category) {
     activeCategory = category;
@@ -309,7 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
     mobList.replaceChildren(fragment);
   }
 
-  mobSearch.addEventListener("input", renderMobs);
+  mobSearch.addEventListener("input", scheduleRenderMobs);
   tabButtons.forEach(button => {
     button.addEventListener("click", () => setActiveTab(button.dataset.category));
   });

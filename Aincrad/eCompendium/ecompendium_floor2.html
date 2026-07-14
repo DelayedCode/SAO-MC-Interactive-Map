@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAO Equipment Compendium</title>
+  <link rel="stylesheet" href="../shared/page-shell.css">
+  <link rel="stylesheet" href="ecompendium.css">
+</head>
+<body>
+  <div class="page">
+    <div class="nav">
+      <button onclick="window.location.href='../Map/maps_floor2.html'">Maps</button>
+      <button onclick="window.location.href='../Bestiary/bestiary_floor2.html'">Bestiary</button>
+      <button onclick="window.location.href='../Quests/quests_floor2.html'">Quests</button>
+      <button onclick="window.location.href='../Patchnotes/patchnotes.html'">Patchnotes</button>
+    </div>
+    <div class="panel">
+      <h1>Equipment Compendium</h1>
+      <div class="panel-header">
+        <p id="status">Loading...</p>
+        <label class="search-label" for="equipmentSearch">
+          <span>Search equipment</span>
+          <input id="equipmentSearch" type="search" placeholder="Search by name..." autocomplete="off">
+        </label>
+      </div>
+      <section id="equipmentRoot" class="equipment-root" aria-live="polite"></section>
+    </div>
+  </div>
+  <script src="ecompendium.js"></script>
+</body>
+</html>
