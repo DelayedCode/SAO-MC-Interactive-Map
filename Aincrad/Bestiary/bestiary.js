@@ -1,10 +1,52 @@
-const REGULAR_MOB_DATA_SOURCE = typeof REGULAR_MOB_DATA !== "undefined" ? REGULAR_MOB_DATA : "";
-const BOSS_MOB_DATA_SOURCE = typeof BOSS_MOB_DATA !== "undefined" ? BOSS_MOB_DATA : "";
-const DUNGEON_MOB_DATA_SOURCE = typeof DUNGEON_MOB_DATA !== "undefined" ? DUNGEON_MOB_DATA : "";
-const DUNGEON_BOSS_MOB_DATA_SOURCE = typeof DUNGEON_BOSS_MOB_DATA !== "undefined" ? DUNGEON_BOSS_MOB_DATA : "";
+function getMobDataSources() {
+  return Object.freeze({
+    regular: window.REGULAR_MOB_DATA || "",
+    boss: window.BOSS_MOB_DATA || "",
+    dungeonMobs: window.DUNGEON_MOB_DATA || "",
+    dungeonBoss: window.DUNGEON_BOSS_MOB_DATA || ""
+  });
+}
 
-// Floor-specific mob data is loaded from the floor data scripts.
-// Each floor file defines REGULAR_MOB_DATA, BOSS_MOB_DATA, DUNGEON_MOB_DATA, and DUNGEON_BOSS_MOB_DATA.
+const bestiaryUiStateStorageKey = "sao.bestiary.uiState";
+
+function getPersistentItem(key) {
+  if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
+    return window.SAOStorage.getItem(key);
+  }
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function setPersistentItem(key, value) {
+  if (window.SAOStorage && typeof window.SAOStorage.setItem === "function") {
+    window.SAOStorage.setItem(key, value);
+    return;
+  }
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Keep bestiary usable if storage is blocked.
+  }
+}
+
+function loadBestiaryUiState() {
+  try {
+    const raw = getPersistentItem(bestiaryUiStateStorageKey);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+}
+
+function saveBestiaryUiState(nextState) {
+  setPersistentItem(bestiaryUiStateStorageKey, JSON.stringify(nextState));
+}
 
 function parseDropToken(token) {
   const cleaned = token.trim();
@@ -40,29 +82,35 @@ function parseDropToken(token) {
 }
 
 function buildMobList(rawData) {
-  return rawData
+  return String(rawData || "")
     .trim()
     .split("\n")
     .map(line => line.split("\t"))
     .filter(parts => parts.length >= 3)
-    .map(parts => {
-      const [name, dropsRaw, xpRaw] = parts;
-      return {
-        name: name.trim(),
-        aggressiveness: "N/A",
-        xp: xpRaw.trim() || "N/A",
-        drops: dropsRaw.split(",").map(parseDropToken)
-      };
-    })
+    .map(([name, dropsRaw, xpRaw]) => ({
+      name: name.trim(),
+      xp: (xpRaw || "").trim() || "N/A",
+      drops: (dropsRaw || "").split(",").map(parseDropToken)
+    }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-const MOB_GROUPS = {
-  boss: buildMobList(BOSS_MOB_DATA_SOURCE),
-  regular: buildMobList(REGULAR_MOB_DATA_SOURCE),
-  dungeonBoss: buildMobList(DUNGEON_BOSS_MOB_DATA_SOURCE),
-  dungeonMobs: buildMobList(DUNGEON_MOB_DATA_SOURCE)
-};
+let MOB_GROUPS = Object.freeze({
+  boss: [],
+  regular: [],
+  dungeonBoss: [],
+  dungeonMobs: []
+});
+
+function refreshMobGroups() {
+  const sources = getMobDataSources();
+  MOB_GROUPS = Object.freeze({
+    boss: buildMobList(sources.boss),
+    regular: buildMobList(sources.regular),
+    dungeonBoss: buildMobList(sources.dungeonBoss),
+    dungeonMobs: buildMobList(sources.dungeonMobs)
+  });
+}
 
 const LIST_TITLES = {
   boss: "Boss List",
@@ -232,7 +280,53 @@ function createMobCard(mob) {
   return card;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+const DEFAULT_BESTIARY_FLOOR = "floor1";
+const SECTION_PATHS = {
+  maps: "../Map/maps.html",
+  bestiary: "../Bestiary/bestiary.html",
+  equipment: "../eCompendium/ecompendium.html",
+  quests: "../Quests/quests.html",
+  patchnotes: "../Patchnotes/patchnotes.html"
+};
+
+const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
+
+function getRequestedFloor() {
+  const requestedFloor = new URLSearchParams(window.location.search).get("floor");
+  return requestedFloor && /^floor[123]$/.test(requestedFloor) ? requestedFloor : DEFAULT_BESTIARY_FLOOR;
+}
+
+function buildSectionUrl(section, floor) {
+  const path = SECTION_PATHS[section] || "#";
+  if (path === "#") return path;
+  if (!floor || !FLOOR_AWARE_SECTIONS.has(section)) return path;
+  return `${path}?${new URLSearchParams({ floor }).toString()}`;
+}
+
+function attachSectionNavButtons() {
+  const nav = document.querySelector(".nav");
+  if (!nav) return;
+
+  nav.addEventListener("click", event => {
+    const button = event.target.closest("button[data-nav-target]");
+    if (!button) return;
+    window.location.href = buildSectionUrl(button.dataset.navTarget, getRequestedFloor());
+  });
+}
+
+function loadFloorMobData(floorKey, onReady) {
+  const floorScript = document.createElement("script");
+  floorScript.src = `bestiary_${floorKey}.js`;
+  floorScript.async = false;
+  floorScript.addEventListener("load", onReady, { once: true });
+  floorScript.addEventListener("error", onReady, { once: true });
+  document.head.appendChild(floorScript);
+}
+
+function initBestiaryRuntime() {
+  refreshMobGroups();
+  attachSectionNavButtons();
+
   const status = document.getElementById("status");
   const mobList = document.getElementById("mobList");
   const mobSearch = document.getElementById("mobSearch");
@@ -241,16 +335,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const requestedCategory = params.get("category");
   const requestedSearch = params.get("search") || params.get("q") || "";
+  const floor = getRequestedFloor();
+  const savedState = loadBestiaryUiState();
+  const floorState = savedState[floor] || {};
 
   if (!status || !mobList || !mobSearch || !listTitle || !tabButtons.length) return;
 
   let activeCategory = "regular";
+  if (floorState.category && MOB_GROUPS[floorState.category]) {
+    activeCategory = floorState.category;
+  }
   if (requestedCategory && MOB_GROUPS[requestedCategory]) {
     activeCategory = requestedCategory;
   }
-  // Allow explicit override via URL hash (e.g. #dungeonMobs). This helps
-  // ensure links from the map can force the dungeon tab even if other
-  // parameters or previous state would select a different tab.
   const hashCategory = (window.location.hash || "").replace(/^#/, "");
   if (hashCategory && MOB_GROUPS[hashCategory]) {
     activeCategory = hashCategory;
@@ -267,6 +364,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setActiveTab(category) {
     activeCategory = category;
+    const currentState = loadBestiaryUiState();
+    const nextState = {
+      ...currentState,
+      [floor]: {
+        ...(currentState[floor] || {}),
+        category
+      }
+    };
+    saveBestiaryUiState(nextState);
     tabButtons.forEach(button => {
       button.classList.toggle("is-active", button.dataset.category === category);
     });
@@ -296,14 +402,31 @@ document.addEventListener("DOMContentLoaded", () => {
     mobList.replaceChildren(fragment);
   }
 
-  mobSearch.addEventListener("input", scheduleRenderMobs);
+  mobSearch.addEventListener("input", () => {
+    const currentState = loadBestiaryUiState();
+    saveBestiaryUiState({
+      ...currentState,
+      [floor]: {
+        ...(currentState[floor] || {}),
+        search: mobSearch.value
+      }
+    });
+    scheduleRenderMobs();
+  });
   tabButtons.forEach(button => {
     button.addEventListener("click", () => setActiveTab(button.dataset.category));
   });
 
-  if (requestedSearch) {
-    mobSearch.value = requestedSearch;
-  }
+  mobSearch.value = requestedSearch || floorState.search || "";
 
   setActiveTab(activeCategory);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.REGULAR_MOB_DATA && window.BOSS_MOB_DATA && window.DUNGEON_MOB_DATA && window.DUNGEON_BOSS_MOB_DATA) {
+    initBestiaryRuntime();
+    return;
+  }
+
+  loadFloorMobData(getRequestedFloor(), initBestiaryRuntime);
 });

@@ -4,24 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SAO Bestiary</title>
-  <link rel="stylesheet" href="../shared/page-shell.css">
   <link rel="stylesheet" href="bestiary.css">
 </head>
 <body>
   <div class="page">
     <div class="nav">
-      <button onclick="window.location.href='../Map/maps.html'">Maps</button>
-      <button onclick="window.location.href='../eCompendium/ecompendium.html'">Equipment</button>
-      <button onclick="window.location.href='../Quests/quests.html'">Quests</button>
-      <button onclick="window.location.href='../Patchnotes/patchnotes.html'">Patchnotes</button>
+      <button type="button" data-nav-target="maps">Maps</button>
+      <button type="button" data-nav-target="equipment">Equipment</button>
+      <button type="button" data-nav-target="quests">Quests</button>
+      <button type="button" data-nav-target="patchnotes">Patchnotes</button>
     </div>
     <div class="panel">
       <h1>Bestiary</h1>
       <div class="list-tabs" role="tablist" aria-label="Bestiary categories">
         <button class="list-tab is-active" type="button" data-category="boss">Boss List</button>
-        <button class="list-tab" type="button" data-category="regular">Regular Mobs List</button>
         <button class="list-tab" type="button" data-category="dungeonBoss">Dungeon Boss List</button>
         <button class="list-tab" type="button" data-category="dungeonMobs">Dungeon Mobs List</button>
+        <button class="list-tab" type="button" data-category="regular">Regular Mobs List</button>
       </div>
       <div class="panel-header">
         <p id="status">Loading...</p>
@@ -34,7 +33,7 @@
       <section id="mobList" class="mob-list" aria-live="polite"></section>
     </div>
   </div>
-  <script src="bestiary_floor1.js"></script>
+  <script src="../../shared/sao-storage.js"></script>
   <script src="bestiary.js"></script>
 </body>
 </html>

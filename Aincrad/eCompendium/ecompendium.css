@@ -1,36 +1,217 @@
 :root {
-  --shell-body-bg: #101215;
-  --shell-body-color: #f0f3f7;
-  --page-max-width: 1100px;
-  --nav-button-border: #32404f;
-  --nav-button-bg: #1a222b;
-  --nav-button-bg-hover: #24303b;
-  --nav-button-color: #f0f3f7;
-  --panel-border: #2a3642;
-  --panel-bg: #141b22;
-  --status-color: #bac7d5;
-  --search-label-color: #bac7d5;
-  --search-input-border: #32404f;
-  --search-input-bg: #0f151b;
-  --search-input-color: #f0f3f7;
-  --search-input-focus-border: #7ab7ff;
-  --search-input-focus-ring: rgba(122, 183, 255, 0.14);
+    --bg: #0f1117;
+    --border: #2c3445;
+    --accent: #49b7ff;
+    --muted: #a8b2c8;
+    --card: rgba(25, 30, 40, 0.85);
 }
 
-.equipment-root {
-  min-height: 80px;
+* {
+    box-sizing: border-box;
 }
 
-.equipment-card,
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111111;
+    color: #f4f4f4;
+    overflow-x: auto;
+}
+
+.page {
+    max-width: 1100px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+}
+
+.nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.nav button {
+    border: 1px solid #333333;
+    background: #1c1c1c;
+    color: #f4f4f4;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.14s ease, transform 0.14s ease;
+}
+
+.nav button:hover {
+    background: #2a2a2a;
+    transform: translateY(-1px);
+}
+
+.nav button:focus-visible {
+    outline: 2px solid #8bb7ff;
+    outline-offset: 2px;
+}
+
+.panel {
+    border: 1px solid #2c2c2c;
+    border-radius: 12px;
+    padding: 16px;
+    background: #171717;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.panel-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+#status {
+    margin: 0;
+    color: #d3d3d3;
+}
+
+.search-label {
+    display: grid;
+    gap: 6px;
+    min-width: min(360px, 100%);
+    margin-left: auto;
+}
+
+.search-label span {
+    color: #bbbbbb;
+    font-size: 0.9rem;
+}
+
+.search-label input {
+    border: 1px solid #2f2f2f;
+    border-radius: 10px;
+    background: #121212;
+    color: #f4f4f4;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.search-label input:focus {
+    border-color: #8bb7ff;
+    box-shadow: 0 0 0 3px rgba(139, 183, 255, 0.15);
+}
+
+.list-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.list-tab {
+    background: #141821;
+    border: 1px solid var(--border);
+    color: #f0f4ff;
+    padding: 10px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.list-tab.is-active {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(73, 183, 255, 0.35);
+}
+
+.list-title {
+    margin: 0 0 20px;
+}
+
+.ecompendium-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.ecompendium-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: 0.2s ease;
+}
+
+.ecompendium-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 16px rgba(73, 183, 255, 0.2);
+}
+
+.ecompendium-name {
+    margin: 0 0 16px;
+}
+
+.ecompendium-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ecompendium-meta p {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0;
+}
+
+.ecompendium-meta span {
+    color: var(--muted);
+}
+
+.equipment-section {
+    margin-top: 14px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.equipment-section-title {
+    margin: 0 0 8px;
+    color: var(--accent);
+}
+
+.stat-list,
+.resource-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.stat-list li,
+.resource-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(18, 20, 27, 0.95);
+}
+
 .empty-state {
-  border: 1px solid #2a3642;
-  border-radius: 10px;
-  padding: 14px;
-  background: #10161d;
-  color: #f0f3f7;
+    padding: 20px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    text-align: center;
+    color: var(--muted);
 }
 
-.empty-state {
-  margin: 0;
-  color: #bac7d5;
+@media (max-width: 768px) {
+    .list-tab {
+        width: 100%;
+    }
 }

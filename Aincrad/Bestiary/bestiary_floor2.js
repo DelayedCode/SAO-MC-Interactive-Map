@@ -1,7 +1,7 @@
 // Floor-specific mob data for bestiary_floor2.js
 // Loaded before bestiary.js as the runtime script.
 
-const REGULAR_MOB_DATA = `
+window.REGULAR_MOB_DATA = `
 Monstrous Bull	Thick Skin (40%) (PB)	N/A
 Forest Bear	Honey Residue (60%) (PB), Bear Skin (50%) (PB), Bearclaw (45%) (PB), Bear Fat (5%) (PB)	N/A
 Mountain Wolf	Wolf Fur (40%) (PB)	N/A
@@ -17,13 +17,13 @@ Sanctuary Skeleton Warrior	Spectral Chain (30%) (PB), Torn Clothing (30%) (PB), 
 Guardian Minion	No Drops (PB)	N/A
 `;
 
-const BOSS_MOB_DATA = `
+window.BOSS_MOB_DATA = `
 Winnie, Man's Best Friend	Bear Skin (N/A) (PB), Bearclaw (N/A) (PB), Bear Fat (N/A) (PB), Honey Residue (N/A) (PB)	N/A
 Velindra Weaver	Potion of the Witch (Vitality) (4%) (PB), Potion of the Witch (Defense) (4%) (PB), Potion of the Witch (Strength) (4%) (PB), Potion of the Witch (Dexterity) (4%) (PB), Potion of the Witch (Intelligence) (4%) (PB), Potion of the Witch (Spirit) (4%) (PB)	N/A
 Guardian of the Sanctuary	Runic Stone (40%) (PB), Guardian Necklace (4%) (PB), Guardian Rune (2%) (PB)	N/A
 `;
 
-const DUNGEON_MOB_DATA = `
+window.DUNGEON_MOB_DATA = `
 Worker	Dart (30%) (PB), Honey (30%) (PB)	N/A
 Dardroyal	Dart (35%) (PB), Bee Shell (30%) (PB)	N/A
 Golem of Peter	Piece of Scrap Metal (40%) (PB)	N/A
@@ -41,7 +41,7 @@ Skeleton of the Archer Sands	N/A (PB)	N/A
 Guardian	N/A (PB)	N/A
 `;
 
-const DUNGEON_BOSS_MOB_DATA = `
+window.DUNGEON_BOSS_MOB_DATA = `
 Melisara, Ruler of the Hive	x1-3 Dark (90%) (PB), x1-3 Honey (100%) (PB), x1-2 Bee Shell (80%) (PB)	N/A
 Magnus, Colossus of the Veins	Piece of Scrap Metal (40%) (PB), Black Shield (4%) (PB), Rune of the Colossus (2%) (PB)	N/A
 Morverth the Soul Flayer	x2 Black Bone Stone (100%) (PB), 2x Necromancer Powder (100%) (PB)	N/A

@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SAO Quests</title>
   <link rel="icon" type="image/svg+xml" href="quest-logo.svg?v=2">
-  <link rel="stylesheet" href="../shared/page-shell.css">
   <link rel="stylesheet" href="quests.css">
 </head>
 <body>
   <div class="page">
     <div class="nav">
-      <button onclick="window.location.href='../Map/maps.html'">Maps</button>
-      <button onclick="window.location.href='../Bestiary/bestiary.html'">Bestiary</button>
-      <button onclick="window.location.href='../eCompendium/ecompendium.html'">Equipment</button>
-      <button onclick="window.location.href='../Patchnotes/patchnotes.html'">Patchnotes</button>
+      <button type="button" data-nav-target="maps">Maps</button>
+      <button type="button" data-nav-target="bestiary">Bestiary</button>
+      <button type="button" data-nav-target="equipment">Equipment</button>
+      <button type="button" data-nav-target="patchnotes">Patchnotes</button>
     </div>
     <div class="panel">
       <h1 class="quests-title">
@@ -49,7 +48,7 @@
       <div id="questTableRoot"></div>
     </div>
   </div>
-  <script src="../shared/persistence.js"></script>
+  <script src="../../shared/sao-storage.js"></script>
   <script src="quests.js"></script>
 </body>
 </html>

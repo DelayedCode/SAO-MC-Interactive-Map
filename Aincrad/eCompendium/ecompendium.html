@@ -1,32 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAO Equipment Compendium</title>
-  <link rel="stylesheet" href="../shared/page-shell.css">
-  <link rel="stylesheet" href="ecompendium.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SAO Equipment Compendium</title>
+
+<link rel="stylesheet" href="ecompendium.css">
+
+<script defer src="../../shared/sao-storage.js"></script>
+<script defer src="ecompendium.js"></script>
 </head>
+
 <body>
-  <div class="page">
+
+<div class="page">
+
     <div class="nav">
-      <button onclick="window.location.href='../Map/maps.html'">Maps</button>
-      <button onclick="window.location.href='../Bestiary/bestiary.html'">Bestiary</button>
-      <button onclick="window.location.href='../Quests/quests.html'">Quests</button>
-      <button onclick="window.location.href='../Patchnotes/patchnotes.html'">Patchnotes</button>
+        <button type="button" data-nav-target="maps">Maps</button>
+        <button type="button" data-nav-target="equipment">Equipment</button>
+        <button type="button" data-nav-target="quests">Quests</button>
+        <button type="button" data-nav-target="patchnotes">Patchnotes</button>
     </div>
+
     <div class="panel">
-      <h1>Equipment Compendium</h1>
-      <div class="panel-header">
-        <p id="status">Loading...</p>
-        <label class="search-label" for="equipmentSearch">
-          <span>Search equipment</span>
-          <input id="equipmentSearch" type="search" placeholder="Search by name..." autocomplete="off">
-        </label>
-      </div>
-      <section id="equipmentRoot" class="equipment-root" aria-live="polite"></section>
+
+        <h1>Equipment Compendium</h1>
+
+        <div class="list-tabs">
+
+            <button class="list-tab" data-category="accessory">Accessories</button>
+            <button class="list-tab" data-category="armor">Armor</button>
+            <button class="list-tab" data-category="consumable">Consumables</button>
+            <button class="list-tab" data-category="currency">Currency</button>
+            <button class="list-tab" data-category="dungeon">Dungeons</button>
+            <button class="list-tab" data-category="food">Food</button>
+            <button class="list-tab" data-category="material">Materials</button>
+            <button class="list-tab" data-category="quest_item">Quest Items</button>
+            <button class="list-tab" data-category="resource">Resources</button>
+            <button class="list-tab" data-category="rune">Runes</button>
+            <button class="list-tab" data-category="tool">Tools</button>
+            <button class="list-tab is-active" data-category="weapon">Weapons</button>
+
+        </div>
+
+        <div class="panel-header">
+
+            <p id="status">Loading...</p>
+
+            <label class="search-label">
+                <span>Search</span>
+
+                <input
+                    id="ecompendiumSearch"
+                    type="search"
+                    placeholder="Search equipment..."
+                    autocomplete="off"
+                >
+            </label>
+
+        </div>
+
+        <h2 id="listTitle" class="list-title">
+            Weapons
+        </h2>
+
+        <section
+            id="entryList"
+            class="ecompendium-list"
+        ></section>
+
     </div>
-  </div>
-  <script src="ecompendium.js"></script>
+
+</div>
+
 </body>
 </html>

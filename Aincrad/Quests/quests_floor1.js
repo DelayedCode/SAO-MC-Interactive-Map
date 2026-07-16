@@ -1,6 +1,7 @@
 // Floor-specific quest data for floor1
 
-window.QUEST_ENTRIES = [
+window.QUEST_ENTRIES_BY_FLOOR = window.QUEST_ENTRIES_BY_FLOOR || {};
+window.QUEST_ENTRIES_BY_FLOOR.floor1 = [
   {
     npcName: "Ayaka",
     city: "Vallhat",

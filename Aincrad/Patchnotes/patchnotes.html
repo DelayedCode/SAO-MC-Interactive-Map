@@ -4,22 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SAO Patchnotes</title>
-  <link rel="stylesheet" href="../shared/page-shell.css">
   <link rel="stylesheet" href="patchnotes.css">
 </head>
 <body>
   <div class="page">
     <div class="nav">
-      <button onclick="window.location.href='../Map/maps.html'">Maps</button>
-      <button onclick="window.location.href='../Bestiary/bestiary.html'">Bestiary</button>
-      <button onclick="window.location.href='../eCompendium/ecompendium.html'">Equipment</button>
-      <button onclick="window.location.href='../Quests/quests.html'">Quests</button>
+      <button type="button" data-nav-target="maps">Maps</button>
+      <button type="button" data-nav-target="bestiary">Bestiary</button>
+      <button type="button" data-nav-target="equipment">Equipment</button>
+      <button type="button" data-nav-target="quests">Quests</button>
     </div>
+
     <div class="panel">
-      <h1>Patchnotes</h1>
-      <p id="status">Loading...</p>
+      <div class="panel-header">
+        <div>
+          <h1>Patchnotes</h1>
+          <p id="status">Loading changelog...</p>
+        </div>
+
+        <label class="search-label" for="patchSearch">
+          <span>Search notes</span>
+          <input id="patchSearch" type="text" placeholder="Filter by version, item, or update">
+        </label>
+      </div>
+
+      <div id="patchnotesList" class="patchnotes-list" aria-live="polite"></div>
     </div>
   </div>
+  <script src="../../shared/sao-storage.js"></script>
   <script src="patchnotes.js"></script>
 </body>
 </html>

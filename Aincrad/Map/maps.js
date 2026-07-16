@@ -64,7 +64,8 @@ const state = {
     armorBlacksmith: false,
     ingotBlacksmith: false,
     keyBlacksmith: false,
-    accessoriesBlacksmith: false
+    accessoriesBlacksmith: false,
+    runeCraftsmen: false
   }
 };
 
@@ -76,20 +77,46 @@ const sidebarResizeConfig = {
 };
 
 const visitedMarkersStorageKey = "sao.visitedMarkers";
-const getPersistentItem = window.SAOMCUtils?.getPersistentItem || (key => {
+const mapUiStateStorageKey = "sao.map.uiState";
+
+function getPersistentItem(key) {
+  if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
+    return window.SAOStorage.getItem(key);
+  }
   try {
     return localStorage.getItem(key);
   } catch {
     return null;
   }
-});
-const setPersistentItem = window.SAOMCUtils?.setPersistentItem || ((key, value) => {
+}
+
+function setPersistentItem(key, value) {
+  if (window.SAOStorage && typeof window.SAOStorage.setItem === "function") {
+    window.SAOStorage.setItem(key, value);
+    return;
+  }
   try {
     localStorage.setItem(key, value);
   } catch {
     // Keep map usable even if storage is blocked.
   }
-});
+}
+
+function loadMapUiState() {
+  try {
+    const raw = getPersistentItem(mapUiStateStorageKey);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveMapUiState(mapState) {
+  setPersistentItem(mapUiStateStorageKey, JSON.stringify(mapState));
+}
 
 function loadVisitedMarkers() {
   try {
@@ -186,32 +213,40 @@ function escapeHtml(value) {
 }
 
 function getFloorSpecificBestiaryUrl(floor, category, search) {
-  const page = floor ? `../Bestiary/bestiary_${floor}.html` : "../Bestiary/bestiary.html";
   const params = new URLSearchParams();
+  if (floor) params.set("floor", floor);
   if (category) params.set("category", category);
   if (search) params.set("search", search);
-  return `${page}${params.toString() ? `?${params.toString()}` : ""}`;
+  return `../Bestiary/bestiary.html${params.toString() ? `?${params.toString()}` : ""}`;
 }
 
 function getFloorSpecificQuestsUrl(floor, search) {
-  const page = floor ? `../Quests/quests_${floor}.html` : "../Quests/quests.html";
   const params = new URLSearchParams();
+  if (floor) params.set("floor", floor);
   if (search) params.set("search", search);
-  return `${page}${params.toString() ? `?${params.toString()}` : ""}`;
+  return `../Quests/quests.html${params.toString() ? `?${params.toString()}` : ""}`;
 }
 
-function getFloorNavigationUrl(type, floor) {
-  if (type === "bestiary") {
-    return floor ? `../Bestiary/bestiary_${floor}.html` : "../Bestiary/bestiary.html";
-  }
-  if (type === "quests") {
-    return floor ? `../Quests/quests_${floor}.html` : "../Quests/quests.html";
-  }
-  return "#";
+const SECTION_PATHS = {
+  maps: "../Map/maps.html",
+  bestiary: "../Bestiary/bestiary.html",
+  equipment: "../eCompendium/ecompendium.html",
+  quests: "../Quests/quests.html",
+  patchnotes: "../Patchnotes/patchnotes.html"
+};
+
+const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
+
+function buildSectionUrl(section, floor) {
+  const path = SECTION_PATHS[section] || "#";
+  if (path === "#") return path;
+  if (!floor || !FLOOR_AWARE_SECTIONS.has(section)) return path;
+  return `${path}?${new URLSearchParams({ floor }).toString()}`;
 }
 
 function parseUrlState() {
   const params = new URLSearchParams(window.location.search);
+  const search = params.get("search") || params.get("q") || "";
   const activeCategories = params.has("categories")
     ? params.get("categories").split(",").reduce((result, category) => {
         if (category) result[category] = true;
@@ -222,8 +257,9 @@ function parseUrlState() {
   return {
     floor: params.get("floor"),
     underground: params.get("underground") === "1",
+    search,
     activeCategories,
-    hasParams: params.has("floor") || params.has("underground") || params.has("categories")
+    hasParams: params.has("floor") || params.has("underground") || params.has("categories") || params.has("search") || params.has("q")
   };
 }
 
@@ -231,6 +267,7 @@ function buildUrlFromState(mapState) {
   const params = new URLSearchParams();
   if (mapState.floor) params.set("floor", mapState.floor);
   if (mapState.underground) params.set("underground", "1");
+  if (mapState.search) params.set("search", mapState.search);
   const active = Object.entries(mapState.activeCategories || {})
     .filter(([, value]) => value)
     .map(([key]) => key);
@@ -238,19 +275,15 @@ function buildUrlFromState(mapState) {
   return `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
 }
 
-function attachMapNavButtons() {
-  const bestiaryButton = document.getElementById("mapToBestiaryButton");
-  const questsButton = document.getElementById("mapToQuestsButton");
-  if (!bestiaryButton || !questsButton) return;
+function attachSectionNavButtons() {
+  const nav = document.querySelector(".top-nav");
+  if (!nav) return;
 
-  const updateNav = () => {
-    const floor = floorSelect.value;
-    bestiaryButton.onclick = () => window.location.href = getFloorNavigationUrl("bestiary", floor);
-    questsButton.onclick = () => window.location.href = getFloorNavigationUrl("quests", floor);
-  };
-
-  updateNav();
-  floorSelect.addEventListener("change", updateNav);
+  nav.addEventListener("click", event => {
+    const button = event.target.closest("button[data-nav-target]");
+    if (!button) return;
+    window.location.href = buildSectionUrl(button.dataset.navTarget, floorSelect.value);
+  });
 }
 
 function buildMobAreaMobListMarkup(areaId, areaFloor) {
@@ -420,9 +453,14 @@ function requestCoordinatePanelUpdate(event) {
 }
 
 function updateTransform() {
-  mapLayer.style.transform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.zoom})`;
+  const mapTransform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.zoom})`;
+  mapLayer.style.transform = mapTransform;
+  markerLayer.querySelectorAll(".marker").forEach(markerEl => {
+    const markerScale = 1 / state.zoom;
+    const markerAnchorY = getComputedStyle(markerEl).getPropertyValue("--marker-anchor-y") || "-50%";
+    markerEl.style.transform = `translate(-50%, ${markerAnchorY}) scale(${markerScale.toFixed(6)})`;
+  });
   zoomLabel.textContent = formatZoomLabel(state.zoom);
-  markerLayer.style.setProperty("--marker-scale", 1 / state.zoom);
 }
 
 function setZoom(nextZoom, anchorX, anchorY) {
@@ -451,6 +489,29 @@ function setUndergroundMode(enabled) {
 function setDefaultSidebarMessage() {
   title.textContent = "Select a marker";
   content.innerHTML = `<p>Choose a marker on the map to see details.</p>`;
+}
+
+function hasActiveMarkerCategories() {
+  return Object.values(state.activeCategories).some(Boolean);
+}
+
+function setMarkerEmptyState(filterText) {
+  const hasActiveCategories = hasActiveMarkerCategories();
+
+  if (!hasActiveCategories && !filterText) {
+    title.textContent = "Choose a category";
+    content.innerHTML = `<p>Turn on one or more categories in the sidebar to display markers for this floor.</p>`;
+    return;
+  }
+
+  if (filterText) {
+    title.textContent = "No search matches";
+    content.innerHTML = `<p>No markers match your current search on this floor.</p>`;
+    return;
+  }
+
+  title.textContent = "No markers available";
+  content.innerHTML = `<p>No markers are available for the currently selected categories on this floor.</p>`;
 }
 
 function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
@@ -519,151 +580,122 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
   mobAreaLayer.replaceChildren(fragment);
 }
 
+const MARKET_ICON_LIBRARY = Object.freeze({
+  lootBuyers: `
+    <svg class="market-icon loot-buyer-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4.5 7.5h15l-1.3 9.2a2 2 0 0 1-2 1.7H7.8a2 2 0 0 1-2-1.7Z" fill="#f6e7ac" stroke="#7c6422" stroke-width="1.1"/>
+      <path d="M8 7.5a4 4 0 0 1 8 0" fill="none" stroke="#fff7d0" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M8.5 11.2h7" stroke="#7c6422" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="12" cy="14.6" r="1.7" fill="#7c6422"/>
+    </svg>
+  `,
+  weaponSellers: `
+    <svg class="market-icon weapon-seller-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M6.2 17.8 15.8 8.2l2 2-9.6 9.6-3 1Z" fill="#d7e3f3" stroke="#52657d" stroke-width="1"/>
+      <path d="M14.6 5.9 18 2.5l3.5 3.5-3.4 3.4Z" fill="#f5c65b" stroke="#8a6120" stroke-width="1"/>
+      <path d="M5 18.8l1.3-3.3 2 2Z" fill="#8a5a34"/>
+    </svg>
+  `,
+  travelingMerchants: `
+    <svg class="market-icon traveling-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M5 10h12.6a2 2 0 0 1 1.8 1.1l1.6 3.2v2.8H19a2.5 2.5 0 0 1-5 0H10a2.5 2.5 0 0 1-5 0H3.5v-5.4Z" fill="#efe6d0" stroke="#7b6543" stroke-width="1.1"/>
+      <path d="M15.6 10V7.4h2.5l1.7 2.6Z" fill="#9ed0ff" stroke="#4d7092" stroke-width="1"/>
+      <circle cx="7.5" cy="17.1" r="1.6" fill="#7b6543"/>
+      <circle cx="16.5" cy="17.1" r="1.6" fill="#7b6543"/>
+    </svg>
+  `,
+  equipmentMerchants: `
+    <svg class="market-icon equipment-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 3.2 18.5 6v5.2c0 4.4-2.7 7.2-6.5 9.6-3.8-2.4-6.5-5.2-6.5-9.6V6Z" fill="#dfe8f6" stroke="#51637d" stroke-width="1.1"/>
+      <path d="M12 6.6 9 8v3.2c0 2.6 1.4 4.5 3 5.8 1.6-1.3 3-3.2 3-5.8V8Z" fill="#7fa4d9"/>
+    </svg>
+  `,
+  toolMerchants: `
+    <svg class="market-icon tool-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M14.5 4.2a4.3 4.3 0 0 0-2.8 6.9L5.1 17.7a1.5 1.5 0 1 0 2.1 2.1l6.6-6.6a4.3 4.3 0 0 0 6.9-2.8l-2.9 1.1-2.3-2.3Z" fill="#cfe9ee" stroke="#456972" stroke-width="1.1"/>
+      <circle cx="6.2" cy="18.7" r="0.9" fill="#456972"/>
+    </svg>
+  `,
+  accessoriesMerchants: `
+    <svg class="market-icon accessories-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12.4" r="5.8" fill="#ffe2b8" stroke="#91612a" stroke-width="1.1"/>
+      <circle cx="12" cy="12.4" r="2.4" fill="#1f2d46"/>
+      <path d="M12 4.8v2M12 18v1.6M4.4 12.4H6.4M17.6 12.4H19.6" stroke="#fff5df" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+  `,
+  occultMerchants: `
+    <svg class="market-icon occult-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 3.8 13.9 9.5H20l-4.9 3.6 1.9 5.7L12 15.2 7 18.8l1.9-5.7L4 9.5h6.1Z" fill="#e0d0ff" stroke="#5c3e88" stroke-width="1.1"/>
+      <circle cx="12" cy="12" r="1.6" fill="#5c3e88"/>
+    </svg>
+  `,
+  consumablesMerchants: `
+    <svg class="market-icon consumables-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M9 3.5h6v2l-1.6 2.4v8.4a3.4 3.4 0 1 1-6.8 0V7.9L9 5.5Z" fill="#ffd8c0" stroke="#93553c" stroke-width="1.1"/>
+      <path d="M8.4 11.4h7.2" stroke="#93553c" stroke-width="1"/>
+      <path d="M9.2 14.2c1-.7 1.9-.3 2.8.1.9.4 1.8.8 2.6.2" stroke="#fff2eb" stroke-width="1.1" fill="none"/>
+    </svg>
+  `
+});
+
 function buildMarketMarkerIcon(category) {
-  if (category === "lootBuyers") {
-    return `
-      <svg class="market-icon loot-buyer-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M4.5 7.5h15l-1.3 9.2a2 2 0 0 1-2 1.7H7.8a2 2 0 0 1-2-1.7Z" fill="#f6e7ac" stroke="#7c6422" stroke-width="1.1"/>
-        <path d="M8 7.5a4 4 0 0 1 8 0" fill="none" stroke="#fff7d0" stroke-width="1.4" stroke-linecap="round"/>
-        <path d="M8.5 11.2h7" stroke="#7c6422" stroke-width="1.2" stroke-linecap="round"/>
-        <circle cx="12" cy="14.6" r="1.7" fill="#7c6422"/>
-      </svg>
-    `;
-  }
-
-  if (category === "weaponSellers") {
-    return `
-      <svg class="market-icon weapon-seller-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M6.2 17.8 15.8 8.2l2 2-9.6 9.6-3 1Z" fill="#d7e3f3" stroke="#52657d" stroke-width="1"/>
-        <path d="M14.6 5.9 18 2.5l3.5 3.5-3.4 3.4Z" fill="#f5c65b" stroke="#8a6120" stroke-width="1"/>
-        <path d="M5 18.8l1.3-3.3 2 2Z" fill="#8a5a34"/>
-      </svg>
-    `;
-  }
-
-  if (category === "travelingMerchants") {
-    return `
-      <svg class="market-icon traveling-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M5 10h12.6a2 2 0 0 1 1.8 1.1l1.6 3.2v2.8H19a2.5 2.5 0 0 1-5 0H10a2.5 2.5 0 0 1-5 0H3.5v-5.4Z" fill="#efe6d0" stroke="#7b6543" stroke-width="1.1"/>
-        <path d="M15.6 10V7.4h2.5l1.7 2.6Z" fill="#9ed0ff" stroke="#4d7092" stroke-width="1"/>
-        <circle cx="7.5" cy="17.1" r="1.6" fill="#7b6543"/>
-        <circle cx="16.5" cy="17.1" r="1.6" fill="#7b6543"/>
-      </svg>
-    `;
-  }
-
-  if (category === "equipmentMerchants") {
-    return `
-      <svg class="market-icon equipment-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M12 3.2 18.5 6v5.2c0 4.4-2.7 7.2-6.5 9.6-3.8-2.4-6.5-5.2-6.5-9.6V6Z" fill="#dfe8f6" stroke="#51637d" stroke-width="1.1"/>
-        <path d="M12 6.6 9 8v3.2c0 2.6 1.4 4.5 3 5.8 1.6-1.3 3-3.2 3-5.8V8Z" fill="#7fa4d9"/>
-      </svg>
-    `;
-  }
-
-  if (category === "toolMerchants") {
-    return `
-      <svg class="market-icon tool-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M14.5 4.2a4.3 4.3 0 0 0-2.8 6.9L5.1 17.7a1.5 1.5 0 1 0 2.1 2.1l6.6-6.6a4.3 4.3 0 0 0 6.9-2.8l-2.9 1.1-2.3-2.3Z" fill="#cfe9ee" stroke="#456972" stroke-width="1.1"/>
-        <circle cx="6.2" cy="18.7" r="0.9" fill="#456972"/>
-      </svg>
-    `;
-  }
-
-  if (category === "accessoriesMerchants") {
-    return `
-      <svg class="market-icon accessories-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="12" cy="12.4" r="5.8" fill="#ffe2b8" stroke="#91612a" stroke-width="1.1"/>
-        <circle cx="12" cy="12.4" r="2.4" fill="#1f2d46"/>
-        <path d="M12 4.8v2M12 18v1.6M4.4 12.4H6.4M17.6 12.4H19.6" stroke="#fff5df" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (category === "occultMerchants") {
-    return `
-      <svg class="market-icon occult-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M12 3.8 13.9 9.5H20l-4.9 3.6 1.9 5.7L12 15.2 7 18.8l1.9-5.7L4 9.5h6.1Z" fill="#e0d0ff" stroke="#5c3e88" stroke-width="1.1"/>
-        <circle cx="12" cy="12" r="1.6" fill="#5c3e88"/>
-      </svg>
-    `;
-  }
-
-  if (category === "consumablesMerchants") {
-    return `
-      <svg class="market-icon consumables-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M9 3.5h6v2l-1.6 2.4v8.4a3.4 3.4 0 1 1-6.8 0V7.9L9 5.5Z" fill="#ffd8c0" stroke="#93553c" stroke-width="1.1"/>
-        <path d="M8.4 11.4h7.2" stroke="#93553c" stroke-width="1"/>
-        <path d="M9.2 14.2c1-.7 1.9-.3 2.8.1.9.4 1.8.8 2.6.2" stroke="#fff2eb" stroke-width="1.1" fill="none"/>
-      </svg>
-    `;
-  }
-
-  return "";
+  return MARKET_ICON_LIBRARY[category] || "";
 }
 
+const CRAFTSMAN_ICON_LIBRARY = Object.freeze({
+  weaponsmith: `
+    <svg class="craftsman-icon weaponsmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M6.2 17.9 15.7 8.4l2 2-9.5 9.5-3 1Z" fill="#dce7f5" stroke="#53657d" stroke-width="1"/>
+      <path d="M14.5 6l3.3-3.3 3.2 3.2-3.3 3.3Z" fill="#f5c45c" stroke="#8d6120" stroke-width="1"/>
+      <path d="M4.9 19l1.3-3.2 1.9 1.9Z" fill="#8d5e35"/>
+    </svg>
+  `,
+  armorBlacksmith: `
+    <svg class="craftsman-icon armor-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 3.4 18.5 6v5.4c0 4.2-2.4 6.9-6.5 9.1-4.1-2.2-6.5-4.9-6.5-9.1V6Z" fill="#d9e6f8" stroke="#4e637f" stroke-width="1.1"/>
+      <path d="M12 6.6 9.1 7.8v3.5c0 2.1 1.1 3.8 2.9 5 1.8-1.2 2.9-2.9 2.9-5V7.8Z" fill="#7ea1d8"/>
+    </svg>
+  `,
+  ingotBlacksmith: `
+    <svg class="craftsman-icon ingot-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4.4" y="11.3" width="15.2" height="5.2" rx="1.1" fill="#f0d2a2" stroke="#8b6335" stroke-width="1.1"/>
+      <path d="M7.2 11.3 10 7.2h4l2.8 4.1" fill="#f7e1bd" stroke="#8b6335" stroke-width="1"/>
+      <path d="M8.1 14h7.8" stroke="#8b6335" stroke-width="1.1" stroke-linecap="round"/>
+    </svg>
+  `,
+  keyBlacksmith: `
+    <svg class="craftsman-icon key-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="8.2" cy="10.5" r="3" fill="#ffeb9d" stroke="#8b6925" stroke-width="1.1"/>
+      <path d="M11 10.5h8v1.8h-1.8v1.8h-2v-1.8h-1.8v1.8h-2V12.3H11Z" fill="#ffeb9d" stroke="#8b6925" stroke-width="1.1" stroke-linejoin="round"/>
+    </svg>
+  `,
+  accessoriesBlacksmith: `
+    <svg class="craftsman-icon accessories-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12.2" r="5.7" fill="#ffe1b9" stroke="#8f622a" stroke-width="1.1"/>
+      <circle cx="12" cy="12.2" r="2.5" fill="#26324e"/>
+      <path d="M12 4.8v1.8M12 17.8v1.4M4.6 12.2h1.8M17.6 12.2h1.8" stroke="#fff6de" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+  `,
+  runeCraftsmen: `
+    <svg class="craftsman-icon rune-craftsmen-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M6.7 18.1 13.4 11.4l2.2 2.2-6.7 6.7-2.9.8Z" fill="#dce8f7" stroke="#4d6078" stroke-width="1"/>
+      <path d="M16.1 4.8 18.4 2.5l3.1 3.1-2.3 2.3Z" fill="#f1ca7e" stroke="#8d6424" stroke-width="1"/>
+      <path d="M5.7 19.3 7 16.3l1.7 1.7Z" fill="#7f5a34"/>
+    </svg>
+  `,
+  refaire: `
+    <svg class="craftsman-icon refaire-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M5.5 16.6c.7 1.2 2.3 1.8 3.7 1.3l7.1-2.7c1.4-.5 2.1-2 1.6-3.4l-1.2-3.4a2.9 2.9 0 0 0-3.6-1.8l-7.1 2.7a2.9 2.9 0 0 0-1.8 3.6l1.3 3.4Z" fill="#f7e2c1" stroke="#7a4b28" stroke-width="1.1"/>
+      <path d="M9.1 9.7 14.2 8.5" stroke="#7a4b28" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M9.7 11.4 15 10.1" stroke="#8a5b33" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M10.4 13.1 15.7 11.9" stroke="#6b3f20" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M8.7 15.1c1.4.2 2.7-.9 3-2.3.3-1.4-.6-2.8-2-3l-2.4-.3c-.9-.1-1.8.5-2.1 1.4l-.7 2.5c-.3.9.1 1.8.9 2.3.6.3 1.3.4 2 .4Z" fill="#edd1a3" stroke="#7a4b28" stroke-width="1"/>
+    </svg>
+  `
+});
+
 function buildCraftsmanMarkerIcon(category) {
-  if (category === "weaponsmith") {
-    return `
-      <svg class="craftsman-icon weaponsmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M6.2 17.9 15.7 8.4l2 2-9.5 9.5-3 1Z" fill="#dce7f5" stroke="#53657d" stroke-width="1"/>
-        <path d="M14.5 6l3.3-3.3 3.2 3.2-3.3 3.3Z" fill="#f5c45c" stroke="#8d6120" stroke-width="1"/>
-        <path d="M4.9 19l1.3-3.2 1.9 1.9Z" fill="#8d5e35"/>
-      </svg>
-    `;
-  }
-
-  if (category === "armorBlacksmith") {
-    return `
-      <svg class="craftsman-icon armor-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M12 3.4 18.5 6v5.4c0 4.2-2.4 6.9-6.5 9.1-4.1-2.2-6.5-4.9-6.5-9.1V6Z" fill="#d9e6f8" stroke="#4e637f" stroke-width="1.1"/>
-        <path d="M12 6.6 9.1 7.8v3.5c0 2.1 1.1 3.8 2.9 5 1.8-1.2 2.9-2.9 2.9-5V7.8Z" fill="#7ea1d8"/>
-      </svg>
-    `;
-  }
-
-  if (category === "ingotBlacksmith") {
-    return `
-      <svg class="craftsman-icon ingot-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <rect x="4.4" y="11.3" width="15.2" height="5.2" rx="1.1" fill="#f0d2a2" stroke="#8b6335" stroke-width="1.1"/>
-        <path d="M7.2 11.3 10 7.2h4l2.8 4.1" fill="#f7e1bd" stroke="#8b6335" stroke-width="1"/>
-        <path d="M8.1 14h7.8" stroke="#8b6335" stroke-width="1.1" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (category === "keyBlacksmith") {
-    return `
-      <svg class="craftsman-icon key-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="8.2" cy="10.5" r="3" fill="#ffeb9d" stroke="#8b6925" stroke-width="1.1"/>
-        <path d="M11 10.5h8v1.8h-1.8v1.8h-2v-1.8h-1.8v1.8h-2V12.3H11Z" fill="#ffeb9d" stroke="#8b6925" stroke-width="1.1" stroke-linejoin="round"/>
-      </svg>
-    `;
-  }
-
-  if (category === "accessoriesBlacksmith") {
-    return `
-      <svg class="craftsman-icon accessories-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="12" cy="12.2" r="5.7" fill="#ffe1b9" stroke="#8f622a" stroke-width="1.1"/>
-        <circle cx="12" cy="12.2" r="2.5" fill="#26324e"/>
-        <path d="M12 4.8v1.8M12 17.8v1.4M4.6 12.2h1.8M17.6 12.2h1.8" stroke="#fff6de" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  if (category === "refaire") {
-    return `
-      <svg class="craftsman-icon refaire-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M5.5 16.6c.7 1.2 2.3 1.8 3.7 1.3l7.1-2.7c1.4-.5 2.1-2 1.6-3.4l-1.2-3.4a2.9 2.9 0 0 0-3.6-1.8l-7.1 2.7a2.9 2.9 0 0 0-1.8 3.6l1.3 3.4Z" fill="#f7e2c1" stroke="#7a4b28" stroke-width="1.1"/>
-        <path d="M9.1 9.7 14.2 8.5" stroke="#7a4b28" stroke-width="1.4" stroke-linecap="round"/>
-        <path d="M9.7 11.4 15 10.1" stroke="#8a5b33" stroke-width="1.4" stroke-linecap="round"/>
-        <path d="M10.4 13.1 15.7 11.9" stroke="#6b3f20" stroke-width="1.4" stroke-linecap="round"/>
-        <path d="M8.7 15.1c1.4.2 2.7-.9 3-2.3.3-1.4-.6-2.8-2-3l-2.4-.3c-.9-.1-1.8.5-2.1 1.4l-.7 2.5c-.3.9.1 1.8.9 2.3.6.3 1.3.4 2 .4Z" fill="#edd1a3" stroke="#7a4b28" stroke-width="1"/>
-      </svg>
-    `;
-  }
-
-  return "";
+  return CRAFTSMAN_ICON_LIBRARY[category] || "";
 }
 
 function scheduleRenderMarkers() {
@@ -724,6 +756,7 @@ function renderMarkers() {
       "ingotBlacksmith",
       "keyBlacksmith",
       "accessoriesBlacksmith",
+      "runeCraftsmen",
       "refaire"
     ].includes(marker.category);
     const isMarketCategory = [
@@ -740,6 +773,8 @@ function renderMarkers() {
     markerEl.dataset.markerId = id;
     markerEl.style.left = `${leftPx}px`;
     markerEl.style.top  = `${topPx}px`;
+    const markerAnchorY = getComputedStyle(markerEl).getPropertyValue("--marker-anchor-y") || "-50%";
+    markerEl.style.transform = `translate(-50%, ${markerAnchorY}) scale(${(1 / state.zoom).toFixed(6)})`;
     if (markerType === "biome") {
       markerEl.innerHTML = `
         <svg class="biome-pin-icon" viewBox="0 0 24 34" aria-hidden="true" focusable="false">
@@ -878,8 +913,7 @@ function renderMarkers() {
 
   if (renderedCount === 0) {
     state.activeMarkerId = null;
-    title.textContent = "No markers available";
-    content.innerHTML = `<p>No markers found for this floor or search term.</p>`;
+    setMarkerEmptyState(filterText);
     return;
   }
 
@@ -1039,23 +1073,28 @@ function stopSidebarResize() {
 
 function init() {
   const urlState = parseUrlState();
-  const requestedFloor = urlState.floor || window.FLOOR_NAME;
+  const savedState = loadMapUiState();
+  const initialState = urlState.hasParams ? urlState : (savedState || {});
+  const requestedFloor = initialState.floor || floorSelect.value;
   if (requestedFloor && ["floor1", "floor2", "floor3"].includes(requestedFloor)) {
     floorSelect.value = requestedFloor;
   }
   if (undergroundToggle) {
-    undergroundToggle.checked = urlState.underground;
+    undergroundToggle.checked = Boolean(initialState.underground);
   }
-  if (urlState.activeCategories) {
+  if (initialState.activeCategories) {
     Object.keys(state.activeCategories).forEach(key => {
-      state.activeCategories[key] = !!urlState.activeCategories[key];
+      state.activeCategories[key] = !!initialState.activeCategories[key];
     });
+  }
+  if (searchInput && typeof initialState.search === "string") {
+    searchInput.value = initialState.search;
   }
 
   mapImage.src = `${floorSelect.value}.png`;
   undergroundMapImage.src = `${floorSelect.value}underground.png`;
 
-  const persistedWidth = Number(localStorage.getItem(sidebarResizeConfig.storageKey));
+  const persistedWidth = Number(getPersistentItem(sidebarResizeConfig.storageKey));
   if (Number.isFinite(persistedWidth) && persistedWidth > 0) {
     applySidebarWidth(persistedWidth);
   } else {
@@ -1111,9 +1150,12 @@ function init() {
     persistStateToHistory();
   });
 
-  searchInput.addEventListener("input", scheduleRenderMarkers);
+  searchInput.addEventListener("input", () => {
+    scheduleRenderMarkers();
+    persistStateToHistory();
+  });
 
-  attachMapNavButtons();
+  attachSectionNavButtons();
 
   categoryToggleButtons.forEach(button => {
     button.addEventListener("click", () => {
@@ -1159,6 +1201,9 @@ function syncStateFromDom() {
     if (floorSelect && mapState.floor) floorSelect.value = mapState.floor;
     mapImage.src = `${floorSelect.value}.png`;
     undergroundMapImage.src = `${floorSelect.value}underground.png`;
+    if (searchInput && typeof mapState.search === "string") {
+      searchInput.value = mapState.search;
+    }
 
     // Restore underground checkbox and visual mode
     if (undergroundToggle) undergroundToggle.checked = Boolean(mapState.underground);
@@ -1204,8 +1249,10 @@ function persistStateToHistory() {
     const mapState = {
       floor: floorSelect ? floorSelect.value : null,
       underground: undergroundToggle ? Boolean(undergroundToggle.checked) : false,
+      search: searchInput ? searchInput.value.trim() : "",
       activeCategories: { ...state.activeCategories }
     };
+    saveMapUiState(mapState);
     const payload = Object.assign({}, history.state || {}, { mapState });
     history.replaceState(payload, document.title, buildUrlFromState(mapState));
   } catch (e) {

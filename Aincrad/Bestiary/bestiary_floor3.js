@@ -1,7 +1,7 @@
 // Floor-specific mob data for bestiary_floor3.js
 // Loaded before bestiary.js as the runtime script.
 
-const REGULAR_MOB_DATA = `
+window.REGULAR_MOB_DATA = `
 Sinister White Wolf	Wolf Fur (60%) (PB), Wolf Fangs (50%) (PB)	N/A
 Sinister Black Wolf	Wolf Fur (60%) (PB), Wolf Fangs (30%) (PB)	N/A
 Mini Treant	Sylvan Sprout (40%) (PB), Magic Wood Shard (30%) (PB)	N/A
@@ -37,7 +37,7 @@ Kobold Sorcerer	N/A (PB)	N/A
 Kobold Sentinel (Minion)	Sentinel's Mace (0%) (PB)	N/A
 `;
 
-const BOSS_MOB_DATA = `
+window.BOSS_MOB_DATA = `
 Corrupted Pumba	Corrupted Crystal (100%), Boar Hide (100%), Boar Meat (100%), Pumba's Ring (3%)	N/A
 Albal	Wolf Fur (100%) (PB), Wolf Fangs (70%) (PB), Albal's Fangs (20%) (PB)	N/A
 Colossal Guardian	Magic Mycelium (20%) (PB), Colossus Hammer (2%) (PB)	N/A
@@ -48,7 +48,7 @@ Illfang the Kobold Lord	N/A (PB)	N/A
 Kazor	N/A (PB)	N/A
 `;
 
-const DUNGEON_MOB_DATA = `
+window.DUNGEON_MOB_DATA = `
 Treant of the Forest	N/A (PB)	N/A
 Forest-Bane Treant	N/A (PB)	N/A
 Devouring Plant	N/A (PB)	N/A
@@ -63,7 +63,7 @@ Venomous Spider	N/A (PB)	N/A
 Strangler Spider	N/A (PB)	N/A
 `;
 
-const DUNGEON_BOSS_MOB_DATA = `
+window.DUNGEON_BOSS_MOB_DATA = `
 Vyrmos	N/A (PB)	N/A
 Tornak	N/A (PB)	N/A
 Narax the Cursed Skeleton	Putrefied Heart (70%) (PB), Cursed Skeleton Mage Staff (3%) (PB), Cursed Skeleton Shaman Staff (3%) (PB), Narax's Ring (1%) (PB)	N/A

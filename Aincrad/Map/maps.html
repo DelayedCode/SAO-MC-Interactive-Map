@@ -8,19 +8,19 @@
 <body>
   <header>
     <div class="top-nav">
-      <button class="top-button" onclick="window.location.href='../Patchnotes/patchnotes.html'">Patch Notes</button>
-      <button class="top-button" type="button" id="mapToBestiaryButton">Bestiary</button>
-      <button class="top-button" onclick="window.location.href='../eCompendium/ecompendium.html'">Equipment Compendium</button>
-      <button class="top-button" type="button" id="mapToQuestsButton">Quests</button>
+      <button class="top-button" type="button" data-nav-target="patchnotes">Patch Notes</button>
+      <button class="top-button" type="button" data-nav-target="bestiary">Bestiary</button>
+      <button class="top-button" type="button" data-nav-target="equipment">Equipment Compendium</button>
+      <button class="top-button" type="button" data-nav-target="quests">Quests</button>
     </div>
     <div class="header-main">
       <h1>SAO Interactive Map</h1>
       <div class="controls">
         <label for="floorSelect">Floor:</label>
         <select id="floorSelect">
-          <option value="floor1">Floor 1</option>
-          <option value="floor2">Floor 2</option>
-          <option value="floor3">Floor 3</option>
+          <option value="floor1">Floor 1 - The Town of Beginnings</option>
+          <option value="floor2">Floor 2 - Arid Desert</option>
+          <option value="floor3">Floor 3 - The Forest of Wandering</option>
         </select>
         <label class="underground-toggle-wrapper" for="undergroundToggle">
           <span>Underground:</span>
@@ -34,8 +34,8 @@
   <main>
     <section id="mapContainer">
       <div id="mapLayer">
-        <img id="mapImage" src="floor1.png" alt="Map floor">
-        <img id="undergroundMapImage" class="underground-map" src="floor1underground.png" alt="Underground overlay">
+        <img id="mapImage" alt="Map floor">
+        <img id="undergroundMapImage" class="underground-map" alt="Underground overlay">
         <svg id="mobAreaLayer" aria-hidden="true"></svg>
         <div id="markers"></div>
       </div>
@@ -63,9 +63,9 @@
         <div class="sidebar-section-title">Category: Main</div>
         <ul class="sidebar-list">
           <li><button class="sidebar-list-button" type="button" data-category="biomes">Biomes</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="bossSpawns">Boss Spawns</button></li>
           <li><button class="sidebar-list-button" type="button" data-category="dungeons">Dungeons</button></li>
           <li><button class="sidebar-list-button" type="button" data-category="mobAreas">Mob Areas</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="bossSpawns">Boss Spawns</button></li>
         </ul>
       </div>
       <div class="sidebar-section">
@@ -85,35 +85,36 @@
       <div class="sidebar-section">
         <div class="sidebar-section-title">Category: Market</div>
         <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="lootBuyers">Loot Buyers</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="weaponSellers">Weapon Sellers</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="travelingMerchants">Traveling Merchants</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="equipmentMerchants">Equipment Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="toolMerchants">Tool Merchant</button></li>
           <li><button class="sidebar-list-button" type="button" data-category="accessoriesMerchants">Accessories Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="occultMerchants">Occult Merchant</button></li>
           <li><button class="sidebar-list-button" type="button" data-category="consumablesMerchants">Consumables Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="equipmentMerchants">Equipment Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="lootBuyers">Loot Buyers</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="occultMerchants">Occult Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="toolMerchants">Tool Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="travelingMerchants">Traveling Merchants</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="weaponSellers">Weapon Sellers</button></li>
         </ul>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-section-title">Category: Craftsmen</div>
         <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="weaponsmith">Weaponsmith</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="accessoriesBlacksmith">Accessories Blacksmith</button></li>
           <li><button class="sidebar-list-button" type="button" data-category="armorBlacksmith">Armor Blacksmith</button></li>
           <li><button class="sidebar-list-button" type="button" data-category="ingotBlacksmith">Ingot Blacksmith</button></li>
           <li><button class="sidebar-list-button" type="button" data-category="keyBlacksmith">Key Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="accessoriesBlacksmith">Accessories Blacksmith</button></li>
           <li><button class="sidebar-list-button" type="button" data-category="refaire">Refaire</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="runeCraftsmen">Rune Craftsmen</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="weaponsmith">Weaponsmith</button></li>
         </ul>
       </div>
     </aside>
   </main>
 
-  <script src="../shared/persistence.js"></script>
   <script src="mapData.js"></script>
   <script src="maps_floor1.js"></script>
   <script src="maps_floor2.js"></script>
   <script src="maps_floor3.js"></script>
+  <script src="../../shared/sao-storage.js"></script>
   <script src="maps.js"></script>
 </body>
 </html>
