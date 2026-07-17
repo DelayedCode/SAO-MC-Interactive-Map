@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Misc. Info</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #10161e;
+      color: #eef4ff;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #1a2432;
+      border-bottom: 1px solid #3a4a5e;
+      gap: 12px;
+    }
+
+    .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .topbar button {
+      padding: 8px 14px;
+      border: 1px solid #5f7692;
+      border-radius: 6px;
+      background: #263447;
+      color: #eef4ff;
+      cursor: pointer;
+    }
+
+    .topbar button:hover {
+      background: #324560;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .button-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 900px;
+    }
+
+    .menu-button {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border: 1px solid #5f7692;
+      border-radius: 8px;
+      background: #1f2c3d;
+      color: #eef4ff;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .menu-button:hover {
+      background: #2a3b53;
+    }
+
+    .details {
+      margin-top: 10px;
+      padding: 14px 16px;
+      border: 1px solid #4e647f;
+      border-radius: 8px;
+      background: #182332;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">Misc. Info</div>
+    <button id="backToMapButton" type="button">Go back to Menu</button>
+  </header>
+
+  <main class="content">
+    <div class="button-list">
+      <button class="menu-button" id="playerLevelsButton" type="button">Player Levels</button>
+      <div class="details" id="playerLevelsDetails" hidden>
+Level 1 → 2: 150 XP
+Level 2 → 3: 300 XP
+Level 3 → 4: 600 XP
+Level 4 → 5: 1,350 XP
+Level 5 → 6: 2,700 XP
+Level 6 → 7: 5,100 XP
+Level 7 → 8: 9,000 XP
+Level 8 → 9: 15,000 XP
+Level 9 → 10: 24,000 XP
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const backToMapButton = document.getElementById("backToMapButton");
+    backToMapButton.addEventListener("click", () => {
+      window.location.href = "maps.html";
+    });
+
+    const playerLevelsButton = document.getElementById("playerLevelsButton");
+    const playerLevelsDetails = document.getElementById("playerLevelsDetails");
+
+    playerLevelsButton.addEventListener("click", () => {
+      const isHidden = playerLevelsDetails.hasAttribute("hidden");
+      if (isHidden) {
+        playerLevelsDetails.removeAttribute("hidden");
+      } else {
+        playerLevelsDetails.setAttribute("hidden", "hidden");
+      }
+    });
+  </script>
+</body>
+</html>

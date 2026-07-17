@@ -15,10 +15,11 @@ const elements = {
   searchInput: document.getElementById("search"),
   zoomLabel: document.getElementById("zoomLabel"),
   resetViewButton: document.getElementById("resetView"),
-  categoryToggleButtons: document.querySelectorAll(".sidebar-list-button[data-category]")
+  categoryToggleButtons: document.querySelectorAll(".sidebar-list-button[data-category]"),
+  globalToast: document.getElementById("globalToast")
 };
 
-const { mapContainer, sidebar, sidebarResizeHandle, mapLayer, mapImage, undergroundMapImage, mobAreaLayer, markerLayer, title, content, overlayMappedCoords, floorSelect, undergroundToggle, searchInput, zoomLabel, resetViewButton, categoryToggleButtons } = elements;
+const { mapContainer, sidebar, sidebarResizeHandle, mapLayer, mapImage, undergroundMapImage, mobAreaLayer, markerLayer, title, content, overlayMappedCoords, floorSelect, undergroundToggle, searchInput, zoomLabel, resetViewButton, categoryToggleButtons, globalToast } = elements;
 
 const DATA_ENTRIES = Object.freeze(
   Object.entries((typeof DATA !== "undefined" && DATA && typeof DATA === "object") ? DATA : {})
@@ -60,6 +61,24 @@ const sidebarResizeConfig = {
 const visitedMarkersStorageKey = "sao.visitedMarkers";
 const mapUiStateStorageKey = "sao.map.uiState";
 
+const MAP_LABELS = Object.freeze({
+  playerIsland: "Player Island",
+  gigasCedar: "Gigas Cedar",
+  iceCave: "Ice Cave",
+  rulid: "Rulid",
+  fishingIsland: "Fishing Island"
+});
+
+const MAIN_CATEGORY_FLOOR_RULES = Object.freeze({
+  npc: null,
+  rulid: Object.freeze(["rulid"]),
+  fishingSpot: Object.freeze(["fishingIsland"]),
+  oakWood: Object.freeze(["gigasCedar"]),
+  copper: Object.freeze(["iceCave"]),
+  iron: Object.freeze(["iceCave"]),
+  coal: Object.freeze(["iceCave"])
+});
+
 const state = {
   zoom: 1,
   translateX: 0,
@@ -82,31 +101,39 @@ const state = {
   activeMarkerId: null,
   visitedMarkerIds: loadVisitedMarkers(),
   activeCategories: {
-    biomes: false,
-    dungeons: false,
-    mobAreas: false,
-    bossSpawns: false,
-    farmingSpots: false,
-    sideQuests: false,
-    alchemist: false,
-    lumberjack: false,
-    lootBuyers: false,
-    weaponSellers: false,
-    travelingMerchants: false,
-    equipmentMerchants: false,
-    toolMerchants: false,
-    accessoriesMerchants: false,
-    occultMerchants: false,
-    consumablesMerchants: false,
-    refaire: false,
-    weaponsmith: false,
-    armorBlacksmith: false,
-    ingotBlacksmith: false,
-    keyBlacksmith: false,
-    accessoriesBlacksmith: false,
-    runeCraftsmen: false
+    npc: false,
+    rulid: false,
+    fishingSpot: false,
+    oakWood: false,
+    copper: false,
+    iron: false,
+    coal: false
   }
 };
+
+function isMainCategoryAvailableForFloor(category, floor) {
+  const allowedFloors = MAIN_CATEGORY_FLOOR_RULES[category];
+  if (!allowedFloors) return true;
+  return allowedFloors.includes(floor);
+}
+
+function syncMainCategoryButtonVisibility() {
+  const selectedFloor = floorSelect ? floorSelect.value : "";
+  categoryToggleButtons.forEach(button => {
+    const category = button.dataset.category;
+    const isVisible = isMainCategoryAvailableForFloor(category, selectedFloor);
+    const listItem = button.closest("li");
+    if (listItem) {
+      listItem.hidden = !isVisible;
+    }
+    button.hidden = !isVisible;
+    button.disabled = !isVisible;
+    if (!isVisible) {
+      state.activeCategories[category] = false;
+      button.classList.remove("active");
+    }
+  });
+}
 
 function getPersistentItem(key) {
   if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
@@ -117,6 +144,65 @@ function getPersistentItem(key) {
   } catch {
     return null;
   }
+}
+
+function getMapLabel(mapKey) {
+  return MAP_LABELS[mapKey] || "Selected Island";
+}
+
+function buildMapPlaceholderDataUri(mapKey, underground = false) {
+  const label = getMapLabel(mapKey);
+  const accent = underground ? "#7bc0ff" : "#9fd4ff";
+  const surface = underground ? "#0d1521" : "#111c2c";
+  const glow = underground ? "rgba(123, 192, 255, 0.22)" : "rgba(159, 212, 255, 0.18)";
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" role="img" aria-label="${label}">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${surface}"/>
+          <stop offset="100%" stop-color="#05070c"/>
+        </linearGradient>
+        <radialGradient id="halo" cx="50%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="${accent}" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="1600" height="1200" fill="url(#bg)"/>
+      <rect width="1600" height="1200" fill="url(#halo)"/>
+      <g opacity="0.24" fill="none" stroke="${accent}" stroke-width="2">
+        <path d="M0 168H1600M0 336H1600M0 504H1600M0 672H1600M0 840H1600M0 1008H1600"/>
+        <path d="M200 0V1200M400 0V1200M600 0V1200M800 0V1200M1000 0V1200M1200 0V1200M1400 0V1200"/>
+      </g>
+      <g fill="${accent}" opacity="0.92">
+        <text x="800" y="520" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="72" font-weight="700">${label}</text>
+        <text x="800" y="610" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="500" fill="${glow}">No image yet</text>
+      </g>
+      <rect x="80" y="80" width="1440" height="1040" rx="34" fill="none" stroke="${accent}" stroke-opacity="0.2" stroke-width="3"/>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function applyMapSources(mapKey) {
+  const primaryPlaceholder = buildMapPlaceholderDataUri(mapKey, false);
+  const undergroundPlaceholder = buildMapPlaceholderDataUri(mapKey, true);
+
+  mapImage.alt = `${getMapLabel(mapKey)} map`;
+  undergroundMapImage.alt = `${getMapLabel(mapKey)} underground overlay`;
+
+  mapImage.onerror = () => {
+    mapImage.onerror = null;
+    mapImage.src = primaryPlaceholder;
+  };
+
+  undergroundMapImage.onerror = () => {
+    undergroundMapImage.onerror = null;
+    undergroundMapImage.src = undergroundPlaceholder;
+  };
+
+  mapImage.src = `${mapKey}.png`;
+  undergroundMapImage.src = `${mapKey}underground.png`;
 }
 
 function setPersistentItem(key, value) {
@@ -269,18 +355,32 @@ function getFloorSpecificQuestsUrl(floor, search) {
   return `../Quests/quests.html${params.toString() ? `?${params.toString()}` : ""}`;
 }
 
+let toastTimeoutId = null;
+
+function showToast(message) {
+  if (!globalToast || !message) return;
+
+  globalToast.textContent = message;
+  globalToast.classList.add("show");
+  globalToast.setAttribute("aria-hidden", "false");
+
+  window.clearTimeout(toastTimeoutId);
+  toastTimeoutId = window.setTimeout(() => {
+    globalToast.classList.remove("show");
+    globalToast.setAttribute("aria-hidden", "true");
+  }, 2600);
+}
+
 const SECTION_PATHS = {
-  menu: "../../index.html",
   maps: "../Map/maps.html",
   bestiary: "../Bestiary/bestiary.html",
   equipment: "../eCompendium/ecompendium.html",
   quests: "../Quests/quests.html",
   patchnotes: "../Patchnotes/patchnotes.html",
-  commands: "../Commands/commands.html",
-  miscinfo: "../Map/miscinfo.html"
+  towerDefense: "../Tower Defense/towerdefense.html"
 };
 
-const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests", "commands"]);
+const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
 
 function buildSectionUrl(section, floor) {
   const path = SECTION_PATHS[section] || "#";
@@ -325,8 +425,15 @@ function attachSectionNavButtons() {
   if (!nav) return;
 
   nav.addEventListener("click", event => {
+    const messageButton = event.target.closest("button[data-message]");
+    if (messageButton) {
+      showToast(messageButton.dataset.message);
+      return;
+    }
+
     const button = event.target.closest("button[data-nav-target]");
     if (!button) return;
+
     window.location.href = buildSectionUrl(button.dataset.navTarget, floorSelect.value);
   });
 }
@@ -407,6 +514,11 @@ function getInverseCoords(x, z, floor, dimensions) {
     return inverseCoordCache.get(key);
   }
 
+  if (typeof invertMapCoordinates !== "function") {
+    inverseCoordCache.set(key, null);
+    return null;
+  }
+
   const inv = invertMapCoordinates(x, z, floor, dimensions);
   inverseCoordCache.set(key, inv || null);
   return inv || null;
@@ -461,6 +573,7 @@ function getImageLocalCoords(event) {
 }
 
 function mapCoordinates(rawX, rawY, dimensions) {
+  if (typeof mapWebsiteCoordinates !== "function") return null;
   return mapWebsiteCoordinates(rawX, rawY, floorSelect.value, dimensions);
 }
 
@@ -562,6 +675,8 @@ function setMarkerEmptyState(filterText) {
 function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
   if (!mobAreaLayer) return;
 
+  const mobAreas = (typeof MOB_AREAS !== "undefined" && Array.isArray(MOB_AREAS)) ? MOB_AREAS : [];
+
   const isEnabled = state.activeCategories.mobAreas === true;
   if (!isEnabled || !imgScale) {
     mobAreaLayer.replaceChildren();
@@ -571,7 +686,7 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
   const svgNS = "http://www.w3.org/2000/svg";
   const fragment = document.createDocumentFragment();
 
-  MOB_AREAS.forEach(area => {
+  mobAreas.forEach(area => {
     if (area.floor !== selectedFloor) return;
     const isAreaUnderground = area.underground === true;
     if (isAreaUnderground !== undergroundToggle.checked) return;
@@ -754,6 +869,7 @@ function scheduleRenderMarkers() {
 function renderMarkers() {
   const selectedFloor = floorSelect.value;
   const filterText = normalizeSearchValue(searchInput.value);
+  const mobAreas = (typeof MOB_AREAS !== "undefined" && Array.isArray(MOB_AREAS)) ? MOB_AREAS : [];
   const fragment = document.createDocumentFragment();
   let renderedCount = 0;
   let activeMarkerRendered = false;
@@ -888,7 +1004,7 @@ function renderMarkers() {
 
   const mobAreasEnabled = state.activeCategories.mobAreas === true;
   if (mobAreasEnabled && imgScale) {
-    MOB_AREAS.forEach(area => {
+    mobAreas.forEach(area => {
       if (area.floor !== selectedFloor) return;
       const isAreaUnderground = area.underground === true;
       if (isAreaUnderground !== undergroundToggle.checked) return;
@@ -939,7 +1055,6 @@ function renderMarkers() {
   }
 
   markerLayer.replaceChildren(fragment);
-  updateTransform();
 
   if (renderedCount === 0) {
     state.activeMarkerId = null;
@@ -1110,7 +1225,7 @@ function init() {
   const savedState = loadMapUiState();
   const initialState = urlState.hasParams ? urlState : (savedState || {});
   const requestedFloor = initialState.floor || floorSelect.value;
-  if (requestedFloor && ["floor1", "floor2", "floor3"].includes(requestedFloor)) {
+  if (requestedFloor && ["gigasCedar", "iceCave", "rulid", "fishingIsland", "playerIsland"].includes(requestedFloor)) {
     floorSelect.value = requestedFloor;
   }
   if (undergroundToggle) {
@@ -1125,8 +1240,7 @@ function init() {
     searchInput.value = initialState.search;
   }
 
-  mapImage.src = `${floorSelect.value}.png`;
-  undergroundMapImage.src = `${floorSelect.value}underground.png`;
+  applyMapSources(floorSelect.value);
 
   const persistedWidth = Number(getPersistentItem(sidebarResizeConfig.storageKey));
   if (Number.isFinite(persistedWidth) && persistedWidth > 0) {
@@ -1171,8 +1285,8 @@ function init() {
 
   resetViewButton.addEventListener("click", resetView);
   floorSelect.addEventListener("change", () => {
-    mapImage.src = `${floorSelect.value}.png`;
-    undergroundMapImage.src = `${floorSelect.value}underground.png`;
+    applyMapSources(floorSelect.value);
+    syncMainCategoryButtonVisibility();
     setUndergroundMode(undergroundToggle.checked);
     scheduleRenderMarkers();
     persistStateToHistory();
@@ -1190,9 +1304,11 @@ function init() {
   });
 
   attachSectionNavButtons();
+  syncMainCategoryButtonVisibility();
 
   categoryToggleButtons.forEach(button => {
     button.addEventListener("click", () => {
+      if (button.disabled) return;
       const category = button.dataset.category;
       const currentlyActive = state.activeCategories[category];
       state.activeCategories[category] = !currentlyActive;
@@ -1232,8 +1348,7 @@ function syncStateFromDom() {
 
   if (mapState) {
     if (floorSelect && mapState.floor) floorSelect.value = mapState.floor;
-    mapImage.src = `${floorSelect.value}.png`;
-    undergroundMapImage.src = `${floorSelect.value}underground.png`;
+    applyMapSources(floorSelect.value);
     if (searchInput && typeof mapState.search === "string") {
       searchInput.value = mapState.search;
     }
@@ -1254,13 +1369,14 @@ function syncStateFromDom() {
       });
     }
 
+    syncMainCategoryButtonVisibility();
+
     if (urlState.hasParams) {
       persistStateToHistory();
     }
   } else {
     // Ensure map images match the selected floor
-    mapImage.src = `${floorSelect.value}.png`;
-    undergroundMapImage.src = `${floorSelect.value}underground.png`;
+    applyMapSources(floorSelect.value);
 
     // Apply underground visual mode based on the checkbox (bfcache may restore the control state)
     setUndergroundMode(undergroundToggle.checked);
@@ -1270,6 +1386,7 @@ function syncStateFromDom() {
       const cat = button.dataset.category;
       state.activeCategories[cat] = button.classList.contains("active");
     });
+    syncMainCategoryButtonVisibility();
   }
 
   // Recalculate transform and re-render markers

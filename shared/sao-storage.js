@@ -4,19 +4,6 @@
   const cookieMaxAgeSeconds = 60 * 60 * 24 * 365 * 5;
   const memoryStore = new Map();
 
-  function hasLocalStorage() {
-    try {
-      const testKey = "__sao_storage_test__";
-      global.localStorage.setItem(testKey, "1");
-      global.localStorage.removeItem(testKey);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  const canUseLocalStorage = hasLocalStorage();
-
   function getCookie(name) {
     const encodedName = encodeURIComponent(name) + "=";
     const cookies = String(document.cookie || "").split(";");
@@ -44,13 +31,11 @@
       const normalizedKey = String(key || "");
       if (!normalizedKey) return null;
 
-      if (canUseLocalStorage) {
-        try {
-          const value = global.localStorage.getItem(normalizedKey);
-          if (value !== null) return value;
-        } catch {
-          // Continue to cookie fallback.
-        }
+      try {
+        const value = global.localStorage.getItem(normalizedKey);
+        if (value !== null) return value;
+      } catch {
+        // Continue to cookie fallback.
       }
 
       try {
@@ -68,13 +53,11 @@
       if (!normalizedKey) return;
       const normalizedValue = String(value);
 
-      if (canUseLocalStorage) {
-        try {
-          global.localStorage.setItem(normalizedKey, normalizedValue);
-          return;
-        } catch {
-          // Continue to cookie fallback.
-        }
+      try {
+        global.localStorage.setItem(normalizedKey, normalizedValue);
+        return;
+      } catch {
+        // Continue to cookie fallback.
       }
 
       try {
@@ -91,12 +74,10 @@
       const normalizedKey = String(key || "");
       if (!normalizedKey) return;
 
-      if (canUseLocalStorage) {
-        try {
-          global.localStorage.removeItem(normalizedKey);
-        } catch {
-          // Ignore localStorage removal errors.
-        }
+      try {
+        global.localStorage.removeItem(normalizedKey);
+      } catch {
+        // Ignore localStorage removal errors.
       }
 
       try {
@@ -124,5 +105,39 @@
     }
   };
 
+  const pageUtils = Object.freeze({
+    SECTION_PATHS: Object.freeze({
+      maps: "../Map/maps.html",
+      bestiary: "../Bestiary/bestiary.html",
+      equipment: "../eCompendium/ecompendium.html",
+      quests: "../Quests/quests.html",
+      patchnotes: "../Patchnotes/patchnotes.html",
+      commands: "../Commands/commands.html"
+    }),
+    FLOOR_AWARE_SECTIONS: new Set(["maps", "bestiary", "equipment", "quests", "commands"]),
+    buildSectionUrl(section, floor) {
+      const path = pageUtils.SECTION_PATHS[section] || "#";
+      if (path === "#") return path;
+      if (!floor || !pageUtils.FLOOR_AWARE_SECTIONS.has(section)) return path;
+      return `${path}?${new URLSearchParams({ floor }).toString()}`;
+    },
+    attachSectionNavButtons(navSelector = ".nav", floorProvider) {
+      const nav = document.querySelector(navSelector);
+      if (!nav) return;
+
+      nav.addEventListener("click", event => {
+        const button = event.target.closest("button[data-nav-target]");
+        if (!button) return;
+
+        const resolvedFloor = typeof floorProvider === "function"
+          ? floorProvider()
+          : floorProvider;
+
+        window.location.href = pageUtils.buildSectionUrl(button.dataset.navTarget, resolvedFloor);
+      });
+    }
+  });
+
   global.SAOStorage = storage;
+  global.SAOPageUtils = pageUtils;
 })(window);

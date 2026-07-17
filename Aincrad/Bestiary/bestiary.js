@@ -237,7 +237,13 @@ function createDropList(drops) {
 
   sortedDrops.forEach(drop => {
     const row = document.createElement("li");
-    row.innerHTML = `<span>${drop.item}${drop.notesText}</span><strong>${drop.chance !== null ? `${drop.chance}%` : "N/A"}</strong>`;
+    const itemText = document.createElement("span");
+    itemText.textContent = `${drop.item}${drop.notesText}`;
+
+    const chanceText = document.createElement("strong");
+    chanceText.textContent = drop.chance !== null ? `${drop.chance}%` : "N/A";
+
+    row.append(itemText, chanceText);
     list.appendChild(row);
   });
 
@@ -281,37 +287,14 @@ function createMobCard(mob) {
 }
 
 const DEFAULT_BESTIARY_FLOOR = "floor1";
-const SECTION_PATHS = {
-  maps: "../Map/maps.html",
-  bestiary: "../Bestiary/bestiary.html",
-  equipment: "../eCompendium/ecompendium.html",
-  quests: "../Quests/quests.html",
-  patchnotes: "../Patchnotes/patchnotes.html"
-};
-
-const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
 
 function getRequestedFloor() {
   const requestedFloor = new URLSearchParams(window.location.search).get("floor");
   return requestedFloor && /^floor[123]$/.test(requestedFloor) ? requestedFloor : DEFAULT_BESTIARY_FLOOR;
 }
 
-function buildSectionUrl(section, floor) {
-  const path = SECTION_PATHS[section] || "#";
-  if (path === "#") return path;
-  if (!floor || !FLOOR_AWARE_SECTIONS.has(section)) return path;
-  return `${path}?${new URLSearchParams({ floor }).toString()}`;
-}
-
 function attachSectionNavButtons() {
-  const nav = document.querySelector(".nav");
-  if (!nav) return;
-
-  nav.addEventListener("click", event => {
-    const button = event.target.closest("button[data-nav-target]");
-    if (!button) return;
-    window.location.href = buildSectionUrl(button.dataset.navTarget, getRequestedFloor());
-  });
+  window.SAOPageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
 }
 
 function loadFloorMobData(floorKey, onReady) {

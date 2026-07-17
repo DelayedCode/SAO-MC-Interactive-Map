@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SAO Interactive Map</title>
+  <link rel="stylesheet" href="mainui.css">
+</head>
+<body>
+  <header>
+    <div class="top-nav">
+      <button class="top-button" type="button" data-nav-target="towerDefense">Tower Defense</button>
+      <button class="top-button" type="button" data-message="Not enough information released yet to make a page!">Compendium</button>
+      <a class="top-button" href="../../index.html">Go back to Menu</a>
+    </div>
+    <div class="header-main">
+      <h1>SAO Interactive Map</h1>
+      <div class="controls">
+        <label for="floorSelect">Island:</label>
+        <select id="floorSelect">
+          <option value="playerIsland" selected>Player Island</option>
+          <option value="gigasCedar">Gigas Cedar</option>
+          <option value="iceCave">Ice Cave</option>
+          <option value="rulid">Rulid</option>
+          <option value="fishingIsland">Fishing Island</option>
+        </select>
+        <label class="underground-toggle-wrapper" for="undergroundToggle">
+          <span>Underground:</span>
+          <input type="checkbox" id="undergroundToggle">
+        </label>
+        <input type="text" id="search" placeholder="Search markers...">
+      </div>
+    </div>
+  </header>
+
+  <div id="globalToast" class="global-toast" aria-hidden="true"></div>
+
+  <main>
+    <section id="mapContainer">
+      <div id="mapLayer">
+        <img id="mapImage" alt="Map floor">
+        <img id="undergroundMapImage" class="underground-map" alt="Underground overlay">
+        <svg id="mobAreaLayer" aria-hidden="true"></svg>
+        <div id="markers"></div>
+      </div>
+      <div id="coordinateDisplay">
+        <div id="overlayMappedCoords">X: -- Z: --</div>
+      </div>
+      <div id="zoomControls">
+        <button id="resetView" type="button">Reset View</button>
+        <span id="zoomLabel">1x</span>
+      </div>
+      <div id="infoOverlay">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title" id="title">Select a marker</div>
+          <div id="content">
+            <p>Choose a marker on the map to see details here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="sidebarResizeHandle" role="separator" aria-label="Resize sidebar" aria-orientation="vertical"></div>
+
+    <aside id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Category: Main</div>
+        <ul class="sidebar-list">
+          <li><button class="sidebar-list-button" type="button" data-category="npc">NPC</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="rulid">Wheat Spawn</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="fishingSpot">Fishing Spot</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="oakWood">Oak Wood</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="copper">Copper</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="iron">Iron</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="coal">Coal</button></li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <script src="../../shared/sao-storage.js"></script>
+  <script src="mainui.js"></script>
+</body>
+</html>

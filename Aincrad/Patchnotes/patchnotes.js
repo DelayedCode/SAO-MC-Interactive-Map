@@ -1,5 +1,12 @@
 const PATCH_NOTES = [
   {
+    version: "Final Touches Till Full Release - v1.1",
+    date: "2026-07-16",
+    title: "Final Touches",
+    summary: "• Added a Commands tab.\n• Added a Misc. Info section for information that doesn't fit anywhere else.\n• Added Back to Menu buttons throughout the website.\n• Added the Fractured Underworld section, although it is still in the early stages of development.\n• Began work on Tower Defense support and information within Fractured Underworld.\n• Added a small disclaimer to the Welcome Mat.\n• Fixed a wapoint bug.\n• Fixed a UI bug",
+    tags: ["Release", "Commands", "Misc Info", "Fractured Underworld", "Tower Defense", "Welcome Mat", "Bug Fixes"]
+  },
+  {
     version: "Full Release - v1.0",
     date: "2026-07-16",
     title: "Full Release",
@@ -23,6 +30,10 @@ const PATCH_NOTES = [
 ];
 
 const patchnotesSearchStorageKey = "sao.patchnotes.search";
+const PATCH_NOTE_SEARCH_INDEX = PATCH_NOTES.map(entry => ({
+  entry,
+  haystack: `${entry.version} ${entry.title} ${entry.summary} ${entry.tags.join(" ")} ${entry.date}`.toLowerCase()
+}));
 
 function getPersistentItem(key) {
   if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
@@ -47,37 +58,13 @@ function setPersistentItem(key, value) {
   }
 }
 
-const SECTION_PATHS = {
-  maps: "../Map/maps.html",
-  bestiary: "../Bestiary/bestiary.html",
-  equipment: "../eCompendium/ecompendium.html",
-  quests: "../Quests/quests.html",
-  patchnotes: "../Patchnotes/patchnotes.html"
-};
-
-const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
-
 function getRequestedFloor() {
   const requestedFloor = new URLSearchParams(window.location.search).get("floor");
   return requestedFloor && /^floor[123]$/.test(requestedFloor) ? requestedFloor : "";
 }
 
-function buildSectionUrl(section, floor) {
-  const path = SECTION_PATHS[section] || "#";
-  if (path === "#") return path;
-  if (!floor || !FLOOR_AWARE_SECTIONS.has(section)) return path;
-  return `${path}?${new URLSearchParams({ floor }).toString()}`;
-}
-
 function attachSectionNavButtons() {
-  const nav = document.querySelector(".nav");
-  if (!nav) return;
-
-  nav.addEventListener("click", event => {
-    const button = event.target.closest("button[data-nav-target]");
-    if (!button) return;
-    window.location.href = buildSectionUrl(button.dataset.navTarget, getRequestedFloor());
-  });
+  window.SAOPageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
 }
 
 function buildPatchNoteCard(entry) {
@@ -129,22 +116,22 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!patchnotesList) return;
 
     const normalizedFilter = filter.trim().toLowerCase();
-    const visibleNotes = PATCH_NOTES.filter((entry) => {
-      const haystack = `${entry.version} ${entry.title} ${entry.summary} ${entry.tags.join(" ")} ${entry.date}`.toLowerCase();
-      return haystack.includes(normalizedFilter);
-    });
-
-    patchnotesList.replaceChildren();
+    const visibleNotes = PATCH_NOTE_SEARCH_INDEX
+      .filter(({ haystack }) => haystack.includes(normalizedFilter))
+      .map(({ entry }) => entry);
 
     if (!visibleNotes.length) {
-      patchnotesList.innerHTML = '<div class="patchnote-empty">No patch notes match that filter.</div>';
+      const emptyState = document.createElement("div");
+      emptyState.className = "patchnote-empty";
+      emptyState.textContent = "No patch notes match that filter.";
+      patchnotesList.replaceChildren(emptyState);
       if (status) status.textContent = "No matching changelog entries found.";
       return;
     }
 
     const fragment = document.createDocumentFragment();
     visibleNotes.forEach(entry => fragment.appendChild(buildPatchNoteCard(entry)));
-    patchnotesList.appendChild(fragment);
+    patchnotesList.replaceChildren(fragment);
 
     if (status) {
       status.textContent = `Showing ${visibleNotes.length} patch note${visibleNotes.length === 1 ? "" : "s"}.`;

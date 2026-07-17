@@ -19,15 +19,6 @@ const columns = [
 
 const completedStorageKey = "sao.completedQuests";
 const questsUiStateStorageKey = "sao.quests.uiState";
-const SECTION_PATHS = {
-  maps: "../Map/maps.html",
-  bestiary: "../Bestiary/bestiary.html",
-  equipment: "../eCompendium/ecompendium.html",
-  quests: "../Quests/quests.html",
-  patchnotes: "../Patchnotes/patchnotes.html"
-};
-
-const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
 
 function getFloorLabel(floor) {
   return String(floor || DEFAULT_FLOOR).replace("floor", "Floor ");
@@ -103,22 +94,8 @@ function setQuestCompleted(completedQuests, questKey, isCompleted) {
   saveCompletedQuests(completedQuests);
 }
 
-function buildSectionUrl(section, floor) {
-  const path = SECTION_PATHS[section] || "#";
-  if (path === "#") return path;
-  if (!floor || !FLOOR_AWARE_SECTIONS.has(section)) return path;
-  return `${path}?${new URLSearchParams({ floor }).toString()}`;
-}
-
 function attachSectionNavButtons() {
-  const nav = document.querySelector(".nav");
-  if (!nav) return;
-
-  nav.addEventListener("click", event => {
-    const button = event.target.closest("button[data-nav-target]");
-    if (!button) return;
-    window.location.href = buildSectionUrl(button.dataset.navTarget, activeFloor);
-  });
+  window.SAOPageUtils.attachSectionNavButtons(".nav", () => activeFloor);
 }
 
 function getQuestEntries() {
@@ -176,6 +153,7 @@ function renderQuestTable(entries) {
 
     columns.forEach(({ key }) => {
       const cell = document.createElement("td");
+      cell.classList.add(key);
       if (key === "completed") {
         const button = document.createElement("button");
         button.type = "button";
@@ -236,7 +214,7 @@ function initQuestsRuntime() {
       } else if (visibleEntries.length === 0 && query) {
         status.textContent = `No quest entries match your search on ${getFloorLabel(activeFloor)}. ${completedCount} completed.`;
       } else {
-        status.textContent = `${visibleEntries.length} of ${questEntries.length} quest entries shown for ${getFloorLabel(activeFloor)}. ${completedCount} completed.`;
+        status.textContent = `${visibleEntries.length} of ${questEntries.length} quest entries shown for ${getFloorLabel(activeFloor)} || ${completedCount} completed.`;
       }
     }
 

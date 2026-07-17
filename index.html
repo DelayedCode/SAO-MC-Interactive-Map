@@ -130,9 +130,25 @@
     }
 
     .subtitle,
+    .home-disclaimer,
     .card-desc,
     .modal-copy {
       color: var(--muted);
+    }
+
+    .home-disclaimer {
+      margin: 18px auto 0;
+      max-width: 860px;
+      padding: 12px 14px;
+      border: 1px solid rgba(186, 205, 230, 0.18);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.84rem;
+      line-height: 1.6;
+      text-align: center;
+      color: #c6d1dd;
+      opacity: 0.96;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
     .subtitle {
@@ -368,9 +384,9 @@
       bottom: 18px;
       left: 50%;
       transform: translateX(-50%) translateY(16px);
-      background: rgba(33, 22, 14, 0.94);
-      color: #ffe7cf;
-      border: 1px solid rgba(255, 180, 110, 0.6);
+      background: rgba(11, 16, 24, 0.96);
+      color: #e8f3ff;
+      border: 1px solid rgba(115, 201, 255, 0.5);
       border-radius: 10px;
       padding: 12px 14px;
       font-weight: 700;
@@ -378,6 +394,7 @@
       pointer-events: none;
       transition: opacity 0.2s ease, transform 0.2s ease;
       z-index: 10;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
     }
 
     .toast.show {
@@ -413,6 +430,12 @@
         </div>
       </header>
 
+      <div class="home-disclaimer">
+        <strong>Please Note:</strong> This is a personal project.<br>
+        This website is primarily intended for personal and guild use. Information will continue to be added, updated, and improved for as long as there is new content to document.<br>
+        Please keep in mind that this project was not originally designed to be a fully public resource, so some information may be incomplete, missing, or tailored toward my own use and my guild's needs.
+      </div>
+
       <section class="grid" aria-label="Gamemode selector">
         <button class="mode-button aincrad" type="button" data-href="Aincrad/Map/maps.html">
           <div class="card-title-row">
@@ -426,16 +449,16 @@
           <div class="card-meta"><span>Interactive mode</span><span class="meta-arrow">→</span></div>
         </button>
 
-        <button class="mode-button underworld" type="button" data-message="Fractured Underworld is not published yet.">
+        <button class="mode-button underworld" type="button" data-href="Fractured Underworld/Main UI/mainui.html">
           <div class="card-title-row">
             <div class="title-cluster">
               <span class="card-icon" aria-hidden="true"></span>
               <h2 class="card-title">Fractured Underworld</h2>
             </div>
-            <span class="tag">Soon</span>
+            <span class="tag">Launch</span>
           </div>
-          <p class="card-desc">This section is still being prepared, so the portal remains locked for now.</p>
-          <div class="card-meta"><span>Status update</span><span class="meta-arrow">→</span></div>
+          <p class="card-desc">Open the Fractured Underworld map hub to start building and testing this module.</p>
+          <div class="card-meta"><span>Interactive mode</span><span class="meta-arrow">→</span></div>
         </button>
 
         <button class="mode-button ggo" type="button" data-message="GGO is not out yet! No info to display.">

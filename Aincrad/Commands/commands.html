@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAO Patchnotes</title>
-  <link rel="stylesheet" href="patchnotes.css">
+  <title>SAO Commands</title>
+  <link rel="stylesheet" href="commands.css">
 </head>
 <body>
   <div class="page">
@@ -13,26 +13,28 @@
       <button type="button" data-nav-target="bestiary">Bestiary</button>
       <button type="button" data-nav-target="equipment">Equipment</button>
       <button type="button" data-nav-target="quests">Quests</button>
+      <button type="button" data-nav-target="patchnotes">Patchnotes</button>
       <button type="button" data-nav-target="commands">Commands</button>
     </div>
 
     <div class="panel">
-      <div class="panel-header">
-        <div>
-          <h1>Patchnotes</h1>
-          <p id="status">Loading changelog...</p>
-        </div>
+      <h1>Commands</h1>
 
-        <label class="search-label" for="patchSearch">
-          <span>Search notes</span>
-          <input id="patchSearch" type="text" placeholder="Filter by version, item, or update">
+      <div id="categoryFilters" class="list-tabs" role="tablist" aria-label="Command categories"></div>
+
+      <div class="panel-header">
+        <p id="status">Loading...</p>
+        <label class="search-label" for="commandSearch">
+          <span>Search commands</span>
+          <input id="commandSearch" type="search" placeholder="Search by command, usage, or example..." autocomplete="off">
         </label>
       </div>
 
-      <div id="patchnotesList" class="patchnotes-list" aria-live="polite"></div>
+      <div id="commandTableRoot"></div>
     </div>
   </div>
+
   <script src="../../shared/sao-storage.js"></script>
-  <script src="patchnotes.js"></script>
+  <script src="commands.js"></script>
 </body>
 </html>

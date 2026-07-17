@@ -55,45 +55,14 @@ function saveCompendiumUiState(nextState) {
 }
 
 const DEFAULT_COMPENDIUM_FLOOR = "floor1";
-const SECTION_PATHS = {
-    maps: "../Map/maps.html",
-    bestiary: "../Bestiary/bestiary.html",
-    equipment: "../eCompendium/ecompendium.html",
-    quests: "../Quests/quests.html",
-    patchnotes: "../Patchnotes/patchnotes.html"
-};
-
-const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
 
 function getRequestedFloor() {
     const requestedFloor = new URLSearchParams(window.location.search).get("floor");
     return requestedFloor && /^floor[123]$/.test(requestedFloor) ? requestedFloor : DEFAULT_COMPENDIUM_FLOOR;
 }
 
-function buildSectionUrl(section, floor) {
-    const path = SECTION_PATHS[section] || "#";
-    if (path === "#") {
-        return path;
-    }
-    if (!floor || !FLOOR_AWARE_SECTIONS.has(section)) {
-        return path;
-    }
-    return `${path}?${new URLSearchParams({ floor }).toString()}`;
-}
-
 function attachSectionNavButtons() {
-    const nav = document.querySelector(".nav");
-    if (!nav) {
-        return;
-    }
-
-    nav.addEventListener("click", function(event) {
-        const button = event.target.closest("button[data-nav-target]");
-        if (!button) {
-            return;
-        }
-        window.location.href = buildSectionUrl(button.dataset.navTarget, getRequestedFloor());
-    });
+    window.SAOPageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
 }
 
 function getActiveDataSet() {
@@ -230,16 +199,17 @@ function renderEntries(entries, query) {
         " entries shown";
 
     if (filteredEntries.length === 0) {
-        list.innerHTML =
-            "<p class='empty-state'>No entries found.</p>";
+        list.replaceChildren(document.createElement("p"));
+        list.firstChild.className = "empty-state";
+        list.firstChild.textContent = "No entries found.";
         return;
     }
 
-    list.innerHTML = "";
-
+    const fragment = document.createDocumentFragment();
     filteredEntries.forEach(function(entry) {
-        list.appendChild(createEntryCard(entry));
+        fragment.appendChild(createEntryCard(entry));
     });
+    list.replaceChildren(fragment);
 }
 
 function initCompendiumRuntime() {
@@ -259,6 +229,18 @@ function initCompendiumRuntime() {
     const savedState = loadCompendiumUiState();
     const floorState = savedState[floor] || {};
     let activeCategory = floorState.category || "weapon";
+    let renderRafId = null;
+
+    function scheduleRenderEntries() {
+        if (renderRafId !== null) {
+            return;
+        }
+
+        renderRafId = window.requestAnimationFrame(function() {
+            renderRafId = null;
+            renderEntries(currentEntries, searchInput.value);
+        });
+    }
 
     function loadCategory(category) {
         activeCategory = category;
@@ -309,7 +291,7 @@ function initCompendiumRuntime() {
                 search: searchInput.value
             }
         });
-        renderEntries(currentEntries, searchInput.value);
+        scheduleRenderEntries();
     });
 
     tabButtons.forEach(function(button) {
