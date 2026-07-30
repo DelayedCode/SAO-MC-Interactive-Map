@@ -1,5 +1,12 @@
 const PATCH_NOTES = [
   {
+    version: "Very Small Bug Fix - v1.2",
+    date: "2026-07-29",
+    title: "Very Small Bug Fix",
+    summary: "• Fixed the Commands Menu loading indefinitely.\n• Fixed patchnote order from lowest to highest date.",
+    tags: ["Bug Fixes", "Commands", "Maps"]
+  },
+  {
     version: "Final Touches Till Full Release - v1.1",
     date: "2026-07-16",
     title: "Final Touches",
@@ -32,7 +39,8 @@ const PATCH_NOTES = [
 const patchnotesSearchStorageKey = "sao.patchnotes.search";
 const PATCH_NOTE_SEARCH_INDEX = PATCH_NOTES.map(entry => ({
   entry,
-  haystack: `${entry.version} ${entry.title} ${entry.summary} ${entry.tags.join(" ")} ${entry.date}`.toLowerCase()
+  haystack: `${entry.version} ${entry.title} ${entry.summary} ${entry.tags.join(" ")} ${entry.date}`.toLowerCase(),
+  parsedDate: new Date(entry.date).getTime() || 0
 }));
 
 function getPersistentItem(key) {
@@ -118,6 +126,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const normalizedFilter = filter.trim().toLowerCase();
     const visibleNotes = PATCH_NOTE_SEARCH_INDEX
       .filter(({ haystack }) => haystack.includes(normalizedFilter))
+      .sort((a, b) => (b.parsedDate || 0) - (a.parsedDate || 0))
       .map(({ entry }) => entry);
 
     if (!visibleNotes.length) {

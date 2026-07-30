@@ -14,17 +14,6 @@ const categories = [
   { key: "useless", label: "Useless Commands" }
 ];
 const categoryLabelMap = new Map(categories.map(category => [category.key, category.label]));
-const commandsByCategory = new Map();
-const commandSearchIndex = commandEntries.map(entry => ({
-  entry,
-  haystack: `${entry.command} ${entry.usage} ${entry.example}`.toLowerCase()
-}));
-
-for (const entry of commandEntries) {
-  const bucket = commandsByCategory.get(entry.category) || [];
-  bucket.push(entry);
-  commandsByCategory.set(entry.category, bucket);
-}
 
 const commandEntries = [
   {
@@ -334,6 +323,19 @@ const commandEntries = [
     example: "/sanctions"
   }
 ];
+
+// Build lookup structures used by the runtime
+const commandsByCategory = new Map();
+commandEntries.forEach(entry => {
+  const list = commandsByCategory.get(entry.category) || [];
+  list.push(entry);
+  commandsByCategory.set(entry.category, list);
+});
+
+const commandSearchIndex = commandEntries.map(entry => {
+  const haystack = [entry.command, entry.usage, entry.example, categoryLabelMap.get(entry.category) || ""].join(" ").toLowerCase();
+  return { entry, haystack };
+});
 
 function getPersistentItem(key) {
   if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
