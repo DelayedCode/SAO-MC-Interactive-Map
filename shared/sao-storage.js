@@ -101,18 +101,24 @@
     },
 
     setJSON(key, value) {
-      this.setItem(key, JSON.stringify(value));
+      try {
+        this.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.error("Failed to persist JSON data.", error);
+      }
     }
   };
 
   const pageUtils = Object.freeze({
     SECTION_PATHS: Object.freeze({
+      menu: "../../index.html",
       maps: "../Map/maps.html",
       bestiary: "../Bestiary/bestiary.html",
       equipment: "../eCompendium/ecompendium.html",
       quests: "../Quests/quests.html",
       patchnotes: "../Patchnotes/patchnotes.html",
-      commands: "../Commands/commands.html"
+      commands: "../Commands/commands.html",
+      miscinfo: "../Misc Info/miscinfo.html"
     }),
     FLOOR_AWARE_SECTIONS: new Set(["maps", "bestiary", "equipment", "quests", "commands"]),
     buildSectionUrl(section, floor) {
@@ -120,6 +126,19 @@
       if (path === "#") return path;
       if (!floor || !pageUtils.FLOOR_AWARE_SECTIONS.has(section)) return path;
       return `${path}?${new URLSearchParams({ floor }).toString()}`;
+    },
+    resolveSafeInternalHref(value) {
+      const rawValue = String(value || "").trim();
+      if (!rawValue) return null;
+
+      try {
+        const resolved = new URL(rawValue, window.location.href);
+        if (resolved.origin !== window.location.origin) return null;
+        if (resolved.protocol !== "http:" && resolved.protocol !== "https:") return null;
+        return resolved.href;
+      } catch {
+        return null;
+      }
     },
     attachSectionNavButtons(navSelector = ".nav", floorProvider) {
       const nav = document.querySelector(navSelector);
@@ -133,7 +152,12 @@
           ? floorProvider()
           : floorProvider;
 
-        window.location.href = pageUtils.buildSectionUrl(button.dataset.navTarget, resolvedFloor);
+        const nextHref = pageUtils.resolveSafeInternalHref(
+          pageUtils.buildSectionUrl(button.dataset.navTarget, resolvedFloor)
+        );
+        if (!nextHref) return;
+
+        window.location.href = nextHref;
       });
     }
   });

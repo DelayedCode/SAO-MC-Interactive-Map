@@ -1,19 +1,40 @@
 const DEFAULT_FLOOR = "floor1";
 const DEFAULT_CATEGORY = "communication";
 const commandsUiStateStorageKey = "sao.commands.uiState";
+const i18n = window.SAOI18n || null;
+const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const storage = window.SAOStorage || {
+  getItem() { return null; },
+  setItem() {},
+  getJSON(_key, fallbackValue) { return fallbackValue; },
+  setJSON() {}
+};
 
 const categories = [
-  { key: "communication", label: "Communication" },
-  { key: "cosmetics", label: "Cosmetics and Appearance" },
-  { key: "dungeons", label: "Dungeons" },
-  { key: "economy", label: "Economy" },
-  { key: "gameplay", label: "Gameplay and Progression" },
-  { key: "information", label: "Information" },
-  { key: "media", label: "Media and Audio" },
-  { key: "navigation", label: "Navigation" },
-  { key: "useless", label: "Useless Commands" }
+  { key: "communication", labelKey: "page.commands.categories.communication" },
+  { key: "cosmetics", labelKey: "page.commands.categories.cosmetics" },
+  { key: "dungeons", labelKey: "page.commands.categories.dungeons" },
+  { key: "economy", labelKey: "page.commands.categories.economy" },
+  { key: "gameplay", labelKey: "page.commands.categories.gameplay" },
+  { key: "information", labelKey: "page.commands.categories.information" },
+  { key: "media", labelKey: "page.commands.categories.media" },
+  { key: "navigation", labelKey: "page.commands.categories.navigation" },
+  { key: "useless", labelKey: "page.commands.categories.useless" }
 ];
-const categoryLabelMap = new Map(categories.map(category => [category.key, category.label]));
+const categoryLabelMap = new Map();
+
+function getCategoryLabel(categoryKey) {
+  return t(`page.commands.categories.${categoryKey}`);
+}
+
+function refreshCategoryLabelMap() {
+  categoryLabelMap.clear();
+  categories.forEach(category => {
+    categoryLabelMap.set(category.key, getCategoryLabel(category.key));
+  });
+}
+
+refreshCategoryLabelMap();
 
 const commandEntries = [
   {
@@ -337,43 +358,13 @@ const commandSearchIndex = commandEntries.map(entry => {
   return { entry, haystack };
 });
 
-function getPersistentItem(key) {
-  if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
-    return window.SAOStorage.getItem(key);
-  }
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function setPersistentItem(key, value) {
-  if (window.SAOStorage && typeof window.SAOStorage.setItem === "function") {
-    window.SAOStorage.setItem(key, value);
-    return;
-  }
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Keep commands usable if storage is blocked.
-  }
-}
-
 function loadCommandsUiState() {
-  try {
-    const raw = getPersistentItem(commandsUiStateStorageKey);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return {};
-    return parsed;
-  } catch {
-    return {};
-  }
+  const parsed = storage.getJSON(commandsUiStateStorageKey, {});
+  return parsed && typeof parsed === "object" ? parsed : {};
 }
 
 function saveCommandsUiState(nextState) {
-  setPersistentItem(commandsUiStateStorageKey, JSON.stringify(nextState));
+  storage.setJSON(commandsUiStateStorageKey, nextState);
 }
 
 function getRequestedFloor() {
@@ -382,7 +373,27 @@ function getRequestedFloor() {
 }
 
 function attachSectionNavButtons() {
-  window.SAOPageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
+  const pageUtils = window.SAOPageUtils;
+  if (!pageUtils || typeof pageUtils.attachSectionNavButtons !== "function") {
+    console.warn("Commands navigation helper is unavailable.");
+    return;
+  }
+
+  pageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
+}
+
+function showCommandsLoadError() {
+  const status = document.getElementById("status");
+  const root = document.getElementById("commandTableRoot");
+  if (status) {
+    status.textContent = t("page.commands.loadError");
+  }
+  if (root) {
+    const emptyState = document.createElement("p");
+    emptyState.className = "empty-state";
+    emptyState.textContent = t("page.commands.loadUnavailable");
+    root.replaceChildren(emptyState);
+  }
 }
 
 function createCategoryFilters(activeCategory) {
@@ -396,9 +407,35 @@ function createCategoryFilters(activeCategory) {
     button.type = "button";
     button.className = `list-tab${category.key === activeCategory ? " is-active" : ""}`;
     button.dataset.category = category.key;
-    button.textContent = category.label;
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-controls", "commandTableRoot");
+    button.setAttribute("aria-selected", category.key === activeCategory ? "true" : "false");
+    button.setAttribute("tabindex", category.key === activeCategory ? "0" : "-1");
+    button.textContent = getCategoryLabel(category.key);
     wrap.appendChild(button);
   });
+}
+
+function setActiveCategoryFilter(activeCategory) {
+  const wrap = document.getElementById("categoryFilters");
+  if (!wrap) return;
+
+  wrap.querySelectorAll("button[data-category]").forEach(button => {
+    const isActive = button.dataset.category === activeCategory;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
+    button.setAttribute("tabindex", isActive ? "0" : "-1");
+  });
+}
+
+function moveCategoryTabFocus(currentButton, offset) {
+  const wrap = document.getElementById("categoryFilters");
+  if (!wrap) return;
+  const tabs = Array.from(wrap.querySelectorAll("button[data-category]"));
+  const currentIndex = tabs.indexOf(currentButton);
+  if (currentIndex < 0 || tabs.length === 0) return;
+  const nextIndex = (currentIndex + offset + tabs.length) % tabs.length;
+  tabs[nextIndex].focus();
 }
 
 function renderCommandTable(entries) {
@@ -408,7 +445,7 @@ function renderCommandTable(entries) {
   if (!entries.length) {
     const emptyState = document.createElement("p");
     emptyState.className = "empty-state";
-    emptyState.textContent = "No commands match your current filters.";
+    emptyState.textContent = t("page.commands.emptyState");
     root.replaceChildren(emptyState);
     return;
   }
@@ -418,7 +455,11 @@ function renderCommandTable(entries) {
 
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
-  ["Command", "Usage", "Example"].forEach(label => {
+  [
+    t("page.commands.colCommand"),
+    t("page.commands.colUsage"),
+    t("page.commands.colExample")
+  ].forEach(label => {
     const th = document.createElement("th");
     th.textContent = label;
     headerRow.appendChild(th);
@@ -452,7 +493,7 @@ function initCommandsRuntime() {
   const status = document.getElementById("status");
   const searchInput = document.getElementById("commandSearch");
   const params = new URLSearchParams(window.location.search);
-  const uiState = loadCommandsUiState();
+  let uiState = loadCommandsUiState();
 
   let activeCategory = params.get("category") || uiState.category || DEFAULT_CATEGORY;
   if (!categories.some(category => category.key === activeCategory)) {
@@ -467,6 +508,14 @@ function initCommandsRuntime() {
 
   if (searchInput) {
     searchInput.value = searchValue;
+  }
+
+  function persistCommandsUiState(nextStatePatch) {
+    uiState = {
+      ...uiState,
+      ...nextStatePatch
+    };
+    saveCommandsUiState(uiState);
   }
 
   function scheduleRenderCommandTable() {
@@ -488,7 +537,11 @@ function initCommandsRuntime() {
     const categoryLabel = categoryLabelMap.get(activeCategory) || "Commands";
 
     if (status) {
-      status.textContent = `${visibleEntries.length} command${visibleEntries.length === 1 ? "" : "s"} shown in ${categoryLabel}.`;
+      status.textContent = t("page.commands.statusShown", {
+        count: visibleEntries.length,
+        suffix: visibleEntries.length === 1 ? "" : "s",
+        category: categoryLabel
+      });
     }
 
     renderCommandTable(visibleEntries);
@@ -504,21 +557,69 @@ function initCommandsRuntime() {
       if (!nextCategory || nextCategory === activeCategory) return;
 
       activeCategory = nextCategory;
-      createCategoryFilters(activeCategory);
-      saveCommandsUiState({ category: activeCategory, search: searchValue });
+      setActiveCategoryFilter(activeCategory);
+      persistCommandsUiState({ category: activeCategory, search: searchValue });
       applyFilters();
+    });
+
+    categoryFilters.addEventListener("keydown", event => {
+      const button = event.target.closest("button[data-category]");
+      if (!button) return;
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        moveCategoryTabFocus(button, 1);
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        moveCategoryTabFocus(button, -1);
+        return;
+      }
+
+      const tabs = Array.from(categoryFilters.querySelectorAll("button[data-category]"));
+      if (event.key === "Home") {
+        event.preventDefault();
+        tabs[0]?.focus();
+        return;
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        tabs[tabs.length - 1]?.focus();
+        return;
+      }
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        button.click();
+      }
     });
   }
 
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       searchValue = searchInput.value;
-      saveCommandsUiState({ category: activeCategory, search: searchValue });
+      persistCommandsUiState({ category: activeCategory, search: searchValue });
       scheduleRenderCommandTable();
     });
   }
 
   applyFilters();
+
+  document.addEventListener("sao:languagechange", () => {
+    refreshCategoryLabelMap();
+    createCategoryFilters(activeCategory);
+    applyFilters();
+  });
 }
 
-document.addEventListener("DOMContentLoaded", initCommandsRuntime);
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    initCommandsRuntime();
+  } catch (error) {
+    console.error("Failed to initialize commands runtime.", error);
+    showCommandsLoadError();
+  }
+});

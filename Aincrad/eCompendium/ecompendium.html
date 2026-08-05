@@ -4,11 +4,53 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SAO Equipment Compendium</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+<title data-i18n="page.ecompendium.title">Aincrad Equipment Compendium | SAO MC Interactive Map</title>
+<meta name="description" content="Search and browse SAO MC Aincrad equipment data including weapons, armor, accessories, resources, and consumables.">
+<meta name="keywords" content="SAO MC equipment compendium, Aincrad weapons, armor, runes, resources">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="DelayedCode">
+<meta name="theme-color" content="#0b121a">
+<link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/eCompendium/ecompendium.html">
+<link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="manifest" href="../../site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SAO MC Interactive Map">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Aincrad Equipment Compendium | SAO MC Interactive Map">
+<meta property="og:description" content="Search and browse SAO MC Aincrad equipment data including weapons, armor, accessories, resources, and consumables.">
+<meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/eCompendium/ecompendium.html">
+<meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+<meta property="og:image:alt" content="SAO MC equipment compendium preview">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Aincrad Equipment Compendium | SAO MC Interactive Map">
+<meta name="twitter:description" content="Search and browse SAO MC Aincrad equipment data including weapons, armor, accessories, resources, and consumables.">
+<meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Aincrad Equipment Compendium",
+        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/eCompendium/ecompendium.html",
+        "description": "Searchable SAO MC Aincrad equipment compendium.",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "SAO MC Interactive Map",
+            "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
+        },
+        "inLanguage": "en"
+    }
+</script>
 
 <link rel="stylesheet" href="ecompendium.css">
 
 <script defer src="../../shared/sao-storage.js"></script>
+<script defer src="../../shared/sao-i18n.js"></script>
+<script defer src="../../shared/sao-runtime-utils.js"></script>
 <script defer src="ecompendium.js"></script>
 </head>
 
@@ -16,45 +58,47 @@
 
 <div class="page">
 
-    <div class="nav">
-        <button type="button" data-nav-target="maps">Maps</button>
-        <button type="button" data-nav-target="equipment">Equipment</button>
-        <button type="button" data-nav-target="quests">Quests</button>
-        <button type="button" data-nav-target="patchnotes">Patchnotes</button>
-        <button type="button" data-nav-target="commands">Commands</button>
-    </div>
+    <nav class="nav" aria-label="Section navigation">
+        <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Maps</button>
+        <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
+        <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
+        <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
+        <button type="button" data-nav-target="commands" data-i18n="ui.nav.commands">Commands</button>
+        <button type="button" data-nav-target="menu" data-i18n="ui.nav.menu">Go back to Menu</button>
+    </nav>
 
     <div class="panel">
 
-        <h1>Equipment Compendium</h1>
+        <h1 data-i18n="page.ecompendium.heading">Equipment Compendium</h1>
 
-        <div class="list-tabs">
+        <div class="list-tabs" role="tablist" aria-label="Equipment categories">
 
-            <button class="list-tab" data-category="accessory">Accessories</button>
-            <button class="list-tab" data-category="armor">Armor</button>
-            <button class="list-tab" data-category="consumable">Consumables</button>
-            <button class="list-tab" data-category="currency">Currency</button>
-            <button class="list-tab" data-category="dungeon">Dungeons</button>
-            <button class="list-tab" data-category="food">Food</button>
-            <button class="list-tab" data-category="material">Materials</button>
-            <button class="list-tab" data-category="quest_item">Quest Items</button>
-            <button class="list-tab" data-category="resource">Resources</button>
-            <button class="list-tab" data-category="rune">Runes</button>
-            <button class="list-tab" data-category="tool">Tools</button>
-            <button class="list-tab is-active" data-category="weapon">Weapons</button>
+            <button class="list-tab" data-category="accessory" data-i18n="page.ecompendium.listTitles.accessory">Accessories</button>
+            <button class="list-tab" data-category="armor" data-i18n="page.ecompendium.listTitles.armor">Armor</button>
+            <button class="list-tab" data-category="consumable" data-i18n="page.ecompendium.listTitles.consumable">Consumables</button>
+            <button class="list-tab" data-category="currency" data-i18n="page.ecompendium.listTitles.currency">Currency</button>
+            <button class="list-tab" data-category="dungeon" data-i18n="page.ecompendium.listTitles.dungeon">Dungeons</button>
+            <button class="list-tab" data-category="food" data-i18n="page.ecompendium.listTitles.food">Food</button>
+            <button class="list-tab" data-category="material" data-i18n="page.ecompendium.listTitles.material">Materials</button>
+            <button class="list-tab" data-category="quest_item" data-i18n="page.ecompendium.listTitles.quest_item">Quest Items</button>
+            <button class="list-tab" data-category="resource" data-i18n="page.ecompendium.listTitles.resource">Resources</button>
+            <button class="list-tab" data-category="rune" data-i18n="page.ecompendium.listTitles.rune">Runes</button>
+            <button class="list-tab" data-category="tool" data-i18n="page.ecompendium.listTitles.tool">Tools</button>
+            <button class="list-tab is-active" data-category="weapon" data-i18n="page.ecompendium.listTitles.weapon">Weapons</button>
 
         </div>
 
         <div class="panel-header">
 
-            <p id="status">Loading...</p>
+            <p id="status" role="status" aria-live="polite">Loading...</p>
 
             <label class="search-label">
-                <span>Search</span>
+                <span data-i18n="page.ecompendium.searchLabel">Search</span>
 
                 <input
                     id="ecompendiumSearch"
                     type="search"
+                    data-i18n-placeholder="page.ecompendium.searchPlaceholder"
                     placeholder="Search equipment..."
                     autocomplete="off"
                 >
@@ -62,13 +106,15 @@
 
         </div>
 
-        <h2 id="listTitle" class="list-title">
+        <h2 id="listTitle" class="list-title" data-i18n="page.ecompendium.listTitles.weapon">
             Weapons
         </h2>
 
         <section
             id="entryList"
             class="ecompendium-list"
+            aria-live="polite"
+            aria-atomic="true"
         ></section>
 
     </div>

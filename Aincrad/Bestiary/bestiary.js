@@ -7,45 +7,25 @@ function getMobDataSources() {
   });
 }
 
+const i18n = window.SAOI18n || null;
+const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const loadedBestiaryFloors = new Set();
+
 const bestiaryUiStateStorageKey = "sao.bestiary.uiState";
-
-function getPersistentItem(key) {
-  if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
-    return window.SAOStorage.getItem(key);
-  }
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function setPersistentItem(key, value) {
-  if (window.SAOStorage && typeof window.SAOStorage.setItem === "function") {
-    window.SAOStorage.setItem(key, value);
-    return;
-  }
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Keep bestiary usable if storage is blocked.
-  }
-}
+const storage = window.SAOStorage || {
+  getItem() { return null; },
+  setItem() {},
+  getJSON(_key, fallbackValue) { return fallbackValue; },
+  setJSON() {}
+};
 
 function loadBestiaryUiState() {
-  try {
-    const raw = getPersistentItem(bestiaryUiStateStorageKey);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return {};
-    return parsed;
-  } catch {
-    return {};
-  }
+  const parsed = storage.getJSON(bestiaryUiStateStorageKey, {});
+  return parsed && typeof parsed === "object" ? parsed : {};
 }
 
 function saveBestiaryUiState(nextState) {
-  setPersistentItem(bestiaryUiStateStorageKey, JSON.stringify(nextState));
+  storage.setJSON(bestiaryUiStateStorageKey, nextState);
 }
 
 function parseDropToken(token) {
@@ -113,11 +93,15 @@ function refreshMobGroups() {
 }
 
 const LIST_TITLES = {
-  boss: "Boss List",
-  regular: "Regular Mobs List",
-  dungeonBoss: "Dungeon Boss List",
-  dungeonMobs: "Dungeon Mobs List"
+  boss: "page.bestiary.listTitleBoss",
+  regular: "page.bestiary.listTitleRegular",
+  dungeonBoss: "page.bestiary.listTitleDungeonBoss",
+  dungeonMobs: "page.bestiary.listTitleDungeonMobs"
 };
+
+function getListTitle(category) {
+  return t(LIST_TITLES[category] || "page.bestiary.heading");
+}
 
 const AGGRESSIVENESS_BY_NAME = {
   "Corrupted Pumba": "Neutral",
@@ -225,6 +209,12 @@ function getAggressivenessClass(value) {
   return "aggressive";
 }
 
+function getAggressivenessLabel(value) {
+  if (value === "Neutral") return t("page.bestiary.neutral");
+  if (value === "Passive") return t("page.bestiary.passive");
+  return t("page.bestiary.aggressive");
+}
+
 function createDropList(drops) {
   const list = document.createElement("ul");
   list.className = "drop-list";
@@ -241,7 +231,7 @@ function createDropList(drops) {
     itemText.textContent = `${drop.item}${drop.notesText}`;
 
     const chanceText = document.createElement("strong");
-    chanceText.textContent = drop.chance !== null ? `${drop.chance}%` : "N/A";
+    chanceText.textContent = drop.chance !== null ? `${drop.chance}%` : t("page.bestiary.na");
 
     row.append(itemText, chanceText);
     list.appendChild(row);
@@ -263,15 +253,15 @@ function createMobCard(mob) {
   meta.className = "mob-meta";
   const aggressivenessRow = document.createElement("p");
   const aggressivenessLabel = document.createElement("span");
-  aggressivenessLabel.textContent = "Aggressiveness";
+  aggressivenessLabel.textContent = t("page.bestiary.aggressiveness");
   const aggressivenessValue = document.createElement("strong");
   aggressivenessValue.className = getAggressivenessClass(aggressiveness);
-  aggressivenessValue.textContent = aggressiveness;
+  aggressivenessValue.textContent = getAggressivenessLabel(aggressiveness);
   aggressivenessRow.append(aggressivenessLabel, aggressivenessValue);
 
   const xpRow = document.createElement("p");
   const xpLabel = document.createElement("span");
-  xpLabel.textContent = "XP";
+  xpLabel.textContent = t("page.bestiary.xp");
   const xpValue = document.createElement("strong");
   xpValue.textContent = mob.xp;
   xpRow.append(xpLabel, xpValue);
@@ -280,7 +270,7 @@ function createMobCard(mob) {
 
   const dropsTitle = document.createElement("h3");
   dropsTitle.className = "drops-title";
-  dropsTitle.textContent = "Drops";
+  dropsTitle.textContent = t("page.bestiary.drops");
 
   card.append(title, meta, dropsTitle, createDropList(mob.drops));
   return card;
@@ -294,16 +284,42 @@ function getRequestedFloor() {
 }
 
 function attachSectionNavButtons() {
-  window.SAOPageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
+  const pageUtils = window.SAOPageUtils;
+  if (!pageUtils || typeof pageUtils.attachSectionNavButtons !== "function") {
+    console.warn("Bestiary navigation helper is unavailable.");
+    return;
+  }
+
+  pageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
 }
 
-function loadFloorMobData(floorKey, onReady) {
-  const floorScript = document.createElement("script");
-  floorScript.src = `bestiary_${floorKey}.js`;
-  floorScript.async = false;
-  floorScript.addEventListener("load", onReady, { once: true });
-  floorScript.addEventListener("error", onReady, { once: true });
-  document.head.appendChild(floorScript);
+function loadFloorMobData(floorKey, onReady, onError) {
+  const runtimeUtils = window.SAORuntimeUtils;
+  if (!runtimeUtils || typeof runtimeUtils.loadTaggedScriptOnce !== "function") {
+    console.warn("Bestiary runtime utilities are unavailable.");
+    onReady();
+    return;
+  }
+
+  runtimeUtils.loadTaggedScriptOnce({
+    cache: loadedBestiaryFloors,
+    cacheKey: floorKey,
+    tagAttribute: "data-bestiary-floor",
+    src: `bestiary_${floorKey}.js`,
+    onReady,
+    onError
+  });
+}
+
+function showBestiaryLoadError() {
+  const status = document.getElementById("status");
+  const mobList = document.getElementById("mobList");
+  if (status) {
+    status.textContent = t("page.bestiary.loadError");
+  }
+  if (mobList) {
+    mobList.innerHTML = `<p class='empty-state'>${t("page.bestiary.loadUnavailable")}</p>`;
+  }
 }
 
 function initBestiaryRuntime() {
@@ -319,10 +335,30 @@ function initBestiaryRuntime() {
   const requestedCategory = params.get("category");
   const requestedSearch = params.get("search") || params.get("q") || "";
   const floor = getRequestedFloor();
-  const savedState = loadBestiaryUiState();
-  const floorState = savedState[floor] || {};
+  let bestiaryUiState = loadBestiaryUiState();
+  const floorState = bestiaryUiState[floor] || {};
 
   if (!status || !mobList || !mobSearch || !listTitle || !tabButtons.length) return;
+
+  function focusTabByOffset(currentButton, offset) {
+    const tabs = Array.from(tabButtons);
+    const currentIndex = tabs.indexOf(currentButton);
+    if (currentIndex < 0) return;
+    const nextIndex = (currentIndex + offset + tabs.length) % tabs.length;
+    tabs[nextIndex].focus();
+  }
+
+  function applyLocalizedTabLabels() {
+    tabButtons.forEach(button => {
+      button.textContent = getListTitle(button.dataset.category);
+      button.setAttribute("role", "tab");
+      button.setAttribute("aria-controls", "mobList");
+      button.setAttribute("tabindex", button.classList.contains("is-active") ? "0" : "-1");
+      button.setAttribute("aria-selected", button.classList.contains("is-active") ? "true" : "false");
+    });
+  }
+
+  applyLocalizedTabLabels();
 
   let activeCategory = "regular";
   if (floorState.category && MOB_GROUPS[floorState.category]) {
@@ -347,19 +383,21 @@ function initBestiaryRuntime() {
 
   function setActiveTab(category) {
     activeCategory = category;
-    const currentState = loadBestiaryUiState();
-    const nextState = {
-      ...currentState,
+    bestiaryUiState = {
+      ...bestiaryUiState,
       [floor]: {
-        ...(currentState[floor] || {}),
+        ...(bestiaryUiState[floor] || {}),
         category
       }
     };
-    saveBestiaryUiState(nextState);
+    saveBestiaryUiState(bestiaryUiState);
     tabButtons.forEach(button => {
       button.classList.toggle("is-active", button.dataset.category === category);
+      const isActive = button.dataset.category === category;
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+      button.setAttribute("tabindex", isActive ? "0" : "-1");
     });
-    listTitle.textContent = LIST_TITLES[category] || "Bestiary";
+    listTitle.textContent = getListTitle(category);
     renderMobs();
   }
 
@@ -370,10 +408,13 @@ function initBestiaryRuntime() {
       ? activeMobs.filter(mob => mob.name.toLowerCase().includes(query))
       : activeMobs;
 
-    status.textContent = `${visibleMobs.length} of ${activeMobs.length} mobs shown.`;
+    status.textContent = t("page.bestiary.statusShown", {
+      visible: visibleMobs.length,
+      total: activeMobs.length
+    });
 
     if (activeMobs.length === 0) {
-      mobList.innerHTML = `<p class="empty-state">No entries yet for ${LIST_TITLES[activeCategory] || "this category"}.</p>`;
+      mobList.innerHTML = `<p class="empty-state">${t("page.bestiary.emptyCategory", { category: getListTitle(activeCategory) })}</p>`;
       return;
     }
 
@@ -386,30 +427,66 @@ function initBestiaryRuntime() {
   }
 
   mobSearch.addEventListener("input", () => {
-    const currentState = loadBestiaryUiState();
-    saveBestiaryUiState({
-      ...currentState,
+    bestiaryUiState = {
+      ...bestiaryUiState,
       [floor]: {
-        ...(currentState[floor] || {}),
+        ...(bestiaryUiState[floor] || {}),
         search: mobSearch.value
       }
-    });
+    };
+    saveBestiaryUiState(bestiaryUiState);
     scheduleRenderMobs();
   });
   tabButtons.forEach(button => {
     button.addEventListener("click", () => setActiveTab(button.dataset.category));
+    button.addEventListener("keydown", event => {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        focusTabByOffset(button, 1);
+        return;
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        focusTabByOffset(button, -1);
+        return;
+      }
+      if (event.key === "Home") {
+        event.preventDefault();
+        tabButtons[0].focus();
+        return;
+      }
+      if (event.key === "End") {
+        event.preventDefault();
+        tabButtons[tabButtons.length - 1].focus();
+        return;
+      }
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        setActiveTab(button.dataset.category);
+      }
+    });
   });
 
   mobSearch.value = requestedSearch || floorState.search || "";
 
   setActiveTab(activeCategory);
+
+  document.addEventListener("sao:languagechange", () => {
+    applyLocalizedTabLabels();
+    setActiveTab(activeCategory);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.REGULAR_MOB_DATA && window.BOSS_MOB_DATA && window.DUNGEON_MOB_DATA && window.DUNGEON_BOSS_MOB_DATA) {
-    initBestiaryRuntime();
-    return;
-  }
+  try {
+    if (window.REGULAR_MOB_DATA && window.BOSS_MOB_DATA && window.DUNGEON_MOB_DATA && window.DUNGEON_BOSS_MOB_DATA) {
+      initBestiaryRuntime();
+      return;
+    }
 
-  loadFloorMobData(getRequestedFloor(), initBestiaryRuntime);
+    loadFloorMobData(getRequestedFloor(), initBestiaryRuntime, showBestiaryLoadError);
+  } catch (error) {
+    console.error("Failed to initialize bestiary runtime.", error);
+    showBestiaryLoadError();
+  }
 });

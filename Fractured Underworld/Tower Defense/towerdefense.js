@@ -6,6 +6,9 @@ const infoSheetContent = document.getElementById("towerDefenseInfoSheetContent")
 const shopList = document.getElementById("towerDefenseShopList");
 const toast = document.getElementById("towerDefenseToast");
 let toastTimeoutId = null;
+let lastFocusedElement = null;
+const i18n = window.SAOI18n || null;
+const t = (key, params) => (i18n ? i18n.t(key, params) : key);
 
 function showToast(message) {
   if (!toast || !message) return;
@@ -21,36 +24,38 @@ function showToast(message) {
   }, 2600);
 }
 
-const defaultInfoSheetMarkup = `
-  <table class="info-table">
-    <thead>
-      <tr>
-        <th>Arc</th>
-        <th>Rewards</th>
-        <th>Waves</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Arc 1 - Tutorial (Boar Planes)</td>
-        <td>
-          Pouch of 100 Col (100%), Utility Crystal (25%), Minor PvE Rune (8%),
-          Dungeon Key (4%), Fern (Habitat Item) (30%), Frosted Lantern (Habitat Item) (20%),
-          Campfire (Habitat Item) (20%)
-        </td>
-        <td>5 Waves, On the Fifth wave a reskinned pumba spawns as the boss.</td>
-      </tr>
-      <tr>
-        <td>Arc 2 - Medium (Boar Zones)</td>
-        <td>
-          500 Col Purse (100%), Utility Crystal (40%), Minor PvE Rune (18%),
-          Dungeon Key (12%), Fern (Habitat) (30%), Hay Bale (Habitat) (20%)
-        </td>
-        <td>6 Waves, On the Sixth wave a reskinned pumba spawns as the boss.</td>
-      </tr>
-    </tbody>
-  </table>
-`;
+function buildDefaultInfoSheetMarkup() {
+  return `
+    <table class="info-table">
+      <thead>
+        <tr>
+          <th>${t("page.towerdefense.arcHead")}</th>
+          <th>${t("page.towerdefense.rewardsHead")}</th>
+          <th>${t("page.towerdefense.wavesHead")}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Arc 1 - Tutorial (Boar Planes)</td>
+          <td>
+            Pouch of 100 Col (100%), Utility Crystal (25%), Minor PvE Rune (8%),
+            Dungeon Key (4%), Fern (Habitat Item) (30%), Frosted Lantern (Habitat Item) (20%),
+            Campfire (Habitat Item) (20%)
+          </td>
+          <td>5 Waves, On the Fifth wave a reskinned pumba spawns as the boss.</td>
+        </tr>
+        <tr>
+          <td>Arc 2 - Medium (Boar Zones)</td>
+          <td>
+            500 Col Purse (100%), Utility Crystal (40%), Minor PvE Rune (18%),
+            Dungeon Key (12%), Fern (Habitat) (30%), Hay Bale (Habitat) (20%)
+          </td>
+          <td>6 Waves, On the Sixth wave a reskinned pumba spawns as the boss.</td>
+        </tr>
+      </tbody>
+    </table>
+  `;
+}
 
 const shopItems = [
   {
@@ -103,12 +108,12 @@ function renderShopItems() {
         <h3 class="shop-item-name">${item.name}</h3>
         <span class="shop-item-cost">${item.invocationCost}</span>
       </div>
-      <p class="shop-item-meta">Unlock with ${item.unlockRequirement}</p>
+      <p class="shop-item-meta">${t("page.towerdefense.unlockWith", { item: item.unlockRequirement })}</p>
       <ul class="shop-item-stats">
         <li>${item.levelOne}</li>
       </ul>
       <div class="shop-item-progression">
-        <h4>Level Progression</h4>
+        <h4>${t("page.towerdefense.levelProgression")}</h4>
         <ul>
           ${item.progression.map(step => `<li>${step}</li>`).join("")}
         </ul>
@@ -125,20 +130,28 @@ function openInfoSheet(event) {
   if (!infoSheet || !infoSheetTitle || !infoSheetContent) return;
 
   if (selectedChapter === 1) {
-    infoSheetTitle.textContent = "Tower Defense Info Sheet";
-    infoSheetContent.innerHTML = defaultInfoSheetMarkup;
+    lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    infoSheetTitle.textContent = t("page.towerdefense.infoSheetTitle");
+    infoSheetContent.innerHTML = buildDefaultInfoSheetMarkup();
     infoSheet.classList.add("open");
     infoSheet.setAttribute("aria-hidden", "false");
+    closeInfoSheetButton?.focus();
     return;
   }
 
-  showToast("Not enough information released yet to make a page!");
+  showToast(t("page.towerdefense.insufficientInfo"));
 }
 
-function closeInfoSheet() {
+function closeInfoSheet(options = {}) {
   if (!infoSheet) return;
+  const shouldRestoreFocus = options.restoreFocus !== false;
+  if (!infoSheet.classList.contains("open")) return;
   infoSheet.classList.remove("open");
   infoSheet.setAttribute("aria-hidden", "true");
+
+  if (shouldRestoreFocus && lastFocusedElement instanceof HTMLElement && lastFocusedElement.isConnected) {
+    lastFocusedElement.focus();
+  }
 }
 
 renderShopItems();
@@ -161,7 +174,15 @@ if (infoSheet) {
 }
 
 document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
+  if (event.key === "Escape" && infoSheet?.classList.contains("open")) {
     closeInfoSheet();
+  }
+});
+
+document.addEventListener("sao:languagechange", () => {
+  renderShopItems();
+  if (infoSheet && infoSheet.classList.contains("open")) {
+    infoSheetTitle.textContent = t("page.towerdefense.infoSheetTitle");
+    infoSheetContent.innerHTML = buildDefaultInfoSheetMarkup();
   }
 });

@@ -1,5 +1,4 @@
 :root {
-    --bg: #0f1117;
     --border: #2c3445;
     --accent: #49b7ff;
     --muted: #a8b2c8;
@@ -12,10 +11,11 @@
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.45;
     background: #111111;
     color: #f4f4f4;
-    overflow-x: auto;
+    overflow-x: hidden;
 }
 
 .page {
@@ -41,6 +41,7 @@ body {
     color: #f4f4f4;
     border-radius: 8px;
     padding: 8px 12px;
+    min-height: 38px;
     cursor: pointer;
     transition: background-color 0.14s ease, transform 0.14s ease;
 }
@@ -48,6 +49,10 @@ body {
 .nav button:hover {
     background: #2a2a2a;
     transform: translateY(-1px);
+}
+
+.nav button:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .nav button:focus-visible {
@@ -65,6 +70,13 @@ body {
     min-width: 0;
     overflow-x: auto;
     overflow-y: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+}
+
+h1 {
+    margin: 0 0 12px;
+    font-size: clamp(1.8rem, 2.6vw, 2.3rem);
+    line-height: 1.12;
 }
 
 .panel-header {
@@ -118,8 +130,21 @@ body {
     border: 1px solid var(--border);
     color: #f0f4ff;
     padding: 10px 16px;
+    min-height: 36px;
     border-radius: 999px;
     cursor: pointer;
+    transition: background-color 0.14s ease, border-color 0.14s ease, transform 0.14s ease;
+}
+
+.list-tab:hover,
+.list-tab:focus-visible {
+    border-color: var(--accent);
+    background: #1d2635;
+    transform: translateY(-1px);
+}
+
+.list-tab:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .list-tab.is-active {
@@ -142,12 +167,13 @@ body {
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 16px;
-    transition: 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .ecompendium-card:hover {
     border-color: var(--accent);
     box-shadow: 0 0 16px rgba(73, 183, 255, 0.2);
+    transform: translateY(-2px);
 }
 
 .ecompendium-name {
@@ -211,7 +237,43 @@ body {
 }
 
 @media (max-width: 768px) {
+    .page {
+        padding: 16px;
+    }
+
+    .nav button {
+        width: 100%;
+    }
+
+    .panel-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-label {
+        min-width: 0;
+        margin-left: 0;
+    }
+
     .list-tab {
         width: 100%;
+    }
+
+    .ecompendium-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .nav button:hover,
+    .list-tab:hover,
+    .ecompendium-card:hover {
+        transform: none;
     }
 }

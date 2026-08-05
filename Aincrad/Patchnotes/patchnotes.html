@@ -3,36 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAO Patchnotes</title>
+   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+   <meta name="referrer" content="strict-origin-when-cross-origin">
+   <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+  <title data-i18n="page.patchnotes.title">SAO MC Patch Notes and Changelog</title>
+  <meta name="description" content="Read SAO MC update history, release notes, and feature changes across Aincrad and Fractured Underworld content.">
+  <meta name="keywords" content="SAO MC patch notes, changelog, update history, release notes">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="author" content="DelayedCode">
+  <meta name="theme-color" content="#0b121a">
+  <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Patchnotes/patchnotes.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <link rel="manifest" href="../../site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SAO MC Interactive Map">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="SAO MC Patch Notes and Changelog">
+  <meta property="og:description" content="Read SAO MC update history, release notes, and feature changes across Aincrad and Fractured Underworld content.">
+  <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Patchnotes/patchnotes.html">
+  <meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <meta property="og:image:alt" content="SAO MC patch notes preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SAO MC Patch Notes and Changelog">
+  <meta name="twitter:description" content="Read SAO MC update history, release notes, and feature changes across Aincrad and Fractured Underworld content.">
+  <meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "SAO MC Patch Notes and Changelog",
+      "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Patchnotes/patchnotes.html",
+      "description": "Chronological SAO MC patch notes and release entries.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "SAO MC Interactive Map",
+        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
+      },
+      "inLanguage": "en"
+    }
+  </script>
   <link rel="stylesheet" href="patchnotes.css">
 </head>
 <body>
   <div class="page">
-    <div class="nav">
-      <button type="button" data-nav-target="maps">Maps</button>
-      <button type="button" data-nav-target="bestiary">Bestiary</button>
-      <button type="button" data-nav-target="equipment">Equipment</button>
-      <button type="button" data-nav-target="quests">Quests</button>
-      <button type="button" data-nav-target="commands">Commands</button>
-    </div>
+    <nav class="nav" aria-label="Section navigation">
+      <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Maps</button>
+      <button type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
+      <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
+      <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
+      <button type="button" data-nav-target="commands" data-i18n="ui.nav.commands">Commands</button>
+      <button type="button" data-nav-target="menu" data-i18n="ui.nav.menu">Go back to Menu</button>
+    </nav>
 
     <div class="panel">
       <div class="panel-header">
         <div>
-          <h1>Patchnotes</h1>
-          <p id="status">Loading changelog...</p>
+          <h1 data-i18n="page.patchnotes.heading">Patchnotes</h1>
+          <p id="status" role="status" aria-live="polite" data-i18n="ui.common.loading">Loading changelog...</p>
         </div>
 
         <label class="search-label" for="patchSearch">
-          <span>Search notes</span>
-          <input id="patchSearch" type="text" placeholder="Filter by version, item, or update">
+          <span data-i18n="page.patchnotes.searchLabel">Search notes</span>
+          <input id="patchSearch" type="text" data-i18n-placeholder="page.patchnotes.searchPlaceholder" placeholder="Filter by version, item, or update">
         </label>
       </div>
 
-      <div id="patchnotesList" class="patchnotes-list" aria-live="polite"></div>
+      <div id="patchnotesList" class="patchnotes-list" aria-live="polite" aria-atomic="true"></div>
     </div>
   </div>
   <script src="../../shared/sao-storage.js"></script>
+  <script src="../../shared/sao-i18n.js"></script>
   <script src="patchnotes.js"></script>
 </body>
 </html>

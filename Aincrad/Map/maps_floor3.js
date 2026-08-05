@@ -910,5 +910,3 @@ Object.assign(DATA, {
   },
 });
 
-MOB_AREAS.push(
-);

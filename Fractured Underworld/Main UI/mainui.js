@@ -13,13 +13,34 @@ const elements = {
   floorSelect: document.getElementById("floorSelect"),
   undergroundToggle: document.getElementById("undergroundToggle"),
   searchInput: document.getElementById("search"),
+  clearFiltersButton: document.getElementById("clearFilters"),
   zoomLabel: document.getElementById("zoomLabel"),
   resetViewButton: document.getElementById("resetView"),
   categoryToggleButtons: document.querySelectorAll(".sidebar-list-button[data-category]"),
   globalToast: document.getElementById("globalToast")
 };
 
-const { mapContainer, sidebar, sidebarResizeHandle, mapLayer, mapImage, undergroundMapImage, mobAreaLayer, markerLayer, title, content, overlayMappedCoords, floorSelect, undergroundToggle, searchInput, zoomLabel, resetViewButton, categoryToggleButtons, globalToast } = elements;
+const { mapContainer, sidebar, sidebarResizeHandle, mapLayer, mapImage, undergroundMapImage, mobAreaLayer, markerLayer, title, content, overlayMappedCoords, floorSelect, undergroundToggle, searchInput, clearFiltersButton, zoomLabel, resetViewButton, categoryToggleButtons, globalToast } = elements;
+
+function showMainUiRuntimeError(message) {
+  const fallbackMessage = message || t("page.mainui.runtimeError");
+  if (title) {
+    title.textContent = t("page.mainui.runtimeTitle");
+  }
+  if (content) {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = fallbackMessage;
+    content.replaceChildren(paragraph);
+  }
+}
+
+function hasRequiredMainUiElements() {
+  return Boolean(
+    mapContainer && sidebar && mapLayer && mapImage && undergroundMapImage &&
+    mobAreaLayer && markerLayer && title && content && overlayMappedCoords &&
+    floorSelect && undergroundToggle && searchInput && zoomLabel && resetViewButton
+  );
+}
 
 const DATA_ENTRIES = Object.freeze(
   Object.entries((typeof DATA !== "undefined" && DATA && typeof DATA === "object") ? DATA : {})
@@ -60,6 +81,15 @@ const sidebarResizeConfig = {
 
 const visitedMarkersStorageKey = "sao.visitedMarkers";
 const mapUiStateStorageKey = "sao.map.uiState";
+const mapWalkthroughStorageKey = "sao.walkthrough.mainui.completed";
+const i18n = window.SAOI18n || null;
+const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const storage = window.SAOStorage || {
+  getItem() { return null; },
+  setItem() {},
+  getJSON(_key, fallbackValue) { return fallbackValue; },
+  setJSON() {}
+};
 
 const MAP_LABELS = Object.freeze({
   playerIsland: "Player Island",
@@ -67,6 +97,14 @@ const MAP_LABELS = Object.freeze({
   iceCave: "Ice Cave",
   rulid: "Rulid",
   fishingIsland: "Fishing Island"
+});
+
+const MAP_IMAGE_AVAILABILITY = Object.freeze({
+  playerIsland: false,
+  gigasCedar: false,
+  iceCave: false,
+  rulid: false,
+  fishingIsland: false
 });
 
 const MAIN_CATEGORY_FLOOR_RULES = Object.freeze({
@@ -135,17 +173,6 @@ function syncMainCategoryButtonVisibility() {
   });
 }
 
-function getPersistentItem(key) {
-  if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
-    return window.SAOStorage.getItem(key);
-  }
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
 function getMapLabel(mapKey) {
   return MAP_LABELS[mapKey] || "Selected Island";
 }
@@ -175,7 +202,7 @@ function buildMapPlaceholderDataUri(mapKey, underground = false) {
       </g>
       <g fill="${accent}" opacity="0.92">
         <text x="800" y="520" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="72" font-weight="700">${label}</text>
-        <text x="800" y="610" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="500" fill="${glow}">No image yet</text>
+        <text x="800" y="610" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="500" fill="${glow}">${t("page.mainui.noImageYet")}</text>
       </g>
       <rect x="80" y="80" width="1440" height="1040" rx="34" fill="none" stroke="${accent}" stroke-opacity="0.2" stroke-width="3"/>
     </svg>
@@ -187,9 +214,18 @@ function buildMapPlaceholderDataUri(mapKey, underground = false) {
 function applyMapSources(mapKey) {
   const primaryPlaceholder = buildMapPlaceholderDataUri(mapKey, false);
   const undergroundPlaceholder = buildMapPlaceholderDataUri(mapKey, true);
+  const hasImageAssets = MAP_IMAGE_AVAILABILITY[mapKey] === true;
 
-  mapImage.alt = `${getMapLabel(mapKey)} map`;
-  undergroundMapImage.alt = `${getMapLabel(mapKey)} underground overlay`;
+  mapImage.alt = `${getMapLabel(mapKey)} ${t("page.mainui.mapSuffix")}`;
+  undergroundMapImage.alt = `${getMapLabel(mapKey)} ${t("page.mainui.undergroundSuffix")}`;
+
+  if (!hasImageAssets) {
+    mapImage.onerror = null;
+    undergroundMapImage.onerror = null;
+    mapImage.src = primaryPlaceholder;
+    undergroundMapImage.src = undergroundPlaceholder;
+    return;
+  }
 
   mapImage.onerror = () => {
     mapImage.onerror = null;
@@ -205,48 +241,23 @@ function applyMapSources(mapKey) {
   undergroundMapImage.src = `${mapKey}underground.png`;
 }
 
-function setPersistentItem(key, value) {
-  if (window.SAOStorage && typeof window.SAOStorage.setItem === "function") {
-    window.SAOStorage.setItem(key, value);
-    return;
-  }
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Keep map usable even if storage is blocked.
-  }
-}
-
 function loadMapUiState() {
-  try {
-    const raw = getPersistentItem(mapUiStateStorageKey);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return null;
-    return parsed;
-  } catch {
-    return null;
-  }
+  const parsed = storage.getJSON(mapUiStateStorageKey, null);
+  return parsed && typeof parsed === "object" ? parsed : null;
 }
 
 function saveMapUiState(mapState) {
-  setPersistentItem(mapUiStateStorageKey, JSON.stringify(mapState));
+  storage.setJSON(mapUiStateStorageKey, mapState);
 }
 
 function loadVisitedMarkers() {
-  try {
-    const raw = getPersistentItem(visitedMarkersStorageKey);
-    if (!raw) return new Set();
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return new Set();
-    return new Set(parsed.filter(id => typeof id === "string"));
-  } catch {
-    return new Set();
-  }
+  const parsed = storage.getJSON(visitedMarkersStorageKey, []);
+  if (!Array.isArray(parsed)) return new Set();
+  return new Set(parsed.filter(id => typeof id === "string"));
 }
 
 function persistVisitedMarkers() {
-  setPersistentItem(visitedMarkersStorageKey, JSON.stringify(Array.from(state.visitedMarkerIds)));
+  storage.setJSON(visitedMarkersStorageKey, Array.from(state.visitedMarkerIds));
 }
 
 function getVisitedMarkerKey(floor, id) {
@@ -306,8 +317,9 @@ function getOppositeHexColor(value) {
 }
 
 function getMobAreaCenter(area) {
-  if (mobAreaCenterCache.has(area.id)) {
-    return mobAreaCenterCache.get(area.id);
+  const cachedCenter = getCachedValue(mobAreaCenterCache, area.id);
+  if (cachedCenter !== undefined) {
+    return cachedCenter;
   }
 
   if (!Array.isArray(area.corners) || area.corners.length === 0) return null;
@@ -320,11 +332,13 @@ function getMobAreaCenter(area) {
     x: Math.round(totals.x / area.corners.length),
     z: Math.round(totals.z / area.corners.length)
   };
-  mobAreaCenterCache.set(area.id, center);
+  setCachedValue(mobAreaCenterCache, area.id, center);
   return center;
 }
 
+const CACHE_LIMIT = 1024;
 const mobAreaCenterCache = new Map();
+const mobAreaSearchCache = new Map();
 const MOB_AREA_LABEL_VERTICAL_OFFSET = 16;
 
 // MOB_AREA_MOBS is defined per-floor in the floor data files (e.g. maps_floor1.js)
@@ -332,12 +346,61 @@ const MOB_AREA_LABEL_VERTICAL_OFFSET = 16;
 // in the code to avoid undefined errors when a floor doesn't provide data.
 
 function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+  const escapeMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  };
+  return String(value).replace(/[&<>"']/g, char => escapeMap[char]);
+}
+
+function resolveSafeInternalHref(value) {
+  const rawValue = String(value || "").trim();
+  if (!rawValue) return null;
+
+  try {
+    const resolved = new URL(rawValue, window.location.href);
+    if (resolved.origin !== window.location.origin) return null;
+    if (resolved.protocol !== "http:" && resolved.protocol !== "https:") return null;
+    return resolved.href;
+  } catch {
+    return null;
+  }
+}
+
+function getCachedValue(cache, key) {
+  if (!cache.has(key)) {
+    return undefined;
+  }
+
+  const value = cache.get(key);
+  cache.delete(key);
+  cache.set(key, value);
+  return value;
+}
+
+function setCachedValue(cache, key, value) {
+  if (cache.has(key)) {
+    cache.delete(key);
+  } else if (cache.size >= CACHE_LIMIT) {
+    const oldestKey = cache.keys().next().value;
+    cache.delete(oldestKey);
+  }
+
+  cache.set(key, value);
+}
+
+function getMobAreaSearchHaystack(area) {
+  const cachedValue = getCachedValue(mobAreaSearchCache, area.id);
+  if (cachedValue !== undefined) {
+    return cachedValue;
+  }
+
+  const haystack = normalizeSearchValue(`${area.id} ${area.title} mob area`);
+  setCachedValue(mobAreaSearchCache, area.id, haystack);
+  return haystack;
 }
 
 function getFloorSpecificBestiaryUrl(floor, category, search) {
@@ -434,7 +497,10 @@ function attachSectionNavButtons() {
     const button = event.target.closest("button[data-nav-target]");
     if (!button) return;
 
-    window.location.href = buildSectionUrl(button.dataset.navTarget, floorSelect.value);
+    const nextHref = resolveSafeInternalHref(buildSectionUrl(button.dataset.navTarget, floorSelect.value));
+    if (!nextHref) return;
+
+    window.location.href = nextHref;
   });
 }
 
@@ -442,7 +508,7 @@ function buildMobAreaMobListMarkup(areaId, areaFloor) {
   const mobLookup = (typeof MOB_AREA_MOBS !== "undefined" ? MOB_AREA_MOBS : {});
   const mobs = mobLookup[areaId] || [];
   if (mobs.length === 0) {
-    return `<p>No mob entries available yet for this zone.</p>`;
+    return `<p>${t("page.mainui.noMobEntries")}</p>`;
   }
 
   return `
@@ -456,7 +522,7 @@ function buildMobAreaMobListMarkup(areaId, areaFloor) {
         return `
           <li class="mob-area-entry-item">
             <span class="mob-area-entry-name">${escapeHtml(mob.name)}</span>
-            <button type="button" class="mob-area-info-button" data-waypoint-info-href="${href}">Go to Waypoint Information</button>
+            <button type="button" class="mob-area-info-button" data-waypoint-info-href="${escapeHtml(href)}">${t("page.maps.viewWaypointInfo")}</button>
           </li>
         `;
       }).join("")}
@@ -466,31 +532,456 @@ function buildMobAreaMobListMarkup(areaId, areaFloor) {
 
 function openMobAreaInfo(area) {
   const center = getMobAreaCenter(area);
-  const titleText = `${area.title} Mobs`;
+  const areaTitle = escapeHtml(area.title || "");
+  const titleText = `${area.title} ${t("page.maps.mobs")}`;
+  const floorText = escapeHtml(String(area.floor || "").replace("floor", `${t("page.maps.floorText")} `));
+  const centerX = center ? escapeHtml(center.x) : "--";
+  const centerZ = center ? escapeHtml(center.z) : "--";
   state.activeMarkerId = `mob-area:${area.id}`;
   title.textContent = titleText;
   content.innerHTML = `
-    <p><strong>Type:</strong> Mob Area</p>
-    <p>${area.title} Available Mobs</p>
-    <p><strong>Floor:</strong> ${area.floor.replace("floor", "Floor ")}</p>
-    <p><strong>Coordinates:</strong> X: ${center ? center.x : "--"} Z: ${center ? center.z : "--"}</p>
-    <p><strong>Mobs:</strong></p>
+    <p><strong>${t("page.maps.mobType")}:</strong> ${t("page.maps.mobAreaType")}</p>
+    <p>${areaTitle} ${t("page.maps.availableMobs")}</p>
+    <p><strong>${t("page.maps.floorText")}:</strong> ${floorText}</p>
+    <p><strong>${t("page.maps.coordinates")}:</strong> X: ${centerX} Z: ${centerZ}</p>
+    <p><strong>${t("page.maps.mobs")}:</strong></p>
     ${buildMobAreaMobListMarkup(area.id, area.floor)}
   `;
-
-  content.querySelectorAll(".mob-area-info-button").forEach(button => {
-    button.addEventListener("click", () => {
-      const href = button.dataset.waypointInfoHref;
-      if (!href) return;
-      try { persistStateToHistory(); } catch (e) {}
-      window.location.href = href;
-    });
-  });
 
   const previousActive = markerLayer.querySelector(".active-marker");
   if (previousActive) previousActive.classList.remove("active-marker");
   const activeMarker = markerLayer.querySelector(`[data-marker-id="mob-area:${area.id}"]`);
   if (activeMarker) activeMarker.classList.add("active-marker");
+}
+
+function handleInfoOverlayClick(event) {
+  const actionButton = event.target.closest("[data-waypoint-info-href]");
+  if (!actionButton || !content.contains(actionButton)) return;
+
+  const href = resolveSafeInternalHref(actionButton.dataset.waypointInfoHref);
+  if (!href) return;
+
+  try { persistStateToHistory(); } catch (e) {}
+  window.location.href = href;
+}
+
+function handleInfoOverlayChange(event) {
+  const visitedToggle = event.target.closest("#visitedToggle");
+  if (!visitedToggle || !content.contains(visitedToggle)) return;
+
+  const targetId = visitedToggle.dataset.markerId || "";
+  if (!targetId) return;
+
+  const targetFloor = visitedToggle.dataset.markerFloor || "";
+  const nextVisited = visitedToggle.checked;
+  setMarkerVisited(targetFloor, targetId, nextVisited);
+  syncMarkerVisitedClass(targetId, nextVisited);
+}
+
+function handleMarkerLayerClick(event) {
+  const markerEl = event.target.closest(".marker[data-marker-id]");
+  if (!markerEl || !markerLayer.contains(markerEl)) return;
+
+  activateMarkerByElement(markerEl);
+}
+
+function handleMarkerLayerKeydown(event) {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const markerEl = event.target.closest(".marker[data-marker-id]");
+  if (!markerEl || !markerLayer.contains(markerEl)) return;
+
+  event.preventDefault();
+  activateMarkerByElement(markerEl);
+}
+
+function activateMarkerByElement(markerEl) {
+  const markerId = markerEl.dataset.markerId || "";
+  if (!markerId) return;
+
+  if (markerId.startsWith("mob-area:")) {
+    const areaId = markerId.slice("mob-area:".length);
+    const area = MOB_AREA_LOOKUP.get(areaId);
+    if (area) {
+      openMobAreaInfo(area);
+    }
+    return;
+  }
+
+  openInfo(markerId);
+}
+
+function clearMapFilters() {
+  if (searchInput) {
+    searchInput.value = "";
+  }
+
+  Object.keys(state.activeCategories).forEach(category => {
+    state.activeCategories[category] = false;
+  });
+
+  categoryToggleButtons.forEach(button => {
+    button.classList.remove("active");
+  });
+
+  state.activeMarkerId = null;
+  setDefaultSidebarMessage();
+  scheduleRenderMarkers();
+  persistStateToHistory();
+}
+
+function ensureWalkthroughStyles() {
+  if (document.getElementById("sao-walkthrough-style")) return;
+
+  const style = document.createElement("style");
+  style.id = "sao-walkthrough-style";
+  style.textContent = `
+    .sao-tour-overlay {
+      --sao-tour-focus-x: 50vw;
+      --sao-tour-focus-y: 50vh;
+      --sao-tour-focus-radius: 96px;
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: flex;
+      background: transparent;
+      padding: 16px;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s step-end;
+    }
+    .sao-tour-overlay::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: rgba(4, 8, 14, 0.7);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      -webkit-mask-image: radial-gradient(
+        circle var(--sao-tour-focus-radius) at var(--sao-tour-focus-x) var(--sao-tour-focus-y),
+        transparent 96%,
+        #000 100%
+      );
+      mask-image: radial-gradient(
+        circle var(--sao-tour-focus-radius) at var(--sao-tour-focus-x) var(--sao-tour-focus-y),
+        transparent 96%,
+        #000 100%
+      );
+      pointer-events: none;
+    }
+    .sao-tour-focus-ring {
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+      border: 3px solid rgba(115, 185, 255, 0.95);
+      border-radius: 10px;
+      box-shadow: 0 0 0 2px rgba(4, 8, 14, 0.8);
+      pointer-events: none;
+      opacity: 0;
+    }
+    .sao-tour-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.2s ease;
+    }
+    .sao-tour-card {
+      position: relative;
+      z-index: 2;
+      width: min(560px, 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(130, 190, 255, 0.5);
+      background: linear-gradient(180deg, rgba(15, 22, 36, 0.98), rgba(8, 14, 24, 0.98));
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      padding: 14px;
+      color: #eaf2ff;
+      opacity: 0;
+      transform: translateY(10px) scale(0.985);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .sao-tour-overlay.open .sao-tour-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .sao-tour-step {
+      margin: 0 0 6px;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9fb9d7;
+    }
+    .sao-tour-title {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .sao-tour-body {
+      margin: 8px 0 12px;
+      color: #c8d8ea;
+      line-height: 1.55;
+    }
+    .sao-tour-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .sao-tour-actions button {
+      border: 1px solid rgba(130, 190, 255, 0.34);
+      border-radius: 10px;
+      background: rgba(12, 19, 31, 0.92);
+      color: #eaf2ff;
+      min-height: 36px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .sao-tour-actions button:hover {
+      background: rgba(24, 38, 58, 0.96);
+      border-color: #73b9ff;
+    }
+    .sao-tour-actions button:active {
+      transform: scale(0.98);
+    }
+    .sao-tour-actions button:focus-visible {
+      outline: 2px solid #8bb7ff;
+      outline-offset: 2px;
+    }
+    .sao-tour-focus-target {
+      position: relative;
+      border-radius: 10px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .sao-tour-overlay,
+      .sao-tour-card,
+      .sao-tour-actions button {
+        transition: none;
+      }
+      .sao-tour-actions button:hover {
+        transform: none;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
+function buildWalkthroughSteps() {
+  return [
+    {
+      selector: ".top-nav",
+      title: t("page.mainui.walkthrough.step1Title"),
+      body: t("page.mainui.walkthrough.step1Body")
+    },
+    {
+      selector: ".controls",
+      title: t("page.mainui.walkthrough.step2Title"),
+      body: t("page.mainui.walkthrough.step2Body")
+    },
+    {
+      selector: "#sidebar",
+      title: t("page.mainui.walkthrough.step3Title"),
+      body: t("page.mainui.walkthrough.step3Body")
+    },
+    {
+      selector: "#mapContainer",
+      title: t("page.mainui.walkthrough.step4Title"),
+      body: t("page.mainui.walkthrough.step4Body")
+    }
+  ];
+}
+
+function startGuidedWalkthrough(options) {
+  const force = !!(options && options.force);
+  const alreadyCompleted = storage.getItem(mapWalkthroughStorageKey) === "1";
+  if (alreadyCompleted && !force) return;
+
+  ensureWalkthroughStyles();
+
+  const steps = buildWalkthroughSteps();
+  if (!steps.length) return;
+
+  let overlay = document.getElementById("sao-tour-overlay");
+  let stepLabel;
+  let titleEl;
+  let bodyEl;
+  let previousButton;
+  let nextButton;
+  let skipButton;
+  let currentStepIndex = 0;
+  let highlightedElement = null;
+  let focusRing = null;
+
+  function clearHighlight() {
+    if (!highlightedElement) return;
+    highlightedElement.classList.remove("sao-tour-focus-target");
+    highlightedElement = null;
+    if (overlay) {
+      overlay.style.removeProperty("--sao-tour-focus-x");
+      overlay.style.removeProperty("--sao-tour-focus-y");
+      overlay.style.removeProperty("--sao-tour-focus-radius");
+    }
+    if (focusRing) {
+      focusRing.style.opacity = "0";
+      focusRing.style.width = "0";
+      focusRing.style.height = "0";
+    }
+  }
+
+  function markComplete() {
+    storage.setItem(mapWalkthroughStorageKey, "1");
+  }
+
+  function closeTour(markAsComplete) {
+    clearHighlight();
+    if (markAsComplete) {
+      markComplete();
+    }
+    if (overlay) {
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function renderStep() {
+    const step = steps[currentStepIndex];
+    if (!step) return;
+
+    clearHighlight();
+    const target = document.querySelector(step.selector);
+    if (target) {
+      highlightedElement = target;
+      highlightedElement.classList.add("sao-tour-focus-target");
+      if (overlay) {
+        const rect = target.getBoundingClientRect();
+        const radius = Math.ceil(Math.max(rect.width, rect.height) / 2 + 18);
+        overlay.style.setProperty("--sao-tour-focus-x", `${Math.round(rect.left + rect.width / 2)}px`);
+        overlay.style.setProperty("--sao-tour-focus-y", `${Math.round(rect.top + rect.height / 2)}px`);
+        overlay.style.setProperty("--sao-tour-focus-radius", `${radius}px`);
+      }
+      if (focusRing) {
+        const rect = target.getBoundingClientRect();
+        const ringPadding = 3;
+        const radius = window.getComputedStyle(target).borderRadius || "10px";
+        focusRing.style.left = `${Math.round(rect.left - ringPadding)}px`;
+        focusRing.style.top = `${Math.round(rect.top - ringPadding)}px`;
+        focusRing.style.width = `${Math.round(rect.width + ringPadding * 2)}px`;
+        focusRing.style.height = `${Math.round(rect.height + ringPadding * 2)}px`;
+        focusRing.style.borderRadius = radius;
+        focusRing.style.opacity = "1";
+      }
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      highlightedElement.scrollIntoView({
+        block: "center",
+        inline: "nearest",
+        behavior: prefersReducedMotion ? "auto" : "smooth"
+      });
+    }
+
+    stepLabel.textContent = t("ui.walkthrough.step", {
+      current: currentStepIndex + 1,
+      total: steps.length
+    });
+    titleEl.textContent = step.title;
+    bodyEl.textContent = step.body;
+    previousButton.disabled = currentStepIndex === 0;
+    nextButton.textContent = currentStepIndex === steps.length - 1
+      ? t("ui.walkthrough.finish")
+      : t("ui.walkthrough.next");
+  }
+
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "sao-tour-overlay";
+    overlay.className = "sao-tour-overlay";
+    overlay.setAttribute("aria-hidden", "true");
+
+    focusRing = document.createElement("div");
+    focusRing.className = "sao-tour-focus-ring";
+    overlay.appendChild(focusRing);
+
+    const card = document.createElement("section");
+    card.className = "sao-tour-card";
+    card.setAttribute("role", "dialog");
+    card.setAttribute("aria-modal", "true");
+
+    stepLabel = document.createElement("p");
+    stepLabel.className = "sao-tour-step";
+
+    titleEl = document.createElement("h2");
+    titleEl.className = "sao-tour-title";
+
+    bodyEl = document.createElement("p");
+    bodyEl.className = "sao-tour-body";
+
+    const actions = document.createElement("div");
+    actions.className = "sao-tour-actions";
+
+    skipButton = document.createElement("button");
+    skipButton.type = "button";
+    skipButton.textContent = t("ui.walkthrough.skip");
+
+    previousButton = document.createElement("button");
+    previousButton.type = "button";
+    previousButton.textContent = t("ui.walkthrough.back");
+
+    nextButton = document.createElement("button");
+    nextButton.type = "button";
+    nextButton.textContent = t("ui.walkthrough.next");
+
+    actions.append(skipButton, previousButton, nextButton);
+    card.append(stepLabel, titleEl, bodyEl, actions);
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    skipButton.addEventListener("click", () => closeTour(true));
+    previousButton.addEventListener("click", () => {
+      if (currentStepIndex === 0) return;
+      currentStepIndex -= 1;
+      renderStep();
+    });
+    nextButton.addEventListener("click", () => {
+      if (currentStepIndex >= steps.length - 1) {
+        closeTour(true);
+        return;
+      }
+      currentStepIndex += 1;
+      renderStep();
+    });
+
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) {
+        closeTour(true);
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (!overlay.classList.contains("open")) return;
+      if (event.key === "Escape") {
+        closeTour(true);
+      }
+    });
+  } else {
+    focusRing = overlay.querySelector(".sao-tour-focus-ring");
+    stepLabel = overlay.querySelector(".sao-tour-step");
+    titleEl = overlay.querySelector(".sao-tour-title");
+    bodyEl = overlay.querySelector(".sao-tour-body");
+    const actionButtons = overlay.querySelectorAll(".sao-tour-actions button");
+    skipButton = actionButtons[0];
+    previousButton = actionButtons[1];
+    nextButton = actionButtons[2];
+    skipButton.textContent = t("ui.walkthrough.skip");
+    previousButton.textContent = t("ui.walkthrough.back");
+  }
+
+  currentStepIndex = 0;
+  overlay.classList.add("open");
+  overlay.setAttribute("aria-hidden", "false");
+  renderStep();
 }
 
 let markerSearchCache = null;
@@ -510,31 +1001,33 @@ const mobAreaCornersCache = new Map();
 function getInverseCoords(x, z, floor, dimensions) {
   const dimKey = dimensions ? `${dimensions.width}x${dimensions.height}` : "na";
   const key = `${floor}:${dimKey}:${x}:${z}`;
-  if (inverseCoordCache.has(key)) {
-    return inverseCoordCache.get(key);
+  const cached = getCachedValue(inverseCoordCache, key);
+  if (cached !== undefined) {
+    return cached;
   }
 
   if (typeof invertMapCoordinates !== "function") {
-    inverseCoordCache.set(key, null);
+    setCachedValue(inverseCoordCache, key, null);
     return null;
   }
 
   const inv = invertMapCoordinates(x, z, floor, dimensions);
-  inverseCoordCache.set(key, inv || null);
+  setCachedValue(inverseCoordCache, key, inv || null);
   return inv || null;
 }
 
 function getInvertedMobAreaCorners(area, floor, dimensions) {
   const dimKey = dimensions ? `${dimensions.width}x${dimensions.height}` : "na";
   const key = `${area.id}:${floor}:${dimKey}`;
-  if (mobAreaCornersCache.has(key)) {
-    return mobAreaCornersCache.get(key);
+  const cached = getCachedValue(mobAreaCornersCache, key);
+  if (cached !== undefined) {
+    return cached;
   }
 
   const corners = area.corners
     .map(point => getInverseCoords(point.x, point.z, floor, dimensions))
     .filter(Boolean);
-  mobAreaCornersCache.set(key, corners);
+  setCachedValue(mobAreaCornersCache, key, corners);
   return corners;
 }
 
@@ -580,7 +1073,7 @@ function mapCoordinates(rawX, rawY, dimensions) {
 function updateCoordinatePanelFromEvent(event) {
   const info = getImageLocalCoords(event);
   if (info.localX < 0 || info.localY < 0 || info.localX > info.contentWidth || info.localY > info.contentHeight) {
-    overlayMappedCoords.textContent = "X: -- Z: --";
+    overlayMappedCoords.textContent = t("page.mainui.coordinatesPlaceholder");
     return;
   }
 
@@ -594,7 +1087,7 @@ function updateCoordinatePanelFromEvent(event) {
   if (mapped) {
     overlayMappedCoords.textContent = `X: ${mapped.x.toFixed(0)} Z: ${mapped.z.toFixed(0)}`;
   } else {
-    overlayMappedCoords.textContent = "X: -- Z: --";
+    overlayMappedCoords.textContent = t("page.mainui.coordinatesPlaceholder");
   }
 }
 
@@ -613,11 +1106,11 @@ function requestCoordinatePanelUpdate(event) {
 function updateTransform() {
   const mapTransform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.zoom})`;
   mapLayer.style.transform = mapTransform;
-  Array.from(markerLayer.children).forEach(markerEl => {
-    const markerScale = 1 / state.zoom;
+  const markerScale = 1 / state.zoom;
+  for (const markerEl of markerLayer.children) {
     const markerAnchorY = getComputedStyle(markerEl).getPropertyValue("--marker-anchor-y") || "-50%";
     markerEl.style.transform = `translate(-50%, ${markerAnchorY}) scale(${markerScale.toFixed(6)})`;
-  });
+  }
   zoomLabel.textContent = formatZoomLabel(state.zoom);
 }
 
@@ -645,8 +1138,8 @@ function setUndergroundMode(enabled) {
 }
 
 function setDefaultSidebarMessage() {
-  title.textContent = "Select a marker";
-  content.innerHTML = `<p>Choose a marker on the map to see details.</p>`;
+  title.textContent = t("page.mainui.defaultInfoTitle");
+  content.innerHTML = `<p>${t("page.mainui.defaultInfoBody")}</p>`;
 }
 
 function hasActiveMarkerCategories() {
@@ -657,19 +1150,19 @@ function setMarkerEmptyState(filterText) {
   const hasActiveCategories = hasActiveMarkerCategories();
 
   if (!hasActiveCategories && !filterText) {
-    title.textContent = "Choose a category";
-    content.innerHTML = `<p>Turn on one or more categories in the sidebar to display markers for this floor.</p>`;
+    title.textContent = t("page.mainui.chooseCategoryTitle");
+    content.innerHTML = `<p>${t("page.mainui.chooseCategoryBody")}</p>`;
     return;
   }
 
   if (filterText) {
-    title.textContent = "No search matches";
-    content.innerHTML = `<p>No markers match your current search on this floor.</p>`;
+    title.textContent = t("page.mainui.noSearchTitle");
+    content.innerHTML = `<p>${t("page.mainui.noSearchBody")}</p>`;
     return;
   }
 
-  title.textContent = "No markers available";
-  content.innerHTML = `<p>No markers are available for the currently selected categories on this floor.</p>`;
+  title.textContent = t("page.mainui.noMarkersTitle");
+  content.innerHTML = `<p>${t("page.mainui.noMarkersBody")}</p>`;
 }
 
 function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
@@ -917,8 +1410,8 @@ function renderMarkers() {
     markerEl.dataset.markerId = id;
     markerEl.style.left = `${leftPx}px`;
     markerEl.style.top  = `${topPx}px`;
-    const markerAnchorY = getComputedStyle(markerEl).getPropertyValue("--marker-anchor-y") || "-50%";
-    markerEl.style.transform = `translate(-50%, ${markerAnchorY}) scale(${(1 / state.zoom).toFixed(6)})`;
+    const markerAnchorY = markerType === "biome" ? "-100%" : "-50%";
+    markerEl.style.setProperty("--marker-anchor-y", markerAnchorY);
     if (markerType === "biome") {
       markerEl.innerHTML = `
         <svg class="biome-pin-icon" viewBox="0 0 24 34" aria-hidden="true" focusable="false">
@@ -985,6 +1478,9 @@ function renderMarkers() {
       markerEl.textContent = markerType.charAt(0);
     }
     markerEl.title = marker.title;
+    markerEl.tabIndex = 0;
+    markerEl.setAttribute("role", "button");
+    markerEl.setAttribute("aria-label", marker.title);
     const canBeVisited = supportsVisitedCategory(marker.category);
     markerEl.dataset.markerFloor = marker.floor || "";
     markerEl.classList.toggle("visited", canBeVisited && isMarkerVisited(marker.floor, id));
@@ -993,7 +1489,6 @@ function renderMarkers() {
       ? (undergroundToggle.checked ? 1 : 0.10)
       : (undergroundToggle.checked ? 0.10 : 1);
     markerEl.style.opacity = opacity;
-    markerEl.addEventListener("click", () => openInfo(id));
     if (state.activeMarkerId === id) {
       markerEl.classList.add("active-marker");
       activeMarkerRendered = true;
@@ -1010,7 +1505,7 @@ function renderMarkers() {
       if (isAreaUnderground !== undergroundToggle.checked) return;
 
       const waypointTitle = `${area.title} Mobs`;
-      const searchHaystack = normalizeSearchValue(`${area.id} ${waypointTitle} mob area`);
+      const searchHaystack = getMobAreaSearchHaystack(area);
       if (filterText && !searchHaystack.includes(filterText)) return;
 
       const center = getMobAreaCenter(area);
@@ -1031,6 +1526,9 @@ function renderMarkers() {
       markerEl.style.left = `${leftPx}px`;
       markerEl.style.top = `${topPx}px`;
       markerEl.title = waypointTitle;
+      markerEl.tabIndex = 0;
+      markerEl.setAttribute("role", "button");
+      markerEl.setAttribute("aria-label", waypointTitle);
       const zoneColor = normalizeHexColor(area.stroke) || "#5a4ed1";
       const contrastColor = getOppositeHexColor(zoneColor);
       markerEl.style.setProperty("--mob-marker-bg", zoneColor);
@@ -1042,8 +1540,6 @@ function renderMarkers() {
           <path class="mob-area-icon-dot" d="M12 10.2a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z"/>
         </svg>
       `;
-      markerEl.addEventListener("click", () => openMobAreaInfo(area));
-
       if (state.activeMarkerId === `mob-area:${area.id}`) {
         markerEl.classList.add("active-marker");
         activeMarkerRendered = true;
@@ -1075,7 +1571,11 @@ function openInfo(id) {
   const markerFloor = marker.floor || "";
   const isVisited = isMarkerVisited(markerFloor, id);
   const waypointQuery = marker.title;
-  const visitedLabel = marker.category === "bossSpawns" ? "Defeated" : marker.category === "dungeons" ? "Completed" : "Visited";
+  const visitedLabel = marker.category === "bossSpawns"
+    ? t("page.maps.visitedDefeated")
+    : marker.category === "dungeons"
+      ? t("page.maps.visitedCompleted")
+      : t("page.maps.visitedVisited");
   const showInfoButton = marker.category === "bossSpawns" || marker.category === "sideQuests";
   const bossCategory = marker.underground === true ? "dungeonBoss" : "boss";
   const bestiaryHref = getFloorSpecificBestiaryUrl(marker.floor, bossCategory, waypointQuery);
@@ -1083,12 +1583,17 @@ function openInfo(id) {
   const waypointInfoHref = marker.category === "bossSpawns" ? bestiaryHref : questsHref;
   state.activeMarkerId = id;
   title.textContent = marker.title;
+  const markerType = escapeHtml(marker.type || "");
+  const markerDescription = escapeHtml(marker.description || "");
+  const floorText = escapeHtml(String(marker.floor || "").replace("floor", `${t("page.maps.floorText")} `));
+  const coordsX = marker.coords && marker.coords.x !== undefined ? escapeHtml(marker.coords.x) : "--";
+  const coordsZ = marker.coords && marker.coords.z !== undefined ? escapeHtml(marker.coords.z) : "--";
   content.innerHTML = `
-    <p><strong>Type:</strong> ${marker.type}</p>
-    <p>${marker.description}</p>
-    <p><strong>Floor:</strong> ${marker.floor.replace("floor", "Floor ")}</p>
-    <p><strong>Coordinates:</strong> X: ${marker.coords.x} Z: ${marker.coords.z}</p>
-    ${showInfoButton ? `<div class="waypoint-info-row"><button type="button" id="waypointInfoButton" class="waypoint-info-button" data-waypoint-info-href="${waypointInfoHref}">Go to Waypoint Information</button></div>` : ""}
+    <p><strong>${t("page.maps.mobType")}:</strong> ${markerType}</p>
+    <p>${markerDescription}</p>
+    <p><strong>${t("page.maps.floorText")}:</strong> ${floorText}</p>
+    <p><strong>${t("page.maps.coordinates")}:</strong> X: ${coordsX} Z: ${coordsZ}</p>
+    ${showInfoButton ? `<div class="waypoint-info-row"><button type="button" id="waypointInfoButton" class="waypoint-info-button" data-waypoint-info-href="${escapeHtml(waypointInfoHref)}">${t("page.maps.viewWaypointInfo")}</button></div>` : ""}
     ${canBeVisited ? `<div class="visited-toggle-row"><label class="visited-toggle-label">${visitedLabel}: <input type="checkbox" id="visitedToggle" data-marker-id="${escapeHtml(id)}" data-marker-floor="${escapeHtml(markerFloor)}" ${isVisited ? "checked" : ""}></label></div>` : ""}
   `;
 
@@ -1097,26 +1602,6 @@ function openInfo(id) {
   const activeMarker = markerLayer.querySelector(`[data-marker-id="${id}"]`);
   if (activeMarker) activeMarker.classList.add("active-marker");
 
-  const visitedToggle = document.getElementById("visitedToggle");
-  if (canBeVisited && visitedToggle) {
-    visitedToggle.addEventListener("change", event => {
-      const nextVisited = event.target.checked;
-      const targetId = event.target.dataset.markerId || id;
-      const targetFloor = event.target.dataset.markerFloor || markerFloor;
-      setMarkerVisited(targetFloor, targetId, nextVisited);
-      syncMarkerVisitedClass(targetId, nextVisited);
-    });
-  }
-
-  const waypointInfoButton = document.getElementById("waypointInfoButton");
-  if (waypointInfoButton) {
-    waypointInfoButton.addEventListener("click", () => {
-      const href = waypointInfoButton.dataset.waypointInfoHref;
-      if (!href) return;
-      try { persistStateToHistory(); } catch (e) {}
-      window.location.href = href;
-    });
-  }
 }
 
 function clearTextSelection() {
@@ -1154,7 +1639,8 @@ function shouldIgnoreMapDrag(target) {
 }
 
 function startDrag(event) {
-  if (event.button !== 0) return;
+  if (event.type === "mousedown" && event.button !== 0) return;
+  if (event.type === "pointerdown" && event.pointerType === "mouse" && event.button !== 0) return;
   if (shouldIgnoreMapDrag(event.target)) return;
   clearTextSelection();
   event.preventDefault();
@@ -1192,11 +1678,21 @@ function clampSidebarWidth(width) {
 function applySidebarWidth(width) {
   const clampedWidth = clampSidebarWidth(width);
   document.documentElement.style.setProperty("--sidebar-width", `${clampedWidth}px`);
+  syncSidebarResizeHandleAria(clampedWidth);
   return clampedWidth;
 }
 
+function syncSidebarResizeHandleAria(width) {
+  if (!sidebarResizeHandle) return;
+  sidebarResizeHandle.setAttribute("aria-valuemin", String(sidebarResizeConfig.min));
+  sidebarResizeHandle.setAttribute("aria-valuemax", String(sidebarResizeConfig.max));
+  sidebarResizeHandle.setAttribute("aria-valuenow", String(Math.round(width)));
+  sidebarResizeHandle.setAttribute("aria-valuetext", `${Math.round(width)} pixels`);
+}
+
 function startSidebarResize(event) {
-  if (event.button !== 0) return;
+  if (event.type === "mousedown" && event.button !== 0) return;
+  if (event.type === "pointerdown" && event.pointerType === "mouse" && event.button !== 0) return;
   event.preventDefault();
   state.isResizingSidebar = true;
   state.sidebarResizeStartX = event.clientX;
@@ -1217,10 +1713,15 @@ function stopSidebarResize() {
   state.isResizingSidebar = false;
   document.body.classList.remove("resizing-sidebar");
   const width = clampSidebarWidth(sidebar.getBoundingClientRect().width);
-  setPersistentItem(sidebarResizeConfig.storageKey, String(Math.round(width)));
+  storage.setItem(sidebarResizeConfig.storageKey, String(Math.round(width)));
 }
 
 function init() {
+  if (!hasRequiredMainUiElements()) {
+    showMainUiRuntimeError("The map UI is missing required page elements.");
+    return;
+  }
+
   const urlState = parseUrlState();
   const savedState = loadMapUiState();
   const initialState = urlState.hasParams ? urlState : (savedState || {});
@@ -1239,10 +1740,13 @@ function init() {
   if (searchInput && typeof initialState.search === "string") {
     searchInput.value = initialState.search;
   }
+  if (searchInput) {
+    searchInput.setAttribute("aria-label", t("page.mainui.searchPlaceholder"));
+  }
 
   applyMapSources(floorSelect.value);
 
-  const persistedWidth = Number(getPersistentItem(sidebarResizeConfig.storageKey));
+  const persistedWidth = Number(storage.getItem(sidebarResizeConfig.storageKey));
   if (Number.isFinite(persistedWidth) && persistedWidth > 0) {
     applySidebarWidth(persistedWidth);
   } else {
@@ -1250,17 +1754,58 @@ function init() {
   }
 
   mapContainer.addEventListener("mousemove", requestCoordinatePanelUpdate);
+  mapContainer.addEventListener("pointermove", requestCoordinatePanelUpdate);
   mapContainer.addEventListener("mouseleave", () => {
+    state.pendingPointerEvent = null;
+    overlayMappedCoords.textContent = "X: -- Z: --";
+  });
+  mapContainer.addEventListener("pointerleave", () => {
     state.pendingPointerEvent = null;
     overlayMappedCoords.textContent = "X: -- Z: --";
   });
   mapContainer.addEventListener("wheel", handleWheel, { passive: false });
   mapContainer.addEventListener("mousedown", startDrag);
+  mapContainer.addEventListener("pointerdown", startDrag);
+  content.addEventListener("click", handleInfoOverlayClick);
+  content.addEventListener("change", handleInfoOverlayChange);
+  markerLayer.addEventListener("click", handleMarkerLayerClick);
+  markerLayer.addEventListener("keydown", handleMarkerLayerKeydown);
   if (sidebarResizeHandle) {
     sidebarResizeHandle.addEventListener("mousedown", startSidebarResize);
+    sidebarResizeHandle.addEventListener("pointerdown", startSidebarResize);
+    sidebarResizeHandle.addEventListener("keydown", event => {
+      const currentWidth = sidebar.getBoundingClientRect().width;
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        applySidebarWidth(currentWidth + 16);
+        scheduleRenderMarkers();
+        return;
+      }
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        applySidebarWidth(currentWidth - 16);
+        scheduleRenderMarkers();
+        return;
+      }
+
+      if (event.key === "Home") {
+        event.preventDefault();
+        applySidebarWidth(sidebarResizeConfig.min);
+        scheduleRenderMarkers();
+        return;
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        applySidebarWidth(sidebarResizeConfig.max);
+        scheduleRenderMarkers();
+      }
+    });
     sidebarResizeHandle.addEventListener("dblclick", () => {
       const width = applySidebarWidth(sidebarResizeConfig.defaultWidth);
-      setPersistentItem(sidebarResizeConfig.storageKey, String(Math.round(width)));
+      storage.setItem(sidebarResizeConfig.storageKey, String(Math.round(width)));
       scheduleRenderMarkers();
     });
   }
@@ -1272,7 +1817,18 @@ function init() {
     }
   });
 
+  window.addEventListener("pointermove", event => {
+    resizeSidebar(event);
+    if (!state.isResizingSidebar) {
+      drag(event);
+    }
+  }, { passive: false });
+
   document.addEventListener("mouseup", () => {
+    stopDrag();
+    stopSidebarResize();
+  });
+  document.addEventListener("pointerup", () => {
     stopDrag();
     stopSidebarResize();
   });
@@ -1303,8 +1859,18 @@ function init() {
     persistStateToHistory();
   });
 
+  if (clearFiltersButton) {
+    clearFiltersButton.textContent = t("page.mainui.clearFilters");
+    clearFiltersButton.addEventListener("click", clearMapFilters);
+  }
+
   attachSectionNavButtons();
   syncMainCategoryButtonVisibility();
+
+  const compendiumButton = document.querySelector('button[data-message]');
+  if (compendiumButton) {
+    compendiumButton.dataset.message = t("page.mainui.compendiumToast");
+  }
 
   categoryToggleButtons.forEach(button => {
     button.addEventListener("click", () => {
@@ -1334,9 +1900,54 @@ function init() {
   state.initialTranslateY = state.translateY;
   // Seed history state so popstate/pageshow can restore it later
   persistStateToHistory();
+
+  window.setTimeout(() => {
+    startGuidedWalkthrough({ force: false });
+  }, 250);
+
+  document.addEventListener("sao:walkthroughrestart", () => {
+    startGuidedWalkthrough({ force: true });
+  });
+
+  document.addEventListener("sao:languagechange", () => {
+    if (clearFiltersButton) {
+      clearFiltersButton.textContent = t("page.mainui.clearFilters");
+    }
+    if (searchInput) {
+      searchInput.setAttribute("aria-label", t("page.mainui.searchPlaceholder"));
+    }
+    applyMapSources(floorSelect.value);
+
+    const compendiumButton = document.querySelector('button[data-message]');
+    if (compendiumButton) {
+      compendiumButton.dataset.message = t("page.mainui.compendiumToast");
+    }
+
+    if (state.activeMarkerId && state.activeMarkerId.startsWith("mob-area:")) {
+      const areaId = state.activeMarkerId.slice("mob-area:".length);
+      const area = MOB_AREA_LOOKUP.get(areaId);
+      if (area) {
+        openMobAreaInfo(area);
+        return;
+      }
+    }
+    if (state.activeMarkerId && DATA[state.activeMarkerId]) {
+      openInfo(state.activeMarkerId);
+      return;
+    }
+    setDefaultSidebarMessage();
+  });
 }
 
-window.addEventListener("DOMContentLoaded", init);
+window.addEventListener("DOMContentLoaded", () => {
+  try {
+    ensureMarkerSearchCache();
+    init();
+  } catch (error) {
+    console.error("Failed to initialize Fractured Underworld map runtime.", error);
+    showMainUiRuntimeError();
+  }
+});
 
 function syncStateFromDom() {
   if (!floorSelect) return;

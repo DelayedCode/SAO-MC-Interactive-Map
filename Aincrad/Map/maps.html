@@ -1,35 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SAO Interactive Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+  <title data-i18n="page.maps.title">Aincrad Interactive Map | SAO MC</title>
+  <meta name="description" content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references.">
+  <meta name="keywords" content="Aincrad map, SAO MC map, dungeon waypoints, biome locations, SAO Minecraft">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="author" content="DelayedCode">
+  <meta name="theme-color" content="#0b121a">
+  <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <link rel="manifest" href="../../site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SAO MC Interactive Map">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Aincrad Interactive Map | SAO MC">
+  <meta property="og:description" content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references.">
+  <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html">
+  <meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <meta property="og:image:alt" content="Preview of the SAO MC interactive map website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Aincrad Interactive Map | SAO MC">
+  <meta name="twitter:description" content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references.">
+  <meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Aincrad Interactive Map",
+      "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html",
+      "description": "Interactive Aincrad floor map with filterable waypoints and location details.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "SAO MC Interactive Map",
+        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
+      },
+      "inLanguage": "en"
+    }
+  </script>
   <link rel="stylesheet" href="maps.css">
 </head>
 <body>
   <header>
-    <div class="top-nav">
-      <button class="top-button" type="button" data-nav-target="patchnotes">Patch Notes</button>
-      <button class="top-button" type="button" data-nav-target="bestiary">Bestiary</button>
-      <button class="top-button" type="button" data-nav-target="equipment">Equipment Compendium</button>
-      <button class="top-button" type="button" data-nav-target="quests">Quests</button>
-      <button class="top-button" type="button" data-nav-target="commands">Commands</button>
-      <button class="top-button" type="button" data-nav-target="miscinfo">Misc. Info</button>
-      <button class="top-button" type="button" data-nav-target="menu">Go back to Menu</button>
-    </div>
+    <nav class="top-nav" aria-label="Primary">
+      <button class="top-button" type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patch Notes</button>
+      <button class="top-button" type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
+      <button class="top-button" type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment Compendium</button>
+      <button class="top-button" type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
+      <button class="top-button" type="button" data-nav-target="commands" data-i18n="ui.nav.commands">Commands</button>
+      <button class="top-button" type="button" data-nav-target="miscinfo" data-i18n="ui.nav.miscinfo">Misc. Info</button>
+      <button class="top-button" type="button" data-nav-target="menu" data-i18n="ui.nav.menu">Go back to Menu</button>
+    </nav>
     <div class="header-main">
-      <h1>SAO Interactive Map</h1>
+      <h1 data-i18n="page.maps.title">SAO Interactive Map</h1>
       <div class="controls">
-        <label for="floorSelect">Floor:</label>
+        <label for="floorSelect" data-i18n="page.maps.floorLabel">Floor:</label>
         <select id="floorSelect">
           <option value="floor1">Floor 1 - The Town of Beginnings</option>
           <option value="floor2">Floor 2 - Arid Desert</option>
           <option value="floor3">Floor 3 - The Forest of Wandering</option>
         </select>
         <label class="underground-toggle-wrapper" for="undergroundToggle">
-          <span>Underground:</span>
+          <span data-i18n="page.maps.undergroundLabel">Underground:</span>
           <input type="checkbox" id="undergroundToggle">
         </label>
-        <input type="text" id="search" placeholder="Search markers...">
+        <input type="text" id="search" data-i18n-placeholder="page.maps.searchPlaceholder" placeholder="Search markers...">
+        <button id="clearFilters" class="control-action" type="button">Clear Filters</button>
       </div>
     </div>
   </header>
@@ -37,8 +79,8 @@
   <main>
     <section id="mapContainer">
       <div id="mapLayer">
-        <img id="mapImage" alt="Map floor">
-        <img id="undergroundMapImage" class="underground-map" alt="Underground overlay">
+        <img id="mapImage" data-i18n-aria-label="page.maps.mapAlt" alt="Map floor" decoding="async" fetchpriority="high">
+        <img id="undergroundMapImage" class="underground-map" data-i18n-aria-label="page.maps.undergroundAlt" alt="Underground overlay" decoding="async" fetchpriority="low">
         <svg id="mobAreaLayer" aria-hidden="true"></svg>
         <div id="markers"></div>
       </div>
@@ -46,20 +88,20 @@
         <div id="overlayMappedCoords">X: -- Z: --</div>
       </div>
       <div id="zoomControls">
-        <button id="resetView" type="button">Reset View</button>
+        <button id="resetView" type="button" data-i18n="page.maps.resetView">Reset View</button>
         <span id="zoomLabel">1x</span>
       </div>
       <div id="infoOverlay">
         <div class="sidebar-section">
-          <div class="sidebar-section-title" id="title">Select a marker</div>
-          <div id="content">
-            <p>Choose a marker on the map to see details here.</p>
+          <div class="sidebar-section-title" id="title" data-i18n="page.maps.defaultInfoTitle">Select a marker</div>
+          <div id="content" aria-live="polite" aria-atomic="true">
+            <p data-i18n="page.maps.defaultInfoBody">Choose a marker on the map to see details here.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <div id="sidebarResizeHandle" role="separator" aria-label="Resize sidebar" aria-orientation="vertical"></div>
+    <div id="sidebarResizeHandle" role="separator" tabindex="0" aria-label="Resize sidebar" aria-orientation="vertical"></div>
 
     <aside id="sidebar">
       <div class="sidebar-section">
@@ -119,6 +161,7 @@
   <script src="maps_floor2.js"></script>
   <script src="maps_floor3.js"></script>
   <script src="../../shared/sao-storage.js"></script>
+  <script src="../../shared/sao-i18n.js"></script>
   <script src="maps.js"></script>
 </body>
 </html>

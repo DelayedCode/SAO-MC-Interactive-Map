@@ -1,57 +1,50 @@
 const LIST_TITLES = {
-    weapon: "Weapons",
-    armor: "Armor",
-    accessory: "Accessories",
-    rune: "Runes",
-    tool: "Tools",
-    food: "Food",
-    consumable: "Consumables",
-    material: "Materials",
-    quest_item: "Quest Items",
-    resource: "Resources",
-    dungeon: "Dungeons",
-    currency: "Currency"
+    weapon: "page.ecompendium.listTitles.weapon",
+    armor: "page.ecompendium.listTitles.armor",
+    accessory: "page.ecompendium.listTitles.accessory",
+    rune: "page.ecompendium.listTitles.rune",
+    tool: "page.ecompendium.listTitles.tool",
+    food: "page.ecompendium.listTitles.food",
+    consumable: "page.ecompendium.listTitles.consumable",
+    material: "page.ecompendium.listTitles.material",
+    quest_item: "page.ecompendium.listTitles.quest_item",
+    resource: "page.ecompendium.listTitles.resource",
+    dungeon: "page.ecompendium.listTitles.dungeon",
+    currency: "page.ecompendium.listTitles.currency"
 };
 
+const i18n = window.SAOI18n || null;
+const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const loadedCompendiumFloors = new Set();
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function getListTitle(category) {
+    return t(LIST_TITLES[category] || "page.ecompendium.heading");
+}
+
 const compendiumUiStateStorageKey = "sao.compendium.uiState";
-
-function getPersistentItem(key) {
-    if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
-        return window.SAOStorage.getItem(key);
-    }
-    try {
-        return localStorage.getItem(key);
-    } catch {
-        return null;
-    }
-}
-
-function setPersistentItem(key, value) {
-    if (window.SAOStorage && typeof window.SAOStorage.setItem === "function") {
-        window.SAOStorage.setItem(key, value);
-        return;
-    }
-    try {
-        localStorage.setItem(key, value);
-    } catch {
-        // Keep compendium usable if storage is blocked.
-    }
-}
+const storage = window.SAOStorage || {
+    getItem() { return null; },
+    setItem() {},
+    getJSON(_key, fallbackValue) { return fallbackValue; },
+    setJSON() {}
+};
 
 function loadCompendiumUiState() {
-    try {
-        const raw = getPersistentItem(compendiumUiStateStorageKey);
-        if (!raw) return {};
-        const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed !== "object") return {};
-        return parsed;
-    } catch {
-        return {};
-    }
+    const parsed = storage.getJSON(compendiumUiStateStorageKey, {});
+    return parsed && typeof parsed === "object" ? parsed : {};
 }
 
 function saveCompendiumUiState(nextState) {
-    setPersistentItem(compendiumUiStateStorageKey, JSON.stringify(nextState));
+    storage.setJSON(compendiumUiStateStorageKey, nextState);
 }
 
 const DEFAULT_COMPENDIUM_FLOOR = "floor1";
@@ -62,7 +55,13 @@ function getRequestedFloor() {
 }
 
 function attachSectionNavButtons() {
-    window.SAOPageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
+    const pageUtils = window.SAOPageUtils;
+    if (!pageUtils || typeof pageUtils.attachSectionNavButtons !== "function") {
+        console.warn("Compendium navigation helper is unavailable.");
+        return;
+    }
+
+    pageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
 }
 
 function getActiveDataSet() {
@@ -71,13 +70,35 @@ function getActiveDataSet() {
     return window[dataSetKey] || {};
 }
 
-function loadFloorDataScript(floorKey, onReady) {
-    const floorScript = document.createElement("script");
-    floorScript.src = `ecompendium_${floorKey}.js`;
-    floorScript.async = false;
-    floorScript.addEventListener("load", onReady, { once: true });
-    floorScript.addEventListener("error", onReady, { once: true });
-    document.head.appendChild(floorScript);
+function loadFloorDataScript(floorKey, onReady, onError) {
+    const runtimeUtils = window.SAORuntimeUtils;
+    if (!runtimeUtils || typeof runtimeUtils.loadTaggedScriptOnce !== "function") {
+        console.warn("Compendium runtime utilities are unavailable.");
+        onReady();
+        return;
+    }
+
+    runtimeUtils.loadTaggedScriptOnce({
+        cache: loadedCompendiumFloors,
+        cacheKey: floorKey,
+        tagAttribute: "data-ecompendium-floor",
+        src: `ecompendium_${floorKey}.js`,
+        onReady,
+        onError
+    });
+}
+
+function showCompendiumLoadError() {
+    const status = document.getElementById("status");
+    const list = document.getElementById("entryList");
+    if (status) {
+        status.textContent = t("page.ecompendium.loadError");
+    }
+    if (list) {
+        list.replaceChildren(document.createElement("p"));
+        list.firstChild.className = "empty-state";
+        list.firstChild.textContent = t("page.ecompendium.loadUnavailable");
+    }
 }
 
 function createEntryCard(entry) {
@@ -87,32 +108,32 @@ function createEntryCard(entry) {
     let html = "";
 
     html += "<h2 class='ecompendium-name'>" +
-        (entry.name || "Unknown Item") +
+        escapeHtml(entry.name || t("page.ecompendium.unknownItem")) +
         "</h2>";
 
     html += "<div class='ecompendium-meta'>";
 
     if (entry.rarity) {
-        html += "<p><span>Rarity</span><strong>" +
-            entry.rarity +
+        html += "<p><span>" + t("page.ecompendium.labels.rarity") + "</span><strong>" +
+            escapeHtml(entry.rarity) +
             "</strong></p>";
     }
 
     if (entry.level) {
-        html += "<p><span>Level</span><strong>" +
-            entry.level +
+        html += "<p><span>" + t("page.ecompendium.labels.level") + "</span><strong>" +
+            escapeHtml(entry.level) +
             "</strong></p>";
     }
 
     if (entry.set) {
-        html += "<p><span>Set</span><strong>" +
-            entry.set +
+        html += "<p><span>" + t("page.ecompendium.labels.set") + "</span><strong>" +
+            escapeHtml(entry.set) +
             "</strong></p>";
     }
 
     if (entry.craftingLocation) {
-        html += "<p><span>Crafted At</span><strong>" +
-            entry.craftingLocation +
+        html += "<p><span>" + t("page.ecompendium.labels.craftedAt") + "</span><strong>" +
+            escapeHtml(entry.craftingLocation) +
             "</strong></p>";
     }
 
@@ -121,22 +142,22 @@ function createEntryCard(entry) {
     if (entry.description) {
         html +=
             "<div class='equipment-section'>" +
-            "<h4 class='equipment-section-title'>Description</h4>" +
-            "<p>" + entry.description + "</p>" +
+            "<h4 class='equipment-section-title'>" + t("page.ecompendium.labels.description") + "</h4>" +
+            "<p>" + escapeHtml(entry.description) + "</p>" +
             "</div>";
     }
 
     if (entry.stats) {
         html +=
             "<div class='equipment-section'>" +
-            "<h4 class='equipment-section-title'>Statistics</h4>" +
+            "<h4 class='equipment-section-title'>" + t("page.ecompendium.labels.statistics") + "</h4>" +
             "<ul class='stat-list'>";
 
         for (const stat in entry.stats) {
             html +=
                 "<li>" +
-                "<span>" + stat + "</span>" +
-                "<strong>" + entry.stats[stat] + "</strong>" +
+                "<span>" + escapeHtml(stat) + "</span>" +
+                "<strong>" + escapeHtml(entry.stats[stat]) + "</strong>" +
                 "</li>";
         }
 
@@ -147,9 +168,9 @@ function createEntryCard(entry) {
 
         html +=
             "<div class='equipment-section'>" +
-            "<h4 class='equipment-section-title'>Crafting Resources</h4>" +
+            "<h4 class='equipment-section-title'>" + t("page.ecompendium.labels.resources") + "</h4>" +
             (entry.craftingNote
-                ? "<p>" + entry.craftingNote + "</p>"
+                ? "<p>" + escapeHtml(entry.craftingNote) + "</p>"
                 : "") +
             ((entry.craftingResources && entry.craftingResources.length > 0)
                 ? "<ul class='resource-list'>"
@@ -159,8 +180,8 @@ function createEntryCard(entry) {
             entry.craftingResources.forEach(function(resource) {
                 html +=
                     "<li>" +
-                    "<span>" + resource.item + "</span>" +
-                    "<strong>x" + resource.amount + "</strong>" +
+                    "<span>" + escapeHtml(resource.item) + "</span>" +
+                    "<strong>x" + escapeHtml(resource.amount) + "</strong>" +
                     "</li>";
             });
 
@@ -192,16 +213,15 @@ function renderEntries(entries, query) {
             .includes(normalizedQuery);
     });
 
-    status.textContent =
-        filteredEntries.length +
-        " of " +
-        safeEntries.length +
-        " entries shown";
+    status.textContent = t("page.ecompendium.statusShown", {
+        visible: filteredEntries.length,
+        total: safeEntries.length
+    });
 
     if (filteredEntries.length === 0) {
         list.replaceChildren(document.createElement("p"));
         list.firstChild.className = "empty-state";
-        list.firstChild.textContent = "No entries found.";
+        list.firstChild.textContent = t("page.ecompendium.noEntriesFound");
         return;
     }
 
@@ -222,12 +242,22 @@ function initCompendiumRuntime() {
         return;
     }
 
+    function focusTabByOffset(currentButton, offset) {
+        const currentIndex = tabButtons.indexOf(currentButton);
+        if (currentIndex < 0) {
+            return;
+        }
+
+        const nextIndex = (currentIndex + offset + tabButtons.length) % tabButtons.length;
+        tabButtons[nextIndex].focus();
+    }
+
     attachSectionNavButtons();
 
     let currentEntries = [];
     const floor = getRequestedFloor();
-    const savedState = loadCompendiumUiState();
-    const floorState = savedState[floor] || {};
+    let compendiumUiState = loadCompendiumUiState();
+    const floorState = compendiumUiState[floor] || {};
     let activeCategory = floorState.category || "weapon";
     let renderRafId = null;
 
@@ -244,24 +274,26 @@ function initCompendiumRuntime() {
 
     function loadCategory(category) {
         activeCategory = category;
-        const currentState = loadCompendiumUiState();
-        saveCompendiumUiState({
-            ...currentState,
+        compendiumUiState = {
+            ...compendiumUiState,
             [floor]: {
-                ...(currentState[floor] || {}),
+                ...(compendiumUiState[floor] || {}),
                 category
             }
-        });
+        };
+        saveCompendiumUiState(compendiumUiState);
 
         tabButtons.forEach(function(button) {
-            button.classList.toggle(
-                "is-active",
-                button.dataset.category === category
-            );
+            const isActive = button.dataset.category === category;
+            button.classList.toggle("is-active", isActive);
+            button.setAttribute("role", "tab");
+            button.setAttribute("aria-controls", "entryList");
+            button.setAttribute("aria-selected", isActive ? "true" : "false");
+            button.setAttribute("tabindex", isActive ? "0" : "-1");
+            button.textContent = getListTitle(button.dataset.category);
         });
 
-        listTitle.textContent =
-            LIST_TITLES[category] || "Equipment";
+        listTitle.textContent = getListTitle(category);
 
         const dataSet = getActiveDataSet();
         currentEntries = Array.isArray(dataSet[category])
@@ -283,20 +315,51 @@ function initCompendiumRuntime() {
     }
 
     searchInput.addEventListener("input", function() {
-        const currentState = loadCompendiumUiState();
-        saveCompendiumUiState({
-            ...currentState,
+        compendiumUiState = {
+            ...compendiumUiState,
             [floor]: {
-                ...(currentState[floor] || {}),
+                ...(compendiumUiState[floor] || {}),
                 search: searchInput.value
             }
-        });
+        };
+        saveCompendiumUiState(compendiumUiState);
         scheduleRenderEntries();
     });
 
     tabButtons.forEach(function(button) {
         button.addEventListener("click", function() {
             loadCategory(button.dataset.category);
+        });
+
+        button.addEventListener("keydown", function(event) {
+            if (event.key === "ArrowRight") {
+                event.preventDefault();
+                focusTabByOffset(button, 1);
+                return;
+            }
+
+            if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                focusTabByOffset(button, -1);
+                return;
+            }
+
+            if (event.key === "Home") {
+                event.preventDefault();
+                tabButtons[0].focus();
+                return;
+            }
+
+            if (event.key === "End") {
+                event.preventDefault();
+                tabButtons[tabButtons.length - 1].focus();
+                return;
+            }
+
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                loadCategory(button.dataset.category);
+            }
         });
     });
 
@@ -309,16 +372,25 @@ function initCompendiumRuntime() {
     }
 
     loadCategory(activeCategory);
+
+    document.addEventListener("sao:languagechange", function() {
+        loadCategory(activeCategory);
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    const floorKey = getRequestedFloor();
-    const floorDataKey = `FLOOR_${floorKey.replace("floor", "")}_DATA`;
+    try {
+        const floorKey = getRequestedFloor();
+        const floorDataKey = `FLOOR_${floorKey.replace("floor", "")}_DATA`;
 
-    if (window[floorDataKey]) {
-        initCompendiumRuntime();
-        return;
+        if (window[floorDataKey]) {
+            initCompendiumRuntime();
+            return;
+        }
+
+        loadFloorDataScript(floorKey, initCompendiumRuntime, showCompendiumLoadError);
+    } catch (error) {
+        console.error("Failed to initialize equipment compendium runtime.", error);
+        showCompendiumLoadError();
     }
-
-    loadFloorDataScript(floorKey, initCompendiumRuntime);
 });

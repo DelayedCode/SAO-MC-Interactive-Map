@@ -3,23 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fractured Underworld - Tower Defense</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+  <title data-i18n="page.towerdefense.title">Fractured Underworld Tower Defense Guide | SAO MC</title>
+  <meta name="description" content="Review SAO MC Fractured Underworld Tower Defense chapter info and shop data with quick access panels and progression context.">
+  <meta name="keywords" content="SAO MC tower defense, Fractured Underworld tower defense, chapter guide, shop info">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="author" content="DelayedCode">
+  <meta name="theme-color" content="#0b121a">
+  <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Fractured%20Underworld/Tower%20Defense/towerdefense.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <link rel="manifest" href="../../site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SAO MC Interactive Map">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Fractured Underworld Tower Defense Guide | SAO MC">
+  <meta property="og:description" content="Review SAO MC Fractured Underworld Tower Defense chapter info and shop data with quick access panels and progression context.">
+  <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Fractured%20Underworld/Tower%20Defense/towerdefense.html">
+  <meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <meta property="og:image:alt" content="SAO MC tower defense page preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Fractured Underworld Tower Defense Guide | SAO MC">
+  <meta name="twitter:description" content="Review SAO MC Fractured Underworld Tower Defense chapter info and shop data with quick access panels and progression context.">
+  <meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Fractured Underworld Tower Defense Guide",
+      "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Fractured%20Underworld/Tower%20Defense/towerdefense.html",
+      "description": "Tower Defense reference page for SAO MC Fractured Underworld chapters and shop.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "SAO MC Interactive Map",
+        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
+      },
+      "inLanguage": "en"
+    }
+  </script>
   <link rel="stylesheet" href="towerdefense.css">
 </head>
 <body>
   <header>
     <div class="header-main">
-      <h1>Fractured Underworld Tower Defense</h1>
-      <a class="header-back-button" href="../Main UI/mainui.html">Go back</a>
+      <h1 data-i18n="page.towerdefense.heading">Fractured Underworld Tower Defense</h1>
+      <a class="header-back-button" href="../Main UI/mainui.html" data-i18n="page.towerdefense.back">Go back</a>
     </div>
   </header>
 
   <main>
-    <section class="layout-grid" aria-label="Tower Defense sections">
+    <section class="layout-grid" data-i18n-aria-label="page.towerdefense.sectionsAria" aria-label="Tower Defense sections">
       <div class="layout-left">
-        <section class="intro-card chapter-card" aria-label="Tower Defense chapter overview">
-          <h2>Chapter Select</h2>
-          <div class="shop-list chapter-list" aria-label="Tower Defense chapter list">
+        <section class="intro-card chapter-card" data-i18n-aria-label="page.towerdefense.chapterOverviewAria" aria-label="Tower Defense chapter overview">
+          <h2 data-i18n="page.towerdefense.chapterSelect">Chapter Select</h2>
+          <div class="shop-list chapter-list" data-i18n-aria-label="page.towerdefense.chapterListAria" aria-label="Tower Defense chapter list">
             <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="1" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 1</button>
             <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="2" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 2</button>
             <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="3" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 3</button>
@@ -30,10 +70,10 @@
         </section>
       </div>
 
-      <aside class="layout-right" aria-label="Tower Defense shop section">
+      <aside class="layout-right" data-i18n-aria-label="page.towerdefense.shopSectionAria" aria-label="Tower Defense shop section">
         <section class="intro-card shop-card">
-          <h2>Tower Defense Shop</h2>
-          <div id="towerDefenseShopList" class="shop-list" aria-label="Tower Defense shop list"></div>
+          <h2 data-i18n="page.towerdefense.shopTitle">Tower Defense Shop</h2>
+          <div id="towerDefenseShopList" class="shop-list" data-i18n-aria-label="page.towerdefense.shopListAria" aria-label="Tower Defense shop list"></div>
         </section>
       </aside>
     </section>
@@ -43,16 +83,18 @@
     <div class="info-sheet-backdrop" data-close-info-sheet="true"></div>
     <section class="info-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="infoSheetTitle">
       <header class="info-sheet-header">
-        <h2 id="infoSheetTitle">Tower Defense Info Sheet</h2>
-        <button id="closeInfoSheetButton" class="close-button" type="button" aria-label="Close info sheet">Close</button>
+        <h2 id="infoSheetTitle" data-i18n="page.towerdefense.infoSheetTitle">Tower Defense Info Sheet</h2>
+        <button id="closeInfoSheetButton" class="close-button" type="button" data-i18n-aria-label="page.towerdefense.closeInfoSheet" aria-label="Close info sheet" data-i18n="ui.settings.closeLabel">Close</button>
       </header>
 
       <div id="towerDefenseInfoSheetContent" class="info-sheet-content"></div>
     </section>
   </div>
 
-  <div id="towerDefenseToast" class="global-toast" aria-hidden="true"></div>
+  <div id="towerDefenseToast" class="global-toast" role="status" aria-live="polite" aria-atomic="true" aria-hidden="true"></div>
 
+  <script src="../../shared/sao-storage.js"></script>
+  <script src="../../shared/sao-i18n.js"></script>
   <script src="towerdefense.js"></script>
 </body>
 </html>

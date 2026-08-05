@@ -1,13 +1,14 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.45;
   background: #151617;
   color: #eceef0;
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .page {
-  max-width: 100%;
+  max-width: 1200px;
   min-width: 0;
   margin: 0 auto;
   padding: 24px;
@@ -29,6 +30,7 @@ body {
   color: #eceef0;
   border-radius: 8px;
   padding: 8px 12px;
+  min-height: 38px;
   cursor: pointer;
   transition: background-color 0.14s ease, transform 0.14s ease;
 }
@@ -36,6 +38,10 @@ body {
 .nav button:hover {
   background: #34373b;
   transform: translateY(-1px);
+}
+
+.nav button:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .nav button:focus-visible {
@@ -53,11 +59,13 @@ body {
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
 }
 
 h1 {
-  margin-top: 0;
-  margin-bottom: 12px;
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 2.6vw, 2.3rem);
+  line-height: 1.12;
 }
 
 .list-tabs {
@@ -73,6 +81,7 @@ h1 {
   color: #eceef0;
   border-radius: 999px;
   padding: 8px 12px;
+  min-height: 36px;
   cursor: pointer;
   transition: background-color 0.14s ease, transform 0.14s ease, border-color 0.14s ease;
 }
@@ -80,6 +89,15 @@ h1 {
 .list-tab:hover {
   background: #34373b;
   transform: translateY(-1px);
+}
+
+.list-tab:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.list-tab:focus-visible {
+  outline: 2px solid #8f949c;
+  outline-offset: 2px;
 }
 
 .list-tab.is-active {
@@ -147,9 +165,9 @@ h1 {
 }
 
 .command-table {
-  display: block;
+  display: table;
   width: 100%;
-  min-width: 980px;
+  min-width: 740px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -171,6 +189,7 @@ h1 {
 
 .command-table td {
   background: #292c30;
+  line-height: 1.5;
 }
 
 .command-table tbody tr:nth-child(even) td {
@@ -194,9 +213,16 @@ h1 {
   white-space: pre-line;
 }
 
+@media (max-width: 860px) {
+  .command-table {
+    min-width: 700px;
+  }
+}
+
 @media (max-width: 720px) {
   .page {
     min-width: 0;
+    padding: 16px;
   }
 
   .panel-header {
@@ -207,5 +233,34 @@ h1 {
   .search-label {
     min-width: 0;
     margin-left: 0;
+  }
+
+  .command-table {
+    table-layout: auto;
+    font-size: 0.92rem;
+  }
+
+  .command-table th,
+  .command-table td {
+    padding: 10px 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .nav button:hover,
+  .list-tab:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .nav button {
+    width: 100%;
   }
 }

@@ -3,38 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAO Bestiary</title>
+   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+   <meta name="referrer" content="strict-origin-when-cross-origin">
+   <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+  <title data-i18n="page.bestiary.title">Aincrad Bestiary | SAO MC Interactive Map</title>
+  <meta name="description" content="Browse SAO MC Aincrad bestiary entries with searchable boss, dungeon, and regular mob listings across available floors.">
+  <meta name="keywords" content="SAO MC bestiary, Aincrad mobs, dungeon bosses, boss list, SAO Minecraft mobs">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="author" content="DelayedCode">
+  <meta name="theme-color" content="#0b121a">
+  <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Bestiary/bestiary.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <link rel="manifest" href="../../site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SAO MC Interactive Map">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Aincrad Bestiary | SAO MC Interactive Map">
+  <meta property="og:description" content="Browse SAO MC Aincrad bestiary entries with searchable boss, dungeon, and regular mob listings across available floors.">
+  <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Bestiary/bestiary.html">
+  <meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <meta property="og:image:alt" content="SAO MC Bestiary preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Aincrad Bestiary | SAO MC Interactive Map">
+  <meta name="twitter:description" content="Browse SAO MC Aincrad bestiary entries with searchable boss, dungeon, and regular mob listings across available floors.">
+  <meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Aincrad Bestiary",
+      "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Bestiary/bestiary.html",
+      "description": "Searchable SAO MC Aincrad bestiary with bosses and mob entries.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "SAO MC Interactive Map",
+        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
+      },
+      "inLanguage": "en"
+    }
+  </script>
   <link rel="stylesheet" href="bestiary.css">
 </head>
 <body>
   <div class="page">
-    <div class="nav">
-      <button type="button" data-nav-target="maps">Maps</button>
-      <button type="button" data-nav-target="equipment">Equipment</button>
-      <button type="button" data-nav-target="quests">Quests</button>
-      <button type="button" data-nav-target="patchnotes">Patchnotes</button>
-      <button type="button" data-nav-target="commands">Commands</button>
-    </div>
+    <nav class="nav" aria-label="Section navigation">
+      <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Maps</button>
+      <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
+      <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
+      <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
+      <button type="button" data-nav-target="commands" data-i18n="ui.nav.commands">Commands</button>
+      <button type="button" data-nav-target="menu" data-i18n="ui.nav.menu">Go back to Menu</button>
+    </nav>
     <div class="panel">
-      <h1>Bestiary</h1>
-      <div class="list-tabs" role="tablist" aria-label="Bestiary categories">
-        <button class="list-tab is-active" type="button" data-category="boss">Boss List</button>
-        <button class="list-tab" type="button" data-category="dungeonBoss">Dungeon Boss List</button>
-        <button class="list-tab" type="button" data-category="dungeonMobs">Dungeon Mobs List</button>
-        <button class="list-tab" type="button" data-category="regular">Regular Mobs List</button>
+      <h1 data-i18n="page.bestiary.heading">Bestiary</h1>
+      <div class="list-tabs" role="tablist" data-i18n-aria-label="page.bestiary.tablistAria" aria-label="Bestiary categories">
+        <button class="list-tab is-active" type="button" data-category="boss" data-i18n="page.bestiary.listTitleBoss">Boss List</button>
+        <button class="list-tab" type="button" data-category="dungeonBoss" data-i18n="page.bestiary.listTitleDungeonBoss">Dungeon Boss List</button>
+        <button class="list-tab" type="button" data-category="dungeonMobs" data-i18n="page.bestiary.listTitleDungeonMobs">Dungeon Mobs List</button>
+        <button class="list-tab" type="button" data-category="regular" data-i18n="page.bestiary.listTitleRegular">Regular Mobs List</button>
       </div>
       <div class="panel-header">
-        <p id="status">Loading...</p>
+        <p id="status" role="status" aria-live="polite" data-i18n="ui.common.loading">Loading...</p>
         <label class="search-label" for="mobSearch">
-          <span>Search mobs</span>
-          <input id="mobSearch" type="search" placeholder="Search by name..." autocomplete="off">
+          <span data-i18n="page.bestiary.searchLabel">Search mobs</span>
+          <input id="mobSearch" type="search" data-i18n-placeholder="page.bestiary.searchPlaceholder" placeholder="Search by name..." autocomplete="off">
         </label>
       </div>
-      <h2 id="listTitle" class="list-title">Regular Mobs List</h2>
-      <section id="mobList" class="mob-list" aria-live="polite"></section>
+      <h2 id="listTitle" class="list-title" data-i18n="page.bestiary.listTitleRegular">Regular Mobs List</h2>
+      <section id="mobList" class="mob-list" aria-live="polite" aria-atomic="true"></section>
     </div>
   </div>
   <script src="../../shared/sao-storage.js"></script>
+  <script src="../../shared/sao-i18n.js"></script>
+  <script src="../../shared/sao-runtime-utils.js"></script>
   <script src="bestiary.js"></script>
 </body>
 </html>

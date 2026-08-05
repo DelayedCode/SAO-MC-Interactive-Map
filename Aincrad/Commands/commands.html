@@ -3,38 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAO Commands</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+  <title data-i18n="page.commands.title">Aincrad Commands Guide | SAO MC Interactive Map</title>
+  <meta name="description" content="Find searchable SAO MC command references for communication, gameplay, navigation, and utility commands in Aincrad.">
+  <meta name="keywords" content="SAO MC commands, SAO Minecraft command list, Aincrad command guide">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="author" content="DelayedCode">
+  <meta name="theme-color" content="#0b121a">
+  <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Commands/commands.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+  <link rel="manifest" href="../../site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SAO MC Interactive Map">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Aincrad Commands Guide | SAO MC Interactive Map">
+  <meta property="og:description" content="Find searchable SAO MC command references for communication, gameplay, navigation, and utility commands in Aincrad.">
+  <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Commands/commands.html">
+  <meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <meta property="og:image:alt" content="SAO MC commands page preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Aincrad Commands Guide | SAO MC Interactive Map">
+  <meta name="twitter:description" content="Find searchable SAO MC command references for communication, gameplay, navigation, and utility commands in Aincrad.">
+  <meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Aincrad Commands Guide",
+      "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Commands/commands.html",
+      "description": "Searchable SAO MC command guide for Aincrad gameplay and utility.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "SAO MC Interactive Map",
+        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
+      },
+      "inLanguage": "en"
+    }
+  </script>
   <link rel="stylesheet" href="commands.css">
 </head>
 <body>
   <div class="page">
-    <div class="nav">
-      <button type="button" data-nav-target="maps">Maps</button>
-      <button type="button" data-nav-target="bestiary">Bestiary</button>
-      <button type="button" data-nav-target="equipment">Equipment</button>
-      <button type="button" data-nav-target="quests">Quests</button>
-      <button type="button" data-nav-target="patchnotes">Patchnotes</button>
-      <button type="button" data-nav-target="commands">Commands</button>
-    </div>
+    <nav class="nav" aria-label="Section navigation">
+      <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Maps</button>
+      <button type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
+      <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
+      <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
+      <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
+      <button type="button" data-nav-target="commands" data-i18n="ui.nav.commands">Commands</button>
+      <button type="button" data-nav-target="menu" data-i18n="ui.nav.menu">Go back to Menu</button>
+    </nav>
 
     <div class="panel">
-      <h1>Commands</h1>
+      <h1 data-i18n="page.commands.heading">Commands</h1>
 
-      <div id="categoryFilters" class="list-tabs" role="tablist" aria-label="Command categories"></div>
+      <div id="categoryFilters" class="list-tabs" role="tablist" data-i18n-aria-label="page.commands.tablistAria" aria-label="Command categories"></div>
 
       <div class="panel-header">
-        <p id="status">Loading...</p>
+        <p id="status" role="status" aria-live="polite" data-i18n="ui.common.loading">Loading...</p>
         <label class="search-label" for="commandSearch">
-          <span>Search commands</span>
-          <input id="commandSearch" type="search" placeholder="Search by command, usage, or example..." autocomplete="off">
+          <span data-i18n="page.commands.searchLabel">Search commands</span>
+          <input id="commandSearch" type="search" data-i18n-placeholder="page.commands.searchPlaceholder" placeholder="Search by command, usage, or example..." autocomplete="off">
         </label>
       </div>
 
-      <div id="commandTableRoot"></div>
+      <div id="commandTableRoot" aria-live="polite" aria-atomic="true"></div>
     </div>
   </div>
 
   <script src="../../shared/sao-storage.js"></script>
+  <script src="../../shared/sao-i18n.js"></script>
   <script src="commands.js"></script>
 </body>
 </html>

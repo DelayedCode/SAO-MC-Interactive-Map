@@ -3,7 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAO MC - Module Hub</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+  <title data-i18n="page.index.title">SAO MC Interactive Map Hub | Aincrad and Fractured Underworld</title>
+  <meta name="description" content="Fan-made SAO MC interactive website hub for Aincrad and Fractured Underworld maps, quests, bestiary, commands, and progression resources.">
+  <meta name="keywords" content="SAO MC, SAO Minecraft, Aincrad map, Fractured Underworld, quests, bestiary, commands, tower defense">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="author" content="DelayedCode">
+  <meta name="application-name" content="SAO MC Interactive Map">
+  <meta name="theme-color" content="#0b121a">
+  <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SAO MC Interactive Map">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="SAO MC Interactive Map Hub | Aincrad and Fractured Underworld">
+  <meta property="og:description" content="Fan-made SAO MC interactive website hub for Aincrad and Fractured Underworld maps, quests, bestiary, commands, and progression resources.">
+  <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/">
+  <meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <meta property="og:image:alt" content="SAO MC Interactive Map site preview">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SAO MC Interactive Map Hub | Aincrad and Fractured Underworld">
+  <meta name="twitter:description" content="Fan-made SAO MC interactive website hub for Aincrad and Fractured Underworld maps, quests, bestiary, commands, and progression resources.">
+  <meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "SAO MC Interactive Map",
+      "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/",
+      "description": "Fan-made SAO MC interactive map and guide website for Aincrad and Fractured Underworld.",
+      "inLanguage": "en"
+    }
+  </script>
   <style>
     :root {
       --bg-1: #0a0f15;
@@ -27,7 +63,8 @@
       display: grid;
       place-items: center;
       padding: 24px;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     body::before {
@@ -61,6 +98,7 @@
       padding: 24px;
       position: relative;
       overflow: hidden;
+      -webkit-backdrop-filter: blur(14px);
       backdrop-filter: blur(14px);
     }
 
@@ -165,15 +203,25 @@
     .overlay {
       position: fixed;
       inset: 0;
-      display: none;
+      display: grid;
       place-items: center;
       padding: 20px;
       background: rgba(4, 7, 11, 0.72);
+      -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
       z-index: 50;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s step-end;
     }
 
-    .overlay.show { display: grid; }
+    .overlay.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.2s ease;
+    }
 
     .discord-modal {
       width: min(420px, 100%);
@@ -182,6 +230,14 @@
       background: linear-gradient(180deg, rgba(20, 27, 37, 0.98), rgba(10, 14, 20, 0.98));
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.46);
       padding: 18px;
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .overlay.show .discord-modal {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
 
     .modal-header {
@@ -309,6 +365,21 @@
       filter: saturate(1.06);
     }
 
+    .mode-button:active,
+    .modal-action:active,
+    .close-button:active,
+    .discord-pill:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .mode-button:focus-visible,
+    .discord-pill:focus-visible,
+    .modal-action:focus-visible,
+    .close-button:focus-visible {
+      outline: 2px solid #8bb7ff;
+      outline-offset: 2px;
+    }
+
     .mode-button .card-title-row,
     .title-cluster,
     .card-meta {
@@ -408,6 +479,40 @@
       .grid { grid-template-columns: 1fr; }
       .mode-button { min-height: auto; }
     }
+
+    @media (max-height: 700px) {
+      body {
+        place-items: start center;
+        padding: 12px;
+      }
+
+      .page-stack {
+        width: min(1040px, 100%);
+      }
+
+      .shell {
+        padding: 16px;
+      }
+
+      .home-disclaimer {
+        margin-top: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .mode-button:hover,
+      .modal-action:hover,
+      .close-button:hover,
+      .discord-pill:hover {
+        transform: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -415,70 +520,70 @@
     <main class="shell">
       <header class="topbar">
         <div class="topbar-strip">
-          <div class="eyebrow">Module Hub</div>
-          <button class="discord-pill" id="discord-button" type="button" aria-label="Open Discord shortcuts">
+          <div class="eyebrow" data-i18n="page.index.eyebrow">Module Hub</div>
+          <button class="discord-pill" id="discord-button" type="button" data-i18n-aria-label="page.index.discordButtonAria" aria-label="Open Discord shortcuts">
             <svg class="discord-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
             </svg>
-            <span>Discord</span>
+            <span data-i18n="page.index.discordButton">Discord</span>
           </button>
         </div>
 
         <div class="title-wrap">
-          <h1>Select SAO MC Gamemode</h1>
-          <p class="subtitle">Choose which gamemode info you want to view.</p>
+          <h1 data-i18n="page.index.heading">Select SAO MC Gamemode</h1>
+          <p class="subtitle" data-i18n="page.index.subtitle">Choose which gamemode info you want to view.</p>
         </div>
       </header>
 
-      <div class="home-disclaimer">
-        <strong>Please Note:</strong> This is a personal project.<br>
+      <div class="home-disclaimer" data-i18n="page.index.disclaimerBody">
+        This is a personal project.<br>
         This website is primarily intended for personal and guild use. Information will continue to be added, updated, and improved for as long as there is new content to document.<br>
         Please keep in mind that this project was not originally designed to be a fully public resource, so some information may be incomplete, missing, or tailored toward my own use and my guild's needs.
       </div>
 
-      <section class="grid" aria-label="Gamemode selector">
+      <section class="grid" data-i18n-aria-label="page.index.selectorAria" aria-label="Gamemode selector">
         <button class="mode-button aincrad" type="button" data-href="Aincrad/Map/maps.html">
           <div class="card-title-row">
             <div class="title-cluster">
               <span class="card-icon" aria-hidden="true"></span>
-              <h2 class="card-title">Aincrad</h2>
+              <h2 class="card-title" data-i18n="page.index.aincradTitle">Aincrad</h2>
             </div>
-            <span class="tag">Launch</span>
+            <span class="tag" data-i18n="page.index.launchTag">Launch</span>
           </div>
-          <p class="card-desc">Open the map hub to browse the dungeon guide, quests, bestiary, and more.</p>
-          <div class="card-meta"><span>Interactive mode</span><span class="meta-arrow">→</span></div>
+          <p class="card-desc" data-i18n="page.index.aincradDesc">Open the map hub to browse the dungeon guide, quests, bestiary, and more.</p>
+          <div class="card-meta"><span data-i18n="page.index.interactiveMode">Interactive mode</span><span class="meta-arrow">→</span></div>
         </button>
 
         <button class="mode-button underworld" type="button" data-href="Fractured Underworld/Main UI/mainui.html">
           <div class="card-title-row">
             <div class="title-cluster">
               <span class="card-icon" aria-hidden="true"></span>
-              <h2 class="card-title">Fractured Underworld</h2>
+              <h2 class="card-title" data-i18n="page.index.underworldTitle">Fractured Underworld</h2>
             </div>
-            <span class="tag">Launch</span>
+            <span class="tag" data-i18n="page.index.launchTag">Launch</span>
           </div>
-          <p class="card-desc">Open the Fractured Underworld map hub to start building and testing this module.</p>
-          <div class="card-meta"><span>Interactive mode</span><span class="meta-arrow">→</span></div>
+          <p class="card-desc" data-i18n="page.index.underworldDesc">Open the Fractured Underworld map hub to start building and testing this module.</p>
+          <div class="card-meta"><span data-i18n="page.index.interactiveMode">Interactive mode</span><span class="meta-arrow">→</span></div>
         </button>
 
-        <button class="mode-button ggo" type="button" data-message="GGO is not out yet! No info to display.">
+        <button class="mode-button ggo" id="ggoButton" type="button" data-message="GGO is not out yet! No info to display.">
           <div class="card-title-row">
             <div class="title-cluster">
               <span class="card-icon" aria-hidden="true"></span>
-              <h2 class="card-title">GunGaleOnline</h2>
+              <h2 class="card-title" data-i18n="page.index.ggoTitle">GunGaleOnline</h2>
             </div>
-            <span class="tag">Not released</span>
+            <span class="tag" data-i18n="page.index.notReleasedTag">Not released</span>
           </div>
-          <p class="card-desc">The GGO menu is not published yet, so no module is available to open.</p>
-          <div class="card-meta"><span>Not released</span><span class="meta-arrow">→</span></div>
+          <p class="card-desc" data-i18n="page.index.ggoDesc">The GGO menu is not published yet, so no module is available to open.</p>
+          <div class="card-meta"><span data-i18n="page.index.notReleasedTag">Not released</span><span class="meta-arrow">→</span></div>
         </button>
       </section>
     </main>
 
     <footer class="page-footer">
-      <div class="guild-badge" aria-label="Guild tribute">
-        <span>Guild:</span>
-        <strong>Vanguard of War</strong>
+      <div class="guild-badge" data-i18n-aria-label="page.index.guildAria" aria-label="Guild tribute">
+        <span data-i18n="page.index.guildLabel">Guild:</span>
+        <strong data-i18n="page.index.guildName">Vanguard of War</strong>
       </div>
     </footer>
   </div>
@@ -486,28 +591,35 @@
   <div id="discord-overlay" class="overlay" aria-hidden="true">
     <div class="discord-modal" role="dialog" aria-modal="true" aria-labelledby="discord-modal-title">
       <div class="modal-header">
-        <h2 class="modal-title" id="discord-modal-title">Discord shortcuts</h2>
-        <button class="close-button" id="close-discord-modal" type="button" aria-label="Close Discord menu">×</button>
+        <h2 class="modal-title" id="discord-modal-title" data-i18n="page.index.discordModalTitle">Discord shortcuts</h2>
+        <button class="close-button" id="close-discord-modal" type="button" data-i18n-aria-label="page.index.discordModalCloseAria" aria-label="Close Discord menu">×</button>
       </div>
-      <p class="modal-copy">Choose where you'd like to go next.</p>
+      <p class="modal-copy" data-i18n="page.index.discordModalBody">Choose where you'd like to go next.</p>
       <div class="modal-actions">
-        <a class="modal-action" href="https://discord.com/users/1153048336258048170" target="_blank" rel="noopener noreferrer">Website Creator Discord</a>
-        <a class="modal-action" href="https://discord.gg/saominecraft" target="_blank" rel="noopener noreferrer">SAO MC Discord</a>
-        <a class="modal-action" href="https://discord.gg/zj53AKmvdE" target="_blank" rel="noopener noreferrer">SAO MC Support Discord</a>
+        <a class="modal-action" href="https://discord.com/users/1153048336258048170" target="_blank" rel="noopener noreferrer" data-i18n="page.index.creatorDiscord">Website Creator Discord</a>
+        <a class="modal-action" href="https://discord.gg/saominecraft" target="_blank" rel="noopener noreferrer" data-i18n="page.index.saoDiscord">SAO MC Discord</a>
+        <a class="modal-action" href="https://discord.gg/zj53AKmvdE" target="_blank" rel="noopener noreferrer" data-i18n="page.index.supportDiscord">SAO MC Support Discord</a>
       </div>
     </div>
   </div>
 
   <div id="status-toast" class="toast" role="status" aria-live="polite"></div>
 
+  <script src="shared/sao-storage.js"></script>
+  <script src="shared/sao-i18n.js"></script>
+
   <script>
     (() => {
+      const i18n = window.SAOI18n;
       const grid = document.querySelector(".grid");
       const discordButton = document.getElementById("discord-button");
       const overlay = document.getElementById("discord-overlay");
       const closeButton = document.getElementById("close-discord-modal");
+      const ggoButton = document.getElementById("ggoButton");
       const toast = document.getElementById("status-toast");
       let timerId = null;
+      let lastFocusedElement = null;
+      const walkthroughStorageKey = "sao.walkthrough.index.completed";
 
       if (!toast) return;
 
@@ -518,10 +630,362 @@
         timerId = setTimeout(() => toast.classList.remove("show"), 2500);
       };
 
-      const closeModal = () => {
+      const syncLocalizedRuntime = () => {
+        if (!i18n) return;
+        if (ggoButton) {
+          ggoButton.dataset.message = i18n.t("page.index.ggoToast");
+        }
+      };
+
+      const closeModal = (options = {}) => {
         if (!overlay) return;
+        const shouldRestoreFocus = options.restoreFocus !== false;
         overlay.classList.remove("show");
         overlay.setAttribute("aria-hidden", "true");
+
+        if (shouldRestoreFocus && lastFocusedElement instanceof HTMLElement && lastFocusedElement.isConnected) {
+          lastFocusedElement.focus();
+        }
+      };
+
+      const ensureWalkthroughStyles = () => {
+        if (document.getElementById("sao-walkthrough-style")) return;
+
+        const style = document.createElement("style");
+        style.id = "sao-walkthrough-style";
+        style.textContent = `
+          .sao-tour-overlay {
+            --sao-tour-focus-x: 50vw;
+            --sao-tour-focus-y: 50vh;
+            --sao-tour-focus-radius: 96px;
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: flex;
+            background: transparent;
+            padding: 16px;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0.2s step-end;
+          }
+          .sao-tour-overlay::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(4, 8, 14, 0.72);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            -webkit-mask-image: radial-gradient(
+              circle var(--sao-tour-focus-radius) at var(--sao-tour-focus-x) var(--sao-tour-focus-y),
+              transparent 96%,
+              #000 100%
+            );
+            mask-image: radial-gradient(
+              circle var(--sao-tour-focus-radius) at var(--sao-tour-focus-x) var(--sao-tour-focus-y),
+              transparent 96%,
+              #000 100%
+            );
+            pointer-events: none;
+          }
+          .sao-tour-overlay.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.2s ease;
+          }
+          .sao-tour-card {
+            position: relative;
+            z-index: 1;
+            width: min(560px, 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(130, 190, 255, 0.5);
+            background: linear-gradient(180deg, rgba(15, 22, 36, 0.98), rgba(8, 14, 24, 0.98));
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            padding: 14px;
+            color: #eaf2ff;
+            opacity: 0;
+            transform: translateY(10px) scale(0.985);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+          }
+          .sao-tour-overlay.open .sao-tour-card {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+          .sao-tour-step {
+            margin: 0 0 6px;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9fb9d7;
+          }
+          .sao-tour-title {
+            margin: 0;
+            font-size: 1rem;
+          }
+          .sao-tour-body {
+            margin: 8px 0 12px;
+            color: #c8d8ea;
+            line-height: 1.55;
+          }
+          .sao-tour-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+          }
+          .sao-tour-actions button {
+            border: 1px solid rgba(130, 190, 255, 0.34);
+            border-radius: 10px;
+            background: rgba(12, 19, 31, 0.92);
+            color: #eaf2ff;
+            min-height: 36px;
+            padding: 8px 12px;
+            cursor: pointer;
+          }
+          .sao-tour-actions button:hover {
+            background: rgba(24, 38, 58, 0.96);
+            border-color: #73b9ff;
+          }
+          .sao-tour-actions button:active {
+            transform: scale(0.98);
+          }
+          .sao-tour-actions button:focus-visible {
+            outline: 2px solid #8bb7ff;
+            outline-offset: 2px;
+          }
+          .sao-tour-focus-target {
+            position: relative;
+            border-radius: 10px;
+            isolation: isolate;
+          }
+          .sao-tour-focus-target::after {
+            content: "";
+            position: absolute;
+            inset: -3px;
+            border: 3px solid rgba(115, 185, 255, 0.95);
+            border-radius: inherit;
+            box-shadow: 0 0 0 2px rgba(4, 8, 14, 0.8);
+            pointer-events: none;
+            z-index: 3;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .sao-tour-overlay,
+            .sao-tour-card,
+            .sao-tour-actions button {
+              transition: none;
+            }
+            .sao-tour-actions button:hover {
+              transform: none;
+            }
+          }
+        `;
+
+        document.head.appendChild(style);
+      };
+
+      const buildWalkthroughSteps = () => ([
+        {
+          selector: ".topbar",
+          titleKey: "ui.walkthrough.welcomeTitle",
+          bodyKey: "ui.walkthrough.welcomeBody"
+        },
+        {
+          selector: ".grid",
+          titleKey: "ui.walkthrough.modeCardsTitle",
+          bodyKey: "ui.walkthrough.modeCardsBody"
+        },
+        {
+          selector: "#discord-button",
+          titleKey: "ui.walkthrough.discordTitle",
+          bodyKey: "ui.walkthrough.discordBody"
+        },
+        {
+          selector: "#sao-settings-anchor .sao-settings-trigger",
+          titleKey: "ui.walkthrough.settingsTitle",
+          bodyKey: "ui.walkthrough.settingsBody"
+        }
+      ]);
+
+      const startGuidedWalkthrough = (options = {}) => {
+        const force = !!options.force;
+        const alreadyCompleted = window.SAOStorage?.getItem(walkthroughStorageKey) === "1";
+        if (alreadyCompleted && !force) return;
+
+        ensureWalkthroughStyles();
+
+        const steps = buildWalkthroughSteps();
+        if (!steps.length) return;
+
+        let overlay = document.getElementById("sao-tour-overlay");
+        let stepLabel;
+        let titleEl;
+        let bodyEl;
+        let previousButton;
+        let nextButton;
+        let skipButton;
+        let currentStepIndex = 0;
+        let highlightedElement = null;
+
+        const handleLanguageChange = () => {
+          if (overlay?.classList.contains("open")) {
+            renderStep();
+          }
+        };
+
+        const clearHighlight = () => {
+          if (!highlightedElement) return;
+          highlightedElement.classList.remove("sao-tour-focus-target");
+          highlightedElement = null;
+          if (overlay) {
+            overlay.style.removeProperty("--sao-tour-focus-x");
+            overlay.style.removeProperty("--sao-tour-focus-y");
+            overlay.style.removeProperty("--sao-tour-focus-radius");
+          }
+        };
+
+        const markComplete = () => {
+          window.SAOStorage?.setItem(walkthroughStorageKey, "1");
+        };
+
+        const closeTour = (markAsComplete) => {
+          clearHighlight();
+          if (markAsComplete) {
+            markComplete();
+          }
+          if (overlay) {
+            overlay.classList.remove("open");
+            overlay.setAttribute("aria-hidden", "true");
+          }
+          document.removeEventListener("sao:languagechange", handleLanguageChange);
+        };
+
+        const renderStep = () => {
+          const step = steps[currentStepIndex];
+          if (!step) return;
+
+          clearHighlight();
+          let target = document.querySelector(step.selector);
+          if (!target && step.selector.includes("sao-settings-anchor")) {
+            i18n?.mountSettingsMenu?.();
+            target = document.querySelector(step.selector);
+          }
+          if (target) {
+            highlightedElement = target;
+            highlightedElement.classList.add("sao-tour-focus-target");
+            if (overlay) {
+              const rect = target.getBoundingClientRect();
+              const radius = Math.ceil(Math.max(rect.width, rect.height) / 2 + 18);
+              overlay.style.setProperty("--sao-tour-focus-x", `${Math.round(rect.left + rect.width / 2)}px`);
+              overlay.style.setProperty("--sao-tour-focus-y", `${Math.round(rect.top + rect.height / 2)}px`);
+              overlay.style.setProperty("--sao-tour-focus-radius", `${radius}px`);
+            }
+            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            highlightedElement.scrollIntoView({
+              block: "center",
+              inline: "nearest",
+              behavior: prefersReducedMotion ? "auto" : "smooth"
+            });
+          }
+
+          stepLabel.textContent = i18n?.t("ui.walkthrough.step", {
+            current: currentStepIndex + 1,
+            total: steps.length
+          });
+          titleEl.textContent = i18n?.t(step.titleKey);
+          bodyEl.textContent = i18n?.t(step.bodyKey);
+          previousButton.disabled = currentStepIndex === 0;
+          nextButton.textContent = currentStepIndex === steps.length - 1
+            ? i18n?.t("ui.walkthrough.finish")
+            : i18n?.t("ui.walkthrough.next");
+        };
+
+        if (!overlay) {
+          overlay = document.createElement("div");
+          overlay.id = "sao-tour-overlay";
+          overlay.className = "sao-tour-overlay";
+          overlay.setAttribute("aria-hidden", "true");
+
+          const card = document.createElement("section");
+          card.className = "sao-tour-card";
+          card.setAttribute("role", "dialog");
+          card.setAttribute("aria-modal", "true");
+
+          stepLabel = document.createElement("p");
+          stepLabel.className = "sao-tour-step";
+
+          titleEl = document.createElement("h2");
+          titleEl.className = "sao-tour-title";
+
+          bodyEl = document.createElement("p");
+          bodyEl.className = "sao-tour-body";
+
+          const actions = document.createElement("div");
+          actions.className = "sao-tour-actions";
+
+          skipButton = document.createElement("button");
+          skipButton.type = "button";
+          skipButton.textContent = i18n?.t("ui.walkthrough.skip");
+
+          previousButton = document.createElement("button");
+          previousButton.type = "button";
+          previousButton.textContent = i18n?.t("ui.walkthrough.back");
+
+          nextButton = document.createElement("button");
+          nextButton.type = "button";
+          nextButton.textContent = i18n?.t("ui.walkthrough.next");
+
+          actions.append(skipButton, previousButton, nextButton);
+          card.append(stepLabel, titleEl, bodyEl, actions);
+          overlay.appendChild(card);
+          document.body.appendChild(overlay);
+
+          skipButton.addEventListener("click", () => closeTour(true));
+          previousButton.addEventListener("click", () => {
+            if (currentStepIndex === 0) return;
+            currentStepIndex -= 1;
+            renderStep();
+          });
+          nextButton.addEventListener("click", () => {
+            if (currentStepIndex >= steps.length - 1) {
+              closeTour(true);
+              return;
+            }
+            currentStepIndex += 1;
+            renderStep();
+          });
+
+          overlay.addEventListener("click", event => {
+            if (event.target === overlay) {
+              closeTour(true);
+            }
+          });
+
+          document.addEventListener("keydown", event => {
+            if (!overlay.classList.contains("open")) return;
+            if (event.key === "Escape") {
+              closeTour(true);
+            }
+          });
+        } else {
+          stepLabel = overlay.querySelector(".sao-tour-step");
+          titleEl = overlay.querySelector(".sao-tour-title");
+          bodyEl = overlay.querySelector(".sao-tour-body");
+          const actionButtons = overlay.querySelectorAll(".sao-tour-actions button");
+          skipButton = actionButtons[0];
+          previousButton = actionButtons[1];
+          nextButton = actionButtons[2];
+          skipButton.textContent = i18n?.t("ui.walkthrough.skip");
+          previousButton.textContent = i18n?.t("ui.walkthrough.back");
+        }
+
+        document.addEventListener("sao:languagechange", handleLanguageChange);
+        currentStepIndex = 0;
+        overlay.classList.add("open");
+        overlay.setAttribute("aria-hidden", "false");
+        renderStep();
       };
 
       grid?.addEventListener("click", (event) => {
@@ -538,8 +1002,10 @@
       });
 
       discordButton?.addEventListener("click", () => {
+        lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         overlay?.classList.add("show");
         overlay?.setAttribute("aria-hidden", "false");
+        closeButton?.focus();
       });
 
       closeButton?.addEventListener("click", closeModal);
@@ -552,6 +1018,20 @@
           closeModal();
         }
       });
+
+      if (i18n) {
+        i18n.mountSettingsMenu();
+        syncLocalizedRuntime();
+        document.addEventListener("sao:languagechange", syncLocalizedRuntime);
+
+        window.setTimeout(() => {
+          startGuidedWalkthrough({ force: false });
+        }, 250);
+
+        document.addEventListener("sao:walkthroughrestart", () => {
+          startGuidedWalkthrough({ force: true });
+        });
+      }
     })();
   </script>
 </body>

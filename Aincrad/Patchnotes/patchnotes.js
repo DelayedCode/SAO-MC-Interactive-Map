@@ -1,5 +1,12 @@
 const PATCH_NOTES = [
   {
+    version: "Language and Compatibility Update - v1.3",
+    date: "2026-08-05",
+    title: "Language and Compatibility Update",
+    summary: "• Added Français, Español, and Deutsch language support. (Many translations are still missing, but I did my best to translate as much as possible.)\n• Added a website walkthrough/guide.\n• Improved compatibility across more web browsers.\n• Optimized and reorganized code to make future updates and maintenance easier.\n\n• This should be the final website update until the server comes back online.",
+    tags: ["Release", "Localization", "Compatibility", "Maintenance"]
+  },
+  {
     version: "Very Small Bug Fix - v1.2",
     date: "2026-07-29",
     title: "Very Small Bug Fix",
@@ -37,34 +44,18 @@ const PATCH_NOTES = [
 ];
 
 const patchnotesSearchStorageKey = "sao.patchnotes.search";
+const i18n = window.SAOI18n || null;
+const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const storage = window.SAOStorage || {
+  getItem() { return null; },
+  setItem() {}
+};
 const PATCH_NOTE_SEARCH_INDEX = PATCH_NOTES.map(entry => ({
   entry,
   haystack: `${entry.version} ${entry.title} ${entry.summary} ${entry.tags.join(" ")} ${entry.date}`.toLowerCase(),
   parsedDate: new Date(entry.date).getTime() || 0
 }));
-
-function getPersistentItem(key) {
-  if (window.SAOStorage && typeof window.SAOStorage.getItem === "function") {
-    return window.SAOStorage.getItem(key);
-  }
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function setPersistentItem(key, value) {
-  if (window.SAOStorage && typeof window.SAOStorage.setItem === "function") {
-    window.SAOStorage.setItem(key, value);
-    return;
-  }
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Keep patchnotes usable if storage is blocked.
-  }
-}
+const SORTED_PATCH_NOTE_SEARCH_INDEX = [...PATCH_NOTE_SEARCH_INDEX].sort((a, b) => (b.parsedDate || 0) - (a.parsedDate || 0));
 
 function getRequestedFloor() {
   const requestedFloor = new URLSearchParams(window.location.search).get("floor");
@@ -72,7 +63,27 @@ function getRequestedFloor() {
 }
 
 function attachSectionNavButtons() {
-  window.SAOPageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
+  const pageUtils = window.SAOPageUtils;
+  if (!pageUtils || typeof pageUtils.attachSectionNavButtons !== "function") {
+    console.warn("Patchnotes navigation helper is unavailable.");
+    return;
+  }
+
+  pageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
+}
+
+function showPatchnotesLoadError() {
+  const status = document.getElementById("status");
+  const list = document.getElementById("patchnotesList");
+  if (status) {
+    status.textContent = t("page.patchnotes.loadError");
+  }
+  if (list) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "patchnote-empty";
+    emptyState.textContent = t("page.patchnotes.loadUnavailable");
+    list.replaceChildren(emptyState);
+  }
 }
 
 function buildPatchNoteCard(entry) {
@@ -113,28 +124,28 @@ function buildPatchNoteCard(entry) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  const status = document.getElementById("status");
-  const searchInput = document.getElementById("patchSearch");
-  const patchnotesList = document.getElementById("patchnotesList");
-  const persistedSearch = getPersistentItem(patchnotesSearchStorageKey) || "";
+  try {
+    const status = document.getElementById("status");
+    const searchInput = document.getElementById("patchSearch");
+    const patchnotesList = document.getElementById("patchnotesList");
+    const persistedSearch = storage.getItem(patchnotesSearchStorageKey) || "";
 
-  attachSectionNavButtons();
+    attachSectionNavButtons();
 
   const renderPatchNotes = (filter = "") => {
     if (!patchnotesList) return;
 
     const normalizedFilter = filter.trim().toLowerCase();
-    const visibleNotes = PATCH_NOTE_SEARCH_INDEX
+    const visibleNotes = SORTED_PATCH_NOTE_SEARCH_INDEX
       .filter(({ haystack }) => haystack.includes(normalizedFilter))
-      .sort((a, b) => (b.parsedDate || 0) - (a.parsedDate || 0))
       .map(({ entry }) => entry);
 
     if (!visibleNotes.length) {
       const emptyState = document.createElement("div");
       emptyState.className = "patchnote-empty";
-      emptyState.textContent = "No patch notes match that filter.";
+      emptyState.textContent = t("page.patchnotes.noMatches");
       patchnotesList.replaceChildren(emptyState);
-      if (status) status.textContent = "No matching changelog entries found.";
+      if (status) status.textContent = t("page.patchnotes.noEntries");
       return;
     }
 
@@ -143,19 +154,30 @@ window.addEventListener("DOMContentLoaded", () => {
     patchnotesList.replaceChildren(fragment);
 
     if (status) {
-      status.textContent = `Showing ${visibleNotes.length} patch note${visibleNotes.length === 1 ? "" : "s"}.`;
+      status.textContent = t("page.patchnotes.statusShowing", {
+        count: visibleNotes.length,
+        suffix: visibleNotes.length === 1 ? "" : "s"
+      });
     }
   };
 
-  searchInput?.addEventListener("input", event => {
-    const searchValue = event.target.value;
-    setPersistentItem(patchnotesSearchStorageKey, searchValue);
-    renderPatchNotes(searchValue);
-  });
+    searchInput?.addEventListener("input", event => {
+      const searchValue = event.target.value;
+      storage.setItem(patchnotesSearchStorageKey, searchValue);
+      renderPatchNotes(searchValue);
+    });
 
-  if (searchInput && persistedSearch) {
-    searchInput.value = persistedSearch;
+    if (searchInput && persistedSearch) {
+      searchInput.value = persistedSearch;
+    }
+
+    renderPatchNotes(persistedSearch);
+
+    document.addEventListener("sao:languagechange", () => {
+      renderPatchNotes(searchInput ? searchInput.value : "");
+    });
+  } catch (error) {
+    console.error("Failed to initialize patchnotes runtime.", error);
+    showPatchnotesLoadError();
   }
-
-  renderPatchNotes(persistedSearch);
 });
