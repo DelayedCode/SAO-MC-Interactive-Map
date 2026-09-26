@@ -1,9 +1,16 @@
 const PATCH_NOTES = [
   {
+    version: "Character Build & Major UI Update - v1.4",
+    date: "2026-09-24",
+    title: "Character Build & Major UI Update",
+    summary: "• Added the complete Character Build system with Current Data and Beta-Test Data support.\n• Added major improvements and a full overhaul of the website's UI and responsiveness.\n• Redesigned the Equipment, Quests, Patchnotes, Misc. Info, Tower Defense, and Compendium sections.\n• Added and expanded translations across the website.\n• Improved website reactivity, performance, loading, and browser compatibility.\n• Fixed missing or incorrect equipment stats and various UI issues.\n• Updated and improved the website walkthrough.\n• Added Beta-Test data and related loading information.\n• Made numerous smaller fixes, improvements, and quality-of-life changes across the website.",
+    tags: ["Release", "Character Build", "UI Overhaul", "Equipment", "Quests", "Localization", "Performance", "Beta-Test Data", "Bug Fixes"]
+  },
+  {
     version: "Language and Compatibility Update - v1.3",
     date: "2026-08-05",
     title: "Language and Compatibility Update",
-    summary: "• Added Français, Español, and Deutsch language support. (Many translations are still missing, but I did my best to translate as much as possible.)\n• Added a website walkthrough/guide.\n• Improved compatibility across more web browsers.\n• Optimized and reorganized code to make future updates and maintenance easier.\n\n• This should be the final website update until the server comes back online.",
+    summary: "• Added Français and Español language support. (Many translations are still missing, but I did my best to translate as much as possible.)\n• Added a website walkthrough/guide.\n• Improved compatibility across more web browsers.\n• Optimized and reorganized code to make future updates and maintenance easier.\n\n• This should be the final website update until the server comes back online.",
     tags: ["Release", "Localization", "Compatibility", "Maintenance"]
   },
   {
@@ -50,6 +57,26 @@ const storage = window.SAOStorage || {
   getItem() { return null; },
   setItem() {}
 };
+
+function getPatchNoteId(entry) {
+  const version = entry.version.match(/v\d+(?:\.\d+)?(?:\.\d+)?/i)?.[0].toLowerCase();
+  return {
+    "v1.4": "v140",
+    "v1.3": "v130",
+    "v1.2": "v120",
+    "v1.1": "v111",
+    "v1.0": "v100",
+    "v0.1.0": "v010",
+    "v0.2.0": "v020"
+  }[version] || "unknown";
+}
+
+function getPatchNoteText(entry, field) {
+  if (getPatchNoteId(entry) === "unknown") return entry[field];
+  const key = `page.patchnotes.entries.${getPatchNoteId(entry)}.${field}`;
+  const translated = t(key);
+  return translated === key ? entry[field] : translated;
+}
 const PATCH_NOTE_SEARCH_INDEX = PATCH_NOTES.map(entry => ({
   entry,
   haystack: `${entry.version} ${entry.title} ${entry.summary} ${entry.tags.join(" ")} ${entry.date}`.toLowerCase(),
@@ -104,10 +131,10 @@ function buildPatchNoteCard(entry) {
   meta.append(version, date);
 
   const title = document.createElement("h2");
-  title.textContent = entry.title;
+  title.textContent = getPatchNoteText(entry, "title");
 
   const summary = document.createElement("p");
-  summary.textContent = entry.summary;
+  summary.textContent = getPatchNoteText(entry, "summary");
   summary.classList.add("patchnote-summary");
 
   const tagsWrap = document.createElement("div");
@@ -115,7 +142,43 @@ function buildPatchNoteCard(entry) {
   entry.tags.forEach(tagText => {
     const tag = document.createElement("span");
     tag.className = "patchnote-tag";
-    tag.textContent = tagText;
+    const tagKey = {
+      "Bug Fixes": "bugFixes",
+      "Beta-Test Data": "betaTestData",
+      "Character Build": "characterBuild",
+      "UI Overhaul": "uiOverhaul",
+      Commands: "commands",
+      Maps: "maps",
+      Release: "release",
+      Localization: "localization",
+      Performance: "performance",
+      Compatibility: "compatibility",
+      Maintenance: "maintenance",
+      "Misc Info": "miscInfo",
+      "Fractured Underworld": "fracturedUnderworld",
+      "Tower Defense": "towerDefense",
+      "Welcome Mat": "welcomeMat",
+      "Floor 3": "floor3",
+      Equipment: "equipment",
+      UI: "ui",
+      Discord: "discord",
+      Contact: "contact",
+      "Floor 1": "floor1",
+      Quests: "quests",
+      Biomes: "biomes",
+      Dungeons: "dungeons",
+      Bestiary: "bestiary",
+      "Floor 2": "floor2",
+      POI: "poi",
+      Waypoints: "waypoints",
+      "Main Menu": "mainMenu"
+    }[tagText];
+    if (!tagKey) {
+      tag.textContent = tagText;
+    } else {
+      const translatedTag = t(`page.patchnotes.tags.${tagKey}`);
+      tag.textContent = translatedTag === `page.patchnotes.tags.${tagKey}` ? tagText : translatedTag;
+    }
     tagsWrap.appendChild(tag);
   });
 

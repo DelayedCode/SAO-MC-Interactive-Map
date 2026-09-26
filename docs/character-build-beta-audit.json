@@ -1,0 +1,4745 @@
+{
+  "generatedAt": "2026-09-23T22:35:25.221Z",
+  "totalBetaEquipmentRecords": 542,
+  "totalSuccessfullyClassified": 542,
+  "totalUnclassified": 0,
+  "countsBySlot": {
+    "Main Weapon": 143,
+    "Offhand": 13,
+    "Leggings": 32,
+    "Boots": 34,
+    "Chestplate": 32,
+    "Helmet": 25,
+    "Bracelet": 39,
+    "Ring": 47,
+    "Amulet": 42,
+    "Glove": 34,
+    "Artifact": 98,
+    "Utility Tool": 3
+  },
+  "countsByFloor": {
+    "floor1": 236,
+    "floor2": 148,
+    "floor3": 158
+  },
+  "countsByClassRestriction": {
+    "archer": 47,
+    "assassin": 49,
+    "shaman": 54,
+    "guerrier": 67,
+    "mage": 54,
+    "all": 285
+  },
+  "countsByCategory": {
+    "armor": {
+      "total": 123,
+      "withStats": 43,
+      "withoutStats": 80
+    },
+    "accessory": {
+      "total": 260,
+      "withStats": 258,
+      "withoutStats": 2
+    },
+    "weapon": {
+      "total": 141,
+      "withStats": 135,
+      "withoutStats": 6
+    },
+    "tool": {
+      "total": 18,
+      "withStats": 15,
+      "withoutStats": 3
+    }
+  },
+  "missingStatsByCategory": {
+    "armor": [
+      {
+        "itemName": "Boots of the Foam",
+        "floor": "floor1",
+        "originalCategory": "armor",
+        "set": null,
+        "statsField": "missing",
+        "statistics": {},
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Assassin's Boots",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Fierce Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Assassin's Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Fierce Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Assassin's Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Fierce Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Assassin's Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Fierce Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Crystallized Honey Boots",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Magic Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Mage"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Crystallized Honey Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Magic Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Mage",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Crystallized Honey Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Magic Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Mage"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Crystallized Honey Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Magic Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Mage"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Hive Boots",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Bee Warrior Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Hive Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Bee Warrior Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Hive Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Bee Warrior Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Hive Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Bee Warrior Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Hunter's Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Mystical Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Hunter's Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Mystical Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Hunter's Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Mystical Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Huntress' Boots",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Mystical Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Mysticized Honey Boots",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Wonderful Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Shaman"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Mysticized Honey Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Wonderful Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Shaman",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Mysticized Honey Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Wonderful Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Shaman"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Mysticized Honey Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Wonderful Bee Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Shaman"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Archer Necromancer Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Mystical Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer",
+          "Rune Slots": 2
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Assassin Necromancer Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Fierce Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin",
+          "Rune Slots": 2
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Assassin Necromancer Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Fierce Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Boots of the Necromancer Shaman",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Wild Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Shaman"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Helmet of the Necromancer Assassin",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Fierce Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Mage Necromancer Boots",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Magical Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Mage"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Mage Necromancer Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Magical Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Mage",
+          "Rune Slots": 2
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Mage Necromancer Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Magical Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Mage"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Mage Necromancer Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Magical Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Mage"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Necromancer Archer Boots",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Mystical Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Necromancer Archer Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Mystical Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Necromancer Archer Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Mystical Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Necromancer Shaman Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Wild Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Shaman"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Necromancer Warrior Boots",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Necromancer Warrior Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Necromancer Warrior Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Necromancer Warrior Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior",
+          "Rune Slots": 2
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Necromancer Warrior Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Necromancer Warrior Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Shaman Necromancer Breastplate",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Wild Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Shaman",
+          "Rune Slots": 2
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Shaman Necromancer Leggings",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Wild Necromancer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Shaman"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Warrior Necromancer Helmet",
+        "floor": "floor2",
+        "originalCategory": "armor",
+        "set": "Necromancer Warrior Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Amethyst Reaper Helm",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Reaper Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Force": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Assassin"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Fierce Amethyst Boots",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Fierce Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Defense Car": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Warrior"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Fierce Amethyst Breastplate",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Fierce Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "2",
+          "Requirement: Defense Car": "2",
+          "Class": "Warrior",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Fierce Amethyst Helm",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Fierce Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Defense Car": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Warrior"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Fierce Amethyst Leggings",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Fierce Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "2",
+          "Requirement: Defense Car": "2",
+          "Class": "Warrior"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Hunter Amethyst Boots",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Hunting Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Force": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Archer"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Hunter Amethyst Breastplate",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Hunting Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "2",
+          "Requirement: Force": "2",
+          "Class": "Archer",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Hunter Amethyst Helmet",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Hunting Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "2",
+          "Requirement: Force": "2",
+          "Class": "Archer"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Hunter Amethyst Leggings",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Hunting Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Force": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Archer"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Magical Amethyst Boots",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Magic Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Intelligence": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Mage"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Magical Amethyst Breastplate",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Magic Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Intelligence": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Mage",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Magical Amethyst Helmet",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Magic Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Intelligence": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Mage"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Magical Amethyst Leggings",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Magic Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "2",
+          "Requirement: Intelligence": "2",
+          "Class": "Mage"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Reaper Amethyst Boots",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Reaper Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Force": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Assassin"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Reaper Amethyst Breastplate",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Reaper Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Force": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Assassin",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Reaper Amethyst Leggings",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Reaper Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "2",
+          "Requirement: Force": "2",
+          "Class": "Assassin"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Wild Amethyst Boots",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Wild Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "2",
+          "Requirement: Spirit": "2",
+          "Class": "Shaman"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Wild Amethyst Breastplate",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Wild Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Spirit": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Shaman",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Wild Amethyst Helmet",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Wild Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Spirit": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Shaman"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Wild Amethyst Leggings",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Wild Amethyst Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Spirit": "2",
+          "Requirement: Vitality": "2",
+          "Class": "Shaman"
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Ancient Wood Leggings Reaper",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Woods Assassin Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "1",
+          "Requirement: Force": "1",
+          "Class": "Assassin",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Ancient Woodland Boots Hunter",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Woodland Archer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Dexterity": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Archer"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Ancient Woodland Boots Reaper",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Woods Assassin Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "1",
+          "Requirement: Force": "1",
+          "Class": "Assassin"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Ancient Woodland Leggings Hunter",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Woodland Archer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Defense Car": "4",
+          "Requirement: Vitality": "1",
+          "Requirement: Dexterity": "1",
+          "Class": "Archer",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Breastplate of the Ancient Woods Hunter",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Woodland Archer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Dexterity": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Archer",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Breastplate of the Ancient Woods Reaper",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Woods Assassin Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Force": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Assassin",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Ferocious Ancient Wood Breastplate",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Fierce Ancient Wood Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "1",
+          "Requirement: Defense Car": "1",
+          "Class": "Warrior",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Fierce Ancient Wood Leggings",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Fierce Ancient Wood Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Defense Car": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Warrior",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Fierce Ancient Woodland Boots",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Fierce Ancient Wood Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Defense Car": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Warrior"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Helm of the Ancient Woods Reaper",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Woods Assassin Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Force": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Assassin"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Helm of the Fierce Ancient Woods",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Fierce Ancient Wood Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Defense Car": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Warrior"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Helmet of the Ancient Woods Hunter",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Woodland Archer Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "1",
+          "Requirement: Dexterity": "1",
+          "Class": "Archer"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Helmet of the Wild Ancient Woods",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Wood Shaman Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Spirit": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Shaman"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Magical Ancient Wood Leggings",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Wood Mage Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Intelligence": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Mage",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Leggings"
+      },
+      {
+        "itemName": "Magical Ancient Woodland Boots",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Wood Mage Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Intelligence": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Mage"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Magical Ancient Woodland Helmet",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Wood Mage Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "1",
+          "Requirement: Intelligence": "1",
+          "Class": "Mage"
+        },
+        "normalizedType": "Helmet"
+      },
+      {
+        "itemName": "Magical Ancient Woods Breastplate",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Wood Mage Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "1",
+          "Requirement: Intelligence": "1",
+          "Class": "Mage",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Wild Ancient Woodland Boots",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Wood Shaman Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Spirit": "1",
+          "Class": "Shaman"
+        },
+        "normalizedType": "Boots"
+      },
+      {
+        "itemName": "Wild Ancient Woods Breastplate",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Wood Shaman Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Vitality": "1",
+          "Requirement: Spirit": "1",
+          "Class": "Shaman",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Chestplate"
+      },
+      {
+        "itemName": "Wild Ancient Woods Leggings",
+        "floor": "floor3",
+        "originalCategory": "armor",
+        "set": "Ancient Wood Shaman Set",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Spirit": "1",
+          "Requirement: Vitality": "1",
+          "Class": "Shaman",
+          "Rune Slots": 1
+        },
+        "normalizedType": "Leggings"
+      }
+    ],
+    "accessory": [
+      {
+        "itemName": "Red Christmas Mittens",
+        "floor": "floor1",
+        "originalCategory": "accessory",
+        "set": null,
+        "statsField": "missing",
+        "statistics": {},
+        "normalizedType": "Artifact"
+      },
+      {
+        "itemName": "Occult Boots",
+        "floor": "floor3",
+        "originalCategory": "accessory",
+        "set": "Seven Shadow Soldiers",
+        "statsField": "metadata-only",
+        "statistics": {
+          "Requirement: Defense Car": "4",
+          "Unique": "Yes"
+        },
+        "normalizedType": "Artifact"
+      }
+    ],
+    "weapon": [
+      {
+        "itemName": "Unyielding Shield",
+        "floor": "floor2",
+        "originalCategory": "weapon",
+        "set": null,
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior"
+        },
+        "normalizedType": "Offhand"
+      },
+      {
+        "itemName": "Assassin's Billhook",
+        "floor": "floor2",
+        "originalCategory": "weapon",
+        "set": null,
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin"
+        },
+        "normalizedType": "Main Weapon"
+      },
+      {
+        "itemName": "Stalking Bee Bow",
+        "floor": "floor2",
+        "originalCategory": "weapon",
+        "set": null,
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer"
+        },
+        "normalizedType": "Main Weapon"
+      },
+      {
+        "itemName": "Shield Maudit",
+        "floor": "floor2",
+        "originalCategory": "weapon",
+        "set": null,
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Warrior"
+        },
+        "normalizedType": "Offhand"
+      },
+      {
+        "itemName": "Necromancer billhook",
+        "floor": "floor2",
+        "originalCategory": "weapon",
+        "set": null,
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Assassin"
+        },
+        "normalizedType": "Main Weapon"
+      },
+      {
+        "itemName": "Necropolis Arch",
+        "floor": "floor2",
+        "originalCategory": "weapon",
+        "set": null,
+        "statsField": "metadata-only",
+        "statistics": {
+          "Class": "Archer"
+        },
+        "normalizedType": "Main Weapon"
+      }
+    ],
+    "tool": [
+      {
+        "itemName": "Magic Brush",
+        "floor": "floor1",
+        "originalCategory": "tool",
+        "set": null,
+        "statsField": "missing",
+        "statistics": {},
+        "normalizedType": null
+      },
+      {
+        "itemName": "Torch",
+        "floor": "floor1",
+        "originalCategory": "tool",
+        "set": null,
+        "statsField": "missing",
+        "statistics": {},
+        "normalizedType": null
+      },
+      {
+        "itemName": "Wooden Fishing Rod",
+        "floor": "floor1",
+        "originalCategory": "tool",
+        "set": null,
+        "statsField": "missing",
+        "statistics": {},
+        "normalizedType": null
+      }
+    ]
+  },
+  "toolSlotMap": {
+    "Chipped Axe": "Main Weapon",
+    "Cracked Pickaxe": "Main Weapon",
+    "Metal Axe": "Main Weapon",
+    "Metal Hoe": "Main Weapon",
+    "Metal Pickaxe": "Main Weapon",
+    "Magic Brush": null,
+    "Twisted Sickle": "Main Weapon",
+    "Torch": null,
+    "Wooden Fishing Rod": null,
+    "Necrotic Ax": "Main Weapon",
+    "Necrotic Hoe": "Main Weapon",
+    "Necrotic Pickaxe": "Main Weapon",
+    "Savannah Ax": "Main Weapon",
+    "Savannah Hoe": "Main Weapon",
+    "Savannah Pickaxe": "Main Weapon",
+    "Reinforced Ax": "Main Weapon",
+    "Reinforced Hoe": "Main Weapon",
+    "Reinforced Pickaxe": "Main Weapon"
+  },
+  "unclassifiedItems": [],
+  "artifactFallbackItems": [
+    {
+      "itemName": "Deer Belt",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Damage Skill": "3.5%",
+        "Health": "10",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Lien de la Sylve",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Mana": "10",
+        "Stamina": "5",
+        "Health": "10",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Stolen Coat",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Defense": "1.5",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Copper Coin",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Defense": "1",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Skeleton Skull",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Defense": "1.5",
+        "Skill Damage": "2.5%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Iron Piece",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Defense": "1",
+        "Health": "5",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Blue Christmas Mittens",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Mana": "30",
+        "Stamina": "15",
+        "Health": "15"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Hood",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Critical Hits": "3.5%",
+        "Damage": "5",
+        "Stamina": "2.5",
+        "Critical Hit Chance": "5%",
+        "Physical Damage": "2.5%",
+        "Requirement: Dexterity": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Crown of Kazor",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Damage Skill": "5%",
+        "Mana": "7.5",
+        "Mana Regeneration": "0.5/s",
+        "Health": "10",
+        "Skill Damage": "2.5%",
+        "Critical Chance Skill": "2.5%",
+        "Requirement: Spirit": "2",
+        "Requirement: Intelligence": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Fallen Boots of the Thief",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "7.5%",
+        "Physical Damage": "1.5%",
+        "Critical Hit Chance": "2.5%",
+        "Evasion": "5%",
+        "Requirement: Dexterity": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Fallen Soldier's Helm",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Reduction": "2%",
+        "Blocking Mastery": "5%",
+        "Blocking Power": "1.5%",
+        "Health": "10",
+        "Requirement: Defense Car": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Gift of Love",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "25",
+        "Defense": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Gray Christmas Mittens",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Blocking Power": "3%",
+        "Blocking Mastery": "10%",
+        "Defense": "2",
+        "Health": "20"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Green Christmas Mittens",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health Regeneration": "0.3/s",
+        "Mana Regeneration": "0.4/s",
+        "Evasion": "10%",
+        "Bonus Healing": "5",
+        "Stamina Regeneration": "0.2/s",
+        "Health": "5"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Midnight Cloak",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "20%",
+        "Damage": "5",
+        "Mana": "25",
+        "Evasion": "15%",
+        "Stamina": "15",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Skull",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Damage Skill": "3.5%",
+        "Mana": "2.5",
+        "Skill Damage": "4%",
+        "Critical Chance Skill": "3.5%",
+        "Magic Damage": "2.5%",
+        "Requirement: Intelligence": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Orange Christmas mittens",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Flight Of Life": "5%",
+        "Movement Speed": "5%",
+        "Damage": "5",
+        "Attack Speed": "0.2"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Pink Christmas Mittens",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Skill Damage": "5%",
+        "Haste": "5%",
+        "Movement Speed": "-5%",
+        "Omnivampirism": "3%"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Red Christmas Mittens",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {},
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Robe",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Evasion": "5%",
+        "Attack Speed": "0.1",
+        "Health": "10",
+        "Movement Speed": "7.5%",
+        "Stamina": "5",
+        "Requirement: Dexterity": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Solstice Crown",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Haste": "5%",
+        "Health": "10",
+        "Mana": "5",
+        "Stamina": "2.5",
+        "Magic Damage": "3%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Sorcerer's Fallen Grimoire",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Stamina Regeneration": "0.4/s",
+        "Skill Damage": "2.5%",
+        "Mana Regeneration": "0.8/s",
+        "Critical Chance Skill": "2.5%",
+        "Requirement: Intelligence": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Sorcerer's Fallen Pendant",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Magic Damage": "2.5%",
+        "Health": "5",
+        "Haste": "2.5%",
+        "Mana": "10",
+        "Damage Critical Hits": "5%",
+        "Requirement: Intelligence": "2",
+        "Requirement: Spirit": "1"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Fallen Thief Pendant",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Critical Hits": "6.5%",
+        "Physical Damage": "3.5%",
+        "Movement Speed": "2.5%",
+        "Stamina": "5",
+        "Requirement: Force": "2",
+        "Requirement: Dexterity": "1"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Yellow Christmas Mittens",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Chance Skill": "10%",
+        "Critical Hit Chance": "5%",
+        "Critical Damage Skill": "5%",
+        "Damage Critical Hits": "10%",
+        "Movement Speed": "15%"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Corrupted Rift Belt",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Attack Speed": "0.2",
+        "Damage": "5",
+        "Movement Speed": "15%",
+        "Critical Hit Chance": "5%",
+        "Defense": "2",
+        "Skill Damage": "-5%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Mask of the Corrupted Rift",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Physical Damage": "-15%",
+        "Mana": "10",
+        "Magic Damage": "5%",
+        "Critical Damage Skill": "5%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Tear of the Corrupted Rift",
+      "floor": "floor1",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Evasion": "5%",
+        "Defense": "2",
+        "Physical Damage": "-5%",
+        "Magic Damage": "-5%",
+        "Damage Reduction": "4%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Bear Belt",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Damage Skill": "2.5%",
+        "Health": "5",
+        "Defense": "1.5",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Azure Feather",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Skill Damage": "3%",
+        "Mana": "5",
+        "Stamina": "2.5",
+        "Omnivampirism": "1%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Blazing Feather",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "7",
+        "Weapon Damage": "3%",
+        "Flight Of Life": "1.7%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Scarlet Feather",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Defense": "1",
+        "Blocking Power": "0.5%",
+        "Blocking Mastery": "2.5%",
+        "Damage Reduction": "1%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Scrap Piece",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "5",
+        "Defense": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Simple Belt",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Mana": "3",
+        "Defense": "1",
+        "Health": "5",
+        "Stamina": "1.5",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Taurus Belt",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Defense": "0.5",
+        "Damage Critical Hits": "3.5%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Cat of the Lunar Year",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Haste": "7.5%",
+        "Movement Speed": "7.5%",
+        "Defense": "2.5",
+        "Health": "7.5",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Gold Coin",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Mana Regeneration": "1/s",
+        "Defense": "1.5",
+        "Stamina Regeneration": "0.5/s",
+        "Health Regeneration": "1.5/s",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Black Lantern",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Defense": "3.5",
+        "Skill Damage": "5%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Red Lantern",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage": "2.5",
+        "Health": "30",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Piece of bauxite",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Critical Hit Chance": "2.5%",
+        "Defense": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Fierce Talisman",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Weapon Damage": "10%",
+        "Critical Hit Chance": "3.5%",
+        "Defense": "1",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Impure Onyx Coin",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Defense": "2.5",
+        "Critical Hit Chance": "3%",
+        "Health": "13",
+        "Damage Critical Hits": "1.5%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Black Shield",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage": "-7.5",
+        "Blocking Mastery": "2.5%",
+        "Movement Speed": "-10%",
+        "Blocking Power": "2.5%",
+        "Health": "5",
+        "Defense": "3",
+        "Stamina": "-2.5",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Taurus Hat",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Haste": "10%",
+        "Critical Chance Skill": "7.5%",
+        "Mana": "20",
+        "Critical Damage Skill": "7.5%"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Grimoire Taurus",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Defense": "3.5",
+        "Attack Speed": "0.3",
+        "Bonus Healing": "10",
+        "Mana": "15",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Corrupted Mask",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Skill Damage": "10%",
+        "Critical Chance Skill": "10%",
+        "Critical Hit Chance": "10%",
+        "Critical Damage Skill": "10%",
+        "Damage Critical Hits": "10%",
+        "Health": "-50",
+        "Weapon Damage": "10%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Mask",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Blocking Power": "2.5%",
+        "Blocking Mastery": "5%",
+        "Damage Reduction": "5%",
+        "Defense": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Scroll",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Chance Skill": "5%",
+        "Skill Damage": "5%",
+        "Magic Damage": "3%",
+        "Critical Damage Skill": "5%",
+        "Mana": "5"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Pure Onyx Piece",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Hit Chance": "4%",
+        "Health": "15",
+        "Defense": "3",
+        "Damage Critical Hits": "2%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Dagger",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Critical Hits": "5%",
+        "Damage": "7",
+        "Critical Hit Chance": "7.5%",
+        "Stamina": "5",
+        "Physical Damage": "3%",
+        "Requirement: Dexterity": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Hourglass",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Bonus Healing": "4",
+        "Mana": "5",
+        "Mana Regeneration": "1/s",
+        "Attack Speed": "0.1",
+        "Haste": "5%",
+        "Movement Speed": "5%",
+        "Requirement: Defense Car": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Talisman",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Stamina": "7.5",
+        "Projectile Damage": "2.5%",
+        "Evasion": "7.5%",
+        "Movement Speed": "10%",
+        "Health": "15",
+        "Attack Speed": "0.1",
+        "Requirement: Dexterity": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Talisman Taurus",
+      "floor": "floor2",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Haste": "2.5%",
+        "Blocking Mastery": "10%",
+        "Blocking Power": "10%",
+        "Health": "50"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Adventurer's Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Physical Damage": "-90%",
+        "Movement Speed": "30%",
+        "Projectile Damage": "-90%",
+        "Magic Damage": "-90%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Simple Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "10%",
+        "Physical Damage": "-90%",
+        "Magic Damage": "-90%",
+        "Projectile Damage": "-90%",
+        "Requirement: Vitality": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Affordable Belt",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Bonus Healing": "2",
+        "Requirement: Spirit": "2",
+        "Requirement: Vitality": "1",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Novice Belt",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "12",
+        "Physical Damage": "3%",
+        "Requirement: Force": "2",
+        "Requirement: Vitality": "1",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Simple Belt",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Stamina": "2",
+        "Health": "12",
+        "Mana": "4",
+        "Requirement: Vitality": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Grainy Copper Belt",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Projectile Damage": "3%",
+        "Requirement: Vitality": "1",
+        "Requirement: Dexterity": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Strange Belt",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Magic Damage": "2%",
+        "Requirement: Intelligence": "2",
+        "Requirement: Vitality": "1",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Bandit's Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Reduction": "-25%",
+        "Physical Damage": "1.5%",
+        "Damage Critical Hits": "5%",
+        "Movement Speed": "1%",
+        "Attack Speed": "0.1",
+        "Requirement: Dexterity": "7",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Boots of the Woods",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Mana": "4",
+        "Bonus Healing": "4",
+        "Haste": "2%",
+        "Movement Speed": "7.5%",
+        "Damage Reduction": "-50%",
+        "Requirement: Spirit": "3",
+        "Requirement: Vitality": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Boots Brumeuses",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Attack Speed": "0.2",
+        "Movement Speed": "7.5%",
+        "Critical Hit Chance": "3%",
+        "Physical Damage": "2.5%",
+        "Damage Reduction": "-50%",
+        "Requirement: Dexterity": "2",
+        "Requirement: Force": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Goblin Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage": "5",
+        "Movement Speed": "5%",
+        "Health": "5",
+        "Damage Reduction": "-50%",
+        "Requirement: Force": "3",
+        "Requirement: Vitality": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Boots Luminescentes",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Reduction": "-50%",
+        "Critical Hit Chance": "2%",
+        "Projectile Damage": "6%",
+        "Attack Speed": "0.2",
+        "Movement Speed": "10%",
+        "Requirement: Force": "2",
+        "Requirement: Dexterity": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Boots Spectrales",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Reduction": "-50%",
+        "Critical Hit Chance": "4%",
+        "Physical Damage": "3.5%",
+        "Damage Critical Hits": "4%",
+        "Movement Speed": "10%",
+        "Requirement: Vitality": "3",
+        "Requirement: Force": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Boots Sylvestres",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Magic Damage": "4%",
+        "Damage Reduction": "-50%",
+        "Movement Speed": "5%",
+        "Bonus Healing": "2",
+        "Mana": "4",
+        "Projectile Damage": "0.2%",
+        "Requirement: Intelligence": "3",
+        "Requirement: Spirit": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Explorer's Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Projectile Damage": "-90%",
+        "Magic Damage": "-90%",
+        "Movement Speed": "40%",
+        "Physical Damage": "-90%",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Spider Web Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "7.5%",
+        "Mana": "5",
+        "Magic Damage": "2.5%",
+        "Damage Reduction": "-50%",
+        "Requirement: Intelligence": "3",
+        "Requirement: Vitality": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Amethyst Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Magic Damage": "-50%",
+        "Physical Damage": "-50%",
+        "Projectile Damage": "-50%",
+        "Movement Speed": "25%",
+        "Haste": "2.5%",
+        "Health": "25",
+        "Requirement: Vitality": "7",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Black Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "12.5%",
+        "Mana Regeneration": "0.35/s",
+        "Mana": "10",
+        "Critical Chance Skill": "10%",
+        "Damage Reduction": "-50%",
+        "Crouch Speed": "250",
+        "Magic Damage": "4.5%",
+        "Requirement: Spirit": "2",
+        "Requirement: Intelligence": "6",
+        "Requirement: Vitality": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Orc Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "7.5%",
+        "Damage": "6",
+        "Health": "10",
+        "Critical Hit Chance": "4%",
+        "Damage Reduction": "-50%",
+        "Requirement: Force": "4",
+        "Requirement: Vitality": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Canvas Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "10%",
+        "Mana Regeneration": "0.2/s",
+        "Mana": "6",
+        "Magic Damage": "3.5%",
+        "Damage Reduction": "-50%",
+        "Requirement: Vitality": "2",
+        "Requirement: Intelligence": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Luminescent Belt",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "5%",
+        "Health": "-5",
+        "Evasion": "2.5%",
+        "Requirement: Dexterity": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Darkwood Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Magic Damage": "4%",
+        "Damage Reduction": "-50%",
+        "Bonus Healing": "3",
+        "Mana": "6",
+        "Attack Speed": "0.2",
+        "Movement Speed": "7.5%",
+        "Requirement: Spirit": "2",
+        "Requirement: Intelligence": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Grimoire of the Dark Woods",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Chance Skill": "-7.5%",
+        "Magic Damage": "6%",
+        "Attack Speed": "0.2",
+        "Requirement: Intelligence": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Mask of the Web",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Mana Regeneration": "0.6/s",
+        "Mana": "10",
+        "Attack Speed": "-0.1",
+        "Requirement: Intelligence": "2",
+        "Requirement: Spirit": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Mist Claw Knife",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Stamina Regeneration": "-0.4/s",
+        "Attack Speed": "0.1",
+        "Physical Damage": "4%",
+        "Requirement: Dexterity": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Misty Fang Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Attack Speed": "0.2",
+        "Movement Speed": "30%",
+        "Damage Reduction": "-50%",
+        "Flight Of Life": "1%",
+        "Critical Hit Chance": "5%",
+        "Physical Damage": "3.5%",
+        "Requirement: Dexterity": "3",
+        "Requirement: Force": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Spectral Feather",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Evasion": "4%",
+        "Health": "-5",
+        "Movement Speed": "7.5%",
+        "Requirement: Dexterity": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Ancient Cog",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Mana Regeneration": "0.3/s",
+        "Mana": "10",
+        "Critical Damage Skill": "5%",
+        "Requirement: Intelligence": "4",
+        "Requirement: Vitality": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Thief Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Physical Damage": "2%",
+        "Damage Reduction": "-25%",
+        "Attack Speed": "0.1",
+        "Movement Speed": "12.5%",
+        "Damage Critical Hits": "7.5%",
+        "Requirement: Dexterity": "8",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Thief's Hood",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Evasion": "4%",
+        "Health": "-5",
+        "Movement Speed": "5%",
+        "Requirement: Dexterity": "2",
+        "Requirement: Force": "2",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Tribe Ax",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Flight Of Life": "2%",
+        "Damage": "6",
+        "Attack Speed": "-0.2",
+        "Requirement: Vitality": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Woodclaw Knife",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Bonus Healing": "5",
+        "Magic Damage": "-3.5%",
+        "Health": "10",
+        "Requirement: Spirit": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Woodfang Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "10%",
+        "Haste": "3.5%",
+        "Bonus Healing": "5",
+        "Mana": "6",
+        "Damage Reduction": "-50%",
+        "Requirement: Vitality": "3",
+        "Requirement: Spirit": "3",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Spectral Will-o'-the-Wisp",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Critical Hits": "4%",
+        "Evasion": "4%",
+        "Movement Speed": "7.5%",
+        "Stamina Regeneration": "-0.5/s",
+        "Health": "-5",
+        "Physical Damage": "4%",
+        "Requirement: Dexterity": "6",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Mantle of the Misty Fangs",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Stamina": "3",
+        "Health Regeneration": "-0.4/s",
+        "Critical Hit Chance": "4%",
+        "Health": "15",
+        "Attack Speed": "0.2"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Tribe Belt",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Stamina Regeneration": "0.4/s",
+        "Health": "15",
+        "Critical Hit Chance": "4%",
+        "Stamina": "-5",
+        "Physical Damage": "3%"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Woodfang Cloak",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "10",
+        "Haste": "6%",
+        "Bonus Healing": "3",
+        "Mana": "6",
+        "Magic Damage": "-3.5%"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Band",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Evasion": "7.5%",
+        "Flight Of Life": "1%",
+        "Attack Speed": "0.3",
+        "Requirement: Force": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Boots",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Requirement: Defense Car": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Helmet",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Damage Reduction": "5%",
+        "Blocking Mastery": "5%",
+        "Health": "50",
+        "Requirement: Defense Car": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Grimoire",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Critical Chance Skill": "7.5%",
+        "Magic Damage": "10%",
+        "Mana": "5",
+        "Requirement: Intelligence": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Axe",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Flight Of Life": "3%",
+        "Stamina Regeneration": "0.5/s",
+        "Physical Damage": "8%",
+        "Requirement: Vitality": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Low Corruption Grimoire",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Health": "-40",
+        "Attack Speed": "0.2",
+        "Omnivampirism": "1.5%",
+        "Critical Damage Skill": "10%",
+        "Magic Damage": "5%"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Mask",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Movement Speed": "0.5%",
+        "Damage Critical Hits": "12.5%",
+        "Projectile Damage": "3.5%",
+        "Requirement: Dexterity": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    },
+    {
+      "itemName": "Occult Earrings",
+      "floor": "floor3",
+      "currentClassification": "Artifact",
+      "rawCategory": "accessory",
+      "classRestriction": [],
+      "statistics": {
+        "Bonus Healing": "5",
+        "Magic Damage": "5%",
+        "Attack Speed": "0.2",
+        "Requirement: Spirit": "4",
+        "Unique": "Yes"
+      },
+      "reason": "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+    }
+  ],
+  "statisticInventory": {
+    "Damage": {
+      "count": 123,
+      "values": [
+        "3",
+        "13.5",
+        "6.5",
+        "6.2",
+        "7",
+        "12",
+        "6",
+        "24",
+        "20",
+        "16",
+        "0.5",
+        "13",
+        "10",
+        "25",
+        "17.5",
+        "18",
+        "14",
+        "29",
+        "15",
+        "31",
+        "19",
+        "42",
+        "21",
+        "37.77",
+        "22",
+        "2",
+        "24.5",
+        "35",
+        "47",
+        "27",
+        "18.5",
+        "23.5",
+        "28",
+        "55",
+        "36",
+        "46",
+        "48",
+        "50",
+        "52",
+        "44",
+        "40",
+        "70",
+        "45",
+        "30",
+        "26",
+        "1",
+        "1.5",
+        "5",
+        "2.5",
+        "63",
+        "60",
+        "-7.5",
+        "72",
+        "4"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Damage"
+    },
+    "Attack Speed": {
+      "count": 149,
+      "values": [
+        "1",
+        "1.1",
+        "1.2",
+        "0.9",
+        "0.7",
+        "1.5",
+        "1.3",
+        "0.8",
+        "1.8",
+        "1.4",
+        "0.1",
+        "-0.1",
+        "0.2",
+        "0.3",
+        "2",
+        "1.6",
+        "-0.2",
+        "0.4"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Attack Speed"
+    },
+    "Class": {
+      "count": 261,
+      "values": [
+        "Archer",
+        "Assassin",
+        "Shaman",
+        "Warrior",
+        "Mage",
+        "Any",
+        "Mage, Shaman",
+        "Assassin, Archer"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Mana": {
+      "count": 84,
+      "values": [
+        "5",
+        "7.5",
+        "-5",
+        "10",
+        "-10",
+        "12.5",
+        "-15",
+        "15",
+        "8",
+        "6",
+        "2.5",
+        "4",
+        "1",
+        "2",
+        "20",
+        "3",
+        "30",
+        "25",
+        "16",
+        "-20",
+        "18",
+        "-25",
+        "12"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Mana"
+    },
+    "Mana Regeneration": {
+      "count": 46,
+      "values": [
+        "0.1/s",
+        "0.15/s",
+        "0.2/s",
+        "0.25/s",
+        "0.3/s",
+        "0.5/s",
+        "0.4/s",
+        "0.8/s",
+        "0.35/s",
+        "0.6/s",
+        "1/s"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Mana Regeneration"
+    },
+    "Health": {
+      "count": 192,
+      "values": [
+        "5",
+        "6",
+        "12",
+        "15",
+        "-10",
+        "-20",
+        "-30",
+        "-15",
+        "20",
+        "35",
+        "-40",
+        "30",
+        "-35",
+        "45",
+        "10",
+        "7",
+        "13",
+        "18",
+        "25",
+        "25.99",
+        "17",
+        "21",
+        "19",
+        "24",
+        "32",
+        "18.72",
+        "23",
+        "27",
+        "34",
+        "31",
+        "38.99",
+        "37",
+        "33",
+        "40",
+        "13.8",
+        "2.5",
+        "-25",
+        "-50",
+        "-60",
+        "60",
+        "7.5",
+        "1",
+        "50",
+        "-5"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Health"
+    },
+    "Bonus Healing": {
+      "count": 54,
+      "values": [
+        "1",
+        "2",
+        "3.5",
+        "2.5",
+        "4.5",
+        "4",
+        "5.5",
+        "10",
+        "5",
+        "6",
+        "1.5",
+        "7",
+        "8",
+        "3"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Bonus Healing"
+    },
+    "Magic Damage": {
+      "count": 49,
+      "values": [
+        "2%",
+        "2.5%",
+        "3.5%",
+        "4%",
+        "5%",
+        "1.5%",
+        "3%",
+        "-5%",
+        "6%",
+        "-90%",
+        "1%",
+        "-3%",
+        "-50%",
+        "4.5%",
+        "-3.5%",
+        "10%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Magic Damage"
+    },
+    "Two-Handed": {
+      "count": 20,
+      "values": [
+        "Yes"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Defense": {
+      "count": 143,
+      "values": [
+        "0.8",
+        "1.5",
+        "1.7",
+        "1.4",
+        "2.1",
+        "9",
+        "3.5",
+        "5",
+        "0.3",
+        "1",
+        "1.2",
+        "0.4",
+        "0.9",
+        "2",
+        "2.3",
+        "3.7",
+        "1.6",
+        "1.92",
+        "4",
+        "2.5",
+        "4.3",
+        "3.2",
+        "3.4",
+        "3",
+        "2.9",
+        "0.5",
+        "-4"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Defense"
+    },
+    "Critical Chance Skill": {
+      "count": 35,
+      "values": [
+        "2%",
+        "3%",
+        "4%",
+        "5%",
+        "15%",
+        "2.5%",
+        "3.5%",
+        "10%",
+        "4.5%",
+        "1.5%",
+        "7.5%",
+        "-3%",
+        "-7.5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Skill Critical Hit Chance"
+    },
+    "Stamina": {
+      "count": 57,
+      "values": [
+        "2",
+        "3",
+        "3.5",
+        "4",
+        "5",
+        "1.5",
+        "0.5",
+        "1",
+        "10",
+        "2.5",
+        "15",
+        "4.5",
+        "7.5",
+        "-2.5",
+        "6",
+        "-3",
+        "-4",
+        "-5"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Stamina"
+    },
+    "Skill Damage": {
+      "count": 29,
+      "values": [
+        "2.5%",
+        "3%",
+        "4%",
+        "1%",
+        "2%",
+        "5%",
+        "8%",
+        "-5%",
+        "3.5%",
+        "4.5%",
+        "7.5%",
+        "10%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Skill Damage"
+    },
+    "Movement Speed": {
+      "count": 60,
+      "values": [
+        "-0.003%",
+        "1%",
+        "0.1%",
+        "0.2%",
+        "0.5%",
+        "50%",
+        "2.5%",
+        "5%",
+        "1.5%",
+        "10%",
+        "7.5%",
+        "-1.5%",
+        "20%",
+        "-5%",
+        "15%",
+        "0.55%",
+        "0.15%",
+        "2%",
+        "-10%",
+        "0.75%",
+        "0.25%",
+        "30%",
+        "40%",
+        "25%",
+        "12.5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Movement Speed"
+    },
+    "Health Regeneration": {
+      "count": 28,
+      "values": [
+        "0.25/s",
+        "0.03/s",
+        "0.3/s",
+        "0.1/s",
+        "0.2/s",
+        "0.5/s",
+        "1.5/s",
+        "0.4/s",
+        "0.15/s",
+        "-0.4/s"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Health Regeneration"
+    },
+    "Critical Hit Chance": {
+      "count": 58,
+      "values": [
+        "12%",
+        "10%",
+        "3.5%",
+        "15%",
+        "5%",
+        "2.5%",
+        "6.5%",
+        "3%",
+        "1%",
+        "2%",
+        "4%",
+        "7.5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Critical Hit Chance"
+    },
+    "Damage Critical Hits": {
+      "count": 42,
+      "values": [
+        "5%",
+        "1.5%",
+        "10%",
+        "3.5%",
+        "6.5%",
+        "1%",
+        "3%",
+        "8%",
+        "2%",
+        "2.5%",
+        "4%",
+        "7.5%",
+        "12.5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Critical Hit Damage"
+    },
+    "Flight Of Life": {
+      "count": 21,
+      "values": [
+        "3.5%",
+        "1%",
+        "0.2%",
+        "1.5%",
+        "3%",
+        "5%",
+        "0.5%",
+        "1.7%",
+        "4%",
+        "2%",
+        "0.8%",
+        "-1.5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Flight Of Life"
+    },
+    "Skill Critical Damage": {
+      "count": 1,
+      "values": [
+        "2.5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Skill Critical Hit Damage"
+    },
+    "Haste": {
+      "count": 27,
+      "values": [
+        "3.5%",
+        "2.5%",
+        "1%",
+        "3%",
+        "1.5%",
+        "5%",
+        "4.5%",
+        "7.5%",
+        "10%",
+        "5.5%",
+        "2%",
+        "6%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Haste"
+    },
+    "3 Piece Set Bonus": {
+      "count": 37,
+      "values": [
+        "+10 Health",
+        "+5% Magic Damage, +15 Mana",
+        "+2.5 Damage",
+        "+2.5% Critical Hit Chance",
+        "+4% Haste",
+        "+2.5% Dodge",
+        "+4% Magic Damage",
+        "+2.5 Defense",
+        "+4 Defense",
+        "+4% Dodge",
+        "+5% Magic Damage"
+      ],
+      "classification": "conditional",
+      "normalizedName": null
+    },
+    "2 Piece Set Bonus": {
+      "count": 24,
+      "values": [
+        "+1.5% Critical Hit Chance",
+        "+15 Mana",
+        "+1.5% Dodge",
+        "+25% Critical Hit Damage",
+        "+15% Critical Hit Chance",
+        "+25 Mana"
+      ],
+      "classification": "conditional",
+      "normalizedName": null
+    },
+    "4 Piece Set Bonus": {
+      "count": 16,
+      "values": [
+        "+2% Damage Reduction",
+        "+5% Damage Reduction",
+        "+5 Damage",
+        "+5% Haste"
+      ],
+      "classification": "conditional",
+      "normalizedName": null
+    },
+    "Rune Slots": {
+      "count": 28,
+      "values": [
+        "2",
+        "1"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Stamina Regeneration": {
+      "count": 34,
+      "values": [
+        "0.2/s",
+        "0.3/s",
+        "0.4/s",
+        "0.1/s",
+        "0.5/s",
+        "-0.3/s",
+        "-0.4/s",
+        "-0.5/s",
+        "0.6/s"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Stamina Regeneration"
+    },
+    "Critical Damage Skill": {
+      "count": 18,
+      "values": [
+        "3.5%",
+        "5%",
+        "2.5%",
+        "1%",
+        "7.5%",
+        "10%",
+        "8%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Skill Critical Hit Damage"
+    },
+    "Unique": {
+      "count": 86,
+      "values": [
+        "Yes"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Evasion": {
+      "count": 15,
+      "values": [
+        "2.5%",
+        "3%",
+        "5%",
+        "10%",
+        "15%",
+        "6%",
+        "7.5%",
+        "4%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Evasion"
+    },
+    "Tenacity": {
+      "count": 1,
+      "values": [
+        "15%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Tenacity"
+    },
+    "Falls Reduction": {
+      "count": 1,
+      "values": [
+        "25%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Fall Damage Reduction"
+    },
+    "Damage Reduction": {
+      "count": 26,
+      "values": [
+        "3%",
+        "2%",
+        "4%",
+        "1%",
+        "2.5%",
+        "5%",
+        "-25%",
+        "-50%",
+        "-15%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Damage Reduction"
+    },
+    "Requirement: Spirit": {
+      "count": 51,
+      "values": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Physical Damage": {
+      "count": 41,
+      "values": [
+        "2.5%",
+        "3%",
+        "1.5%",
+        "-2.5%",
+        "3.5%",
+        "-15%",
+        "-5%",
+        "4%",
+        "-90%",
+        "2%",
+        "1%",
+        "4.5%",
+        "-50%",
+        "8%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Physical Damage"
+    },
+    "Requirement: Vitality": {
+      "count": 84,
+      "values": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "7"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Requirement: Defense Car": {
+      "count": 37,
+      "values": [
+        "2",
+        "1",
+        "3",
+        "4"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Requirement: Dexterity": {
+      "count": 41,
+      "values": [
+        "3",
+        "1",
+        "4",
+        "2",
+        "7",
+        "8",
+        "6"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Requirement: Intelligence": {
+      "count": 34,
+      "values": [
+        "3",
+        "2",
+        "1",
+        "6",
+        "4",
+        "5"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Projectile Damage": {
+      "count": 22,
+      "values": [
+        "2.5%",
+        "-90%",
+        "1%",
+        "3%",
+        "-5%",
+        "4%",
+        "6%",
+        "0.2%",
+        "-50%",
+        "8%",
+        "3.5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Projectile Damage"
+    },
+    "Requirement: Force": {
+      "count": 41,
+      "values": [
+        "2",
+        "1",
+        "4",
+        "3"
+      ],
+      "classification": "metadata",
+      "normalizedName": null
+    },
+    "Blocking Mastery": {
+      "count": 9,
+      "values": [
+        "5%",
+        "10%",
+        "2.5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Block Proficiency"
+    },
+    "Blocking Power": {
+      "count": 8,
+      "values": [
+        "1.5%",
+        "3%",
+        "0.5%",
+        "1%",
+        "2.5%",
+        "10%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Block Power"
+    },
+    "Omnivampirism": {
+      "count": 9,
+      "values": [
+        "1.5%",
+        "3%",
+        "1%",
+        "2%",
+        "-2%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Omnivamp"
+    },
+    "Effect: Harvest Power": {
+      "count": 15,
+      "values": [
+        "1",
+        "2"
+      ],
+      "classification": "unsupported",
+      "normalizedName": null
+    },
+    "Effect: Sustainability": {
+      "count": 15,
+      "values": [
+        "768",
+        "576",
+        "608",
+        "800"
+      ],
+      "classification": "unsupported",
+      "normalizedName": null
+    },
+    "Weapon Damage": {
+      "count": 6,
+      "values": [
+        "3%",
+        "10%",
+        "7.5%",
+        "-5%"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Weapon Damage"
+    },
+    "Crouch Speed": {
+      "count": 1,
+      "values": [
+        "250"
+      ],
+      "classification": "calculated",
+      "normalizedName": "Crouching Speed"
+    }
+  },
+  "statisticsByClassification": {
+    "calculated": [
+      "Damage",
+      "Attack Speed",
+      "Mana",
+      "Mana Regeneration",
+      "Health",
+      "Bonus Healing",
+      "Magic Damage",
+      "Defense",
+      "Critical Chance Skill",
+      "Stamina",
+      "Skill Damage",
+      "Movement Speed",
+      "Health Regeneration",
+      "Critical Hit Chance",
+      "Damage Critical Hits",
+      "Flight Of Life",
+      "Skill Critical Damage",
+      "Haste",
+      "Stamina Regeneration",
+      "Critical Damage Skill",
+      "Evasion",
+      "Tenacity",
+      "Falls Reduction",
+      "Damage Reduction",
+      "Physical Damage",
+      "Projectile Damage",
+      "Blocking Mastery",
+      "Blocking Power",
+      "Omnivampirism",
+      "Weapon Damage",
+      "Crouch Speed"
+    ],
+    "metadata": [
+      "Class",
+      "Two-Handed",
+      "Rune Slots",
+      "Unique",
+      "Requirement: Spirit",
+      "Requirement: Vitality",
+      "Requirement: Defense Car",
+      "Requirement: Dexterity",
+      "Requirement: Intelligence",
+      "Requirement: Force"
+    ],
+    "conditional": [
+      "3 Piece Set Bonus",
+      "2 Piece Set Bonus",
+      "4 Piece Set Bonus"
+    ],
+    "unsupported": [
+      "Effect: Harvest Power",
+      "Effect: Sustainability"
+    ],
+    "unverified": []
+  },
+  "calculatedStatistics": [
+    "Damage",
+    "Attack Speed",
+    "Mana",
+    "Mana Regeneration",
+    "Health",
+    "Bonus Healing",
+    "Magic Damage",
+    "Defense",
+    "Skill Critical Hit Chance",
+    "Stamina",
+    "Skill Damage",
+    "Movement Speed",
+    "Health Regeneration",
+    "Critical Hit Chance",
+    "Critical Hit Damage",
+    "Flight Of Life",
+    "Skill Critical Hit Damage",
+    "Haste",
+    "Stamina Regeneration",
+    "Evasion",
+    "Tenacity",
+    "Fall Damage Reduction",
+    "Damage Reduction",
+    "Physical Damage",
+    "Projectile Damage",
+    "Block Proficiency",
+    "Block Power",
+    "Omnivamp",
+    "Weapon Damage",
+    "Crouching Speed"
+  ],
+  "displayedStatistics": [
+    "Damage",
+    "Attack Speed",
+    "Mana",
+    "Mana Regeneration",
+    "Health",
+    "Bonus Healing",
+    "Magic Damage",
+    "Defense",
+    "Skill Critical Hit Chance",
+    "Stamina",
+    "Skill Damage",
+    "Movement Speed",
+    "Health Regeneration",
+    "Critical Hit Chance",
+    "Critical Hit Damage",
+    "Flight Of Life",
+    "Skill Critical Hit Damage",
+    "Haste",
+    "Stamina Regeneration",
+    "Evasion",
+    "Tenacity",
+    "Fall Damage Reduction",
+    "Damage Reduction",
+    "Physical Damage",
+    "Projectile Damage",
+    "Block Proficiency",
+    "Block Power",
+    "Omnivamp",
+    "Weapon Damage",
+    "Crouching Speed"
+  ],
+  "calculatedSetBonusStatistics": [
+    "3 Piece Set Bonus",
+    "2 Piece Set Bonus",
+    "4 Piece Set Bonus"
+  ],
+  "preservedButUnsupportedStatistics": [
+    "Class",
+    "Two-Handed",
+    "Rune Slots",
+    "Unique",
+    "Requirement: Spirit",
+    "Requirement: Vitality",
+    "Requirement: Defense Car",
+    "Requirement: Dexterity",
+    "Requirement: Intelligence",
+    "Requirement: Force",
+    "Effect: Harvest Power",
+    "Effect: Sustainability"
+  ],
+  "setBonusAudit": {
+    "Ika": {
+      "pieceCount": 3,
+      "items": [
+        "Ika Boots",
+        "Ika Leggings",
+        "Ika's Tunic"
+      ],
+      "thresholds": {
+        "3": {
+          "sourceValues": [
+            "+10 Health"
+          ],
+          "effects": {
+            "Health": [
+              "+10"
+            ]
+          }
+        }
+      }
+    },
+    "Spectral F1": {
+      "pieceCount": 3,
+      "items": [
+        "Spectral Boots",
+        "Spectral Leggings",
+        "Spectral Tunic"
+      ],
+      "thresholds": {
+        "3": {
+          "sourceValues": [
+            "+5% Magic Damage, +15 Mana"
+          ],
+          "effects": {
+            "Magic Damage": [
+              "+5%"
+            ],
+            "Mana": [
+              "+15"
+            ]
+          }
+        }
+      }
+    },
+    "Tactical": {
+      "pieceCount": 3,
+      "items": [
+        "Tactical Boots",
+        "Tactical Leggings",
+        "Tactical Tunic"
+      ],
+      "thresholds": {
+        "3": {
+          "sourceValues": [
+            "+2.5 Damage"
+          ],
+          "effects": {
+            "Damage": [
+              "+2.5"
+            ]
+          }
+        }
+      }
+    },
+    "Hunter's Set": {
+      "pieceCount": 3,
+      "items": [
+        "Hunter's Boots",
+        "Hunter's Breastplate",
+        "Hunter's Leggings"
+      ],
+      "thresholds": {
+        "2": {
+          "sourceValues": [
+            "+1.5% Critical Hit Chance"
+          ],
+          "effects": {
+            "Critical Hit Chance": [
+              "+1.5%"
+            ]
+          }
+        },
+        "3": {
+          "sourceValues": [
+            "+2.5% Critical Hit Chance"
+          ],
+          "effects": {
+            "Critical Hit Chance": [
+              "+2.5%"
+            ]
+          }
+        }
+      }
+    },
+    "Magician's Set": {
+      "pieceCount": 3,
+      "items": [
+        "Magician's Robe",
+        "Magician's Sandals",
+        "Magician's Trousers"
+      ],
+      "thresholds": {
+        "2": {
+          "sourceValues": [
+            "+15 Mana"
+          ],
+          "effects": {
+            "Mana": [
+              "+15"
+            ]
+          }
+        },
+        "3": {
+          "sourceValues": [
+            "+4% Haste"
+          ],
+          "effects": {
+            "Haste": [
+              "+4%"
+            ]
+          }
+        }
+      }
+    },
+    "Ninja": {
+      "pieceCount": 3,
+      "items": [
+        "Ninja Boots",
+        "Ninja Leggings",
+        "Ninja Tunic"
+      ],
+      "thresholds": {
+        "2": {
+          "sourceValues": [
+            "+1.5% Dodge"
+          ],
+          "effects": {
+            "Dodge": [
+              "+1.5%"
+            ]
+          }
+        },
+        "3": {
+          "sourceValues": [
+            "+2.5% Dodge"
+          ],
+          "effects": {
+            "Dodge": [
+              "+2.5%"
+            ]
+          }
+        }
+      }
+    },
+    "Sorcerer's Set": {
+      "pieceCount": 3,
+      "items": [
+        "Sorcerer's Pants",
+        "Sorcerer's Robe",
+        "Sorcerer's Sandals"
+      ],
+      "thresholds": {
+        "2": {
+          "sourceValues": [
+            "+15 Mana"
+          ],
+          "effects": {
+            "Mana": [
+              "+15"
+            ]
+          }
+        },
+        "3": {
+          "sourceValues": [
+            "+4% Magic Damage"
+          ],
+          "effects": {
+            "Magic Damage": [
+              "+4%"
+            ]
+          }
+        }
+      }
+    },
+    "Titan": {
+      "pieceCount": 4,
+      "items": [
+        "Titan Boots",
+        "Titan Breastplate",
+        "Titan Helmet",
+        "Titan Leggings"
+      ],
+      "thresholds": {
+        "3": {
+          "sourceValues": [
+            "+2.5 Defense"
+          ],
+          "effects": {
+            "Defense": [
+              "+2.5"
+            ]
+          }
+        },
+        "4": {
+          "sourceValues": [
+            "+2% Damage Reduction"
+          ],
+          "effects": {
+            "Damage Reduction": [
+              "+2%"
+            ]
+          }
+        }
+      }
+    },
+    "Guardian": {
+      "pieceCount": 4,
+      "items": [
+        "Guardian Boots",
+        "Guardian Breastplate",
+        "Guardian Helmet",
+        "Guardian Leggings"
+      ],
+      "thresholds": {
+        "2": {
+          "sourceValues": [
+            "+25% Critical Hit Damage"
+          ],
+          "effects": {
+            "Critical Hit Damage": [
+              "+25%"
+            ]
+          }
+        },
+        "3": {
+          "sourceValues": [
+            "+4 Defense"
+          ],
+          "effects": {
+            "Defense": [
+              "+4"
+            ]
+          }
+        },
+        "4": {
+          "sourceValues": [
+            "+5% Damage Reduction"
+          ],
+          "effects": {
+            "Damage Reduction": [
+              "+5%"
+            ]
+          }
+        }
+      }
+    },
+    "Herald": {
+      "pieceCount": 4,
+      "items": [
+        "Herald Breastplate",
+        "Herald Helmet",
+        "Herald Leggings",
+        "Herald's Boots"
+      ],
+      "thresholds": {
+        "2": {
+          "sourceValues": [
+            "+15% Critical Hit Chance"
+          ],
+          "effects": {
+            "Critical Hit Chance": [
+              "+15%"
+            ]
+          }
+        },
+        "3": {
+          "sourceValues": [
+            "+4% Dodge"
+          ],
+          "effects": {
+            "Dodge": [
+              "+4%"
+            ]
+          }
+        },
+        "4": {
+          "sourceValues": [
+            "+5 Damage"
+          ],
+          "effects": {
+            "Damage": [
+              "+5"
+            ]
+          }
+        }
+      }
+    },
+    "Reaper": {
+      "pieceCount": 4,
+      "items": [
+        "Reaper Boots",
+        "Reaper Breastplate",
+        "Reaper Helmet",
+        "Reaper Leggings"
+      ],
+      "thresholds": {
+        "2": {
+          "sourceValues": [
+            "+25 Mana"
+          ],
+          "effects": {
+            "Mana": [
+              "+25"
+            ]
+          }
+        },
+        "3": {
+          "sourceValues": [
+            "+5% Magic Damage"
+          ],
+          "effects": {
+            "Magic Damage": [
+              "+5%"
+            ]
+          }
+        },
+        "4": {
+          "sourceValues": [
+            "+5% Haste"
+          ],
+          "effects": {
+            "Haste": [
+              "+5%"
+            ]
+          }
+        }
+      }
+    },
+    "Copper": {
+      "pieceCount": 5,
+      "items": [
+        "Copper Bracelet",
+        "Copper Ring",
+        "Copper Amulet",
+        "Copper Gloves",
+        "Copper Coin"
+      ],
+      "thresholds": {}
+    },
+    "Weakling Wolf": {
+      "pieceCount": 2,
+      "items": [
+        "Albal Necklace",
+        "Wolf Gloves"
+      ],
+      "thresholds": {}
+    },
+    "Gelatinous Slime": {
+      "pieceCount": 3,
+      "items": [
+        "Glutinous Amulet",
+        "Glutinous Ring",
+        "Bracelet Gluant"
+      ],
+      "thresholds": {}
+    },
+    "Beginner Bandit": {
+      "pieceCount": 2,
+      "items": [
+        "Bandit Gloves",
+        "Stolen Coat"
+      ],
+      "thresholds": {}
+    },
+    "Sylvan": {
+      "pieceCount": 4,
+      "items": [
+        "Sylvester bracelet",
+        "Lien de la Sylve",
+        "Wood Amulet",
+        "Ring Sylvester"
+      ],
+      "thresholds": {}
+    },
+    "Peaceful Deer": {
+      "pieceCount": 3,
+      "items": [
+        "Deer Belt",
+        "Deer Gloves",
+        "Deer Bracelet"
+      ],
+      "thresholds": {}
+    },
+    "Dusty Skeleton": {
+      "pieceCount": 5,
+      "items": [
+        "Bone Gloves",
+        "Skeletal Amulet",
+        "Narax's Ring",
+        "Skeleton Ring",
+        "Skeleton Skull"
+      ],
+      "thresholds": {}
+    },
+    "Iron": {
+      "pieceCount": 5,
+      "items": [
+        "Iron Bracelet",
+        "Iron Ring",
+        "Iron Amulet",
+        "Iron Gloves",
+        "Iron Piece"
+      ],
+      "thresholds": {}
+    },
+    "Gelatinous Slimes": {
+      "pieceCount": 1,
+      "items": [
+        "Glutinous Ring"
+      ],
+      "thresholds": {}
+    },
+    "Fallen": {
+      "pieceCount": 1,
+      "items": [
+        "Reaper Ring"
+      ],
+      "thresholds": {}
+    },
+    "Shadow Neophyte F1": {
+      "pieceCount": 7,
+      "items": [
+        "Occult Amulet",
+        "Occult Ring",
+        "Occult Bracelet",
+        "Occult Hood",
+        "Occult Gloves",
+        "Occult Skull",
+        "Occult Robe"
+      ],
+      "thresholds": {}
+    },
+    "Fierce Bee Set": {
+      "pieceCount": 4,
+      "items": [
+        "Assassin's Boots",
+        "Assassin's Breastplate",
+        "Assassin's Helmet",
+        "Assassin's Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Magic Bee Set": {
+      "pieceCount": 4,
+      "items": [
+        "Crystallized Honey Boots",
+        "Crystallized Honey Breastplate",
+        "Crystallized Honey Helmet",
+        "Crystallized Honey Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Bee Warrior Set": {
+      "pieceCount": 4,
+      "items": [
+        "Hive Boots",
+        "Hive Breastplate",
+        "Hive Helmet",
+        "Hive Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Mystical Bee Set": {
+      "pieceCount": 4,
+      "items": [
+        "Hunter's Breastplate",
+        "Hunter's Helmet",
+        "Hunter's Leggings",
+        "Huntress' Boots"
+      ],
+      "thresholds": {}
+    },
+    "Wonderful Bee Set": {
+      "pieceCount": 4,
+      "items": [
+        "Mysticized Honey Boots",
+        "Mysticized Honey Breastplate",
+        "Mysticized Honey Helmet",
+        "Mysticized Honey Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Mystical Necromancer Set": {
+      "pieceCount": 4,
+      "items": [
+        "Archer Necromancer Breastplate",
+        "Necromancer Archer Boots",
+        "Necromancer Archer Helmet",
+        "Necromancer Archer Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Fierce Necromancer Set": {
+      "pieceCount": 4,
+      "items": [
+        "Assassin Necromancer Breastplate",
+        "Assassin Necromancer Leggings",
+        "Boots of the Necromancer Assassin",
+        "Helmet of the Necromancer Assassin"
+      ],
+      "thresholds": {}
+    },
+    "Wild Necromancer Set": {
+      "pieceCount": 4,
+      "items": [
+        "Boots of the Necromancer Shaman",
+        "Necromancer Shaman Helmet",
+        "Shaman Necromancer Breastplate",
+        "Shaman Necromancer Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Magical Necromancer Set": {
+      "pieceCount": 4,
+      "items": [
+        "Mage Necromancer Boots",
+        "Mage Necromancer Breastplate",
+        "Mage Necromancer Helmet",
+        "Mage Necromancer Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Necromancer Warrior Set": {
+      "pieceCount": 4,
+      "items": [
+        "Necromancer Warrior Boots",
+        "Necromancer Warrior Breastplate",
+        "Necromancer Warrior Leggings",
+        "Warrior Necromancer Helmet"
+      ],
+      "thresholds": {}
+    },
+    "Bear Set": {
+      "pieceCount": 4,
+      "items": [
+        "Bear Belt",
+        "Bear Gloves",
+        "Bear Ring",
+        "Pooh's Ring"
+      ],
+      "thresholds": {}
+    },
+    "Bulls Set": {
+      "pieceCount": 6,
+      "items": [
+        "Bulls Gloves",
+        "Taurus Belt",
+        "Taurus Ring",
+        "Bull Necklace",
+        "Fierce Talisman",
+        "Asterios Bracelet"
+      ],
+      "thresholds": {}
+    },
+    "Scrap Metal Set": {
+      "pieceCount": 5,
+      "items": [
+        "Scrap Bracelet",
+        "Scrap Gloves",
+        "Scrap Metal Amulet",
+        "Scrap Piece",
+        "Scrap Ring"
+      ],
+      "thresholds": {}
+    },
+    "Weak Wolf Set": {
+      "pieceCount": 2,
+      "items": [
+        "Wolf Bracelet",
+        "Wild Gloves"
+      ],
+      "thresholds": {}
+    },
+    "Bauxite Set": {
+      "pieceCount": 4,
+      "items": [
+        "Bauxite bracelet",
+        "Bauxite Gloves",
+        "Bauxite Ring",
+        "Piece of bauxite"
+      ],
+      "thresholds": {}
+    },
+    "Dusty Skeleton Set": {
+      "pieceCount": 2,
+      "items": [
+        "Runic Necklace",
+        "Guardian's Necklace"
+      ],
+      "thresholds": {}
+    },
+    "Impure Onyx Set": {
+      "pieceCount": 5,
+      "items": [
+        "Impure Onyx Amulet",
+        "Impure Onyx Bracelet",
+        "Impure Onyx Coin",
+        "Impure Onyx Gloves",
+        "Impure Onyx Ring"
+      ],
+      "thresholds": {}
+    },
+    "Pure Onyx Set": {
+      "pieceCount": 5,
+      "items": [
+        "Pure Onyx Amulet",
+        "Pure Onyx Ring",
+        "Pure Onyx Bracelet",
+        "Pure Onyx Gloves",
+        "Pure Onyx Piece"
+      ],
+      "thresholds": {}
+    },
+    "Shadow Neophyte Set P2": {
+      "pieceCount": 9,
+      "items": [
+        "Occult Amulet",
+        "Occult Ring",
+        "Occult Bracelet",
+        "Occult Gloves",
+        "Occult Mask",
+        "Occult Scroll",
+        "Occult Dagger",
+        "Occult Hourglass",
+        "Occult Talisman"
+      ],
+      "thresholds": {}
+    },
+    "Weak Corruption Set": {
+      "pieceCount": 4,
+      "items": [
+        "Corrupted Mask",
+        "Weak Corruption Bracelet",
+        "Low Corruption Gloves",
+        "Low Corruption Grimoire"
+      ],
+      "thresholds": {}
+    },
+    "Reaper Amethyst Set": {
+      "pieceCount": 4,
+      "items": [
+        "Amethyst Reaper Helm",
+        "Reaper Amethyst Boots",
+        "Reaper Amethyst Breastplate",
+        "Reaper Amethyst Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Fierce Amethyst Set": {
+      "pieceCount": 4,
+      "items": [
+        "Fierce Amethyst Boots",
+        "Fierce Amethyst Breastplate",
+        "Fierce Amethyst Helm",
+        "Fierce Amethyst Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Hunting Amethyst Set": {
+      "pieceCount": 4,
+      "items": [
+        "Hunter Amethyst Boots",
+        "Hunter Amethyst Breastplate",
+        "Hunter Amethyst Helmet",
+        "Hunter Amethyst Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Magic Amethyst Set": {
+      "pieceCount": 4,
+      "items": [
+        "Magical Amethyst Boots",
+        "Magical Amethyst Breastplate",
+        "Magical Amethyst Helmet",
+        "Magical Amethyst Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Wild Amethyst Set": {
+      "pieceCount": 4,
+      "items": [
+        "Wild Amethyst Boots",
+        "Wild Amethyst Breastplate",
+        "Wild Amethyst Helmet",
+        "Wild Amethyst Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Ancient Woods Assassin Set": {
+      "pieceCount": 4,
+      "items": [
+        "Ancient Wood Leggings Reaper",
+        "Ancient Woodland Boots Reaper",
+        "Breastplate of the Ancient Woods Reaper",
+        "Helm of the Ancient Woods Reaper"
+      ],
+      "thresholds": {}
+    },
+    "Ancient Woodland Archer Set": {
+      "pieceCount": 4,
+      "items": [
+        "Ancient Woodland Boots Hunter",
+        "Ancient Woodland Leggings Hunter",
+        "Breastplate of the Ancient Woods Hunter",
+        "Helmet of the Ancient Woods Hunter"
+      ],
+      "thresholds": {}
+    },
+    "Fierce Ancient Wood Set": {
+      "pieceCount": 4,
+      "items": [
+        "Ferocious Ancient Wood Breastplate",
+        "Fierce Ancient Wood Leggings",
+        "Fierce Ancient Woodland Boots",
+        "Helm of the Fierce Ancient Woods"
+      ],
+      "thresholds": {}
+    },
+    "Ancient Wood Shaman Set": {
+      "pieceCount": 4,
+      "items": [
+        "Helmet of the Wild Ancient Woods",
+        "Wild Ancient Woodland Boots",
+        "Wild Ancient Woods Breastplate",
+        "Wild Ancient Woods Leggings"
+      ],
+      "thresholds": {}
+    },
+    "Ancient Wood Mage Set": {
+      "pieceCount": 4,
+      "items": [
+        "Magical Ancient Wood Leggings",
+        "Magical Ancient Woodland Boots",
+        "Magical Ancient Woodland Helmet",
+        "Magical Ancient Woods Breastplate"
+      ],
+      "thresholds": {}
+    },
+    "Amethyst Set": {
+      "pieceCount": 5,
+      "items": [
+        "Amethyst Amulet",
+        "Amethyst Gloves",
+        "Amethyst Ring",
+        "Amethyst Bracelet",
+        "Amethyst Boots"
+      ],
+      "thresholds": {}
+    },
+    "Dark Woods Set": {
+      "pieceCount": 6,
+      "items": [
+        "Amulet of the Dark Woods",
+        "Bracelet of the Dark Woods",
+        "Gloves of the Dark Woods",
+        "Ring of the Dark Woods",
+        "Darkwood Boots",
+        "Grimoire of the Dark Woods"
+      ],
+      "thresholds": {}
+    },
+    "Web Set": {
+      "pieceCount": 7,
+      "items": [
+        "Amulet of the Web",
+        "Canvas Gloves",
+        "Ring of the Web",
+        "Web Bracelet",
+        "Black Boots",
+        "Canvas Boots",
+        "Mask of the Web"
+      ],
+      "thresholds": {}
+    },
+    "Misty Fangs Set": {
+      "pieceCount": 6,
+      "items": [
+        "Amulet Brumeuse",
+        "Misty Ring",
+        "Misty Bracelet",
+        "Misty Gloves",
+        "Mist Claw Knife",
+        "Mantle of the Misty Fangs"
+      ],
+      "thresholds": {}
+    },
+    "Set Luminescent": {
+      "pieceCount": 6,
+      "items": [
+        "Amulet Luminescente",
+        "Ring Luminescent",
+        "Boots Luminescentes",
+        "Luminescent Bracelet",
+        "Luminescent Gloves",
+        "Luminescent Belt"
+      ],
+      "thresholds": {}
+    },
+    "Tribe Set": {
+      "pieceCount": 6,
+      "items": [
+        "Amulet Orcienne",
+        "Ring Orcien",
+        "Orc Bracelet",
+        "Orc Gloves",
+        "Orc Boots",
+        "Tribe Ax"
+      ],
+      "thresholds": {}
+    },
+    "Set Spectral P3": {
+      "pieceCount": 7,
+      "items": [
+        "Amulet Spectrale",
+        "Ring Spectral",
+        "Boots Spectrales",
+        "Spectral Bracelet",
+        "Spectral Gloves",
+        "Spectral Feather",
+        "Spectral Will-o'-the-Wisp"
+      ],
+      "thresholds": {}
+    },
+    "Wood Fang Set": {
+      "pieceCount": 7,
+      "items": [
+        "Bracelet of the Woods",
+        "Ring of the Woods",
+        "Wood Amulet",
+        "Wood Gloves",
+        "Woodclaw Knife",
+        "Woodfang Boots",
+        "Woodfang Cloak"
+      ],
+      "thresholds": {}
+    },
+    "Thief Set": {
+      "pieceCount": 6,
+      "items": [
+        "Ring of the Thief",
+        "Thief's Amulet",
+        "Amethyst Bracelet",
+        "Thief's Gloves",
+        "Thief Boots",
+        "Thief's Hood"
+      ],
+      "thresholds": {}
+    },
+    "Seven Shadow Soldiers": {
+      "pieceCount": 11,
+      "items": [
+        "Occult Amulet",
+        "Occult Ring",
+        "Occult Band",
+        "Occult Boots",
+        "Occult Bracelet",
+        "Occult Helmet",
+        "Occult Gloves",
+        "Occult Grimoire",
+        "Occult Axe",
+        "Occult Mask",
+        "Occult Earrings"
+      ],
+      "thresholds": {}
+    }
+  },
+  "uninterpretedStatistics": [
+    {
+      "itemName": "Chipped Axe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "1"
+    },
+    {
+      "itemName": "Chipped Axe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "768"
+    },
+    {
+      "itemName": "Cracked Pickaxe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "1"
+    },
+    {
+      "itemName": "Cracked Pickaxe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "768"
+    },
+    {
+      "itemName": "Metal Axe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Metal Axe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "576"
+    },
+    {
+      "itemName": "Metal Hoe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Metal Hoe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "576"
+    },
+    {
+      "itemName": "Metal Pickaxe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Metal Pickaxe",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "576"
+    },
+    {
+      "itemName": "Twisted Sickle",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "1"
+    },
+    {
+      "itemName": "Twisted Sickle",
+      "floor": "floor1",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "768"
+    },
+    {
+      "itemName": "Necrotic Ax",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Necrotic Ax",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "608"
+    },
+    {
+      "itemName": "Necrotic Hoe",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Necrotic Hoe",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "608"
+    },
+    {
+      "itemName": "Necrotic Pickaxe",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Necrotic Pickaxe",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "608"
+    },
+    {
+      "itemName": "Savannah Ax",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "1"
+    },
+    {
+      "itemName": "Savannah Ax",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "800"
+    },
+    {
+      "itemName": "Savannah Hoe",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "1"
+    },
+    {
+      "itemName": "Savannah Hoe",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "800"
+    },
+    {
+      "itemName": "Savannah Pickaxe",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "1"
+    },
+    {
+      "itemName": "Savannah Pickaxe",
+      "floor": "floor2",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "800"
+    },
+    {
+      "itemName": "Reinforced Ax",
+      "floor": "floor3",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Reinforced Ax",
+      "floor": "floor3",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "576"
+    },
+    {
+      "itemName": "Reinforced Hoe",
+      "floor": "floor3",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Reinforced Hoe",
+      "floor": "floor3",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "576"
+    },
+    {
+      "itemName": "Reinforced Pickaxe",
+      "floor": "floor3",
+      "category": "tool",
+      "key": "Effect: Harvest Power",
+      "value": "2"
+    },
+    {
+      "itemName": "Reinforced Pickaxe",
+      "floor": "floor3",
+      "category": "tool",
+      "key": "Effect: Sustainability",
+      "value": "576"
+    }
+  ]
+}

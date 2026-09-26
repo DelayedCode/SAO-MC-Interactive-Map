@@ -42,29 +42,46 @@
   </script>
   <style>
     :root {
-      --bg-1: #0a0f15;
-      --bg-2: #151b23;
-      --text: #eef4fb;
-      --muted: #9dafc3;
-      --line-strong: rgba(174, 198, 223, 0.4);
+      --panel-bg: linear-gradient(180deg, rgba(16, 24, 34, 0.96), rgba(7, 12, 18, 0.98));
+      --panel-stroke: rgba(162, 196, 227, 0.22);
+      --panel-stroke-strong: rgba(120, 181, 255, 0.48);
+      --info-bg: rgba(17, 25, 38, 0.82);
+      --info-stroke: rgba(164, 198, 230, 0.18);
+      --text: #edf4ff;
+      --muted: #a7b9c9;
+      --muted-strong: #cfe1f7;
+      --card-bg: linear-gradient(180deg, rgba(18, 27, 39, 0.98), rgba(10, 15, 23, 0.99));
+      --card-stroke: rgba(168, 200, 232, 0.14);
+      --shadow: rgba(3, 7, 12, 0.52);
     }
 
-    * { box-sizing: border-box; }
+    html {
+      min-width: 100%;
+      min-height: 100%;
+      background: #0a0f15;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
 
     body {
-      margin: 0;
+      min-width: 100%;
       min-height: 100vh;
-      font-family: "Segoe UI", Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(1200px 700px at 12% -12%, rgba(78, 110, 143, 0.35), transparent 52%),
-        radial-gradient(1000px 600px at 100% 0%, rgba(55, 72, 95, 0.35), transparent 48%),
-        linear-gradient(145deg, var(--bg-1), var(--bg-2));
-      display: grid;
-      place-items: center;
-      padding: 24px;
+      margin: 0;
+      padding: clamp(28px, 4vw, 54px) clamp(18px, 3vw, 48px);
       overflow-x: hidden;
-      overflow-y: auto;
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(900px 560px at 50% 38%, rgba(41, 78, 112, 0.2), transparent 68%),
+        radial-gradient(1100px 700px at 50% 110%, rgba(14, 28, 43, 0.42), transparent 70%),
+        linear-gradient(145deg, #080d13, #111a25 52%, #080d13);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     body::before {
@@ -72,32 +89,34 @@
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
       background-size: 22px 22px;
       -webkit-mask-image: radial-gradient(circle at center, black, transparent 82%);
       mask-image: radial-gradient(circle at center, black, transparent 82%);
-      pointer-events: none;
       opacity: 0.35;
+      pointer-events: none;
     }
 
     .page-stack {
-      width: min(1040px, 100%);
+      width: min(1360px, 100%);
+      margin-top: 24px;
+      zoom: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 0;
     }
 
     .shell {
       width: 100%;
-      border: 1px solid rgba(186, 205, 230, 0.22);
-      border-radius: 26px;
-      background: linear-gradient(180deg, rgba(16, 22, 31, 0.94), rgba(9, 13, 18, 0.95));
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255,255,255,0.05);
-      padding: 24px;
       position: relative;
       overflow: hidden;
+      border: 1px solid var(--panel-stroke);
+      border-radius: 24px;
+      background: var(--panel-bg);
+      box-shadow: 0 28px 76px rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255,255,255,0.05);
+      padding: clamp(28px, 3vw, 38px) clamp(30px, 3.4vw, 46px) 26px;
       -webkit-backdrop-filter: blur(14px);
       backdrop-filter: blur(14px);
     }
@@ -107,8 +126,8 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at top left, rgba(115, 201, 255, 0.16), transparent 36%),
-        radial-gradient(circle at bottom right, rgba(84, 110, 147, 0.14), transparent 42%);
+        radial-gradient(circle at top left, rgba(115, 201, 255, 0.09), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(101, 128, 171, 0.08), transparent 42%);
       pointer-events: none;
     }
 
@@ -122,7 +141,7 @@
     .topbar {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .topbar-strip {
@@ -131,73 +150,493 @@
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
+      min-height: 40px;
     }
 
     .title-wrap {
-      max-width: 680px;
+      max-width: 860px;
       margin: 0 auto;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(164, 198, 230, 0.14);
       text-align: center;
-    }
-
-    .eyebrow,
-    .guild-badge,
-    .discord-pill {
-      border: 1px solid var(--line-strong);
-      background: rgba(16, 22, 31, 0.92);
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text);
     }
 
     .eyebrow {
-      padding: 6px 10px;
-      font-size: 0.72rem;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #9cc7e7;
+      font-size: 0.7rem;
       font-weight: 800;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      line-height: 1.2;
     }
 
     h1 {
-      margin: 14px 0 6px;
-      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      margin: 8px 0 0;
+      font-size: clamp(2rem, 2.8vw, 2.7rem);
       line-height: 1.08;
-      letter-spacing: 0.03em;
-      text-shadow: 0 0 16px rgba(115, 201, 255, 0.14);
-    }
-
-    .subtitle,
-    .home-disclaimer,
-    .card-desc,
-    .modal-copy {
-      color: var(--muted);
-    }
-
-    .home-disclaimer {
-      margin: 18px auto 0;
-      max-width: 860px;
-      padding: 12px 14px;
-      border: 1px solid rgba(186, 205, 230, 0.18);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.03);
-      font-size: 0.84rem;
-      line-height: 1.6;
-      text-align: center;
-      color: #c6d1dd;
-      opacity: 0.96;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      letter-spacing: 0;
+      color: var(--text);
+      text-shadow: 0 0 18px rgba(110, 180, 255, 0.14);
     }
 
     .subtitle {
-      margin: 0;
-      font-size: 0.98rem;
+      margin: 6px auto 0;
       max-width: 620px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+    }
+
+    .home-disclaimer {
+      width: min(86%, 860px);
+      margin: 20px auto 0;
+      padding: 14px 18px;
+      border: 1px solid var(--info-stroke);
+      border-left: 3px solid rgba(115, 201, 255, 0.82);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(13, 20, 30, 0.78), rgba(8, 14, 21, 0.82));
+      color: var(--muted-strong);
+      font-size: 0.82rem;
+      line-height: 1.6;
+      text-align: left;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 26px rgba(0,0,0,0.12);
+    }
+
+    .home-disclaimer br { content: ""; display: block; margin-top: 0.4rem; }
+
+    .grid {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 0.85fr));
+      gap: 18px;
+      align-items: stretch;
+      justify-content: space-between;
+    }
+
+    .mode-button {
+      width: 96%;
+      justify-self: center;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 198px;
+      padding: 16px 16px 12px;
+      border: 1.113px solid var(--card-stroke);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(15, 23, 33, 0.99) 0%, rgba(8, 13, 20, 0.995) 100%);
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 0 1px rgba(255,255,255,0.015), 0 12px 22px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.02);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .mode-button::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.55;
+      transition: opacity 0.18s ease;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), transparent 28%),
+        linear-gradient(180deg, rgba(6, 10, 16, 0.08), rgba(6, 10, 16, 0.28) 72%, rgba(6, 10, 16, 0.44) 100%),
+        repeating-linear-gradient(90deg, var(--card-pattern, rgba(176, 202, 233, 0.05)) 0 1px, transparent 1px 12px),
+        repeating-linear-gradient(0deg, var(--card-pattern, rgba(176, 202, 233, 0.05)) 0 1px, transparent 1px 12px);
+    }
+
+    .mode-button::after {
+      content: none;
+    }
+
+    .mode-button:hover {
+      transform: translateY(-3px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.02), 0 22px 38px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .mode-button:hover::before {
+      opacity: 0.82;
+    }
+
+    .mode-button:hover::after {
+      content: none;
+    }
+
+    .mode-button:active,
+    .modal-action:active,
+    .close-button:active,
+    .discord-pill:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .mode-button:focus-visible,
+    .discord-pill:focus-visible,
+    .modal-action:focus-visible,
+    .close-button:focus-visible {
+      outline: 2px solid #8bb7ff;
+      outline-offset: 2px;
+    }
+
+    .mode-button .card-title-row,
+    .title-cluster,
+    .card-meta {
+      display: flex;
+      align-items: center;
+    }
+
+    .mode-button .card-title-row {
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .title-cluster {
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+      flex: 1 1 180px;
+    }
+
+    .card-icon {
+      width: 12px;
+      height: 12px;
+      flex: none;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.6);
+      background: currentColor;
+      opacity: 0.78;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.035), 0 0 4px currentColor, 0 0 7px currentColor;
+      transition: opacity 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .mode-button:hover .card-icon {
+      opacity: 1;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.05), 0 0 6px currentColor, 0 0 11px currentColor, 0 0 13px rgba(255,255,255,0.045);
+    }
+
+    .mode-button .tag {
+      flex: none;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.04);
+      padding: 5px 8px;
+      font-size: 0.5576rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #d4e2f3;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .mode-button.ggo .tag {
+      position: absolute;
+      top: 12.75px;
+      right: 13.6px;
+      margin-top: 0;
+      border-color: rgba(255, 192, 121, 0.56);
+      background: rgba(255, 192, 121, 0.08);
+      color: #ffdca3;
+      box-shadow: inset 0 0 0 1px rgba(255, 192, 121, 0.12);
+    }
+
+    .mode-button.ggo .card-title-row {
+      display: block;
+      min-height: 54px;
+      padding-top: 30px;
+    }
+
+    .mode-button.ggo .title-cluster {
+      width: 100%;
+      flex: none;
+      padding-right: 0;
+    }
+
+    .mode-button.ggo .card-title {
+      overflow-wrap: normal;
+    }
+
+    .mode-button.ggo .card-meta > span:first-child {
+      visibility: hidden;
+    }
+
+    .mode-button.aincrad {
+      --card-glow: rgba(125, 196, 255, 0.14);
+      --card-pattern: rgba(125, 196, 255, 0.05);
+      color: #9cd2ff;
+      border-color: rgba(125, 196, 255, 0.38);
+      background: linear-gradient(180deg, rgba(17, 27, 37, 0.99), rgba(9, 13, 19, 0.99));
+    }
+    .mode-button.underworld {
+      --card-glow: rgba(143, 214, 174, 0.12);
+      --card-pattern: rgba(143, 214, 174, 0.05);
+      color: #9edfba;
+      border-color: rgba(143, 214, 174, 0.36);
+      background: linear-gradient(180deg, rgba(17, 28, 24, 0.99), rgba(9, 13, 17, 0.99));
+    }
+    .mode-button.ggo {
+      --card-glow: rgba(255, 192, 121, 0.1);
+      --card-pattern: rgba(255, 192, 121, 0.04);
+      color: #ffc079;
+      border-color: rgba(255, 192, 121, 0.3);
+      opacity: 0.9;
+      background: linear-gradient(180deg, rgba(26, 22, 16, 0.98), rgba(10, 12, 17, 0.99));
+    }
+
+    .mode-button.aincrad::before {
+      background:
+        linear-gradient(180deg, rgba(125, 196, 255, 0.05), transparent 30%),
+        radial-gradient(circle at top left, rgba(125, 196, 255, 0.06), transparent 38%),
+        repeating-linear-gradient(90deg, rgba(125, 196, 255, 0.04) 0 1px, transparent 1px 12px),
+        repeating-linear-gradient(0deg, rgba(125, 196, 255, 0.04) 0 1px, transparent 1px 12px);
+    }
+    .mode-button.underworld::before {
+      background:
+        linear-gradient(180deg, rgba(143, 214, 174, 0.05), transparent 30%),
+        radial-gradient(circle at top left, rgba(143, 214, 174, 0.06), transparent 38%),
+        repeating-linear-gradient(90deg, rgba(143, 214, 174, 0.04) 0 1px, transparent 1px 12px),
+        repeating-linear-gradient(0deg, rgba(143, 214, 174, 0.04) 0 1px, transparent 1px 12px);
+    }
+    .mode-button.ggo::before { background-color: rgba(255, 192, 121, 0.03); }
+
+    .mode-button.aincrad:hover { border-color: rgba(125, 196, 255, 0.82); box-shadow: inset 0 1px 0 rgba(125, 196, 255, 0.12), 0 18px 36px rgba(0,0,0,0.28), 0 0 0 1px rgba(125, 196, 255, 0.1); }
+    .mode-button.underworld:hover { border-color: rgba(143, 214, 174, 0.82); box-shadow: inset 0 1px 0 rgba(143, 214, 174, 0.1), 0 18px 36px rgba(0,0,0,0.28), 0 0 0 1px rgba(143, 214, 174, 0.1); }
+    .mode-button.ggo:hover { border-color: rgba(255, 192, 121, 0.8); box-shadow: inset 0 1px 0 rgba(255, 192, 121, 0.08), 0 18px 36px rgba(0,0,0,0.28), 0 0 0 1px rgba(255, 192, 121, 0.08); }
+
+    .mode-button.aincrad .card-title { text-shadow: 0 0 12px rgba(115, 201, 255, 0.14); }
+    .mode-button.underworld .card-title { text-shadow: 0 0 12px rgba(143, 214, 174, 0.14); }
+    .mode-button.ggo .card-title { text-shadow: 0 0 12px rgba(255, 192, 121, 0.1); }
+
+    .card-title {
+      min-width: 0;
+      margin: 0;
+      color: var(--text);
+      font-size: 1.12rem;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .card-desc {
+      margin: 0;
+      max-width: 38ch;
+      color: #cfe1f7;
+      font-size: 0.972rem;
+      line-height: 1.5;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+    }
+
+    .card-meta {
+      margin-top: auto;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 100%);
+      color: #e1ebfb;
+      font-size: 0.72rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      font-weight: 700;
+      opacity: 0.96;
+      position: relative;
+      transition: border-color 0.18s ease, opacity 0.18s ease;
+    }
+
+    .card-meta::before {
+      content: "";
+      position: absolute;
+      inset: -1px 0 auto 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.16), rgba(255,255,255,0.08));
+    }
+
+    .meta-arrow {
+      display: inline-block;
+      transition: transform 0.18s ease, color 0.18s ease, text-shadow 0.18s ease;
+      font-size: 1rem;
+      line-height: 1;
+      color: currentColor;
+      text-shadow: 0 0 3px currentColor, 0 0 4px currentColor;
+    }
+
+    .mode-button:hover .meta-arrow {
+      transform: translateX(3px);
+      text-shadow: 0 0 4px currentColor, 0 0 6px currentColor;
+    }
+
+    .mode-button:hover .card-meta > span:first-child {
+      color: #f5f8ff;
+      text-shadow: 0 0 12px rgba(255,255,255,0.12);
+    }
+
+    .mode-button:hover .card-meta {
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .character-build-float {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 11.25px 16.25px;
+      border: 1px solid rgba(115, 201, 255, 0.48);
+      border-radius: 10px;
+      background: rgba(12, 24, 36, 0.94);
+      color: #d9efff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.24), 0 0 12px rgba(115, 201, 255, 0.08);
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .character-build-float:hover {
+      transform: translateY(-2px);
+      border-color: rgba(115, 201, 255, 0.82);
+      background: rgba(18, 35, 51, 0.97);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.28), 0 0 16px rgba(115, 201, 255, 0.12);
+    }
+
+    .character-build-float:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .character-build-float:focus-visible {
+      outline: 2px solid #8bb7ff;
+      outline-offset: 3px;
+    }
+
+    .character-build-float-icon {
+      display: inline-flex;
+      width: 49.69px;
+      height: 49.69px;
+      color: #73c9ff;
+      line-height: 1;
+    }
+
+    .character-build-float-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .character-build-float-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .welcome-language-hint {
+      position: fixed;
+      top: calc(14px + env(safe-area-inset-top));
+      left: calc(66px + 20px + env(safe-area-inset-left));
+      z-index: 89;
+      display: inline-flex;
+      align-items: center;
+      gap: 5.6px;
+      max-width: calc(100vw - 80px);
+      color: rgba(207, 225, 247, 0.72);
+      font-size: 0.6496rem;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      pointer-events: none;
+      text-align: left;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65);
+    }
+
+    .welcome-language-hint svg {
+      flex: 0 0 15.68px;
+      width: 15.68px;
+      height: 15.68px;
+      color: #73c9ff;
+      filter: drop-shadow(0 0 4px rgba(115, 201, 255, 0.3));
+    }
+
+    .welcome-language-hint-text {
+      display: grid;
+      gap: 1px;
+    }
+
+    .welcome-language-hint-separator {
+      display: block;
+      width: 100%;
+      height: 1px;
+      background: rgba(164, 198, 230, 0.28);
     }
 
     .page-footer {
+      width: 100%;
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(186, 205, 230, 0.16);
       display: flex;
       justify-content: center;
+    }
+
+    .guild-badge {
+      width: auto;
+      margin-top: 0;
+      padding: 0 4px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .guild-badge strong { color: #f8fbff; }
+
+    .discord-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8.75px 12.5px;
+      border: 1px solid rgba(115, 185, 255, 0.32);
+      border-radius: 999px;
+      background: rgba(10, 16, 24, 0.9);
+      color: #ebf4ff;
+      cursor: pointer;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-left: auto;
+      text-decoration: none;
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .discord-pill .link-icon,
+    .modal-action .discord-icon,
+    .modal-action .link-icon {
+      width: 20px;
+      height: 20px;
+      display: block;
+      flex: none;
+      color: #73b9ff;
+    }
+
+    .discord-pill:hover {
+      transform: translateY(-1px);
+      border-color: rgba(115, 185, 255, 0.7);
+      background: rgba(17, 28, 38, 0.96);
+    }
+
+    html:not([lang="en"]) .discord-pill {
+      margin-right: 24px;
+      transform: translateX(-75%);
     }
 
     .overlay {
@@ -225,19 +664,11 @@
 
     .discord-modal {
       width: min(420px, 100%);
-      border: 1px solid rgba(174, 198, 223, 0.38);
+      padding: 20px;
+      border: 1px solid rgba(120, 181, 255, 0.42);
       border-radius: 18px;
-      background: linear-gradient(180deg, rgba(20, 27, 37, 0.98), rgba(10, 14, 20, 0.98));
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.46);
-      padding: 18px;
-      opacity: 0;
-      transform: translateY(8px) scale(0.98);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-
-    .overlay.show .discord-modal {
-      opacity: 1;
-      transform: translateY(0) scale(1);
+      background: linear-gradient(180deg, rgba(18, 28, 41, 0.98), rgba(8, 14, 22, 0.98));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
     .modal-header {
@@ -247,270 +678,160 @@
       gap: 12px;
     }
 
-    .modal-title,
-    .card-title {
+    .modal-title {
       margin: 0;
-      font-weight: 800;
+      color: var(--text);
+      font-size: 1.08rem;
+      line-height: 1.25;
     }
 
-    .modal-title { font-size: 1.05rem; }
-    .modal-copy { margin: 10px 0 16px; font-size: 0.92rem; line-height: 1.5; }
-    .modal-actions { display: grid; gap: 10px; }
+    .modal-copy {
+      margin: 10px 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
 
-    .modal-action,
-    .close-button {
-      appearance: none;
-      border: 1px solid rgba(174, 198, 223, 0.3);
-      border-radius: 12px;
-      background: rgba(17, 24, 34, 0.95);
-      color: var(--text);
-      cursor: pointer;
-      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    .modal-actions {
+      display: grid;
+      gap: 8px;
     }
 
     .modal-action {
-      padding: 12px 14px;
-      text-align: left;
-      font-weight: 700;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(174, 198, 223, 0.22);
+      border-radius: 10px;
+      background: rgba(10, 17, 27, 0.9);
+      color: var(--text);
       text-decoration: none;
-      display: block;
+      font-size: 0.88rem;
+      line-height: 1.25;
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .modal-action:hover {
+      transform: translateY(-1px);
+      border-color: rgba(115, 185, 255, 0.62);
+      background: rgba(17, 29, 43, 0.98);
     }
 
     .close-button {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       display: grid;
       place-items: center;
-      font-size: 1.15rem;
       padding: 0;
+      border: 1px solid rgba(136, 183, 255, 0.3);
+      border-radius: 50%;
+      background: rgba(10, 17, 27, 0.9);
+      color: var(--muted-strong);
+      appearance: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      object-fit: contain;
+      line-height: 1;
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
     }
 
-    .modal-action:hover,
-    .close-button:hover,
-    .discord-pill:hover {
+    .close-button:hover {
       transform: translateY(-1px);
-      border-color: rgba(115, 201, 255, 0.7);
-      background: rgba(23, 31, 42, 1);
+      border-color: rgba(115, 185, 255, 0.62);
+      background: rgba(17, 29, 43, 0.98);
     }
-
-    .guild-badge {
-      margin-top: 2px;
-      align-self: flex-start;
-      font-size: 0.8rem;
-      letter-spacing: 0.04em;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
-      border-radius: 14px;
-      padding: 11px 14px;
-      background: rgba(10, 14, 19, 0.9);
-    }
-
-    .guild-badge strong { color: #fbfdff; }
-
-    .discord-pill {
-      padding: 8px 10px;
-      cursor: pointer;
-      text-decoration: none;
-      font-weight: 700;
-      margin-left: auto;
-    }
-
-    .discord-icon {
-      width: 18px;
-      height: 18px;
-      display: inline-block;
-      flex: none;
-    }
-
-    .grid {
-      margin-top: 22px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-    }
-
-    .mode-button {
-      width: 100%;
-      border: 1px solid rgba(189, 210, 234, 0.18);
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(20, 28, 38, 0.98), rgba(11, 16, 24, 0.98));
-      color: var(--text);
-      text-align: left;
-      padding: 18px;
-      cursor: pointer;
-      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-height: 190px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 16px 34px rgba(0,0,0,0.26);
-    }
-
-    .mode-button::after {
-      content: "";
-      position: absolute;
-      inset: auto -30px -36px auto;
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      filter: blur(12px);
-      opacity: 0.42;
-      pointer-events: none;
-    }
-
-    .mode-button:hover {
-      transform: translateY(-4px);
-      border-color: rgba(178, 216, 255, 0.7);
-      filter: saturate(1.06);
-    }
-
-    .mode-button:active,
-    .modal-action:active,
-    .close-button:active,
-    .discord-pill:active {
-      transform: translateY(0) scale(0.98);
-    }
-
-    .mode-button:focus-visible,
-    .discord-pill:focus-visible,
-    .modal-action:focus-visible,
-    .close-button:focus-visible {
-      outline: 2px solid #8bb7ff;
-      outline-offset: 2px;
-    }
-
-    .mode-button .card-title-row,
-    .title-cluster,
-    .card-meta {
-      display: flex;
-      align-items: center;
-    }
-
-    .mode-button .card-title-row {
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .title-cluster {
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .card-icon {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.6);
-      box-shadow: 0 0 0 4px rgba(255,255,255,0.05), 0 0 12px currentColor;
-      flex: none;
-      background: currentColor;
-    }
-
-    .mode-button .tag {
-      flex: none;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      padding: 4px 8px;
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #c7d6e8;
-      background: rgba(255,255,255,0.05);
-    }
-
-    .mode-button.aincrad { color: #73c9ff; }
-    .mode-button.underworld { color: #8fd6ae; }
-    .mode-button.ggo { color: #ffc079; }
-
-    .mode-button.aincrad::after { background: rgba(115, 201, 255, 0.26); }
-    .mode-button.underworld::after { background: rgba(143, 214, 174, 0.24); }
-    .mode-button.ggo::after { background: rgba(255, 192, 121, 0.24); }
-
-    .card-title { font-size: 1.08rem; color: var(--text); }
-    .card-desc {
-      margin: 0;
-      font-size: 0.93rem;
-      line-height: 1.55;
-      max-width: 35ch;
-    }
-
-    .card-meta {
-      margin-top: auto;
-      justify-content: space-between;
-      gap: 10px;
-      color: #d7e5f6;
-      font-size: 0.76rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      opacity: 0.92;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .meta-arrow { font-size: 0.92rem; color: inherit; }
 
     .toast {
       position: fixed;
-      bottom: 18px;
       left: 50%;
-      transform: translateX(-50%) translateY(16px);
-      background: rgba(11, 16, 24, 0.96);
-      color: #e8f3ff;
-      border: 1px solid rgba(115, 201, 255, 0.5);
+      bottom: 18px;
+      z-index: 100;
+      max-width: calc(100vw - 32px);
+      padding: 10px 14px;
+      border: 1px solid rgba(115, 201, 255, 0.52);
       border-radius: 10px;
-      padding: 12px 14px;
+      background: rgba(9, 16, 27, 0.96);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34), 0 0 16px rgba(74, 164, 255, 0.12);
+      color: #e8f3ff;
+      font-size: 0.86rem;
       font-weight: 700;
+      line-height: 1.3;
+      text-align: center;
       opacity: 0;
+      visibility: hidden;
       pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      z-index: 10;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+      transform: translate(-50%, 12px);
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s step-end;
     }
 
     .toast.show {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      visibility: visible;
+      transform: translate(-50%, 0);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .modal-action {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-separator {
+      color: #73b9ff;
+      flex: none;
     }
 
     @media (max-width: 640px) {
-      .shell { padding: 18px; }
-      .topbar-strip { flex-direction: column; align-items: flex-start; }
-      .grid { grid-template-columns: 1fr; }
-      .mode-button { min-height: auto; }
+      .shell {
+        padding: 22px 18px 20px;
+      }
+
+      .topbar-strip {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .title-wrap {
+        text-align: center;
+        margin: 0 auto;
+      }
+
+      .subtitle {
+        margin: 7px auto 0;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mode-button {
+        min-height: 146.2px;
+      }
+
+      .home-disclaimer {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-height: 700px) {
       body {
-        place-items: start center;
-        padding: 12px;
+        align-items: flex-start;
+        padding: 18px 12px;
       }
 
       .page-stack {
-        width: min(1040px, 100%);
+        width: min(920px, 100%);
+        margin-top: 24px;
       }
 
       .shell {
-        padding: 16px;
-      }
-
-      .home-disclaimer {
-        margin-top: 12px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-
-      .mode-button:hover,
-      .modal-action:hover,
-      .close-button:hover,
-      .discord-pill:hover {
-        transform: none;
+        padding: 18px 18px 16px;
       }
     }
   </style>
@@ -520,18 +841,16 @@
     <main class="shell">
       <header class="topbar">
         <div class="topbar-strip">
-          <div class="eyebrow" data-i18n="page.index.eyebrow">Module Hub</div>
-          <button class="discord-pill" id="discord-button" type="button" data-i18n-aria-label="page.index.discordButtonAria" aria-label="Open Discord shortcuts">
-            <svg class="discord-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
-            </svg>
-            <span data-i18n="page.index.discordButton">Discord</span>
+          <div class="eyebrow" data-i18n="page.index.eyebrow">SAO MC / WORLD HUB</div>
+          <button class="discord-pill" id="discord-button" type="button" data-i18n-aria-label="page.index.discordButtonAria" aria-label="Open links">
+            <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span data-i18n="page.index.discordButton">Links</span>
           </button>
         </div>
 
         <div class="title-wrap">
-          <h1 data-i18n="page.index.heading">Select SAO MC Gamemode</h1>
-          <p class="subtitle" data-i18n="page.index.subtitle">Choose which gamemode info you want to view.</p>
+          <h1 data-walkthrough="welcome-heading" data-i18n="page.index.heading">Select Your World</h1>
+          <p class="subtitle" data-i18n="page.index.subtitle">Choose a world to continue.</p>
         </div>
       </header>
 
@@ -541,14 +860,13 @@
         Please keep in mind that this project was not originally designed to be a fully public resource, so some information may be incomplete, missing, or tailored toward my own use and my guild's needs.
       </div>
 
-      <section class="grid" data-i18n-aria-label="page.index.selectorAria" aria-label="Gamemode selector">
+      <section class="grid" data-walkthrough="world-selector" data-i18n-aria-label="page.index.selectorAria" aria-label="Gamemode selector">
         <button class="mode-button aincrad" type="button" data-href="Aincrad/Map/maps.html">
           <div class="card-title-row">
             <div class="title-cluster">
               <span class="card-icon" aria-hidden="true"></span>
               <h2 class="card-title" data-i18n="page.index.aincradTitle">Aincrad</h2>
             </div>
-            <span class="tag" data-i18n="page.index.launchTag">Launch</span>
           </div>
           <p class="card-desc" data-i18n="page.index.aincradDesc">Open the map hub to browse the dungeon guide, quests, bestiary, and more.</p>
           <div class="card-meta"><span data-i18n="page.index.interactiveMode">Interactive mode</span><span class="meta-arrow">→</span></div>
@@ -560,7 +878,6 @@
               <span class="card-icon" aria-hidden="true"></span>
               <h2 class="card-title" data-i18n="page.index.underworldTitle">Fractured Underworld</h2>
             </div>
-            <span class="tag" data-i18n="page.index.launchTag">Launch</span>
           </div>
           <p class="card-desc" data-i18n="page.index.underworldDesc">Open the Fractured Underworld map hub to start building and testing this module.</p>
           <div class="card-meta"><span data-i18n="page.index.interactiveMode">Interactive mode</span><span class="meta-arrow">→</span></div>
@@ -578,27 +895,45 @@
           <div class="card-meta"><span data-i18n="page.index.notReleasedTag">Not released</span><span class="meta-arrow">→</span></div>
         </button>
       </section>
-    </main>
 
-    <footer class="page-footer">
-      <div class="guild-badge" data-i18n-aria-label="page.index.guildAria" aria-label="Guild tribute">
-        <span data-i18n="page.index.guildLabel">Guild:</span>
-        <strong data-i18n="page.index.guildName">Vanguard of War</strong>
-      </div>
-    </footer>
+      <footer class="page-footer">
+        <div class="guild-badge" data-i18n-aria-label="page.index.guildAria" aria-label="Guild tribute">
+          <span data-i18n="page.index.guildLabel">Guild:</span>
+          <strong data-i18n="page.index.guildName">Vanguard of War</strong>
+        </div>
+      </footer>
+    </main>
   </div>
+
+  <button class="character-build-float" id="characterBuildButton" data-walkthrough="character-build-launch" type="button" data-href="Aincrad/Character%20Build/character-build.html" data-i18n-aria-label="ui.walkthrough.characterBuildTitle" aria-label="Open Character Build">
+    <span class="character-build-float-icon" aria-hidden="true"><img src="Aincrad/Character%20Build/Character%20Build.png" alt=""></span>
+    <span data-i18n="ui.walkthrough.characterBuildTitle">Character Build</span>
+  </button>
+
+  <aside class="welcome-language-hint" data-i18n-aria-label="ui.settings.languageHintAria" aria-label="Language settings hint">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 7H2M2 7l4-4M2 7l4 4"/>
+    </svg>
+    <span class="welcome-language-hint-text">
+      <span>Change Language Here!</span>
+      <span class="welcome-language-hint-separator" aria-hidden="true"></span>
+      <span>Changez de langue ici !</span>
+      <span class="welcome-language-hint-separator" aria-hidden="true"></span>
+      <span>¡Cambia el idioma aquí!</span>
+    </span>
+  </aside>
 
   <div id="discord-overlay" class="overlay" aria-hidden="true">
     <div class="discord-modal" role="dialog" aria-modal="true" aria-labelledby="discord-modal-title">
       <div class="modal-header">
-        <h2 class="modal-title" id="discord-modal-title" data-i18n="page.index.discordModalTitle">Discord shortcuts</h2>
-        <button class="close-button" id="close-discord-modal" type="button" data-i18n-aria-label="page.index.discordModalCloseAria" aria-label="Close Discord menu">×</button>
+        <h2 class="modal-title" id="discord-modal-title" data-i18n="page.index.discordModalTitle">Links</h2>
+        <button class="close-button" id="close-discord-modal" type="button" data-i18n-aria-label="page.index.discordModalCloseAria" aria-label="Close links menu">×</button>
       </div>
       <p class="modal-copy" data-i18n="page.index.discordModalBody">Choose where you'd like to go next.</p>
       <div class="modal-actions">
-        <a class="modal-action" href="https://discord.com/users/1153048336258048170" target="_blank" rel="noopener noreferrer" data-i18n="page.index.creatorDiscord">Website Creator Discord</a>
-        <a class="modal-action" href="https://discord.gg/saominecraft" target="_blank" rel="noopener noreferrer" data-i18n="page.index.saoDiscord">SAO MC Discord</a>
-        <a class="modal-action" href="https://discord.gg/zj53AKmvdE" target="_blank" rel="noopener noreferrer" data-i18n="page.index.supportDiscord">SAO MC Support Discord</a>
+        <a class="modal-action" href="https://discord.com/users/1153048336258048170" target="_blank" rel="noopener noreferrer"><svg class="discord-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg><span class="modal-separator" aria-hidden="true">•</span><span data-i18n="page.index.creatorDiscord">Website Creator Discord</span></a>
+        <a class="modal-action" href="https://discord.gg/saominecraft" target="_blank" rel="noopener noreferrer"><svg class="discord-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg><span class="modal-separator" aria-hidden="true">•</span><span data-i18n="page.index.saoDiscord">SAO MC Discord</span></a>
+        <a class="modal-action" href="https://support.triggersstudio.com" target="_blank" rel="noopener noreferrer"><svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span class="modal-separator" aria-hidden="true">•</span><span data-i18n="page.index.supportWebsite">SAO MC Support Website</span></a>
       </div>
     </div>
   </div>
@@ -607,6 +942,8 @@
 
   <script src="shared/sao-storage.js"></script>
   <script src="shared/sao-i18n.js"></script>
+  <script src="shared/sao-content-translations.js"></script>
+  <script src="shared/sao-walkthrough.js"></script>
 
   <script>
     (() => {
@@ -616,6 +953,7 @@
       const overlay = document.getElementById("discord-overlay");
       const closeButton = document.getElementById("close-discord-modal");
       const ggoButton = document.getElementById("ggoButton");
+      const characterBuildButton = document.getElementById("characterBuildButton");
       const toast = document.getElementById("status-toast");
       let timerId = null;
       let lastFocusedElement = null;
@@ -786,7 +1124,7 @@
         document.head.appendChild(style);
       };
 
-      const buildWalkthroughSteps = () => ([
+      const legacyBuildWalkthroughSteps = () => ([
         {
           selector: ".topbar",
           titleKey: "ui.walkthrough.welcomeTitle",
@@ -809,7 +1147,7 @@
         }
       ]);
 
-      const startGuidedWalkthrough = (options = {}) => {
+      const legacyStartGuidedWalkthrough = (options = {}) => {
         const force = !!options.force;
         const alreadyCompleted = window.SAOStorage?.getItem(walkthroughStorageKey) === "1";
         if (alreadyCompleted && !force) return;
@@ -988,6 +1326,49 @@
         renderStep();
       };
 
+      const buildWalkthroughSteps = () => ([
+        {
+          selector: "[data-walkthrough='welcome-heading']",
+          title: i18n?.t("ui.walkthrough.welcomeTitle"),
+          body: i18n?.t("ui.walkthrough.welcomeBody")
+        },
+        {
+          selector: "[data-walkthrough='world-selector']",
+          title: i18n?.t("ui.walkthrough.modeCardsTitle"),
+          body: i18n?.t("ui.walkthrough.modeCardsBody")
+        },
+        {
+          selector: "#discord-button",
+          title: i18n?.t("ui.walkthrough.discordTitle"),
+          body: i18n?.t("ui.walkthrough.discordBody")
+        },
+        {
+          selector: "[data-walkthrough='character-build-launch']",
+          title: i18n?.t("ui.walkthrough.characterBuildTitle"),
+          body: i18n?.t("ui.walkthrough.characterBuildBody")
+        },
+        {
+          selector: "#sao-settings-anchor .sao-settings-trigger",
+          title: i18n?.t("ui.walkthrough.settingsTitle"),
+          body: i18n?.t("ui.walkthrough.settingsBody")
+        }
+      ]);
+      const walkthroughController = window.createWalkthroughController({
+        document,
+        window,
+        storage: window.SAOStorage,
+        storageKey: walkthroughStorageKey,
+        getSteps: buildWalkthroughSteps,
+        translate: (key, params) => i18n?.t(key, params) || key,
+        getTarget: selector => {
+          if (selector.includes("sao-settings-anchor")) {
+            i18n?.mountSettingsMenu?.();
+          }
+          return document.querySelector(selector);
+        }
+      });
+      const startGuidedWalkthrough = (options = {}) => walkthroughController.start(options);
+
       grid?.addEventListener("click", (event) => {
         const button = event.target.closest("button[data-href]");
         if (button) {
@@ -999,6 +1380,10 @@
         if (lockedButton) {
           showToast(lockedButton.dataset.message);
         }
+      });
+
+      characterBuildButton?.addEventListener("click", () => {
+        window.location.assign(characterBuildButton.dataset.href);
       });
 
       discordButton?.addEventListener("click", () => {
@@ -1019,8 +1404,19 @@
         }
       });
 
+      const syncLanguageHint = () => {
+        const hint = document.querySelector(".welcome-language-hint");
+        const settingsTrigger = document.querySelector("#sao-settings-anchor .sao-settings-trigger");
+        if (!hint || !settingsTrigger) return;
+        const gearRect = settingsTrigger.getBoundingClientRect();
+        const hintRect = hint.getBoundingClientRect();
+        hint.style.top = `${gearRect.top + (gearRect.height - hintRect.height) / 2}px`;
+      };
+
       if (i18n) {
         i18n.mountSettingsMenu();
+        syncLanguageHint();
+        window.addEventListener("resize", syncLanguageHint);
         syncLocalizedRuntime();
         document.addEventListener("sao:languagechange", syncLocalizedRuntime);
 

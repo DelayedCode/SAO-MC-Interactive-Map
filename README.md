@@ -16,7 +16,7 @@ Static fan-made SAO MC reference website hosted on GitHub Pages.
 - `Fractured Underworld/`: Underworld pages (Main UI map and Tower Defense).
 - `shared/`: Cross-page runtime utilities (`sao-storage.js`, `sao-i18n.js`, `sao-runtime-utils.js`).
 - `assets/`: Shared SEO/social assets (icons and preview image).
-- `scripts/`: Maintenance scripts (currently sitemap generation).
+- `scripts/`: Project tooling, including sitemap generation, localization validation, and regression tests.
 
 ## Runtime Conventions
 
@@ -45,6 +45,36 @@ Optional base URL override:
 ```powershell
 ./scripts/generate-sitemap.ps1 -BaseUrl "https://example.com"
 ```
+
+## Checking Localization Coverage
+
+Run the content inventory and translation coverage diagnostic from the workspace root:
+
+```powershell
+node ./scripts/check-localization.js
+```
+
+Add `--verbose` to print the complete missing-key lists.
+
+## Checking Persistence Behavior
+
+Run the persistence regression guard from the workspace root:
+
+```powershell
+node ./scripts/test-persistence.js
+```
+
+The test locks in the current browser storage fallback order, compatibility keys, and persisted quest/marker behavior without changing any runtime storage logic.
+
+## Checking Coordinate Behavior
+
+Run the protected map coordinate regression test from the workspace root:
+
+```powershell
+node ./scripts/test-coordinates.js
+```
+
+The test evaluates the existing coordinate implementation, loads the real map datasets and PNG dimensions, and checks raw/game round trips plus representative marker and waypoint coordinates.
 
 ## Extension Guidelines
 

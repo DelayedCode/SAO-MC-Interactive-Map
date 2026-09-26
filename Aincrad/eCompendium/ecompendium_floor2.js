@@ -69,6 +69,8 @@ window.FLOOR_2_DATA = {
                 }
             ],
             "stats": {
+                "Defense": "2.9",
+                "Health": "24.99",
                 "Class": "Warrior"
             }
         },
@@ -166,6 +168,8 @@ window.FLOOR_2_DATA = {
                 }
             ],
             "stats": {
+                "Damage": "38",
+                "Attack Speed": "1.5",
                 "Class": "Assassin"
             }
         },
@@ -306,6 +310,8 @@ window.FLOOR_2_DATA = {
                 }
             ],
             "stats": {
+                "Damage": "19",
+                "Attack Speed": "1.2",
                 "Class": "Archer"
             }
         },
@@ -351,6 +357,8 @@ window.FLOOR_2_DATA = {
                 }
             ],
             "stats": {
+                "Defense": "4",
+                "Health": "34.29",
                 "Class": "Warrior"
             }
         },
@@ -454,6 +462,8 @@ window.FLOOR_2_DATA = {
                 }
             ],
             "stats": {
+                "Damage": "43.99",
+                "Attack Speed": "1.5",
                 "Class": "Assassin"
             }
         },
@@ -505,6 +515,8 @@ window.FLOOR_2_DATA = {
                 }
             ],
             "stats": {
+                "Damage": "22",
+                "Attack Speed": "1.3",
                 "Class": "Archer"
             }
         },
@@ -788,8 +800,13 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
-                "Class": "Assassin"
+            "stats":                                     {
+                "Class": "Assassin",
+                "Defense": "3.4",
+                "Health": "38.99",
+                "2 Piece Set Bonus": "+15% Critical Hit Damage, +5% Critical Hit Chance",
+                "3 Piece Set Bonus": "+0.5% Movement Speed",
+                "4 Piece Set Bonus": "+8 Damage"
             }
         },
         {
@@ -813,9 +830,14 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Assassin",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "4.7",
+                "Health": "42",
+                "2 Piece Set Bonus": "+15% Critical Hit Damage, +5% Critical Hit Chance",
+                "3 Piece Set Bonus": "+0.5% Movement Speed",
+                "4 Piece Set Bonus": "+8 Damage"
             }
         },
         {
@@ -839,8 +861,13 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
-                "Class": "Assassin"
+            "stats":                                     {
+                "Class": "Assassin",
+                "Defense": "3.6",
+                "Health": "31",
+                "2 Piece Set Bonus": "+15% Critical Hit Damage, +5% Critical Hit Chance",
+                "3 Piece Set Bonus": "+0.5% Movement Speed",
+                "4 Piece Set Bonus": "+8 Damage"
             }
         },
         {
@@ -864,8 +891,13 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
-                "Class": "Assassin"
+            "stats":                                     {
+                "Class": "Assassin",
+                "Defense": "3.7",
+                "Health": "31.06",
+                "2 Piece Set Bonus": "+15% Critical Hit Damage, +5% Critical Hit Chance",
+                "3 Piece Set Bonus": "+0.5% Movement Speed",
+                "4 Piece Set Bonus": "+8 Damage"
             }
         },
         {
@@ -873,7 +905,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Imbued with the crystallized essence of bees, this armor protects the mage while channeling his magical energy.",
-            "set": "Magic Bee Set",
+            "set": "Magical Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -889,8 +921,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Mage"
+            "stats":                                     {
+                "Class": "Mage",
+                "Defense": "3.2",
+                "Health": "27",
+                "2 Piece Set Bonus": "+30 Mana, +2.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+6 Hatred",
+                "4 Piece Set Bonus": "+6 Magic Damage"
             }
         },
         {
@@ -898,7 +935,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Imbued with the crystallized essence of bees, this armor protects the mage while channeling his magical energy.",
-            "set": "Magic Bee Set",
+            "set": "Magical Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -914,9 +951,14 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Mage",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "4.5",
+                "Health": "40",
+                "2 Piece Set Bonus": "+30 Mana, +2.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+6 Hatred",
+                "4 Piece Set Bonus": "+6 Magic Damage"
             }
         },
         {
@@ -924,7 +966,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Imbued with the crystallized essence of bees, this armor protects the mage while channeling his magical energy.",
-            "set": "Magic Bee Set",
+            "set": "Magical Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -940,8 +982,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Mage"
+            "stats":                                     {
+                "Class": "Mage",
+                "Defense": "3.5",
+                "Health": "31",
+                "2 Piece Set Bonus": "+30 Mana, +2.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+6 Hatred",
+                "4 Piece Set Bonus": "+6 Magic Damage"
             }
         },
         {
@@ -949,7 +996,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Imbued with the crystallized essence of bees, this armor protects the mage while channeling his magical energy.",
-            "set": "Magic Bee Set",
+            "set": "Magical Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -965,8 +1012,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Mage"
+            "stats":                                     {
+                "Class": "Mage",
+                "Defense": "3.5",
+                "Health": "29.99",
+                "2 Piece Set Bonus": "+30 Mana, +2.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+6 Hatred",
+                "4 Piece Set Bonus": "+6 Magic Damage"
             }
         },
         {
@@ -974,7 +1026,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Forged from shells, this armor provides strength and protection.",
-            "set": "Bee Warrior Set",
+            "set": "Warrior Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -990,8 +1042,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Warrior"
+            "stats":                                     {
+                "Class": "Warrior",
+                "Defense": "2.5",
+                "Health": "38.99",
+                "2 Piece Set Bonus": "+5 Stamina, +0.1 Stamina Regen",
+                "3 Piece Set Bonus": "+5.5% Damage Reduction",
+                "4 Piece Set Bonus": "+10 Health, +4 Defense"
             }
         },
         {
@@ -999,7 +1056,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Forged from shells, this armor provides strength and protection.",
-            "set": "Bee Warrior Set",
+            "set": "Warrior Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1015,9 +1072,14 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Warrior",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "5",
+                "Health": "49.99",
+                "2 Piece Set Bonus": "+5 Stamina, +0.1 Stamina Regen",
+                "3 Piece Set Bonus": "+5.5% Damage Reduction",
+                "4 Piece Set Bonus": "+10 Health, +4 Defense"
             }
         },
         {
@@ -1025,7 +1087,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Forged from shells, this armor provides strength and protection.",
-            "set": "Bee Warrior Set",
+            "set": "Warrior Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1041,8 +1103,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Warrior"
+            "stats":                                     {
+                "Class": "Warrior",
+                "Defense": "3.5",
+                "Health": "41",
+                "2 Piece Set Bonus": "+5 Stamina, +0.1 Stamina Regen",
+                "3 Piece Set Bonus": "+5.5% Damage Reduction",
+                "4 Piece Set Bonus": "+10 Health, +4 Defense"
             }
         },
         {
@@ -1050,7 +1117,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Forged from shells, this armor provides strength and protection.",
-            "set": "Bee Warrior Set",
+            "set": "Warrior Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1066,8 +1133,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Warrior"
+            "stats":                                     {
+                "Class": "Warrior",
+                "Defense": "3.9",
+                "Health": "45",
+                "2 Piece Set Bonus": "+5 Stamina, +0.1 Stamina Regen",
+                "3 Piece Set Bonus": "+5.5% Damage Reduction",
+                "4 Piece Set Bonus": "+10 Health, +4 Defense"
             }
         },
         {
@@ -1075,7 +1147,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Light and flexible, this bee-inspired armor allows speed and precision, ideal for hunters.",
-            "set": "Mystical Bee Set",
+            "set": "Hunter Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1091,9 +1163,14 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Archer",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "4.5",
+                "Health": "40",
+                "2 Piece Set Bonus": "+15% Critical Hit Chance, +5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.75% Movement Speed",
+                "4 Piece Set Bonus": "+7 Damage"
             }
         },
         {
@@ -1101,7 +1178,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Light and flexible, this bee-inspired armor allows speed and precision, ideal for hunters.",
-            "set": "Mystical Bee Set",
+            "set": "Hunter Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1117,8 +1194,13 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
-                "Class": "Archer"
+            "stats":                                     {
+                "Class": "Archer",
+                "Defense": "3.5",
+                "Health": "31",
+                "2 Piece Set Bonus": "+15% Critical Hit Chance, +5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.75% Movement Speed",
+                "4 Piece Set Bonus": "+7 Damage"
             }
         },
         {
@@ -1126,7 +1208,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Light and flexible, this bee-inspired armor allows speed and precision, ideal for hunters.",
-            "set": "Mystical Bee Set",
+            "set": "Hunter Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1142,8 +1224,13 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
-                "Class": "Archer"
+            "stats":                                     {
+                "Class": "Archer",
+                "Defense": "3.5",
+                "Health": "29.99",
+                "2 Piece Set Bonus": "+15% Critical Hit Chance, +5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.75% Movement Speed",
+                "4 Piece Set Bonus": "+7 Damage"
             }
         },
         {
@@ -1151,7 +1238,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Light and flexible, this bee-inspired armor allows speed and precision, ideal for hunters.",
-            "set": "Mystical Bee Set",
+            "set": "Hunter Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1167,8 +1254,13 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
-                "Class": "Archer"
+            "stats":                                     {
+                "Class": "Archer",
+                "Defense": "3.2",
+                "Health": "27",
+                "2 Piece Set Bonus": "+15% Critical Hit Chance, +5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.75% Movement Speed",
+                "4 Piece Set Bonus": "+7 Damage"
             }
         },
         {
@@ -1176,7 +1268,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Infused with the magical essence of bees, this armor protects the mage while channeling their mystical energy.",
-            "set": "Wonderful Bee Set",
+            "set": "Mysticized Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1192,8 +1284,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Shaman"
+            "stats":                                     {
+                "Class": "Shaman",
+                "Defense": "3.2",
+                "Health": "27",
+                "2 Piece Set Bonus": "+30 Mana, +0.1 Mana Regen",
+                "3 Piece Set Bonus": "+6.5 Hatred",
+                "4 Piece Set Bonus": "+2 Healing Bonus"
             }
         },
         {
@@ -1201,7 +1298,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Infused with the magical essence of bees, this armor protects the mage while channeling their mystical energy.",
-            "set": "Wonderful Bee Set",
+            "set": "Mysticized Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1217,9 +1314,14 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Shaman",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "4.5",
+                "Health": "40",
+                "2 Piece Set Bonus": "+30 Mana, +0.1 Mana Regen",
+                "3 Piece Set Bonus": "+6.5 Hatred",
+                "4 Piece Set Bonus": "+2 Healing Bonus"
             }
         },
         {
@@ -1227,7 +1329,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Infused with the magical essence of bees, this armor protects the mage while channeling their mystical energy.",
-            "set": "Wonderful Bee Set",
+            "set": "Mysticized Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1243,8 +1345,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Shaman"
+            "stats":                                     {
+                "Class": "Shaman",
+                "Defense": "3.5",
+                "Health": "31",
+                "2 Piece Set Bonus": "+30 Mana, +0.1 Mana Regen",
+                "3 Piece Set Bonus": "+6.5 Hatred",
+                "4 Piece Set Bonus": "+2 Healing Bonus"
             }
         },
         {
@@ -1252,7 +1359,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Rare",
             "level": 11,
             "description": "Infused with the magical essence of bees, this armor protects the mage while channeling their mystical energy.",
-            "set": "Wonderful Bee Set",
+            "set": "Mysticized Bee Set",
             "craftingLocation": "the Armorsmith in the Sweet Forest",
             "craftingResources": [
                 {
@@ -1268,8 +1375,13 @@ window.FLOOR_2_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
-                "Class": "Shaman"
+            "stats":                                     {
+                "Class": "Shaman",
+                "Defense": "3.5",
+                "Health": "29.99",
+                "2 Piece Set Bonus": "+30 Mana, +0.1 Mana Regen",
+                "3 Piece Set Bonus": "+6.5 Hatred",
+                "4 Piece Set Bonus": "+2 Healing Bonus"
             }
         },
         {
@@ -1277,7 +1389,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Mystical Necromancer Set",
+            "set": "Necromancer Archer Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1297,9 +1409,14 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Archer",
-                "Rune Slots": 2
+                "Rune Slots": 2,
+                "Defense": "5.06",
+                "Health": "44",
+                "2 Piece Set Bonus": "+20% Critical Hit Chance, +10% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.85% Movement Speed",
+                "4 Piece Set Bonus": "+8 Damage"
             }
         },
         {
@@ -1307,7 +1424,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Fierce Necromancer Set",
+            "set": "Necromancer Assassin Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1327,9 +1444,14 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Assassin",
-                "Rune Slots": 2
+                "Rune Slots": 2,
+                "Defense": "4.5",
+                "Health": "41.15",
+                "2 Piece Set Bonus": "+10% Critical Hit Chance, +20% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.6% Movement Speed",
+                "4 Piece Set Bonus": "+10 Damage"
             }
         },
         {
@@ -1337,7 +1459,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Fierce Necromancer Set",
+            "set": "Necromancer Assassin Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1357,8 +1479,13 @@ window.FLOOR_2_DATA = {
                     "amount": 12
                 }
             ],
-            "stats": {
-                "Class": "Assassin"
+            "stats":                                     {
+                "Class": "Assassin",
+                "Defense": "4.2",
+                "Health": "37.2",
+                "2 Piece Set Bonus": "+10% Critical Hit Chance, +20% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.6% Movement Speed",
+                "4 Piece Set Bonus": "+10 Damage"
             }
         },
         {
@@ -1396,7 +1523,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Wild Necromancer Set",
+            "set": "Necromancer Shaman Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1416,8 +1543,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Shaman"
+            "stats":                                     {
+                "Class": "Shaman",
+                "Defense": "3.6",
+                "Health": "31",
+                "2 Piece Set Bonus": "+35 Mana, +0.2 Mana Regen",
+                "3 Piece Set Bonus": "+8 Hatred",
+                "4 Piece Set Bonus": "+3 Healing Bonus"
             }
         },
         {
@@ -1425,7 +1557,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Fierce Necromancer Set",
+            "set": "Necromancer Assassin Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1445,8 +1577,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Assassin"
+            "stats":                                     {
+                "Class": "Assassin",
+                "Defense": "4",
+                "Health": "37",
+                "2 Piece Set Bonus": "+10% Critical Hit Chance, +20% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.6% Movement Speed",
+                "4 Piece Set Bonus": "+10 Damage"
             }
         },
         {
@@ -1454,7 +1591,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Magical Necromancer Set",
+            "set": "Necromancer Mage Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1474,8 +1611,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Mage"
+            "stats":                                     {
+                "Class": "Mage",
+                "Defense": "3.6",
+                "Health": "31",
+                "2 Piece Set Bonus": "+35 Mana, +3.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+7 Hatred",
+                "4 Piece Set Bonus": "+7 Magic Damage"
             }
         },
         {
@@ -1483,7 +1625,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Magical Necromancer Set",
+            "set": "Necromancer Mage Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1503,9 +1645,14 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Mage",
-                "Rune Slots": 2
+                "Rune Slots": 2,
+                "Defense": "5.06",
+                "Health": "44",
+                "2 Piece Set Bonus": "+35 Mana, +3.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+7 Hatred",
+                "4 Piece Set Bonus": "+7 Magic Damage"
             }
         },
         {
@@ -1513,7 +1660,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Magical Necromancer Set",
+            "set": "Necromancer Mage Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1533,8 +1680,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Mage"
+            "stats":                                     {
+                "Class": "Mage",
+                "Defense": "3.37",
+                "Health": "32",
+                "2 Piece Set Bonus": "+35 Mana, +3.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+7 Hatred",
+                "4 Piece Set Bonus": "+7 Magic Damage"
             }
         },
         {
@@ -1542,7 +1694,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Magical Necromancer Set",
+            "set": "Necromancer Mage Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1562,8 +1714,13 @@ window.FLOOR_2_DATA = {
                     "amount": 12
                 }
             ],
-            "stats": {
-                "Class": "Mage"
+            "stats":                                     {
+                "Class": "Mage",
+                "Defense": "3.9",
+                "Health": "34",
+                "2 Piece Set Bonus": "+35 Mana, +3.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+7 Hatred",
+                "4 Piece Set Bonus": "+7 Magic Damage"
             }
         },
         {
@@ -1571,7 +1728,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Mystical Necromancer Set",
+            "set": "Necromancer Archer Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1591,8 +1748,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Archer"
+            "stats":                                     {
+                "Class": "Archer",
+                "Defense": "3.6",
+                "Health": "31",
+                "2 Piece Set Bonus": "+20% Critical Hit Chance, +10% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.85% Movement Speed",
+                "4 Piece Set Bonus": "+8 Damage"
             }
         },
         {
@@ -1600,7 +1762,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Mystical Necromancer Set",
+            "set": "Necromancer Archer Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1620,8 +1782,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Archer"
+            "stats":                                     {
+                "Class": "Archer",
+                "Defense": "3.37",
+                "Health": "32",
+                "2 Piece Set Bonus": "+20% Critical Hit Chance, +10% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.85% Movement Speed",
+                "4 Piece Set Bonus": "+8 Damage"
             }
         },
         {
@@ -1629,7 +1796,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Mystical Necromancer Set",
+            "set": "Necromancer Archer Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1649,8 +1816,13 @@ window.FLOOR_2_DATA = {
                     "amount": 12
                 }
             ],
-            "stats": {
-                "Class": "Archer"
+            "stats":                                     {
+                "Class": "Archer",
+                "Defense": "3.9",
+                "Health": "34",
+                "2 Piece Set Bonus": "+20% Critical Hit Chance, +10% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.85% Movement Speed",
+                "4 Piece Set Bonus": "+8 Damage"
             }
         },
         {
@@ -1658,7 +1830,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Wild Necromancer Set",
+            "set": "Necromancer Shaman Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1678,8 +1850,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Shaman"
+            "stats":                                     {
+                "Class": "Shaman",
+                "Defense": "3.37",
+                "Health": "32",
+                "2 Piece Set Bonus": "+35 Mana, +0.2 Mana Regen",
+                "3 Piece Set Bonus": "+8 Hatred",
+                "4 Piece Set Bonus": "+3 Healing Bonus"
             }
         },
         {
@@ -1707,8 +1884,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Warrior"
+            "stats":                                     {
+                "Class": "Warrior",
+                "Defense": "3.5",
+                "Health": "46.99",
+                "2 Piece Set Bonus": "+6 Stamina, +0.2 Stamina Regen",
+                "3 Piece Set Bonus": "+6% Damage Reduction",
+                "4 Piece Set Bonus": "+20 Health, +5.5 Defense"
             }
         },
         {
@@ -1736,9 +1918,14 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Warrior",
-                "Rune Slots": 2
+                "Rune Slots": 2,
+                "Defense": "7",
+                "Health": "57",
+                "2 Piece Set Bonus": "+6 Stamina, +0.2 Stamina Regen",
+                "3 Piece Set Bonus": "+6% Damage Reduction",
+                "4 Piece Set Bonus": "+20 Health, +5.5 Defense"
             }
         },
         {
@@ -1766,8 +1953,13 @@ window.FLOOR_2_DATA = {
                     "amount": 12
                 }
             ],
-            "stats": {
-                "Class": "Warrior"
+            "stats":                                     {
+                "Class": "Warrior",
+                "Defense": "5",
+                "Health": "51.98",
+                "2 Piece Set Bonus": "+6 Stamina, +0.2 Stamina Regen",
+                "3 Piece Set Bonus": "+6% Damage Reduction",
+                "4 Piece Set Bonus": "+20 Health, +5.5 Defense"
             }
         },
         {
@@ -1775,7 +1967,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Wild Necromancer Set",
+            "set": "Necromancer Shaman Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1795,9 +1987,14 @@ window.FLOOR_2_DATA = {
                     "amount": 16
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Class": "Shaman",
-                "Rune Slots": 2
+                "Rune Slots": 2,
+                "Defense": "5.06",
+                "Health": "44",
+                "2 Piece Set Bonus": "+35 Mana, +0.2 Mana Regen",
+                "3 Piece Set Bonus": "+8 Hatred",
+                "4 Piece Set Bonus": "+3 Healing Bonus"
             }
         },
         {
@@ -1805,7 +2002,7 @@ window.FLOOR_2_DATA = {
             "rarity": "Epic",
             "level": 13,
             "description": "Forged from bone and dark magic, this armor grants strength and protection.",
-            "set": "Wild Necromancer Set",
+            "set": "Necromancer Shaman Set",
             "craftingLocation": "the Armorsmith outside the Necromancer's Tomb Dungeon",
             "craftingResources": [
                 {
@@ -1825,8 +2022,13 @@ window.FLOOR_2_DATA = {
                     "amount": 12
                 }
             ],
-            "stats": {
-                "Class": "Shaman"
+            "stats":                                     {
+                "Class": "Shaman",
+                "Defense": "3.9",
+                "Health": "34",
+                "2 Piece Set Bonus": "+35 Mana, +0.2 Mana Regen",
+                "3 Piece Set Bonus": "+8 Hatred",
+                "4 Piece Set Bonus": "+3 Healing Bonus"
             }
         },
         {
@@ -1854,8 +2056,13 @@ window.FLOOR_2_DATA = {
                     "amount": 8
                 }
             ],
-            "stats": {
-                "Class": "Warrior"
+            "stats":                                     {
+                "Class": "Warrior",
+                "Defense": "4.5",
+                "Health": "50",
+                "2 Piece Set Bonus": "+6 Stamina, +0.2 Stamina Regen",
+                "3 Piece Set Bonus": "+6% Damage Reduction",
+                "4 Piece Set Bonus": "+20 Health, +5.5 Defense"
             }
         },
         {
@@ -2936,7 +3143,13 @@ window.FLOOR_2_DATA = {
                 "Health": "10",
                 "Mana": "8",
                 "Mana Regeneration": "0.4/s",
-                "Requirement: Spirit": "2"
+                "Requirement: Spirit": "2",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -2978,7 +3191,13 @@ window.FLOOR_2_DATA = {
                 "Magic Damage": "2.5%",
                 "Physical Damage": "4%",
                 "Stamina": "4",
-                "Requirement: Vitality": "2"
+                "Requirement: Vitality": "2",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3048,7 +3267,13 @@ window.FLOOR_2_DATA = {
                 "Physical Damage": "4%",
                 "Defense": "3",
                 "Magic Damage": "3%",
-                "Requirement: Defense Car": "2"
+                "Requirement: Defense Car": "2",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3101,7 +3326,13 @@ window.FLOOR_2_DATA = {
                 "Critical Hit Chance": "6.5%",
                 "Attack Speed": "0.2",
                 "Omnivampirism": "2%",
-                "Requirement: Force": "2"
+                "Requirement: Force": "2",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3170,7 +3401,13 @@ window.FLOOR_2_DATA = {
                 "Blocking Mastery": "5%",
                 "Damage Reduction": "5%",
                 "Defense": "3",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3185,7 +3422,13 @@ window.FLOOR_2_DATA = {
                 "Skill Damage": "5%",
                 "Magic Damage": "3%",
                 "Critical Damage Skill": "5%",
-                "Mana": "5"
+                "Mana": "5",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3229,7 +3472,13 @@ window.FLOOR_2_DATA = {
                 "Stamina": "5",
                 "Physical Damage": "3%",
                 "Requirement: Dexterity": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3253,7 +3502,13 @@ window.FLOOR_2_DATA = {
                 "Haste": "5%",
                 "Movement Speed": "5%",
                 "Requirement: Defense Car": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3277,7 +3532,13 @@ window.FLOOR_2_DATA = {
                 "Health": "15",
                 "Attack Speed": "0.1",
                 "Requirement: Dexterity": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {

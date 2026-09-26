@@ -1,0 +1,27 @@
+{
+  "name": "sao-mc-interactive-map",
+  "version": "1.0.0",
+  "description": "Static fan-made SAO MC reference website hosted on GitHub Pages.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DelayedCode/SAO-MC-Interactive-Map.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/DelayedCode/SAO-MC-Interactive-Map/issues"
+  },
+  "homepage": "https://github.com/DelayedCode/SAO-MC-Interactive-Map#readme",
+  "dependencies": {
+    "playwright": "^1.63.0"
+  }
+}

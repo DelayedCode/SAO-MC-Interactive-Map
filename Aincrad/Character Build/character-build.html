@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="#0b121a">
+<title data-i18n="page.characterBuild.browserTitle">Character Build Mode | SAO MC Interactive Map</title>
+<meta name="description" data-i18n-content="page.characterBuild.metaDescription" content="Build and preview an Aincrad character with sample equipment and skills.">
+<link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
+<link rel="stylesheet" href="character-build.css">
+<link rel="stylesheet" href="../../shared/sao-dropdown.css">
+<script defer src="../../shared/sao-storage.js"></script>
+<script defer src="../../shared/sao-i18n.js"></script>
+<script defer src="../../shared/sao-content-translations.js"></script>
+<script defer src="../../shared/sao-runtime-utils.js"></script>
+<script defer src="../../shared/sao-dropdown.js"></script>
+<script defer src="../../shared/sao-walkthrough.js"></script>
+<script defer src="character-build-icons.js"></script>
+<script defer src="character-build-data.js"></script>
+<script defer src="character-build-adapter.js"></script>
+<script defer src="character-build-calculator.js"></script>
+<script defer src="character-build.js"></script>
+</head>
+<body>
+<main class="build-page">
+  <nav class="nav" data-i18n-aria-label="ui.nav.sectionAria" aria-label="Section navigation">
+    <button type="button" data-nav-target="menu"><span class="nav-icon" aria-hidden="true"><svg class="nav-icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6H2M2 6l4-4M2 6l4 4"/></svg></span><span data-i18n="page.characterBuild.navBack">Go back to Menu</span></button>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <p class="eyebrow" data-i18n="page.characterBuild.eyebrow">AINCRAD / BUILD LAB</p>
+      <h1 data-walkthrough="character-build-title" data-i18n="page.characterBuild.title">Character Build Mode</h1>
+      <p class="subtitle" data-i18n="page.characterBuild.subtitle">Assemble a loadout, review its combat stats, and explore prototype skill trees.</p>
+    </div>
+    <button class="reset-button" id="resetBuild" type="button"><span class="control-icon" data-cb-icon="reset" aria-hidden="true"></span><span data-i18n="page.characterBuild.resetBuild">Reset Build</span></button>
+  </header>
+
+  <section class="control-bar panel" data-i18n-aria-label="page.characterBuild.configuration" aria-label="Build configuration">
+    <div class="control-group source-control">
+      <span class="control-label" data-i18n="page.characterBuild.dataSource">Data source</span>
+      <div class="segmented-control" role="group" data-i18n-aria-label="page.characterBuild.dataSource" aria-label="Data source">
+        <button type="button" class="segment is-active" data-source="current"><span class="control-icon" data-cb-icon="current" aria-hidden="true"></span><span data-i18n="page.characterBuild.currentData">Current Data</span></button>
+        <button type="button" class="segment" data-source="beta"><span class="control-icon" data-cb-icon="beta" aria-hidden="true"></span><span data-i18n="page.characterBuild.betaData">Beta-Test Data</span></button>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="buildSlot"><span class="label-icon" data-cb-icon="saved" aria-hidden="true"></span><span data-i18n="page.characterBuild.buildSlot">Build slot</span></label>
+      <div class="sao-select-wrap">
+        <select id="buildSlot">
+          <option value="1"></option>
+          <option value="2"></option>
+          <option value="3"></option>
+        </select>
+        <span class="sao-select-arrow" aria-hidden="true"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path class="arrow-closed" d="M2 6.5 5 3.5l3 3"/><path class="arrow-open" d="M2 3.5 5 6.5l3-3"/></svg></span>
+      </div>
+    </div>
+    <div class="control-group level-control">
+      <label class="control-label" for="characterLevel"><span data-i18n="page.characterBuild.level">Level</span> <output id="levelValue">1</output></label>
+      <div class="level-range">
+        <span aria-hidden="true">1</span>
+        <input id="characterLevel" type="range" min="1" max="25" value="1">
+        <span aria-hidden="true">25</span>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="characterClass" data-i18n="page.characterBuild.class">Class</label>
+      <div class="sao-select-wrap">
+        <select id="characterClass"></select>
+        <span class="sao-select-arrow" aria-hidden="true"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path class="arrow-closed" d="M2 6.5 5 3.5l3 3"/><path class="arrow-open" d="M2 3.5 5 6.5l3-3"/></svg></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="workspace-grid">
+    <section class="equipment-panel panel" aria-labelledby="equipmentHeading">
+      <div class="section-heading">
+        <div><p class="section-kicker" data-i18n="page.characterBuild.loadout">LOADOUT</p><h2 id="equipmentHeading"><span class="heading-icon" data-cb-icon="equipment" aria-hidden="true"></span><span data-i18n="page.characterBuild.equipment">Equipment</span></h2></div>
+        <span class="section-count"></span>
+      </div>
+      <div class="equipment-layout">
+        <div class="slot-group"><h3 data-i18n="page.characterBuild.armor">Armor</h3><div id="armorSlots" class="slot-grid"></div></div>
+        <div class="slot-group"><h3 data-i18n="page.characterBuild.accessories">Accessories</h3><div id="accessorySlots" class="slot-grid accessory-grid"></div></div>
+        <div class="slot-group weapon-group"><h3 data-i18n="page.characterBuild.weaponsOffhand">Weapons / Offhand</h3><div id="weaponSlots" class="slot-grid weapon-grid"></div></div>
+      </div>
+    </section>
+
+    <aside class="stats-panel panel" aria-labelledby="statsHeading">
+      <div class="section-heading"><div><p class="section-kicker" data-i18n="page.characterBuild.characterSheet">CHARACTER SHEET</p><h2 id="statsHeading"><span class="heading-icon" data-cb-icon="stats" aria-hidden="true"></span><span data-i18n="page.characterBuild.stats">Stats</span></h2></div><span class="base-value"></span></div>
+      <div id="statsGroups" class="stats-groups"></div>
+    </aside>
+  </div>
+
+  <section class="skills-panel panel" aria-labelledby="skillsHeading">
+    <div class="section-heading"><div><p class="section-kicker" data-i18n="page.characterBuild.placeholderPreview">PROTOTYPE PREVIEW</p><h2 id="skillsHeading"><span class="heading-icon" data-cb-icon="skills" aria-hidden="true"></span><span data-i18n="page.characterBuild.skillTree">Skill Tree</span> <span id="skillClassLabel"></span></h2></div><span class="preview-badge" data-i18n="page.characterBuild.sampleSkills">Prototype skills</span></div>
+    <div id="skillTree" class="skill-tree" data-i18n-aria-label="page.characterBuild.sampleSkillTree" aria-label="Prototype skill tree"></div>
+    <p class="placeholder-note" data-i18n="page.characterBuild.placeholderNote">These prototype nodes demonstrate a possible class progression; they are not final skill data.</p>
+  </section>
+</main>
+
+<dialog id="equipmentDialog" class="equipment-dialog" aria-labelledby="dialogTitle">
+  <div class="dialog-shell">
+    <div class="dialog-header"><div><p class="section-kicker" data-i18n="page.characterBuild.equipmentSelector">EQUIPMENT SELECTOR</p><h2 id="dialogTitle" data-i18n="page.characterBuild.selectEquipment">Select equipment</h2></div><button class="icon-button" id="closeDialog" type="button" data-i18n-aria-label="page.characterBuild.closeEquipmentSelector" aria-label="Close equipment selector"><span class="close-icon" data-cb-icon="close" aria-hidden="true"></span></button></div>
+    <div class="dialog-controls">
+      <label class="search-field"><span data-i18n="page.characterBuild.searchItems">Search items</span><input id="itemSearch" type="search" data-i18n-placeholder="page.characterBuild.searchPlaceholder" placeholder="Search by name or effect..." autocomplete="off"></label>
+      <label><span data-i18n="page.characterBuild.rarity">Rarity</span><div class="sao-select-wrap"><select id="rarityFilter"><option value="" data-i18n="page.characterBuild.allRarities">All rarities</option></select><span class="sao-select-arrow" aria-hidden="true"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path class="arrow-closed" d="M2 6.5 5 3.5l3 3"/><path class="arrow-open" d="M2 3.5 5 6.5l3-3"/></svg></span></div></label>
+    </div>
+    <p id="pickerNotice" class="picker-notice" role="status" aria-live="polite"></p>
+    <div id="itemList" class="item-list" aria-live="polite"></div>
+  </div>
+</dialog>
+</body>
+</html>

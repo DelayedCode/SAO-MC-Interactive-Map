@@ -157,6 +157,18 @@
         );
         if (!nextHref) return;
 
+        const datasets = global.SAODatasets;
+        if (datasets && datasets.affectedSections.has(button.dataset.navTarget)) {
+          event.preventDefault();
+          datasets.installStyles();
+          datasets.navigate({
+            section: button.dataset.navTarget,
+            url: nextHref,
+            title: button.textContent.trim()
+          });
+          return;
+        }
+
         window.location.href = nextHref;
       });
     }

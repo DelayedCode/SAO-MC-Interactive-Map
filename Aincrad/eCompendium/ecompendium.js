@@ -15,7 +15,64 @@ const LIST_TITLES = {
 
 const i18n = window.SAOI18n || null;
 const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const content = (key, fallback) => (i18n && typeof i18n.content === "function"
+    ? i18n.content(key, fallback)
+    : fallback);
 const loadedCompendiumFloors = new Set();
+const registeredEquipmentDataSets = new WeakSet();
+const registeredEntryTranslations = new WeakSet();
+
+function slugifyContentId(value) {
+    return String(value || "unknown")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "unknown";
+}
+
+function getEntryId(entry) {
+    return entry.id || slugifyContentId(entry.name);
+}
+
+function getEntryText(entry, field, fallback) {
+    const value = entry[field];
+    if (!value) return fallback;
+    const translated = content(`equipment.${getEntryId(entry)}.${field}`, value);
+    return translated === value ? localizeRuntimeText(value) : translated;
+}
+
+function registerEntryTranslations(entry) {
+    if (!entry || registeredEntryTranslations.has(entry)) {
+        return;
+    }
+    registeredEntryTranslations.add(entry);
+
+    for (const field of ["name", "craftingLocation", "craftingNote"]) {
+        if (entry[field]) {
+            window.SAOContentTranslations?.translateEquipmentTerm?.(`equipment.${getEntryId(entry)}.${field}`, entry[field]);
+        }
+    }
+    for (const resource of entry.craftingResources || []) {
+        const resourceId = slugifyContentId(resource.item);
+        window.SAOContentTranslations?.translateEquipmentTerm?.(`equipment.${getEntryId(entry)}.resource.${resourceId}`, resource.item);
+    }
+    for (const stat of Object.keys(entry.stats || {})) {
+        window.SAOContentTranslations?.translateEquipmentTerm?.(`equipment.${getEntryId(entry)}.stat.${slugifyContentId(stat)}`, stat);
+    }
+}
+
+function getResourceText(entry, resource) {
+    const resourceId = slugifyContentId(resource.item);
+    const translated = content(`equipment.${getEntryId(entry)}.resource.${resourceId}`, resource.item);
+    return translated === resource.item ? localizeRuntimeText(resource.item) : translated;
+}
+
+function normalizeSearchText(value) {
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+}
 
 function escapeHtml(value) {
     return String(value)
@@ -24,6 +81,26 @@ function escapeHtml(value) {
         .replace(/>/g, "&gt;")
         .replace(/\"/g, "&quot;")
         .replace(/'/g, "&#39;");
+}
+
+function localizeRuntimeText(value) {
+    if (value === null || value === undefined || value === "") return value;
+    const language = i18n && typeof i18n.getLanguage === "function" ? i18n.getLanguage() : "en";
+    if (language === "en") return String(value);
+    const text = String(value);
+    if (window.SAOContentTranslations && typeof window.SAOContentTranslations.translateEquivalentProse === "function") {
+        const prose = window.SAOContentTranslations.translateEquivalentProse(text, language);
+        if (prose && prose !== text) return prose;
+    }
+    if (window.SAOContentTranslations && typeof window.SAOContentTranslations.translateKnownTerms === "function") {
+        const known = window.SAOContentTranslations.translateKnownTerms(text, language);
+        if (known && known !== text) return known;
+    }
+    if (window.SAOContentTranslations && typeof window.SAOContentTranslations.translateEquivalentLabel === "function") {
+        const equivalent = window.SAOContentTranslations.translateEquivalentLabel(text, language === "fr" ? 1 : 0);
+        if (equivalent && equivalent !== text) return equivalent;
+    }
+    return text;
 }
 
 function getListTitle(category) {
@@ -66,8 +143,19 @@ function attachSectionNavButtons() {
 
 function getActiveDataSet() {
     const floorIndex = getRequestedFloor().replace("floor", "");
+    const registerDataSet = dataSet => {
+        if (!dataSet || typeof dataSet !== "object" || registeredEquipmentDataSets.has(dataSet)) {
+            return dataSet;
+        }
+
+        registeredEquipmentDataSets.add(dataSet);
+        return dataSet;
+    };
+    if (window.SAODatasets?.getDatasetFromLocation() === "current") {
+        return registerDataSet(window.SAO_CURRENT_EQUIPMENT_DATA?.[getRequestedFloor()] || {});
+    }
     const dataSetKey = `FLOOR_${floorIndex}_DATA`;
-    return window[dataSetKey] || {};
+    return registerDataSet(window[dataSetKey] || {});
 }
 
 function loadFloorDataScript(floorKey, onReady, onError) {
@@ -102,20 +190,22 @@ function showCompendiumLoadError() {
 }
 
 function createEntryCard(entry) {
+    registerEntryTranslations(entry);
+
     const card = document.createElement("div");
     card.className = "ecompendium-card";
 
     let html = "";
 
     html += "<h2 class='ecompendium-name'>" +
-        escapeHtml(entry.name || t("page.ecompendium.unknownItem")) +
+        escapeHtml(getEntryText(entry, "name", t("page.ecompendium.unknownItem"))) +
         "</h2>";
 
     html += "<div class='ecompendium-meta'>";
 
     if (entry.rarity) {
         html += "<p><span>" + t("page.ecompendium.labels.rarity") + "</span><strong>" +
-            escapeHtml(entry.rarity) +
+            escapeHtml(localizeRuntimeText(entry.rarity)) +
             "</strong></p>";
     }
 
@@ -127,13 +217,13 @@ function createEntryCard(entry) {
 
     if (entry.set) {
         html += "<p><span>" + t("page.ecompendium.labels.set") + "</span><strong>" +
-            escapeHtml(entry.set) +
+            escapeHtml(localizeRuntimeText(entry.set)) +
             "</strong></p>";
     }
 
     if (entry.craftingLocation) {
         html += "<p><span>" + t("page.ecompendium.labels.craftedAt") + "</span><strong>" +
-            escapeHtml(entry.craftingLocation) +
+            escapeHtml(getEntryText(entry, "craftingLocation", entry.craftingLocation)) +
             "</strong></p>";
     }
 
@@ -143,7 +233,7 @@ function createEntryCard(entry) {
         html +=
             "<div class='equipment-section'>" +
             "<h4 class='equipment-section-title'>" + t("page.ecompendium.labels.description") + "</h4>" +
-            "<p>" + escapeHtml(entry.description) + "</p>" +
+            "<p>" + escapeHtml(getEntryText(entry, "description", entry.description)) + "</p>" +
             "</div>";
     }
 
@@ -154,10 +244,14 @@ function createEntryCard(entry) {
             "<ul class='stat-list'>";
 
         for (const stat in entry.stats) {
+            const statId = slugifyContentId(stat);
+            const statLabel = content(`equipment.${getEntryId(entry)}.stat.${statId}`, stat);
+            const localizedStatLabel = statLabel === stat ? localizeRuntimeText(stat) : statLabel;
+            const statValue = localizeRuntimeText(entry.stats[stat]);
             html +=
                 "<li>" +
-                "<span>" + escapeHtml(stat) + "</span>" +
-                "<strong>" + escapeHtml(entry.stats[stat]) + "</strong>" +
+                "<span>" + escapeHtml(localizedStatLabel) + "</span>" +
+                "<strong>" + escapeHtml(statValue) + "</strong>" +
                 "</li>";
         }
 
@@ -170,7 +264,7 @@ function createEntryCard(entry) {
             "<div class='equipment-section'>" +
             "<h4 class='equipment-section-title'>" + t("page.ecompendium.labels.resources") + "</h4>" +
             (entry.craftingNote
-                ? "<p>" + escapeHtml(entry.craftingNote) + "</p>"
+                ? "<p>" + escapeHtml(getEntryText(entry, "craftingNote", entry.craftingNote)) + "</p>"
                 : "") +
             ((entry.craftingResources && entry.craftingResources.length > 0)
                 ? "<ul class='resource-list'>"
@@ -180,7 +274,7 @@ function createEntryCard(entry) {
             entry.craftingResources.forEach(function(resource) {
                 html +=
                     "<li>" +
-                    "<span>" + escapeHtml(resource.item) + "</span>" +
+                    "<span>" + escapeHtml(getResourceText(entry, resource)) + "</span>" +
                     "<strong>x" + escapeHtml(resource.amount) + "</strong>" +
                     "</li>";
             });
@@ -196,6 +290,8 @@ function createEntryCard(entry) {
     return card;
 }
 
+let compendiumRenderToken = 0;
+
 function renderEntries(entries, query) {
     const list = document.getElementById("entryList");
     const status = document.getElementById("status");
@@ -204,13 +300,13 @@ function renderEntries(entries, query) {
         return;
     }
 
-    const normalizedQuery = (query || "").trim().toLowerCase();
+    const normalizedQuery = normalizeSearchText(query).trim();
     const safeEntries = Array.isArray(entries) ? entries : [];
 
     const filteredEntries = safeEntries.filter(function(entry) {
-        return (entry.name || "")
-            .toLowerCase()
-            .includes(normalizedQuery);
+        const canonicalName = normalizeSearchText(entry.name);
+        const localizedName = normalizeSearchText(getEntryText(entry, "name", entry.name || ""));
+        return canonicalName.includes(normalizedQuery) || localizedName.includes(normalizedQuery);
     });
 
     status.textContent = t("page.ecompendium.statusShown", {
@@ -225,11 +321,33 @@ function renderEntries(entries, query) {
         return;
     }
 
-    const fragment = document.createDocumentFragment();
-    filteredEntries.forEach(function(entry) {
-        fragment.appendChild(createEntryCard(entry));
-    });
-    list.replaceChildren(fragment);
+    const renderToken = ++compendiumRenderToken;
+    list.replaceChildren();
+
+    const batchSize = 24;
+    let nextIndex = 0;
+
+    function flushBatch() {
+        if (renderToken !== compendiumRenderToken) {
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        const endIndex = Math.min(nextIndex + batchSize, filteredEntries.length);
+
+        for (let index = nextIndex; index < endIndex; index += 1) {
+            fragment.appendChild(createEntryCard(filteredEntries[index]));
+        }
+
+        list.appendChild(fragment);
+        nextIndex = endIndex;
+
+        if (nextIndex < filteredEntries.length) {
+            requestAnimationFrame(flushBatch);
+        }
+    }
+
+    requestAnimationFrame(flushBatch);
 }
 
 function initCompendiumRuntime() {
@@ -383,7 +501,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const floorKey = getRequestedFloor();
         const floorDataKey = `FLOOR_${floorKey.replace("floor", "")}_DATA`;
 
-        if (window[floorDataKey]) {
+        if (window.SAODatasets?.getDatasetFromLocation() === "current" || window[floorDataKey]) {
             initCompendiumRuntime();
             return;
         }

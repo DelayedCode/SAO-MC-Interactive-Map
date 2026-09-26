@@ -32,11 +32,12 @@
 
   const SETTINGS_STORAGE_KEY = "sao.global.settings";
   const DEFAULT_LANGUAGE = "en";
-  const SUPPORTED_LANGUAGES = ["en", "es", "de", "fr"];
+  const SUPPORTED_LANGUAGES = ["en", "es", "fr"];
   const WALKTHROUGH_PROGRESS_KEYS = Object.freeze([
     "sao.walkthrough.index.completed",
     "sao.walkthrough.maps.completed",
-    "sao.walkthrough.mainui.completed"
+    "sao.walkthrough.mainui.completed",
+    "sao.walkthrough.characterBuild.completed"
   ]);
 
   const translations = {
@@ -49,13 +50,14 @@
           subtitle: "Customize your global website preferences.",
           languageLabel: "Language",
           languageHint: "Applied to all pages.",
+          languageHintAria: "Language settings hint",
           closeLabel: "Close settings",
           walkthroughLabel: "Walkthrough",
           walkthroughHint: "Replay the guided tour for the current page.",
           restartWalkthrough: "Restart walkthrough"
         },
         nav: {
-          maps: "Maps",
+          maps: "Map",
           bestiary: "Bestiary",
           equipment: "Equipment",
           quests: "Quests",
@@ -77,14 +79,23 @@
           step: "Step {current} of {total}"
         }
       },
+      dataset: {
+        betaLabel: "Beta-Test Data",
+        currentLabel: "Current Data",
+        betaDescription: "THIS INFO IS FROM BETA TESTS. INFORMATION MAY BE OFF.",
+        currentDescription: "THIS INFO IS ACTIVELY BEING UPDATED. IF YOU CANNOT FIND SOMETHING, PLEASE CHECK 'BETA-TEST DATA' FOR IT UNTIL WE GET THE INFO FOR IT.",
+        chooseTitle: "Choose Data Version",
+        cancel: "Cancel",
+        close: "Close dataset selection"
+      },
       page: {
         index: {
           title: "SAO MC - Module Hub",
-          eyebrow: "Module Hub",
-          discordButton: "Discord",
-          discordButtonAria: "Open Discord shortcuts",
-          heading: "Select SAO MC Gamemode",
-          subtitle: "Choose which gamemode info you want to view.",
+          eyebrow: "SAO MC / WORLD HUB",
+          discordButton: "Links",
+          discordButtonAria: "Open links",
+          heading: "Select Your World",
+          subtitle: "Select a world to begin.",
           disclaimerLabel: "Please Note:",
           disclaimerBody: "This is a personal project.\nThis website is primarily intended for personal and guild use. Information will continue to be added, updated, and improved for as long as there is new content to document.\nPlease keep in mind that this project was not originally designed to be a fully public resource, so some information may be incomplete, missing, or tailored toward my own use and my guild's needs.",
           selectorAria: "Gamemode selector",
@@ -100,12 +111,12 @@
           guildLabel: "Guild:",
           guildName: "Vanguard of War",
           guildAria: "Guild tribute",
-          discordModalTitle: "Discord shortcuts",
-          discordModalCloseAria: "Close Discord menu",
+          discordModalTitle: "Links",
+          discordModalCloseAria: "Close links menu",
           discordModalBody: "Choose where you'd like to go next.",
           creatorDiscord: "Website Creator Discord",
           saoDiscord: "SAO MC Discord",
-          supportDiscord: "SAO MC Support Discord",
+          supportWebsite: "SAO MC Support Website",
           ggoToast: "GGO is not out yet! No info to display."
         },
         maps: {
@@ -120,11 +131,11 @@
           defaultInfoTitle: "Select a marker",
           defaultInfoBody: "Choose a marker on the map to see details here.",
           chooseCategoryTitle: "Choose a category",
-          chooseCategoryBody: "Turn on one or more categories in the sidebar to display markers for this floor.",
+          chooseCategoryBody: "Turn on one or more categories in the sidebar to display markers for this island.",
           noSearchTitle: "No search matches",
-          noSearchBody: "No markers match your current search on this floor.",
+          noSearchBody: "No markers match your current search on this island.",
           noMarkersTitle: "No markers available",
-          noMarkersBody: "No markers are available for the currently selected categories on this floor.",
+          noMarkersBody: "No markers are available for the currently selected categories on this island.",
           noMobEntries: "No mob entries available yet for this zone.",
           mobType: "Type",
           mobAreaType: "Mob Area",
@@ -165,11 +176,11 @@
           defaultInfoTitle: "Select a marker",
           defaultInfoBody: "Choose a marker on the map to see details here.",
           chooseCategoryTitle: "Choose a category",
-          chooseCategoryBody: "Turn on one or more categories in the sidebar to display markers for this floor.",
+          chooseCategoryBody: "Turn on one or more categories in the sidebar to display markers for this island.",
           noSearchTitle: "No search matches",
-          noSearchBody: "No markers match your current search on this floor.",
+          noSearchBody: "No markers match your current search on this island.",
           noMarkersTitle: "No markers available",
-          noMarkersBody: "No markers are available for the currently selected categories on this floor.",
+          noMarkersBody: "No markers are available for the currently selected categories on this island.",
           noImageYet: "No image yet",
           noMobEntries: "No mob entries available yet for this zone.",
           mapSuffix: "map",
@@ -264,6 +275,11 @@
           logoAria: "Quests logo",
           searchLabel: "Search quests",
           searchPlaceholder: "Search by any column...",
+          questTypeFilterAria: "Quest type filter",
+          questTypes: {
+            main: "Main Quests",
+            side: "Side Quests"
+          },
           tableCols: {
             npcName: "NPC Name",
             city: "City",
@@ -337,13 +353,14 @@
           subtitle: "Personaliza tus preferencias globales del sitio.",
           languageLabel: "Idioma",
           languageHint: "Se aplica a todas las paginas.",
+          languageHintAria: "Aviso de configuración de idioma",
           closeLabel: "Cerrar configuracion",
           walkthroughLabel: "Guía",
           walkthroughHint: "Vuelve a reproducir la guía del recorrido para la página actual.",
           restartWalkthrough: "Reiniciar guía"
         },
         nav: {
-          maps: "Mapas",
+          maps: "Mapa",
           bestiary: "Bestiario",
           equipment: "Equipo",
           quests: "Misiones",
@@ -360,11 +377,11 @@
       page: {
         index: {
           title: "SAO MC - Centro de Modulos",
-          eyebrow: "Centro de Modulos",
-          discordButton: "Discord",
-          discordButtonAria: "Abrir accesos de Discord",
-          heading: "Selecciona modo de juego SAO MC",
-          subtitle: "Elige que informacion del modo quieres ver.",
+          eyebrow: "SAO MC / HUB del mundo",
+          discordButton: "Enlaces",
+          discordButtonAria: "Abrir enlaces",
+          heading: "Selecciona tu mundo",
+          subtitle: "Selecciona un mundo para comenzar.",
           disclaimerLabel: "Aviso:",
           disclaimerBody: "Este es un proyecto personal.\nEste sitio esta pensado principalmente para uso personal y del gremio. La informacion se seguira actualizando y mejorando mientras haya contenido nuevo por documentar.\nTen en cuenta que este proyecto no fue pensado originalmente como recurso publico completo, por lo que parte de la informacion puede estar incompleta o adaptada a mis necesidades y las de mi gremio.",
           selectorAria: "Selector de modos",
@@ -380,12 +397,12 @@
           guildLabel: "Gremio:",
           guildName: "Vanguard of War",
           guildAria: "Tributo al gremio",
-          discordModalTitle: "Accesos directos de Discord",
-          discordModalCloseAria: "Cerrar menu de Discord",
+          discordModalTitle: "Enlaces",
+          discordModalCloseAria: "Cerrar menú de enlaces",
           discordModalBody: "Elige a donde quieres ir.",
           creatorDiscord: "Discord del creador",
           saoDiscord: "Discord de SAO MC",
-          supportDiscord: "Discord de soporte SAO MC",
+          supportWebsite: "Sitio web de soporte de SAO MC",
           ggoToast: "GGO aun no esta disponible. No hay informacion para mostrar."
         },
         patchnotes: {
@@ -408,86 +425,6 @@
         }
       }
     },
-    de: {
-      languageName: "Deutsch",
-      ui: {
-        settings: {
-          buttonLabel: "Einstellungen offnen",
-          title: "Einstellungen",
-          subtitle: "Globale Website-Einstellungen anpassen.",
-          languageLabel: "Sprache",
-          languageHint: "Gilt fur alle Seiten.",
-          closeLabel: "Einstellungen schlie?en",
-          walkthroughLabel: "Schritt-für-Schritt-Anleitung",
-          walkthroughHint: "Die geführte Tour für die aktuelle Seite erneut starten.",
-          restartWalkthrough: "Anleitung neu starten"
-        },
-        nav: {
-          maps: "Karten",
-          bestiary: "Bestiarium",
-          equipment: "Ausrustung",
-          quests: "Quests",
-          patchnotes: "Patchnotes",
-          commands: "Befehle",
-          miscinfo: "Sonstige Infos",
-          menu: "Zuruck zum Menu"
-        },
-        common: {
-          loading: "Ladt...",
-          search: "Suchen"
-        }
-      },
-      page: {
-        index: {
-          title: "SAO MC - Modul Hub",
-          eyebrow: "Modul Hub",
-          discordButton: "Discord",
-          discordButtonAria: "Discord-Verknupfungen offnen",
-          heading: "SAO MC Spielmodus auswahlen",
-          subtitle: "Wahle, welche Modus-Informationen du ansehen mochtest.",
-          disclaimerLabel: "Hinweis:",
-          disclaimerBody: "Dies ist ein personliches Projekt.\nDiese Website ist in erster Linie fur den personlichen und Gilden-Gebrauch gedacht. Informationen werden fortlaufend erganzt und verbessert, solange neue Inhalte verfugbar sind.\nBitte beachte, dass dieses Projekt ursprunglich nicht als vollstandige offentliche Ressource gedacht war; daher konnen Informationen unvollstandig sein oder auf meine bzw. unsere Gildenbedurfnisse zugeschnitten sein.",
-          selectorAria: "Spielmodus-Auswahl",
-          aincradTitle: "Aincrad",
-          underworldTitle: "Fractured Underworld",
-          ggoTitle: "GunGaleOnline",
-          launchTag: "Start",
-          notReleasedTag: "Nicht veroffentlicht",
-          aincradDesc: "Offne den Karten-Hub fur Dungeon-Guide, Quests, Bestiarium und mehr.",
-          underworldDesc: "Offne den Fractured-Underworld-Karten-Hub zum Bauen und Testen dieses Moduls.",
-          ggoDesc: "Das GGO-Menu ist noch nicht veroffentlicht, daher ist kein Modul verfugbar.",
-          interactiveMode: "Interaktiver Modus",
-          guildLabel: "Gilde:",
-          guildName: "Vanguard of War",
-          guildAria: "Gilden-Hommage",
-          discordModalTitle: "Discord-Verknupfungen",
-          discordModalCloseAria: "Discord-Menu schlie?en",
-          discordModalBody: "Wahle, wohin du als Nächstes gehen mochtest.",
-          creatorDiscord: "Creator Discord",
-          saoDiscord: "SAO MC Discord",
-          supportDiscord: "SAO MC Support Discord",
-          ggoToast: "GGO ist noch nicht verfugbar. Keine Informationen anzeigbar."
-        },
-        patchnotes: {
-          title: "SAO-Patchnotes und Changelog",
-          heading: "Patchnotes",
-          searchLabel: "Notizen suchen",
-          searchPlaceholder: "Nach Version, Gegenstand oder Update filtern",
-          noMatches: "Keine Patchnotes passen zu diesem Filter.",
-          noEntries: "Keine passenden Changelog-Einträge gefunden.",
-          statusShowing: "{count} Patchnote{suffix} wird angezeigt.",
-          translationNotice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        },
-        miscinfo: {
-          title: "Sonstige Infos",
-          heading: "Sonstige Infos",
-          back: "Zurück zum Menü",
-          playerLevels: "Spielerlevel",
-          playerLevelsDetails: "Level 1 -> 2: 150 XP\nLevel 2 -> 3: 300 XP\nLevel 3 -> 4: 600 XP\nLevel 4 -> 5: 1.350 XP\nLevel 5 -> 6: 2.700 XP\nLevel 6 -> 7: 5.100 XP\nLevel 7 -> 8: 9.000 XP\nLevel 8 -> 9: 15.000 XP\nLevel 9 -> 10: 24.000 XP",
-          translationNotice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        }
-      }
-    },
     fr: {
       languageName: "Francais",
       ui: {
@@ -497,13 +434,14 @@
           subtitle: "Personnalisez vos preferences globales du site.",
           languageLabel: "Langue",
           languageHint: "Applique a toutes les pages.",
+          languageHintAria: "Indication des paramètres de langue",
           closeLabel: "Fermer les parametres",
           walkthroughLabel: "Visite guidée",
           walkthroughHint: "Relancer la visite guidée pour la page actuelle.",
           restartWalkthrough: "Redémarrer la visite guidée"
         },
         nav: {
-          maps: "Cartes",
+          maps: "Carte",
           bestiary: "Bestiaire",
           equipment: "Equipement",
           quests: "Quetes",
@@ -520,11 +458,11 @@
       page: {
         index: {
           title: "SAO MC - Hub des Modules",
-          eyebrow: "Hub des Modules",
-          discordButton: "Discord",
-          discordButtonAria: "Ouvrir les raccourcis Discord",
-          heading: "Selectionnez le mode de jeu SAO MC",
-          subtitle: "Choisissez les informations de mode que vous voulez consulter.",
+          eyebrow: "SAO MC / HUB du monde",
+          discordButton: "Liens",
+          discordButtonAria: "Ouvrir les liens",
+          heading: "Sélectionnez votre monde",
+          subtitle: "Sélectionnez un monde pour commencer.",
           disclaimerLabel: "Note :",
           disclaimerBody: "Ceci est un projet personnel.\nCe site est principalement destine a un usage personnel et de guilde. Les informations continueront d'etre ajoutees, mises a jour et ameliorees tant qu'il y aura du nouveau contenu a documenter.\nGardez a l'esprit que ce projet n'etait pas initialement concu comme une ressource publique complete ; certaines informations peuvent donc etre incompletes ou adaptees a mes besoins et a ceux de ma guilde.",
           selectorAria: "Selection du mode",
@@ -540,12 +478,12 @@
           guildLabel: "Guilde :",
           guildName: "Vanguard of War",
           guildAria: "Hommage a la guilde",
-          discordModalTitle: "Raccourcis Discord",
-          discordModalCloseAria: "Fermer le menu Discord",
+          discordModalTitle: "Liens",
+          discordModalCloseAria: "Fermer le menu des liens",
           discordModalBody: "Choisissez votre prochaine destination.",
           creatorDiscord: "Discord du createur",
           saoDiscord: "Discord SAO MC",
-          supportDiscord: "Discord support SAO MC",
+          supportWebsite: "Site web d'assistance SAO MC",
           ggoToast: "GGO n'est pas encore sorti. Aucune information a afficher."
         },
         patchnotes: {
@@ -597,9 +535,10 @@
         nav: {
           sectionAria: "Section navigation",
           primaryAria: "Primary navigation",
-          mapNavAria: "Map navigation"
+          mapNavAria: "Map navigation",
+          islandAria: "Island navigation"
         },
-        pageNotice: "A large portion of this website has not been translated yet. This project is maintained by a solo developer, so translating every page takes a significant amount of time.",
+        pageNotice: "Some translations may be incomplete, incorrect, or have grammar mistakes. A large portion of this website has not been translated yet. This project is maintained by a solo developer, so translating every page takes a significant amount of time.",
         walkthrough: {
           title: "Quick walkthrough",
           skip: "Skip",
@@ -611,13 +550,23 @@
           welcomeBody: "This is the doormat. Use this page to choose which SAO MC module you want to open.",
           modeCardsTitle: "Mode cards",
           modeCardsBody: "Pick Aincrad or Fractured Underworld to launch a module. The GGO card is currently locked until release.",
-          discordTitle: "Discord shortcuts",
-          discordBody: "Open quick links to the creator profile, SAO MC Discord, and support server.",
+          discordTitle: "Links",
+          discordBody: "Open quick links to the SAO MC Support Website, SAO MC Discord, and my Discord Profile.",
           settingsTitle: "Settings",
           settingsBody: "Use the gear to switch language and replay this walkthrough whenever you want."
         }
       },
       page: {
+        uwcompendium: {
+          title: "Fractured Underworld Compendium",
+          map: "Go back to Map",
+          searchLabel: "Search",
+          searchPlaceholder: "Search compendium...",
+          statusShown: "Showing {visible} of {total} entries.",
+          noEntries: "No compendium entries found.",
+          unavailable: "Beta-Test Compendium data is not available yet.",
+          insufficientInfo: "Not enough information released yet to make a page!"
+        },
         maps: {
           walkthrough: {
             step1Title: "Navigation",
@@ -658,6 +607,7 @@
         },
         maps: {
           categories: {
+            main: "Main Quests",
             biomes: "Biomes",
             bossSpawns: "Boss Spawns",
             dungeons: "Dungeons",
@@ -687,11 +637,11 @@
             floor2: "Floor 2 - Arid Desert",
             floor3: "Floor 3 - The Forest of Wandering"
           },
-          categoryMainTitle: "Category: Main",
-          categoryQuestsTitle: "Category: Quests",
-          categoryJourneymenTitle: "Category: Journeymen",
-          categoryMarketTitle: "Category: Market",
-          categoryCraftsmenTitle: "Category: Craftsmen",
+          categoryMainTitle: "Main",
+          categoryQuestsTitle: "Quests",
+          categoryJourneymenTitle: "Journeymen",
+          categoryMarketTitle: "Market",
+          categoryCraftsmenTitle: "Craftsmen",
           walkthrough: {
             step1Title: "Navigation",
             step1Body: "Use this top row to jump between Maps, Bestiary, Equipment, Quests, Commands, and the Menu.",
@@ -716,7 +666,7 @@
             iron: "Iron",
             coal: "Coal"
           },
-          categoryMainTitle: "Category: Main",
+          categoryMainTitle: "Main",
           islandOptions: {
             playerIsland: "Player Island",
             gigasCedar: "Gigas Cedar",
@@ -726,7 +676,7 @@
           },
           walkthrough: {
             step1Title: "Navigation",
-            step1Body: "Use the top row to open Tower Defense or go back to the main Menu.",
+            step1Body: "Use the top row to go to Tower Defense information, see the Compendium and Return to the Menu.",
             step2Title: "Island Controls",
             step2Body: "Change islands, toggle underground mode, search markers, and reset filters quickly.",
             step3Title: "Filters",
@@ -740,6 +690,14 @@
         },
         patchnotes: {
           entries: {
+            v140: {
+              title: "Character Build & Major UI Update",
+              summary: "• Added the complete Character Build system with Current Data and Beta-Test Data support.\n• Added major improvements and a full overhaul of the website's UI and responsiveness.\n• Redesigned the Equipment, Quests, Patchnotes, Misc. Info, Tower Defense, and Compendium sections.\n• Added and expanded translations across the website.\n• Improved website reactivity, performance, loading, and browser compatibility.\n• Fixed missing or incorrect equipment stats and various UI issues.\n• Updated and improved the website walkthrough.\n• Added Beta-Test data and related loading information.\n• Made numerous smaller fixes, improvements, and quality-of-life changes across the website."
+            },
+            v130: {
+              title: "Language and Compatibility Update",
+              summary: "• Added Français and Español language support. (Many translations are still missing, but I did my best to translate as much as possible.)\n• Added a website walkthrough/guide.\n• Improved compatibility across more web browsers.\n• Optimized and reorganized code to make future updates and maintenance easier.\n\n• This should be the final website update until the server comes back online."
+            },
             v120: {
               title: "Very Small Bug Fix",
               summary: "• Fixed the Commands Menu loading indefinitely.\n• Fixed patchnote order from lowest to highest date."
@@ -763,9 +721,16 @@
           },
           tags: {
             bugFixes: "Bug Fixes",
+            betaTestData: "Beta-Test Data",
+            characterBuild: "Character Build",
+            uiOverhaul: "UI Overhaul",
             commands: "Commands",
             maps: "Maps",
             release: "Release",
+            localization: "Localization",
+            performance: "Performance",
+            compatibility: "Compatibility",
+            maintenance: "Maintenance",
             miscInfo: "Misc Info",
             fracturedUnderworld: "Fractured Underworld",
             towerDefense: "Tower Defense",
@@ -842,9 +807,10 @@
         nav: {
           sectionAria: "Navegacion de seccion",
           primaryAria: "Navegacion principal",
-          mapNavAria: "Navegacion del mapa"
+          mapNavAria: "Navegacion del mapa",
+          islandAria: "Navegacion de isla"
         },
-        pageNotice: "Una gran parte de este sitio web todavía no ha sido traducida. Este proyecto es mantenido por un desarrollador solitario, así que traducir cada página requiere una cantidad significativa de tiempo.",
+        pageNotice: "Algunas traducciones pueden estar incompletas, ser incorrectas o tener errores gramaticales. ¡Lo sentimos! Este sitio web es mantenido por un solo desarrollador que solo habla inglés, por lo que mantener otros idiomas actualizados puede ser difícil. Si encuentras algo que necesite traducción, no dudes en contactar al desarrollador por Discord.",
         walkthrough: {
           title: "Guía rápida",
           skip: "Omitir",
@@ -856,13 +822,23 @@
           welcomeBody: "Esta es la bienvenida. Usa esta pagina para elegir que modulo de SAO MC quieres abrir.",
           modeCardsTitle: "Tarjetas de modo",
           modeCardsBody: "Elige Aincrad o Fractured Underworld para abrir un modulo. La tarjeta de GGO sigue bloqueada hasta su lanzamiento.",
-          discordTitle: "Accesos directos de Discord",
-          discordBody: "Abre enlaces rapidos al perfil del creador, al Discord de SAO MC y al servidor de soporte.",
+          discordTitle: "Enlaces",
+          discordBody: "Abre enlaces rapidos al perfil del creador y al Discord de SAO MC.",
           settingsTitle: "Configuracion",
           settingsBody: "Usa el engranaje para cambiar el idioma y repetir esta guia cuando quieras."
         }
       },
       page: {
+        uwcompendium: {
+          title: "Compendio de Fractured Underworld",
+          map: "Volver al mapa",
+          searchLabel: "Buscar",
+          searchPlaceholder: "Buscar en el compendio...",
+          statusShown: "Mostrando {visible} de {total} entradas.",
+          noEntries: "No se encontraron entradas en el compendio.",
+          unavailable: "Los datos del compendio de la beta todavía no están disponibles.",
+          insufficientInfo: "Todavía no hay suficiente información publicada para crear una página."
+        },
         maps: {
           walkthrough: {
             step1Title: "Navegación",
@@ -967,6 +943,11 @@
           logoAria: "Logo de misiones",
           searchLabel: "Buscar misiones",
           searchPlaceholder: "Buscar por cualquier columna...",
+          questTypeFilterAria: "Filtro de tipo de misión",
+          questTypes: {
+            main: "Misiones principales",
+            side: "Misiones secundarias"
+          },
           tableCols: {
             npcName: "Nombre del PNJ",
             city: "Ciudad",
@@ -1005,6 +986,7 @@
         },
         maps: {
           categories: {
+            main: "Misiones principales",
             biomes: "Biomas",
             bossSpawns: "Apariciones de jefes",
             dungeons: "Mazmorras",
@@ -1034,11 +1016,11 @@
             floor2: "Piso 2 - Desierto árido",
             floor3: "Piso 3 - El bosque errante"
           },
-          categoryMainTitle: "Categoria: Principal",
-          categoryQuestsTitle: "Categoria: Misiones",
-          categoryJourneymenTitle: "Categoria: Artesanos",
-          categoryMarketTitle: "Categoria: Mercado",
-          categoryCraftsmenTitle: "Categoria: Artesanos",
+          categoryMainTitle: "Principal",
+          categoryQuestsTitle: "Misiones",
+          categoryJourneymenTitle: "Artesanos",
+          categoryMarketTitle: "Mercado",
+          categoryCraftsmenTitle: "Artesanos",
           walkthrough: {
             step1Title: "Navegación",
             step1Body: "Usa esta fila superior para saltar entre Mapas, Bestiario, Equipo, Misiones, Comandos y el Menú.",
@@ -1063,7 +1045,7 @@
             iron: "Hierro",
             coal: "Carbón"
           },
-          categoryMainTitle: "Categoría: Principal",
+          categoryMainTitle: "Principal",
           clearFilters: "Borrar filtros",
           islandOptions: {
             playerIsland: "Isla del jugador",
@@ -1097,6 +1079,14 @@
         },
         patchnotes: {
           entries: {
+            v140: {
+              title: "Actualización de Character Build y de la interfaz principal",
+              summary: "• Se añadió el sistema completo de Character Build con compatibilidad para datos actuales y datos de prueba beta.\n• Se añadieron grandes mejoras y una renovación completa de la interfaz y la capacidad de respuesta del sitio web.\n• Se rediseñaron las secciones de Equipo, Misiones, Notas de parche, Info. Varia, Defensa de torres y Compendio.\n• Se añadieron y ampliaron las traducciones en todo el sitio web.\n• Se mejoraron la reactividad, el rendimiento, la carga y la compatibilidad del sitio web con los navegadores.\n• Se corrigieron estadísticas de equipo ausentes o incorrectas y varios problemas de interfaz.\n• Se actualizó y mejoró el recorrido guiado del sitio web.\n• Se añadieron datos beta e información relacionada con su carga.\n• Se realizaron numerosos arreglos pequeños, mejoras y cambios de calidad de vida en todo el sitio web."
+            },
+            v130: {
+              title: "Actualización de idioma y compatibilidad",
+              summary: "• Se añadió soporte de idiomas en francés y español. (Todavía faltan muchas traducciones, pero hice lo posible para traducir tanto como pude.)\n• Se añadió una guía de recorrido por la web.\n• Se mejoró la compatibilidad con más navegadores web.\n• Se optimizó y reorganizó el código para facilitar futuras actualizaciones y mantenimiento.\n\n• Esta debería ser la última actualización del sitio hasta que el servidor vuelva a estar en línea."
+            },
             v120: {
               title: "Correción muy pequeña",
               summary: "• Se corrigió que el menú de comandos se cargara indefinidamente.\n• Se corrigió el orden de notas desde la fecha más antigua a la más reciente."
@@ -1120,9 +1110,16 @@
           },
           tags: {
             bugFixes: "Correciones",
+            betaTestData: "Datos de prueba beta",
+            characterBuild: "Character Build",
+            uiOverhaul: "Renovación de interfaz",
             commands: "Comandos",
             maps: "Mapas",
             release: "Lanzamiento",
+            localization: "Localización",
+            performance: "Rendimiento",
+            compatibility: "Compatibilidad",
+            maintenance: "Mantenimiento",
             miscInfo: "Info variada",
             fracturedUnderworld: "Fractured Underworld",
             towerDefense: "Defensa de torres",
@@ -1195,371 +1192,15 @@
         }
       }
     },
-    de: {
-      ui: {
-        nav: {
-          sectionAria: "Abschnittsnavigation",
-          primaryAria: "Hauptnavigation",
-          mapNavAria: "Karten-Navigation"
-        },
-        pageNotice: "Ein großer Teil dieser Website wurde noch nicht übersetzt. Dieses Projekt wird von einem Solo-Entwickler betreut, daher dauert das Übersetzen jeder Seite sehr lange.",
-        walkthrough: {
-          title: "Schnelle Führung",
-          skip: "Überspringen",
-          back: "Zurück",
-          next: "Weiter",
-          finish: "Fertig",
-          step: "Schritt {current} von {total}",
-          welcomeTitle: "Willkommen",
-          welcomeBody: "Das ist die Willkommensseite. Nutze diese Seite, um zu wählen, welches SAO-MC-Modul du öffnen möchtest.",
-          modeCardsTitle: "Modus-Karten",
-          modeCardsBody: "Wähle Aincrad oder Fractured Underworld, um ein Modul zu starten. Die GGO-Karte ist bis zur Veröffentlichung gesperrt.",
-          discordTitle: "Discord-Verknüpfungen",
-          discordBody: "Öffne schnelle Links zum Profil des Erstellers, zum SAO-MC-Discord und zum Support-Server.",
-          settingsTitle: "Einstellungen",
-          settingsBody: "Nutze das Zahnrad, um die Sprache zu wechseln und diese Führung jederzeit erneut zu starten."
-        }
-      },
-      page: {
-        maps: {
-          walkthrough: {
-            step1Title: "Navigation",
-            step1Body: "Nutze diese obere Zeile, um zwischen Karten, Bestiarium, Ausrüstung, Quests, Befehlen und dem Menü zu wechseln.",
-            step2Title: "Kartensteuerung",
-            step2Body: "Wähle den Stock, schalte den Untergrundmodus um, verwende die Suche und setze Filter hier schnell zurück.",
-            step3Title: "Filter",
-            step3Body: "Aktiviere Kategorien, um Markierungen anzuzeigen. Aktive Filter bleiben hervorgehoben, damit du leicht siehst, was gerade eingeschaltet ist.",
-            step4Title: "Interaktive Karte",
-            step4Body: "Ziehe zum Verschieben und scroll zum Zoomen. Wähle einen Marker, um Details und Verknüpfungen im Infopanel zu öffnen."
-          }
-        },
-        bestiary: {
-          title: "SAO-Bestiarium",
-          heading: "Bestiarium",
-          tablistAria: "Bestiarium-Kategorien",
-          searchLabel: "Mobs suchen",
-          searchPlaceholder: "Nach Namen suchen...",
-          listTitleRegular: "Liste regulärer Mobs",
-          listTitleBoss: "Boss-Liste",
-          listTitleDungeonBoss: "Liste der Dungeon-Bosse",
-          listTitleDungeonMobs: "Liste der Dungeon-Mobs",
-          statusShown: "{visible} von {total} Mobs angezeigt.",
-          emptyCategory: "Noch keine Einträge für {category}.",
-          drops: "Drops",
-          aggressiveness: "Aggressivität",
-          aggressive: "Aggressiv",
-          neutral: "Neutral",
-          passive: "Passiv",
-          xp: "XP",
-          na: "N/V",
-          loadError: "Die Bestiary-Daten konnten nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
-          loadUnavailable: "Die Bestiary-Daten sind gerade nicht verfügbar.",
-          notice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        },
-        commands: {
-          title: "SAO-Befehlsübersicht",
-          heading: "Befehle",
-          tablistAria: "Befehlskategorien",
-          searchLabel: "Befehle suchen",
-          searchPlaceholder: "Nach Befehl, Nutzung oder Beispiel suchen...",
-          emptyState: "Keine Befehle passen zu deinen aktuellen Filtern.",
-          colCommand: "Befehl",
-          colUsage: "Nutzung",
-          colExample: "Beispiel",
-          statusShown: "{count} Befehl{suffix} in {category} angezeigt.",
-          categories: {
-            communication: "Kommunikation",
-            cosmetics: "Kosmetik und Erscheinung",
-            dungeons: "Dungeons",
-            economy: "Wirtschaft",
-            gameplay: "Spielablauf und Fortschritt",
-            information: "Information",
-            media: "Medien und Audio",
-            navigation: "Navigation",
-            useless: "Nutzlose Befehle"
-          },
-          loadError: "Die Befehle konnten gerade nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
-          loadUnavailable: "Die Befehle sind gerade nicht verfügbar.",
-          notice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        },
-        ecompendium: {
-          title: "SAO-Ausrüstungscompendium",
-          heading: "Ausrüstungscompendium",
-          searchLabel: "Suchen",
-          searchPlaceholder: "Ausrüstung suchen...",
-          noEntriesFound: "Keine Einträge gefunden.",
-          statusShown: "{visible} von {total} Einträgen werden angezeigt.",
-          listTitles: {
-            weapon: "Waffen",
-            armor: "Rüstung",
-            accessory: "Zubehör",
-            rune: "Runen",
-            tool: "Werkzeuge",
-            food: "Essen",
-            consumable: "Verbrauchsgegenstände",
-            material: "Materialien",
-            quest_item: "Quest-Gegenstände",
-            resource: "Ressourcen",
-            dungeon: "Dungeons",
-            currency: "Währung"
-          },
-          labels: {
-            rarity: "Seltenheit",
-            level: "Level",
-            set: "Set",
-            craftedAt: "Hergestellt in",
-            description: "Beschreibung",
-            statistics: "Statistiken",
-            source: "Quelle",
-            resources: "Ressourcen"
-          },
-          unknownItem: "Unbekannter Gegenstand",
-          unknown: "Unbekannt",
-          loadError: "Die Ausrüstungsdaten konnten nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
-          loadUnavailable: "Die Ausrüstungsdaten sind gerade nicht verfügbar.",
-          notice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        },
-        quests: {
-          title: "SAO-Quest-Übersicht",
-          heading: "Quests",
-          logoAria: "Quests-Logo",
-          searchLabel: "Quests suchen",
-          searchPlaceholder: "In jeder Spalte suchen...",
-          tableCols: {
-            npcName: "NPC-Name",
-            city: "Stadt",
-            coordinates: "Koordinaten",
-            requirements: "Anforderungen / Ressourcen",
-            questName: "Quest-Name",
-            xpReward: "XP",
-            colReward: "Col",
-            bonusItems: "Bonusgegenstände",
-            completed: "Abgeschlossen"
-          },
-          markCompleted: "Als abgeschlossen markieren",
-          completed: "Abgeschlossen",
-          titleWithFloor: "Quests - {floor}",
-          noQuestData: "Für {floor} sind noch keine Quest-Daten hinzugefügt worden.",
-          noQuestMatchFloor: "Keine Quest-Einträge entsprechen deiner Suche auf {floor}. {completed} abgeschlossen.",
-          shownStatus: "{visible} von {total} Quest-Einträgen für {floor} angezeigt || {completed} abgeschlossen.",
-          noQuestMatch: "Keine Quest-Einträge entsprechen deiner aktuellen Suche.",
-          loadedStatus: "{count} Quest-Einträge für {floor} geladen.",
-          loadError: "Die Quest-Daten konnten nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
-          loadUnavailable: "Die Quest-Daten sind gerade nicht verfügbar.",
-          notice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        },
-        patchnotes: {
-          title: "SAO-Patchnotes und Changelog",
-          heading: "Patchnotes",
-          searchLabel: "Notizen suchen",
-          searchPlaceholder: "Nach Version, Gegenstand oder Update filtern",
-          noMatches: "Keine Patchnotes passen zu diesem Filter.",
-          noEntries: "Keine passenden Changelog-Einträge gefunden.",
-          statusShowing: "{count} Patchnote{suffix} wird angezeigt.",
-          loadError: "Die Patchnotes konnten nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
-          loadUnavailable: "Die Patchnotes sind gerade nicht verfügbar.",
-          translationNotice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird.",
-          notice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        },
-        maps: {
-          categories: {
-            biomes: "Biome",
-            bossSpawns: "Boss-Spawnpunkte",
-            dungeons: "Dungeons",
-            farmingSpots: "Farmstellen",
-            mobAreas: "Mob-Bereiche",
-            sideQuests: "Nebenquests",
-            alchemist: "Alchemist",
-            lumberjack: "Holzfäller",
-            accessoriesMerchants: "Zubehör-Händler",
-            consumablesMerchants: "Verbrauchsartikel-Händler",
-            equipmentMerchants: "Ausrüstungs-Händler",
-            lootBuyers: "Beutenkäufer",
-            occultMerchants: "Okkult-Händler",
-            toolMerchants: "Werkzeug-Händler",
-            travelingMerchants: "Reisende Händler",
-            weaponSellers: "Waffenhändler",
-            accessoriesBlacksmith: "Zubehör-Schmied",
-            armorBlacksmith: "Rüstungs-Schmied",
-            ingotBlacksmith: "Barren-Schmied",
-            keyBlacksmith: "Schlüssel-Schmied",
-            refaire: "Refaire",
-            runeCraftsmen: "Runen-Handwerker",
-            weaponsmith: "Waffenschmied"
-          },
-          floorOptions: {
-            floor1: "Stock 1 - Die Stadt des Anfangs",
-            floor2: "Stock 2 - Aride Wüste",
-            floor3: "Stock 3 - Der wandernde Wald"
-          },
-          categoryMainTitle: "Kategorie: Haupt",
-          categoryQuestsTitle: "Kategorie: Quests",
-          categoryJourneymenTitle: "Kategorie: Handwerker",
-          categoryMarketTitle: "Kategorie: Markt",
-          categoryCraftsmenTitle: "Kategorie: Handwerker",
-          walkthrough: {
-            step1Title: "Navigation",
-            step1Body: "Nutze diese obere Zeile, um zwischen Karten, Bestiarium, Ausrüstung, Quests, Befehlen und dem Menü zu wechseln.",
-            step2Title: "Kartensteuerung",
-            step2Body: "Wähle den Stock, schalte den Untergrundmodus um, verwende die Suche und setze Filter hier schnell zurück.",
-            step3Title: "Filter",
-            step3Body: "Aktiviere Kategorien, um Markierungen anzuzeigen. Aktive Filter bleiben hervorgehoben, damit du leicht siehst, was gerade eingeschaltet ist.",
-            step4Title: "Interaktive Karte",
-            step4Body: "Ziehe zum Verschieben und scroll zum Zoomen. Wähle einen Marker, um Details und Verknüpfungen im Infopanel zu öffnen."
-          },
-          runtimeError: "Die Karte konnte gerade nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
-          runtimeTitle: "Karte nicht verfügbar",
-          coordinatesPlaceholder: "X: -- Z: --"
-        },
-        mainui: {
-          categories: {
-            npc: "NPC",
-            rulid: "Weizen-Spawn",
-            fishingSpot: "Angelplatz",
-            oakWood: "Eichenholz",
-            copper: "Kupfer",
-            iron: "Eisen",
-            coal: "Kohle"
-          },
-          categoryMainTitle: "Kategorie: Haupt",
-          clearFilters: "Filter löschen",
-          islandOptions: {
-            playerIsland: "Spielerinsel",
-            gigasCedar: "Gigas Cedar",
-            iceCave: "Eishöhle",
-            rulid: "Rulid",
-            fishingIsland: "Fischinsel"
-          },
-          walkthrough: {
-            step1Title: "Navigation",
-            step1Body: "Nutze diese obere Zeile, um Tower Defense zu öffnen oder zum Hauptmenü zurückzukehren.",
-            step2Title: "Inselsteuerung",
-            step2Body: "Wechsle die Insel, aktiviere den Untergrundmodus, suche Marker und setze Filter schnell zurück.",
-            step3Title: "Filter",
-            step3Body: "Aktiviere Kategorien, um passende Marker anzuzeigen. Deaktivierte Filter werden automatisch ausgeblendet, wenn sie für die gewählte Insel nicht gültig sind.",
-            step4Title: "Interaktive Karte",
-            step4Body: "Ziehe zum Verschieben, scrolle zum Zoomen und wähle einen Marker, um Details im Seitenpanel zu öffnen."
-          },
-          runtimeError: "Die Karte konnte gerade nicht geladen werden. Aktualisiere die Seite und versuche es erneut.",
-          runtimeTitle: "Karte nicht verfügbar",
-          coordinatesPlaceholder: "X: -- Z: --", 
-          notice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        },
-        miscinfo: {
-          title: "Sonstige Infos",
-          heading: "Sonstige Infos",
-          back: "Zurück zum Menü",
-          playerLevels: "Spielerlevel",
-          playerLevelsDetails: "Level 1 -> 2: 150 XP\nLevel 2 -> 3: 300 XP\nLevel 3 -> 4: 600 XP\nLevel 4 -> 5: 1.350 XP\nLevel 5 -> 6: 2.700 XP\nLevel 6 -> 7: 5.100 XP\nLevel 7 -> 8: 9.000 XP\nLevel 8 -> 9: 15.000 XP\nLevel 9 -> 10: 24.000 XP",
-          translationNotice: "Der Großteil des Inhalts dieser Seite ist noch nicht übersetzt, weil die Website von nur einer Person mit begrenzter Zeit gepflegt wird."
-        },
-        patchnotes: {
-          entries: {
-            v120: {
-              title: "Sehr kleiner Fehlerbehebungs-Release",
-              summary: "• Das Laden des Befehlsmenüs wurde korrigiert.\n• Die Reihenfolge der Patchnotes wurde von älter nach neuer korrigiert."
-            },
-            v111: {
-              title: "Feinschliff",
-              summary: "• Ein Reiter für Befehle wurde ergänzt.\n• Ein Bereich für sonstige Infos wurde ergänzt.\n• Zurück-zum-Menü-Buttons wurden im gesamten Webauftritt ergänzt.\n• Der Bereich Fractured Underworld wurde ergänzt, obwohl er sich noch in frühen Entwicklungsstadien befindet.\n• Die Arbeit an Tower Defense wurde begonnen.\n• Ein kurzer Hinweis auf der Willkommensseite wurde ergänzt.\n• Ein Wegpunktfehler wurde korrigiert.\n• Ein UI-Fehler wurde korrigiert."
-            },
-            v100: {
-              title: "Vollversion",
-              summary: "• Stock 3 und verfügbare Waypoints wurden ergänzt.\n• Die Hauptquest-Infos für die Stöcke 1 bis 3 fehlen noch.\n• Einige Waypoints auf Stock 3 funktionieren bewusst nicht, weil noch zu wenig Informationen vorhanden sind.\n• Der Code der Website wurde optimiert.\n• Das Equipment-Compendium wurde fertiggestellt.\n• Die meisten Buttons sind nun alphabetisch sortiert.\n• Die Website-Oberfläche wurde aktualisiert und verbessert.\n• Die Startseite wurde neu gestaltet.\n• Buttons zu Discord von SAO MC, Support und meinem Profil wurden ergänzt.\n• Kontaktiere mich über Discord für Vorschläge oder Fehlerberichte."
-            },
-            v010: {
-              title: "Webseiten-Release",
-              summary: "Erstveröffentlichung der Webseite. Stock 1, Nebenquest-Orte, Biome, Dungeons, das Quest-Menü und das Bestiary-Menü wurden ergänzt."
-            },
-            v020: {
-              title: "Neue Karten",
-              summary: "Stock 2, wichtige POI-Waypoints für Stock 1 und 2, Waypoint-Interaktionen, die das Bestiary oder Quest-Menü öffnen, sowie der Hauptmenübildschirm wurden ergänzt."
-            }
-          },
-          tags: {
-            bugFixes: "Fehlerbehebungen",
-            commands: "Befehle",
-            maps: "Karten",
-            release: "Release",
-            miscInfo: "Sonstige Infos",
-            fracturedUnderworld: "Fractured Underworld",
-            towerDefense: "Tower Defense",
-            welcomeMat: "Willkommensseite",
-            floor3: "Stock 3",
-            equipment: "Ausrüstung",
-            ui: "UI",
-            discord: "Discord",
-            contact: "Kontakt",
-            floor1: "Stock 1",
-            quests: "Quests",
-            biomes: "Biome",
-            dungeons: "Dungeons",
-            bestiary: "Bestiarium",
-            floor2: "Stock 2",
-            poi: "POI",
-            waypoints: "Waypoints",
-            mainMenu: "Hauptmenü"
-          }
-        },
-        towerdefense: {
-          arc1Title: "Arc 1 - Tutorial (Boar Planes)",
-          arc1Rewards: "Beutel mit 100 Col (100 %), Utility-Kristall (25 %), Minor-PvE-Rune (8 %), Dungeon-Schlüssel (4 %), Farn (Habitat-Item) (30 %), Frostlampe (Habitat-Item) (20 %), Lagerfeuer (Habitat-Item) (20 %)",
-          arc1Waves: "5 Wellen, in der fünften Welle erscheint ein reskinnter Pumba als Boss.",
-          arc2Title: "Arc 2 - Mittel (Boar-Zonen)",
-          arc2Rewards: "500-Col-Beutel (100 %), Utility-Kristall (40 %), Minor-PvE-Rune (18 %), Dungeon-Schlüssel (12 %), Farn (Habitat) (30 %), Heuballen (Habitat) (20 %)",
-          arc2Waves: "6 Wellen, in der sechsten Welle erscheint ein reskinnter Pumba als Boss.",
-          shopItems: {
-            mageSkeleton: {
-              name: "Magier-Skelett",
-              unlockRequirement: "5 Magierrollen",
-              invocationCost: "Invokationskosten: 200",
-              levelOne: "Stufe 1: 1,1 Angriffsgeschwindigkeit, 7 Reichweite, 5 Schaden",
-              progression: {
-                one: "Stufe 1 -> 2: +.1 Angriffsgeschwindigkeit, +2 Reichweite, +2 Schaden (1,2 Angriffsgeschwindigkeit, 9 Reichweite, 7 Schaden)",
-                two: "Stufe 2 -> 3: +.2 Angriffsgeschwindigkeit, +2 Reichweite, +2 Schaden (1,4 Angriffsgeschwindigkeit, 11 Reichweite, 9 Schaden)",
-                three: "Stufe 3 -> 4: +.3 Angriffsgeschwindigkeit, +2 Reichweite, +3 Schaden (1,7 Angriffsgeschwindigkeit, 13 Reichweite, 12 Schaden)",
-                four: "Stufe 4 -> 5 (Max): +.3 Angriffsgeschwindigkeit, +2 Reichweite, +3 Schaden (2 Angriffsgeschwindigkeit, 15 Reichweite, 15 Schaden)"
-              },
-              upgradeCosts: "Upgrade-Kosten: Stufe 2 80, Stufe 3 150, Stufe 4 250, Stufe 5 400"
-            },
-            archerSkeleton: {
-              name: "Bogenschützen-Skelett",
-              unlockRequirement: "5 Bogenschützenrollen",
-              invocationCost: "Invokationskosten: 150",
-              levelOne: "Stufe 1: .4 Angriffsgeschwindigkeit, 10 Reichweite, 6 Schaden",
-              progression: {
-                one: "Stufe 1 -> 2: +.1 Angriffsgeschwindigkeit, +3 Reichweite, +3 Schaden (0,5 Angriffsgeschwindigkeit, 13 Reichweite, 9 Schaden)",
-                two: "Stufe 2 -> 3: +3 Reichweite, +4 Schaden (0,5 Angriffsgeschwindigkeit, 16 Reichweite, 13 Schaden)",
-                three: "Stufe 3 -> 4: N/V (N/V)",
-                four: "Stufe 4 -> 5: N/V (N/V)"
-              },
-              upgradeCosts: "Upgrade-Kosten: Stufe 2 80, Stufe 3 150, Stufe 4 250, Stufe 5 400"
-            },
-            swordsmanSkeleton: {
-              name: "Schwertkämpfer-Skelett",
-              unlockRequirement: "5 Schwertkämpferrollen",
-              invocationCost: "Invokationskosten: 100",
-              levelOne: "Stufe 1: .7 Angriffsgeschwindigkeit, 4 Reichweite, 8 Schaden",
-              progression: {
-                one: "Stufe 1 -> 2: +4 Schaden (.7 Angriffsgeschwindigkeit, 4 Reichweite, 12 Schaden)",
-                two: "Stufe 2 -> 3: +.1 Angriffsgeschwindigkeit, +1 Reichweite, +5 Schaden (.8 Angriffsgeschwindigkeit, 5 Reichweite, 17 Schaden)",
-                three: "Stufe 3 -> 4: +7 Schaden (.8 Angriffsgeschwindigkeit, 5 Reichweite, 24 Schaden)",
-                four: "Stufe 4 -> 5 (Max): +.1 Angriffsgeschwindigkeit, +1 Reichweite, +8 Schaden"
-              },
-              upgradeCosts: "Upgrade-Kosten: Stufe 2 80, Stufe 3 150, Stufe 4 250, Stufe 5 400"
-            }
-          }
-        }
-      }
-    },
     fr: {
       ui: {
         nav: {
           sectionAria: "Navigation de section",
           primaryAria: "Navigation principale",
-          mapNavAria: "Navigation de la carte"
+          mapNavAria: "Navigation de la carte",
+          islandAria: "Navigation de l'île"
         },
-        pageNotice: "Une grande partie de ce site web n'a pas encore été traduite. Ce projet est maintenu par un développeur solo, donc traduire chaque page prend beaucoup de temps.",
+        pageNotice: "Certaines traductions peuvent être incomplètes, incorrectes ou contenir des erreurs de grammaire. Désolé ! Ce site est maintenu par un seul développeur qui ne parle qu’anglais, ce qui peut rendre difficile la mise à jour des autres langues. Si vous trouvez quelque chose qui nécessite une traduction, n’hésitez pas à contacter le développeur sur Discord.",
         walkthrough: {
           title: "Visite guidée rapide",
           skip: "Passer",
@@ -1571,13 +1212,23 @@
           welcomeBody: "Ceci est la page d'accueil. Utilise cette page pour choisir quel module SAO MC ouvrir.",
           modeCardsTitle: "Cartes de modes",
           modeCardsBody: "Choisis Aincrad ou Fractured Underworld pour lancer un module. La carte GGO est actuellement verrouillée jusqu'à sa sortie.",
-          discordTitle: "Raccourcis Discord",
-          discordBody: "Ouvre des liens rapides vers le profil du créateur, le Discord SAO MC et le serveur d'assistance.",
+          discordTitle: "Liens",
+          discordBody: "Ouvre des liens rapides vers le profil du créateur et le Discord SAO MC.",
           settingsTitle: "Paramètres",
           settingsBody: "Utilise la roue pour changer de langue et rejouer cette visite guidée quand tu veux."
         }
       },
       page: {
+        uwcompendium: {
+          title: "Compendium de Fractured Underworld",
+          map: "Retour à la carte",
+          searchLabel: "Rechercher",
+          searchPlaceholder: "Rechercher dans le compendium...",
+          statusShown: "Affichage de {visible} sur {total} entrées.",
+          noEntries: "Aucune entrée de compendium trouvée.",
+          unavailable: "Les données du compendium bêta ne sont pas encore disponibles.",
+          insufficientInfo: "Il n'y a pas encore assez d'informations publiées pour créer une page."
+        },
         maps: {
           walkthrough: {
             step1Title: "Navigation",
@@ -1682,6 +1333,11 @@
           logoAria: "Logo des quêtes",
           searchLabel: "Rechercher des quêtes",
           searchPlaceholder: "Rechercher dans n'importe quelle colonne...",
+          questTypeFilterAria: "Filtre de type de quête",
+          questTypes: {
+            main: "Quêtes principales",
+            side: "Quêtes secondaires"
+          },
           tableCols: {
             npcName: "Nom du PNJ",
             city: "Ville",
@@ -1724,6 +1380,7 @@
             bossSpawns: "Apparitions de boss",
             dungeons: "Donjons",
             farmingSpots: "Zones de récolte",
+            main: "Quêtes principales",
             mobAreas: "Zones de mobs",
             sideQuests: "Quêtes annexes",
             alchemist: "Alchimiste",
@@ -1749,11 +1406,11 @@
             floor2: "Étage 2 - Désert aride",
             floor3: "Étage 3 - La forêt errante"
           },
-          categoryMainTitle: "Catégorie : Principal",
-          categoryQuestsTitle: "Catégorie : Quêtes",
-          categoryJourneymenTitle: "Catégorie : Artisans",
-          categoryMarketTitle: "Catégorie : Marché",
-          categoryCraftsmenTitle: "Catégorie : Artisans",
+          categoryMainTitle: "Principal",
+          categoryQuestsTitle: "Quêtes",
+          categoryJourneymenTitle: "Artisans",
+          categoryMarketTitle: "Marché",
+          categoryCraftsmenTitle: "Artisans",
           walkthrough: {
             step1Title: "Navigation",
             step1Body: "Utilise cette ligne du haut pour passer entre Cartes, Bestiaire, Équipement, Quêtes, Commandes et le Menu.",
@@ -1778,7 +1435,7 @@
             iron: "Fer",
             coal: "Charbon"
           },
-          categoryMainTitle: "Catégorie : Principal",
+          categoryMainTitle: "Principal",
           clearFilters: "Effacer les filtres",
           islandOptions: {
             playerIsland: "Île du joueur",
@@ -1812,6 +1469,14 @@
         },
         patchnotes: {
           entries: {
+            v140: {
+              title: "Mise à jour de Character Build et de l'interface majeure",
+              summary: "• Le système complet Character Build avec prise en charge des données actuelles et des données de test bêta a été ajouté.\n• De grandes améliorations et une refonte complète de l'interface et de l'adaptation du site ont été ajoutées.\n• Les sections Équipement, Quêtes, Notes de patch, Infos diverses, Défense de tours et Compendium ont été repensées.\n• Les traductions ont été ajoutées et étendues dans tout le site.\n• La réactivité, les performances, le chargement et la compatibilité du site avec les navigateurs ont été améliorés.\n• Les statistiques d'équipement manquantes ou incorrectes et divers problèmes d'interface ont été corrigés.\n• La visite guidée du site a été mise à jour et améliorée.\n• Les données bêta et les informations liées à leur chargement ont été ajoutées.\n• De nombreux petits correctifs, améliorations et changements de qualité de vie ont été apportés dans tout le site."
+            },
+            v130: {
+              title: "Mise à jour de langue et compatibilité",
+              summary: "• Le support des langues français et espagnol a été ajouté. (De nombreuses traductions manquent encore, mais j'ai fait de mon mieux pour traduire autant que possible.)\n• Un guide de visite du site a été ajouté.\n• La compatibilité avec davantage de navigateurs web a été améliorée.\n• Le code a été optimisé et réorganisé pour faciliter les futures mises à jour et maintenance.\n\n• Ce devrait être la dernière mise à jour du site avant le retour du serveur en ligne."
+            },
             v120: {
               title: "Correctif très mineur",
               summary: "• Le chargement du menu des commandes a été corrigé.\n• L'ordre des notes de patch a été corrigé du plus ancien au plus récent."
@@ -1835,9 +1500,16 @@
           },
           tags: {
             bugFixes: "Corrections",
+            betaTestData: "Données de test bêta",
+            characterBuild: "Character Build",
+            uiOverhaul: "Refonte de l'interface",
             commands: "Commandes",
             maps: "Cartes",
             release: "Version",
+            localization: "Localisation",
+            performance: "Performance",
+            compatibility: "Compatibilité",
+            maintenance: "Maintenance",
             miscInfo: "Infos diverses",
             fracturedUnderworld: "Fractured Underworld",
             towerDefense: "Tower Defense",
@@ -1916,6 +1588,700 @@
     translations[language] = deepMerge(translations[language] || {}, additions);
   });
 
+  translations.en = deepMerge(translations.en, {
+    page: {
+      quests: { emptyState: "No quest entries to display." },
+      maps: {
+        categories: { main: "Main Quests" },
+        sidebarResizeAria: "Resize sidebar"
+      }
+    }
+  });
+  translations.es = deepMerge(translations.es, {
+    languageName: "Español",
+    dataset: {
+      betaLabel: "Datos de prueba beta",
+      currentLabel: "Datos actuales",
+      betaDescription: "ESTA INFORMACIÓN PROVIENE DE PRUEBAS BETA. PUEDE NO SER PRECISA.",
+      currentDescription: "ESTA INFORMACIÓN SE ESTÁ ACTUALIZANDO. SI NO ENCUENTRAS ALGO, CONSULTA «DATOS DE PRUEBA BETA» HASTA QUE OBTENGAMOS LA INFORMACIÓN.",
+      chooseTitle: "Elegir versión de datos",
+      cancel: "Cancelar",
+      close: "Cerrar selección de datos"
+    },
+    page: {
+      maps: {
+        title: "Mapa interactivo de SAO",
+        floorLabel: "Piso:",
+        undergroundLabel: "Subterráneo:",
+        searchPlaceholder: "Buscar marcadores...",
+        clearFilters: "Borrar filtros",
+        mapAlt: "Mapa del piso",
+        undergroundAlt: "Capa subterránea",
+        resetView: "Restablecer vista",
+        defaultInfoTitle: "Selecciona un marcador",
+        defaultInfoBody: "Elige un marcador del mapa para ver los detalles aquí.",
+        chooseCategoryTitle: "Elige una categoría",
+        chooseCategoryBody: "Activa una o más categorías en la barra lateral para mostrar marcadores de este piso.",
+        noSearchTitle: "Sin coincidencias de búsqueda",
+        noSearchBody: "Ningún marcador coincide con tu búsqueda actual en este piso.",
+        noMarkersTitle: "No hay marcadores disponibles",
+        noMarkersBody: "No hay marcadores disponibles para las categorías seleccionadas en este piso.",
+        noMobEntries: "Todavía no hay entradas de mobs disponibles para esta zona.",
+        mobType: "Tipo",
+        mobAreaType: "Zona de mobs",
+        availableMobs: "Mobs disponibles",
+        floorText: "Piso",
+        coordinates: "Coordenadas",
+        mobs: "Mobs",
+        viewWaypointInfo: "Ver información del waypoint",
+        markVisited: "Marcar como visitado",
+        visitedDefeated: "Derrotado",
+        visitedCompleted: "Completado",
+        visitedVisited: "Visitado",
+        categories: { main: "Principal" },
+        sidebarResizeAria: "Cambiar tamaño de la barra lateral"
+      },
+      mainui: {
+        towerDefenseNav: "Defensa de torres",
+        compendiumNav: "Compendio",
+        compendiumToast: "Todavía no hay suficiente información publicada para crear una página.",
+        title: "Mapa interactivo de SAO",
+        translationNotice: "La mayor parte del contenido de esta página todavía no está traducida.",
+        islandLabel: "Isla:",
+        undergroundLabel: "Subterráneo:",
+        searchPlaceholder: "Buscar marcadores...",
+        resetView: "Restablecer vista",
+        defaultInfoTitle: "Selecciona un marcador",
+        defaultInfoBody: "Elige un marcador del mapa para ver los detalles aquí.",
+        chooseCategoryTitle: "Elige una categoría",
+        chooseCategoryBody: "Activa una o más categorías para mostrar marcadores de esta isla.",
+        noSearchTitle: "Sin coincidencias de búsqueda",
+        noSearchBody: "Ningún marcador coincide con tu búsqueda actual en esta isla.",
+        noMarkersTitle: "No hay marcadores disponibles",
+        noMarkersBody: "No hay marcadores disponibles para las categorías seleccionadas en esta isla.",
+        noImageYet: "Todavía no hay imagen",
+        noMobEntries: "Todavía no hay entradas de mobs disponibles para esta zona.",
+        mapSuffix: "mapa",
+        undergroundSuffix: "capa subterránea"
+      },
+      bestiary: { translationNotice: "La mayor parte del contenido de esta página todavía no está traducida." },
+      commands: { translationNotice: "La mayor parte del contenido de esta página todavía no está traducida." },
+      ecompendium: { translationNotice: "La mayor parte del contenido de esta página todavía no está traducida." },
+      quests: { translationNotice: "La mayor parte del contenido de esta página todavía no está traducida.", emptyState: "No hay entradas de misiones para mostrar." },
+      miscinfo: { notice: "La mayor parte del contenido de esta página todavía no está traducida." },
+      towerdefense: {
+        title: "Fractured Underworld - Defensa de torres",
+        translationNotice: "La mayor parte del contenido de esta página todavía no está traducida.",
+        sectionsAria: "Secciones de defensa de torres",
+        chapterOverviewAria: "Resumen de capítulos de defensa de torres",
+        chapterListAria: "Lista de capítulos de defensa de torres",
+        shopSectionAria: "Sección de tienda de defensa de torres",
+        shopListAria: "Lista de tienda de defensa de torres",
+        infoSheetTitle: "Ficha de información de defensa de torres",
+        closeInfoSheet: "Cerrar ficha de información",
+        insufficientInfo: "Todavía no hay suficiente información publicada para crear una página.",
+        rewardsHead: "Recompensas",
+        wavesHead: "Oleadas",
+        arcHead: "Arco"
+      }
+    }
+  });
+  translations.fr = deepMerge(translations.fr, {
+    languageName: "Français",
+    dataset: {
+      betaLabel: "Données de test bêta",
+      currentLabel: "Données actuelles",
+      betaDescription: "CES INFORMATIONS PROVIENNENT DE TESTS BÊTA. ELLES PEUVENT ÊTRE INCORRECTES.",
+      currentDescription: "CES INFORMATIONS SONT ACTIVEMENT MISES À JOUR. SI VOUS NE TROUVEZ PAS QUELQUE CHOSE, CONSULTEZ LES « DONNÉES DE TEST BÊTA » EN ATTENDANT LES INFORMATIONS.",
+      chooseTitle: "Choisir la version des données",
+      cancel: "Annuler",
+      close: "Fermer la sélection des données"
+    },
+    page: {
+      maps: {
+        title: "Carte interactive de SAO",
+        floorLabel: "Étage :",
+        undergroundLabel: "Souterrain :",
+        searchPlaceholder: "Rechercher des marqueurs...",
+        clearFilters: "Effacer les filtres",
+        mapAlt: "Carte de l'étage",
+        undergroundAlt: "Overlay souterrain",
+        resetView: "Réinitialiser la vue",
+        defaultInfoTitle: "Sélectionnez un marqueur",
+        defaultInfoBody: "Choisissez un marqueur sur la carte pour voir les détails ici.",
+        chooseCategoryTitle: "Choisissez une catégorie",
+        chooseCategoryBody: "Activez une ou plusieurs catégories dans la barre latérale pour afficher les marqueurs de cet étage.",
+        noSearchTitle: "Aucun résultat de recherche",
+        noSearchBody: "Aucun marqueur ne correspond à votre recherche actuelle sur cet étage.",
+        noMarkersTitle: "Aucun marqueur disponible",
+        noMarkersBody: "Aucun marqueur n'est disponible pour les catégories sélectionnées sur cet étage.",
+        noMobEntries: "Aucune entrée de mob n'est encore disponible pour cette zone.",
+        mobType: "Type",
+        mobAreaType: "Zone de mobs",
+        availableMobs: "Mobs disponibles",
+        floorText: "Étage",
+        coordinates: "Coordonnées",
+        mobs: "Mobs",
+        viewWaypointInfo: "Voir les informations du waypoint",
+        markVisited: "Marquer comme visité",
+        visitedDefeated: "Vaincu",
+        visitedCompleted: "Terminé",
+        visitedVisited: "Visité",
+        categories: { main: "Principal" },
+        sidebarResizeAria: "Redimensionner la barre latérale"
+      },
+      mainui: {
+        towerDefenseNav: "Défense de tours",
+        compendiumNav: "Compendium",
+        compendiumToast: "Il n'y a pas encore assez d'informations publiées pour créer une page.",
+        title: "Carte interactive de SAO",
+        translationNotice: "La majeure partie du contenu de cette page n'est pas encore traduite.",
+        islandLabel: "Île :",
+        undergroundLabel: "Souterrain :",
+        searchPlaceholder: "Rechercher des marqueurs...",
+        resetView: "Réinitialiser la vue",
+        defaultInfoTitle: "Sélectionnez un marqueur",
+        defaultInfoBody: "Choisissez un marqueur sur la carte pour voir les détails ici.",
+        chooseCategoryTitle: "Choisissez une catégorie",
+        chooseCategoryBody: "Activez une ou plusieurs catégories pour afficher les marqueurs de cette île.",
+        noSearchTitle: "Aucun résultat de recherche",
+        noSearchBody: "Aucun marqueur ne correspond à votre recherche actuelle sur cette île.",
+        noMarkersTitle: "Aucun marqueur disponible",
+        noMarkersBody: "Aucun marqueur n'est disponible pour les catégories sélectionnées sur cette île.",
+        noImageYet: "Aucune image pour le moment",
+        noMobEntries: "Aucune entrée de mob n'est encore disponible pour cette zone.",
+        mapSuffix: "carte",
+        undergroundSuffix: "overlay souterrain"
+      },
+      bestiary: { translationNotice: "La majeure partie du contenu de cette page n'est pas encore traduite." },
+      commands: { translationNotice: "La majeure partie du contenu de cette page n'est pas encore traduite." },
+      ecompendium: { translationNotice: "La majeure partie du contenu de cette page n'est pas encore traduite." },
+      quests: { translationNotice: "La majeure partie du contenu de cette page n'est pas encore traduit.", emptyState: "Aucune entrée de quête à afficher." },
+      miscinfo: { notice: "La majeure partie du contenu de cette page n'est pas encore traduite." },
+      towerdefense: {
+        title: "Fractured Underworld - Défense de tours",
+        translationNotice: "La majeure partie du contenu de cette page n'est pas encore traduite.",
+        sectionsAria: "Sections de défense de tours",
+        chapterOverviewAria: "Aperçu des chapitres de défense de tours",
+        chapterListAria: "Liste des chapitres de défense de tours",
+        shopSectionAria: "Section de boutique de défense de tours",
+        shopListAria: "Liste de boutique de défense de tours",
+        infoSheetTitle: "Fiche d'information de défense de tours",
+        closeInfoSheet: "Fermer la fiche d'information",
+        insufficientInfo: "Il n'y a pas encore assez d'informations publiées pour créer une page.",
+        rewardsHead: "Récompenses",
+        wavesHead: "Vagues",
+        arcHead: "Arc"
+      }
+    }
+  });
+  translations.en = deepMerge(translations.en, {
+    ui: {
+      walkthrough: {
+        welcomeTitle: "Welcome",
+        welcomeBody: "Use this page to choose which SAO MC world or module you want to open.",
+        modeCardsTitle: "Mode Cards",
+        modeCardsBody: "Pick Aincrad or Fractured Underworld to launch a module. The GGO card is currently locked until release.",
+        discordTitle: "Links",
+        discordBody: "Open quick links to the SAO MC Support Website, SAO MC Discord, and my Discord Profile.",
+        characterBuildTitle: "Character Build",
+        characterBuildBody: "Open Character Build to create and customize your character, equipment, runes, skills, and other build settings.",
+        settingsTitle: "Settings",
+        settingsBody: "Use the gear to switch language and replay this walkthrough whenever you want."
+      }
+    },
+    page: {
+      maps: {
+        walkthrough: {
+          step1Title: "Navigation",
+          step1Body: "Use the top row to switch between Bestiary, Equipment, Quests, Patch Notes, Misc. Info, and the Menu.",
+          step2Title: "Map Controls",
+          step2Body: "Choose the floor, toggle underground mode, search for markers, and clear your current filters from here.",
+          step3Title: "Filters",
+          step3Body: "Use the category filters to control which markers appear on the map. Active filters stay highlighted so you can see what is enabled.",
+          step4Title: "Interactive Map",
+          step4Body: "Drag to pan and scroll to zoom. Select a marker to open its details and shortcuts in the information panel."
+        }
+      },
+      mainui: {
+        walkthrough: {
+          step1Title: "Navigation",
+          step1Body: "Use the top row to open Tower Defense, open the Compendium, or return to the Menu.",
+          step2Title: "Island Controls",
+          step2Body: "Choose an island, search for markers, and clear your current filters from here.",
+          step3Title: "Filters",
+          step3Body: "Use the category filters to control which markers appear on the selected island. Active filters stay highlighted so you can see what is enabled.",
+          step4Title: "Map Area",
+          step4Body: "This area shows the selected island and any map data currently available. Some Underworld islands still display an unavailable-data state."
+        }
+      }
+    }
+  });
+  translations.es = deepMerge(translations.es, {
+    ui: {
+      walkthrough: {
+        welcomeTitle: "Bienvenida",
+        welcomeBody: "Usa esta página para elegir qué mundo o módulo de SAO MC quieres abrir.",
+        modeCardsTitle: "Tarjetas de modo",
+        modeCardsBody: "Elige Aincrad o Fractured Underworld para abrir un módulo. La tarjeta de GGO está bloqueada hasta su lanzamiento.",
+        discordTitle: "Enlaces",
+        discordBody: "Abre enlaces rápidos al sitio de asistencia, al Discord de SAO MC y a mi perfil de Discord.",
+        characterBuildTitle: "Creación de personaje",
+        characterBuildBody: "Abre Character Build para crear y personalizar tu personaje, equipo, runas, habilidades y otros ajustes de la build.",
+        settingsTitle: "Configuración",
+        settingsBody: "Usa el engranaje para cambiar el idioma y volver a reproducir este recorrido cuando quieras."
+      }
+    },
+    page: {
+      maps: {
+        walkthrough: {
+          step1Title: "Navegación",
+          step1Body: "Usa la fila superior para cambiar entre Bestiario, Equipo, Misiones, Notas de parche, Info. Varia y el Menú.",
+          step2Title: "Controles del mapa",
+          step2Body: "Elige el piso, activa el modo subterráneo, busca marcadores y borra los filtros actuales desde aquí.",
+          step3Title: "Filtros",
+          step3Body: "Usa los filtros de categoría para controlar qué marcadores aparecen en el mapa. Los filtros activos permanecen resaltados para mostrar lo que está habilitado.",
+          step4Title: "Mapa interactivo",
+          step4Body: "Arrastra para desplazarte y usa la rueda para acercar. Selecciona un marcador para abrir sus detalles y accesos rápidos en el panel de información."
+        }
+      },
+      mainui: {
+        walkthrough: {
+          step1Title: "Navegación",
+          step1Body: "Usa la fila superior para abrir Defensa de torres, abrir el compendio o volver al menú.",
+          step2Title: "Controles de isla",
+          step2Body: "Elige una isla, busca marcadores y borra los filtros actuales desde aquí.",
+          step3Title: "Filtros",
+          step3Body: "Usa los filtros de categoría para controlar qué marcadores aparecen en la isla seleccionada. Los filtros activos permanecen resaltados para mostrar lo que está habilitado.",
+          step4Title: "Área del mapa",
+          step4Body: "Esta área muestra la isla seleccionada y los datos de mapa disponibles. Algunas islas de Underworld todavía muestran un estado de datos no disponibles."
+        }
+      }
+    }
+  });
+  translations.fr = deepMerge(translations.fr, {
+    ui: {
+      walkthrough: {
+        welcomeTitle: "Bienvenue",
+        welcomeBody: "Utilise cette page pour choisir quel monde ou module SAO MC ouvrir.",
+        modeCardsTitle: "Cartes de modes",
+        modeCardsBody: "Choisis Aincrad ou Fractured Underworld pour lancer un module. La carte GGO est verrouillée jusqu'à sa sortie.",
+        discordTitle: "Liens",
+        discordBody: "Ouvre des liens rapides vers le site d'assistance, le Discord SAO MC et mon profil Discord.",
+        characterBuildTitle: "Création de personnage",
+        characterBuildBody: "Ouvre Character Build pour créer et personnaliser ton personnage, son équipement, ses runes, ses compétences et ses autres réglages.",
+        settingsTitle: "Paramètres",
+        settingsBody: "Utilise la roue pour changer de langue et rejouer cette visite guidée quand tu veux."
+      }
+    },
+    page: {
+      maps: {
+        walkthrough: {
+          step1Title: "Navigation",
+          step1Body: "Utilise la ligne du haut pour passer entre Bestiaire, Équipement, Quêtes, Notes de patch, Infos diverses et le Menu.",
+          step2Title: "Contrôles de la carte",
+          step2Body: "Choisis l'étage, active le mode souterrain, recherche des marqueurs et efface les filtres actuels depuis ici.",
+          step3Title: "Filtres",
+          step3Body: "Utilise les filtres de catégories pour contrôler les marqueurs affichés sur la carte. Les filtres actifs restent en évidence.",
+          step4Title: "Carte interactive",
+          step4Body: "Fais glisser pour déplacer et utilise la molette pour zoomer. Sélectionne un marqueur pour ouvrir ses détails et ses raccourcis dans le panneau d'information."
+        }
+      },
+      mainui: {
+        walkthrough: {
+          step1Title: "Navigation",
+          step1Body: "Utilisez la ligne du haut pour ouvrir Tower Defense, ouvrir le compendium ou revenir au menu.",
+          step2Title: "Contrôles de l'île",
+          step2Body: "Choisis une île, recherche des marqueurs et efface les filtres actuels depuis ici.",
+          step3Title: "Filtres",
+          step3Body: "Utilise les filtres de catégories pour contrôler les marqueurs affichés sur l'île sélectionnée. Les filtres actifs restent en évidence.",
+          step4Title: "Zone de carte",
+          step4Body: "Cette zone affiche l'île sélectionnée et les données cartographiques actuellement disponibles. Certaines îles de l'Underworld indiquent encore que les données sont indisponibles."
+        }
+      }
+    }
+  });
+
+  const characterBuildTranslations = {
+    en: {
+      page: {
+        characterBuild: {
+          navBack: "Go back to Menu",
+          eyebrow: "AINCRAD / BUILD LAB",
+          title: "Character Build Mode",
+          browserTitle: "Character Build Mode | SAO MC Interactive Map",
+          metaDescription: "Build and preview an Aincrad character with sample equipment and skills.",
+          subtitle: "Assemble a loadout, review its combat stats, and explore prototype skill trees.",
+          resetBuild: "Reset Build",
+          configuration: "Build configuration",
+          dataSource: "Data source",
+          currentData: "Current Data",
+          betaData: "Beta-Test Data",
+          readingCurrent: "Reading the Current Equipment Compendium.",
+          buildSlot: "Build slot",
+          buildNumber: "Build {number}",
+          level: "Level",
+          class: "Class",
+          loadout: "LOADOUT",
+          equipment: "Equipment",
+          slots: "{count} slots",
+          armor: "Armor",
+          accessories: "Accessories",
+          weaponsOffhand: "Weapons / Offhand",
+          characterSheet: "CHARACTER SHEET",
+          stats: "Stats",
+          base: "Base {level}",
+          placeholderPreview: "PROTOTYPE PREVIEW",
+          skillTree: "Skill Tree",
+          sampleSkills: "Prototype skills",
+          sampleSkillTree: "Prototype skill tree",
+          placeholderNote: "These prototype nodes demonstrate a possible class progression; they are not final skill data.",
+          equipmentSelector: "EQUIPMENT SELECTOR",
+          selectEquipment: "Select equipment",
+          closeEquipmentSelector: "Close equipment selector",
+          searchItems: "Search items",
+          searchPlaceholder: "Search by name or effect...",
+          rarity: "Rarity",
+          allRarities: "All rarities",
+          rune: "Rune",
+          selected: "Selected",
+          locked: "Locked",
+          available: "Available",
+          selectSlot: "Select {slot}",
+          selectRune: "Select {slot} rune {number}",
+          runeSlots: "{slot} rune slots",
+          equipped: "Equipped",
+          unavailable: "Unavailable in selected data",
+          emptySlot: "Empty slot",
+          prototypeTree: "Prototype tree",
+          prototypeDataOnly: "Prototype data only",
+          requires: "Requires: {value}",
+          effect: "Effect: {value}",
+          state: "State: {value}",
+          none: "None",
+          alreadyUnlocked: "Already unlocked",
+          readyToUnlock: "Ready to unlock",
+          requiresSkills: "Requires {value}",
+          deselectDependent: "Deselect dependent skills first.",
+          noMatchingItems: "No {slot} items match these filters at level {level}.",
+          weaponAlreadyEquipped: "This weapon is already equipped in the other weapon slot.",
+          selectRuneFor: "Select Rune {number} for {slot}",
+          itemLevel: "Level {level}",
+          branchCore: "core",
+          branchA: "branch A",
+          branchB: "branch B",
+          select: "Select",
+          walkthrough: {
+            step1Title: "Character Build",
+            step1Body: "Configure a character, equipment, level, class, stats, skills, and related build information here.",
+            step2Title: "Character level",
+            step2Body: "Changing the level updates the displayed level and recalculates the build stats. It also affects which equipment is available at the selected level.",
+            step3Title: "Equipment",
+            step3Body: "Use this loadout section to choose equipment for the character across the available equipment groups.",
+            step4Title: "Equipment slots",
+            step4Body: "Each slot represents an equipment type, such as armor, accessories, a main weapon, or an offhand. Select a slot to browse matching items.",
+            step5Title: "Equipment selector",
+            step5Body: "The selector lists items that match the chosen slot. Use search or select an item to equip it; the walkthrough opened this dialog temporarily.",
+            step6Title: "Rarity filter",
+            step6Body: "Use Rarity to limit the items shown in the equipment selector to a particular rarity.",
+            step7Title: "Stats",
+            step7Body: "Stats shows the calculated values for the current build, grouped into sections such as Offensive and Defensive. Existing accordion state is left unchanged.",
+            step8Title: "Skill Tree",
+            step8Body: "This prototype skill tree shows the available class skills, their relationships, effects, and current unlock state. Skill nodes can be interacted with.",
+            step9Title: "Build slots",
+            step9Body: "Choose one of the build slots to work on a separate configuration. Character Build saves changes automatically in the browser.",
+            step10Title: "Data source",
+            step10Body: "Current Data uses the current equipment source. Beta-Test Data is a separate beta data source and is not active unless you select it.",
+            step11Title: "Ready to build",
+            step11Body: "You now know the main parts of Character Build. Start configuring your character whenever you are ready."
+          }
+        }
+      }
+    },
+    es: {
+      page: {
+        characterBuild: {
+          navBack: "Volver al menú",
+          eyebrow: "AINCRAD / LABORATORIO DE BUILDS",
+          title: "Modo de creación de personaje",
+          browserTitle: "Modo de creación de personaje | Mapa interactivo de SAO MC",
+          metaDescription: "Crea y previsualiza un personaje de Aincrad con equipo y habilidades de muestra.",
+          subtitle: "Configura tu equipo, revisa sus estadísticas de combate y explora árboles de habilidades prototipo.",
+          resetBuild: "Restablecer build",
+          configuration: "Configuración de la build",
+          dataSource: "Fuente de datos",
+          currentData: "Datos actuales",
+          betaData: "Datos de prueba beta",
+          readingCurrent: "Leyendo el compendio de equipo actual.",
+          buildSlot: "Espacio de build",
+          buildNumber: "Construcción {number}",
+          level: "Nivel",
+          class: "Clase",
+          loadout: "EQUIPAMIENTO",
+          equipment: "Equipo",
+          slots: "{count} espacios",
+          armor: "Armadura",
+          accessories: "Accesorios",
+          weaponsOffhand: "Armas / Mano secundaria",
+          characterSheet: "HOJA DEL PERSONAJE",
+          stats: "Estadísticas",
+          base: "Base {level}",
+          placeholderPreview: "VISTA PREVIA DEL PROTOTIPO",
+          skillTree: "Árbol de habilidades",
+          sampleSkills: "Habilidades prototipo",
+          sampleSkillTree: "Árbol de habilidades prototipo",
+          placeholderNote: "Estos nodos prototipo muestran una posible progresión de clase; no son datos definitivos de habilidades.",
+          equipmentSelector: "SELECTOR DE EQUIPO",
+          selectEquipment: "Seleccionar equipo",
+          closeEquipmentSelector: "Cerrar selector de equipo",
+          searchItems: "Buscar objetos",
+          searchPlaceholder: "Buscar por nombre o efecto...",
+          rarity: "Rareza",
+          allRarities: "Todas las rarezas",
+          rune: "Runa",
+          selected: "Seleccionada",
+          locked: "Bloqueada",
+          available: "Disponible",
+          selectSlot: "Seleccionar {slot}",
+          selectRune: "Seleccionar runa de {slot} {number}",
+          runeSlots: "Espacios de runa de {slot}",
+          equipped: "Equipado",
+          unavailable: "No disponible en los datos seleccionados",
+          emptySlot: "Espacio vacío",
+          prototypeTree: "Árbol de prueba",
+          prototypeDataOnly: "Solo datos de prueba",
+          requires: "Requiere: {value}",
+          effect: "Efecto: {value}",
+          state: "Estado: {value}",
+          none: "Ninguno",
+          alreadyUnlocked: "Ya desbloqueada",
+          readyToUnlock: "Lista para desbloquear",
+          requiresSkills: "Requiere {value}",
+          deselectDependent: "Quita primero las habilidades dependientes.",
+          noMatchingItems: "Ningún objeto de {slot} coincide con estos filtros en el nivel {level}.",
+          weaponAlreadyEquipped: "Esta arma ya está equipada en el otro espacio de arma.",
+          selectRuneFor: "Seleccionar runa {number} para {slot}",
+          itemLevel: "Nivel {level}",
+          branchCore: "núcleo",
+          branchA: "rama A",
+          branchB: "rama B",
+          select: "Seleccionar",
+          walkthrough: {
+            step1Title: "Creación de personaje",
+            step1Body: "Configura aquí el personaje, el equipo, el nivel, la clase, las estadísticas, las habilidades y otra información de la build.",
+            step2Title: "Nivel del personaje",
+            step2Body: "Cambiar el nivel actualiza el nivel mostrado y recalcula las estadísticas de la build. También afecta al equipo disponible para ese nivel.",
+            step3Title: "Equipo",
+            step3Body: "Usa esta sección de equipamiento para elegir el equipo del personaje entre los grupos disponibles.",
+            step4Title: "Espacios de equipo",
+            step4Body: "Cada espacio representa un tipo de equipo, como armadura, accesorios, arma principal o mano secundaria. Selecciona un espacio para buscar objetos compatibles.",
+            step5Title: "Selector de equipo",
+            step5Body: "El selector muestra los objetos que coinciden con el espacio elegido. Busca o selecciona un objeto para equiparlo; esta ventana se abrió temporalmente para la guía.",
+            step6Title: "Filtro de rareza",
+            step6Body: "Usa Rareza para limitar los objetos mostrados en el selector a una rareza concreta.",
+            step7Title: "Estadísticas",
+            step7Body: "Estadísticas muestra los valores calculados de la build actual, agrupados en secciones como Ofensiva y Defensiva. El estado actual de los acordeones no se modifica.",
+            step8Title: "Árbol de habilidades",
+            step8Body: "Este árbol de habilidades de prueba muestra las habilidades de la clase, sus relaciones, efectos y estado de desbloqueo. Puedes interactuar con sus nodos.",
+            step9Title: "Espacios de build",
+            step9Body: "Elige uno de los espacios para trabajar en una configuración separada. Character Build guarda los cambios automáticamente en el navegador.",
+            step10Title: "Fuente de datos",
+            step10Body: "Datos actuales usa la fuente de equipo actual. Datos de prueba beta es una fuente separada y no se activa a menos que la selecciones.",
+            step11Title: "Listo para crear tu build",
+            step11Body: "Ya conoces las partes principales de Character Build. Empieza a configurar tu personaje cuando quieras."
+          }
+        }
+      }
+    },
+    fr: {
+      page: {
+        characterBuild: {
+          navBack: "Retour au menu",
+          eyebrow: "AINCRAD / LABORATOIRE DE BUILD",
+          title: "Mode de création de personnage",
+          browserTitle: "Mode de création de personnage | Carte interactive SAO MC",
+          metaDescription: "Créez et prévisualisez un personnage d'Aincrad avec un équipement et des compétences d'exemple.",
+          subtitle: "Composez un équipement, consultez ses statistiques de combat et explorez des arbres de compétences prototypes.",
+          resetBuild: "Réinitialiser le build",
+          configuration: "Configuration du build",
+          dataSource: "Source des données",
+          currentData: "Données actuelles",
+          betaData: "Données de test bêta",
+          readingCurrent: "Lecture du compendium d'équipement actuel.",
+          buildSlot: "Emplacement de build",
+          buildNumber: "Build {number}",
+          level: "Niveau",
+          class: "Classe",
+          loadout: "ÉQUIPEMENT",
+          equipment: "Équipement",
+          slots: "{count} emplacements",
+          armor: "Armure",
+          accessories: "Accessoires",
+          weaponsOffhand: "Armes / Main secondaire",
+          characterSheet: "FICHE DU PERSONNAGE",
+          stats: "Statistiques",
+          base: "Base {level}",
+          placeholderPreview: "APERÇU DU PROTOTYPE",
+          skillTree: "Arbre de compétences",
+          sampleSkills: "Compétences prototypes",
+          sampleSkillTree: "Arbre de compétences prototype",
+          placeholderNote: "Ces nœuds prototypes illustrent une progression de classe possible ; les données de compétences ne sont pas définitives.",
+          equipmentSelector: "SÉLECTEUR D'ÉQUIPEMENT",
+          selectEquipment: "Sélectionner l'équipement",
+          closeEquipmentSelector: "Fermer le sélecteur d'équipement",
+          searchItems: "Rechercher des objets",
+          searchPlaceholder: "Rechercher par nom ou effet...",
+          rarity: "Rareté",
+          allRarities: "Toutes les raretés",
+          rune: "Rune",
+          selected: "Sélectionnée",
+          locked: "Verrouillée",
+          available: "Disponible",
+          selectSlot: "Sélectionner {slot}",
+          selectRune: "Sélectionner la rune {number} de {slot}",
+          runeSlots: "Emplacements de runes de {slot}",
+          equipped: "Équipé",
+          unavailable: "Indisponible dans les données sélectionnées",
+          emptySlot: "Emplacement vide",
+          prototypeTree: "Arbre prototype",
+          prototypeDataOnly: "Données de prototype uniquement",
+          requires: "Nécessite : {value}",
+          effect: "Effet : {value}",
+          state: "État : {value}",
+          none: "Aucun",
+          alreadyUnlocked: "Déjà débloquée",
+          readyToUnlock: "Prête à débloquer",
+          requiresSkills: "Nécessite {value}",
+          deselectDependent: "Désélectionnez d'abord les compétences dépendantes.",
+          noMatchingItems: "Aucun objet de {slot} ne correspond à ces filtres au niveau {level}.",
+          weaponAlreadyEquipped: "Cette arme est déjà équipée dans l'autre emplacement d'arme.",
+          selectRuneFor: "Sélectionner la rune {number} pour {slot}",
+          itemLevel: "Niveau {level}",
+          branchCore: "noyau",
+          branchA: "branche A",
+          branchB: "branche B",
+          select: "Sélectionner",
+          walkthrough: {
+            step1Title: "Création de personnage",
+            step1Body: "Configurez ici votre personnage, son équipement, son niveau, sa classe, ses statistiques, ses compétences et les informations associées au build.",
+            step2Title: "Niveau du personnage",
+            step2Body: "Modifier le niveau met à jour le niveau affiché et recalcule les statistiques du build. Cela influence aussi l'équipement disponible à ce niveau.",
+            step3Title: "Équipement",
+            step3Body: "Utilisez cette section d'équipement pour choisir l'équipement du personnage parmi les groupes disponibles.",
+            step4Title: "Emplacements d'équipement",
+            step4Body: "Chaque emplacement représente un type d'équipement, comme l'armure, les accessoires, l'arme principale ou la main secondaire. Sélectionnez un emplacement pour parcourir les objets correspondants.",
+            step5Title: "Sélecteur d'équipement",
+            step5Body: "Le sélecteur liste les objets correspondant à l'emplacement choisi. Recherchez ou sélectionnez un objet pour l'équiper ; cette fenêtre a été ouverte temporairement pour la visite.",
+            step6Title: "Filtre de rareté",
+            step6Body: "Utilisez Rareté pour limiter les objets affichés dans le sélecteur à une rareté donnée.",
+            step7Title: "Statistiques",
+            step7Body: "Statistiques affiche les valeurs calculées du build actuel, regroupées dans des sections comme Offensif et Défensif. L'état actuel des accordéons reste inchangé.",
+            step8Title: "Arbre de compétences",
+            step8Body: "Cet arbre de compétences prototype présente les compétences de la classe, leurs relations, leurs effets et leur état de déblocage. Vous pouvez interagir avec ses nœuds.",
+            step9Title: "Emplacements de build",
+            step9Body: "Choisissez l'un des emplacements pour travailler sur une configuration distincte. Character Build enregistre automatiquement les changements dans le navigateur.",
+            step10Title: "Source des données",
+            step10Body: "Données actuelles utilise la source d'équipement actuelle. Données de test bêta est une source distincte et ne devient active que si vous la sélectionnez.",
+            step11Title: "Prêt à créer votre build",
+            step11Body: "Vous connaissez maintenant les principales parties de Character Build. Commencez à configurer votre personnage quand vous le souhaitez."
+          }
+        }
+      }
+    }
+  };
+
+  Object.entries(characterBuildTranslations).forEach(([language, additions]) => {
+    translations[language] = deepMerge(translations[language] || {}, additions);
+  });
+
+  const characterBuildDataTranslations = {
+    en: {
+      page: { characterBuild: {
+        classes: { archer: "Archer / Ranger", assassin: "Assassin / DPS", guerrier: "Warrior / Tank", mage: "Mage / Ranged Magic", "martial-artist": "Martial Artist / Melee", shaman: "Shaman / Support" },
+        slotNames: { helmet: "Helmet", chestplate: "Chestplate", leggings: "Leggings", boots: "Boots", amulet: "Amulet", "ring-1": "Ring 1", "ring-2": "Ring 2", bracelet: "Bracelet", glove: "Glove", "artifact-1": "Artifact 1", "artifact-2": "Artifact 2", "artifact-3": "Artifact 3", offhand: "Offhand", "main-weapon": "Main Weapon" },
+        groupNames: { offensive: "Offensive", defensive: "Defensive", mobilityStamina: "Mobility & Stamina", healthRegeneration: "Health & Regeneration", specialEffects: "Special Effects" },
+        statNames: { damage: "Damage", physicalDamage: "Physical Damage", weaponDamage: "Weapon Damage", magicDamage: "Magic Damage", skillDamage: "Skill Damage", projectileDamage: "Projectile Damage", attackSpeed: "Attack Speed", criticalHitChance: "Critical Hit Chance", criticalHitDamage: "Critical Hit Damage", skillCriticalHitChance: "Skill Critical Hit Chance", skillCriticalHitDamage: "Skill Critical Hit Damage", defense: "Defense", blockProficiency: "Block Proficiency", blockPower: "Block Power", health: "Health", evasion: "Evasion", damageReduction: "Damage Reduction", fallDamageReduction: "Fall Damage Reduction", tenacity: "Tenacity", knockbackResistance: "Knockback Resistance", parryChance: "Parry Chance", haste: "Haste", movementSpeed: "Movement Speed", crouchingSpeed: "Crouching Speed", mana: "Mana", stamina: "Stamina", lifeSteal: "Life Steal", omnivamp: "Omnivamp", bonusHealing: "Bonus Healing", healingPower: "Healing Power", healthRegeneration: "Health Regeneration", manaRegeneration: "Mana Regeneration", staminaRegeneration: "Stamina Regeneration", flightOfLife: "Flight Of Life" }
+      } }
+    },
+    es: {
+      page: { characterBuild: {
+        classes: { archer: "Arquero / Explorador", assassin: "Asesino / DPS", guerrier: "Guerrero / Tanque", mage: "Mago / Magia a distancia", "martial-artist": "Artista marcial / Cuerpo a cuerpo", shaman: "Chamán / Apoyo" },
+        slotNames: { helmet: "Casco", chestplate: "Peto", leggings: "Calzas", boots: "Botas", amulet: "Amuleto", "ring-1": "Anillo 1", "ring-2": "Anillo 2", bracelet: "Brazalete", glove: "Guante", "artifact-1": "Artefacto 1", "artifact-2": "Artefacto 2", "artifact-3": "Artefacto 3", offhand: "Mano secundaria", "main-weapon": "Arma principal" },
+        groupNames: { offensive: "Ofensiva", defensive: "Defensiva", mobilityStamina: "Movilidad y resistencia", healthRegeneration: "Salud y regeneración", specialEffects: "Efectos especiales" },
+        statNames: { damage: "Daño", physicalDamage: "Daño físico", weaponDamage: "Daño de arma", magicDamage: "Daño mágico", skillDamage: "Daño de habilidad", projectileDamage: "Daño de proyectil", attackSpeed: "Velocidad de ataque", criticalHitChance: "Probabilidad de golpe crítico", criticalHitDamage: "Daño de golpe crítico", skillCriticalHitChance: "Probabilidad crítica de habilidad", skillCriticalHitDamage: "Daño crítico de habilidad", defense: "Defensa", blockProficiency: "Dominio de bloqueo", blockPower: "Potencia de bloqueo", health: "Salud", evasion: "Evasión", damageReduction: "Reducción de daño", fallDamageReduction: "Reducción de daño por caída", tenacity: "Tenacidad", knockbackResistance: "Resistencia al retroceso", parryChance: "Probabilidad de parada", haste: "Celeridad", movementSpeed: "Velocidad de movimiento", crouchingSpeed: "Velocidad agachado", mana: "Maná", stamina: "Resistencia", lifeSteal: "Robo de vida", omnivamp: "Omnivampirismo", bonusHealing: "Curación adicional", healingPower: "Potencia de curación", healthRegeneration: "Regeneración de salud", manaRegeneration: "Regeneración de maná", staminaRegeneration: "Regeneración de resistencia", flightOfLife: "Vuelo de vida" }
+      } }
+    },
+    fr: {
+      page: { characterBuild: {
+        classes: { archer: "Archer / Éclaireur", assassin: "Assassin / DPS", guerrier: "Guerrier / Tank", mage: "Mage / Magie à distance", "martial-artist": "Artiste martial / Corps à corps", shaman: "Chaman / Soutien" },
+        slotNames: { helmet: "Casque", chestplate: "Plastron", leggings: "Jambières", boots: "Bottes", amulet: "Amulette", "ring-1": "Anneau 1", "ring-2": "Anneau 2", bracelet: "Bracelet", glove: "Gant", "artifact-1": "Artefact 1", "artifact-2": "Artefact 2", "artifact-3": "Artefact 3", offhand: "Main secondaire", "main-weapon": "Arme principale" },
+        groupNames: { offensive: "Offensif", defensive: "Défensif", mobilityStamina: "Mobilité et endurance", healthRegeneration: "Santé et régénération", specialEffects: "Effets spéciaux" },
+        statNames: { damage: "Dégâts", physicalDamage: "Dégâts physiques", weaponDamage: "Dégâts d'arme", magicDamage: "Dégâts magiques", skillDamage: "Dégâts de compétence", projectileDamage: "Dégâts de projectile", attackSpeed: "Vitesse d'attaque", criticalHitChance: "Chance de coup critique", criticalHitDamage: "Dégâts critiques", skillCriticalHitChance: "Chance critique de compétence", skillCriticalHitDamage: "Dégâts critiques de compétence", defense: "Défense", blockProficiency: "Maîtrise du blocage", blockPower: "Puissance de blocage", health: "Santé", evasion: "Évasion", damageReduction: "Réduction des dégâts", fallDamageReduction: "Réduction des dégâts de chute", tenacity: "Ténacité", knockbackResistance: "Résistance au recul", parryChance: "Chance de parade", haste: "Hâte", movementSpeed: "Vitesse de déplacement", crouchingSpeed: "Vitesse accroupie", mana: "Mana", stamina: "Endurance", lifeSteal: "Vol de vie", omnivamp: "Omnivampirisme", bonusHealing: "Bonus de soin", healingPower: "Puissance de soin", healthRegeneration: "Régénération de santé", manaRegeneration: "Régénération de mana", staminaRegeneration: "Régénération d'endurance", flightOfLife: "Vol de vie" }
+      } }
+    }
+  };
+  Object.entries(characterBuildDataTranslations).forEach(([language, additions]) => {
+    translations[language] = deepMerge(translations[language] || {}, additions);
+  });
+
+  Object.assign(translations.en.page.ecompendium, {
+    ["categories" + "Aria"]: "Compendium categories", categories: { currentData: "Current Data" }, type: "Type", category: "Category", costRequirement: "Cost / requirement", description: "Description", details: "Details", statistics: "Statistics", entries: "Compendium entries"
+  });
+  Object.assign(translations.es.page.ecompendium, {
+    ["categories" + "Aria"]: "Categorías del compendio", categories: { currentData: "Datos actuales" }, type: "Tipo", category: "Categoría", costRequirement: "Coste / requisito", description: "Descripción", details: "Detalles", statistics: "Estadísticas", entries: "Entradas del compendio"
+  });
+  Object.assign(translations.fr.page.ecompendium, {
+    ["categories" + "Aria"]: "Catégories du compendium", categories: { currentData: "Données actuelles" }, type: "Type", category: "Catégorie", costRequirement: "Coût / condition", description: "Description", details: "Détails", statistics: "Statistiques", entries: "Entrées du compendium"
+  });
+  Object.assign(translations.en.page.miscinfo, { classesHeading: "Classes", classesDescription: "Available class references from Character Build.", equipmentSlotsHeading: "Equipment Slots", equipmentSlotsDescription: "Slots exposed by the build planner.", currentLevel: "Current Level", nextLevel: "Next Level", xpToNextLevel: "XP to Next Level", eyebrow: "Aincrad reference", subtitle: "Useful reference information about Aincrad, progression, systems, and the website.", referenceHub: "Reference hub", progression: "Progression", playerProgression: "Player Progression", xpThresholds: "XP thresholds", characterSystems: "Character systems", aincradSystems: "Aincrad systems", gameSystems: "Game Systems", worldReference: "World reference", worldAincradReference: "World / Aincrad Reference", mapLayers: "Map Layers", mapLayersText: "The map module provides Floor 1 - The Town of Beginnings, Floor 2 - Arid Desert, and Floor 3 - The Forest of Wandering, with surface and underground map images.", coordinatesHeading: "Coordinates", coordinatesText: "Map markers expose X and Z coordinates, and the map runtime provides coordinate conversion for each floor.", markerSystems: "Marker Systems", markerSystemsText: "Existing map categories include biomes, dungeons, bosses, quests, merchants, crafting stations, and mob areas.", projectReference: "Project reference", projectInformation: "Website / Project Information", projectHeading: "Project", projectText: "Static fan-made SAO MC reference website hosted on GitHub Pages.", languagesHeading: "Languages", languagesText: "English, Español, and Français are available through the shared language system.", commandReference: "Command Reference", commandReferenceText: "Search the existing command catalog by category, command, usage, or example.", loadingCommands: "Loading commands...", questsCardText: "Search quests by NPC, location, requirements, rewards, and completion state.", equipmentCardText: "Browse equipment categories, levels, rarity, descriptions, statistics, and crafting resources.", bestiaryCardText: "Review bosses, dungeon mobs, regular mobs, aggressiveness, XP, and drops.", mapsCardText: "Explore floor maps with searchable markers, categories, coordinates, and underground layers." });
+  Object.assign(translations.es.page.miscinfo, { classesHeading: "Clases", classesDescription: "Referencias de clase disponibles en Character Build.", equipmentSlotsHeading: "Espacios de equipo", equipmentSlotsDescription: "Espacios disponibles en el planificador de builds.", currentLevel: "Nivel actual", nextLevel: "Siguiente nivel", xpToNextLevel: "XP para el siguiente nivel", eyebrow: "Referencia de Aincrad", subtitle: "Información útil sobre Aincrad, la progresión, los sistemas y el sitio web.", referenceHub: "Centro de referencia", progression: "Progresión", playerProgression: "Progresión del jugador", xpThresholds: "Umbrales de XP", characterSystems: "Sistemas del personaje", aincradSystems: "Sistemas de Aincrad", gameSystems: "Sistemas del juego", worldReference: "Referencia del mundo", worldAincradReference: "Referencia del mundo / Aincrad", mapLayers: "Capas del mapa", mapLayersText: "El módulo de mapas ofrece el piso 1 - El pueblo de los comienzos, el piso 2 - Desierto árido y el piso 3 - El bosque errante, con imágenes de superficie y subterráneas.", coordinatesHeading: "Coordenadas", coordinatesText: "Los marcadores muestran coordenadas X y Z, y el runtime del mapa ofrece conversión de coordenadas para cada piso.", markerSystems: "Sistemas de marcadores", markerSystemsText: "Las categorías existentes incluyen biomas, mazmorras, jefes, misiones, mercaderes, estaciones de fabricación y zonas de mobs.", projectReference: "Referencia del proyecto", projectInformation: "Información del sitio / proyecto", projectHeading: "Proyecto", projectText: "Sitio web de referencia de SAO MC, creado por fans y alojado en GitHub Pages.", languagesHeading: "Idiomas", languagesText: "English, Español y Français están disponibles mediante el sistema de idiomas compartido.", commandReference: "Referencia de comandos", commandReferenceText: "Busca el catálogo de comandos por categoría, comando, uso o ejemplo.", loadingCommands: "Cargando comandos...", questsCardText: "Busca misiones por PNJ, ubicación, requisitos, recompensas y estado de finalización.", equipmentCardText: "Explora categorías de equipo, niveles, rareza, descripciones, estadísticas y recursos de fabricación.", bestiaryCardText: "Consulta jefes, mobs de mazmorra, mobs normales, agresividad, XP y botines.", mapsCardText: "Explora mapas de pisos con marcadores, categorías, coordenadas y capas subterráneas." });
+  Object.assign(translations.fr.page.miscinfo, { classesHeading: "Classes", classesDescription: "Références de classes disponibles dans Character Build.", equipmentSlotsHeading: "Emplacements d'équipement", equipmentSlotsDescription: "Emplacements proposés par le planificateur de builds.", currentLevel: "Niveau actuel", nextLevel: "Niveau suivant", xpToNextLevel: "XP jusqu'au niveau suivant", eyebrow: "Référence Aincrad", subtitle: "Informations utiles sur Aincrad, la progression, les systèmes et le site web.", referenceHub: "Centre de référence", progression: "Progression", playerProgression: "Progression du joueur", xpThresholds: "Seuils d'XP", characterSystems: "Systèmes du personnage", aincradSystems: "Systèmes d'Aincrad", gameSystems: "Systèmes du jeu", worldReference: "Référence du monde", worldAincradReference: "Référence du monde / Aincrad", mapLayers: "Couches de la carte", mapLayersText: "Le module de carte propose l'étage 1 - La ville du début, l'étage 2 - Désert aride et l'étage 3 - La forêt errante, avec des images de surface et souterraines.", coordinatesHeading: "Coordonnées", coordinatesText: "Les marqueurs indiquent les coordonnées X et Z, et le runtime de la carte fournit une conversion pour chaque étage.", markerSystems: "Systèmes de marqueurs", markerSystemsText: "Les catégories existantes comprennent les biomes, donjons, boss, quêtes, marchands, ateliers de fabrication et zones de mobs.", projectReference: "Référence du projet", projectInformation: "Informations sur le site / projet", projectHeading: "Projet", projectText: "Site de référence SAO MC créé par des fans et hébergé sur GitHub Pages.", languagesHeading: "Langues", languagesText: "English, Español et Français sont disponibles via le système de langues partagé.", commandReference: "Référence des commandes", commandReferenceText: "Recherchez dans le catalogue des commandes par catégorie, commande, usage ou exemple.", loadingCommands: "Chargement des commandes...", questsCardText: "Recherchez des quêtes par PNJ, lieu, conditions, récompenses et état d'achèvement.", equipmentCardText: "Parcourez les catégories d'équipement, niveaux, raretés, descriptions, statistiques et ressources de fabrication.", bestiaryCardText: "Consultez les boss, mobs de donjon, mobs ordinaires, agressivité, XP et butins.", mapsCardText: "Explorez les cartes des étages avec marqueurs, catégories, coordonnées et couches souterraines." });
+
+  Object.assign(translations.en.page.miscinfo, { skillsHeading: "Skills", skillsUnavailable: "Skill information is not available yet." });
+  Object.assign(translations.es.page.miscinfo, { skillsHeading: "Habilidades", skillsUnavailable: "La información sobre habilidades aún no está disponible." });
+  Object.assign(translations.fr.page.miscinfo, { skillsHeading: "Compétences", skillsUnavailable: "Les informations sur les compétences ne sont pas encore disponibles." });
+
+  Object.assign(translations.en.page.patchnotes, { loadError: "Patch notes could not be loaded. Refresh the page and try again.", loadUnavailable: "Patch notes are currently unavailable." });
+  Object.assign(translations.es.page.patchnotes, { loadError: "No se pudieron cargar las notas de parche. Actualiza la página e inténtalo de nuevo.", loadUnavailable: "Las notas de parche no están disponibles en este momento." });
+  Object.assign(translations.fr.page.patchnotes, { loadError: "Les notes de mise à jour n'ont pas pu être chargées. Actualise la page et réessaie.", loadUnavailable: "Les notes de mise à jour ne sont actuellement pas disponibles." });
+
+  Object.assign(translations.en.page.uwcompendium, { categoriesAria: "Compendium categories", category: "Category", costRequirement: "Cost / requirement", description: "Description", details: "Details", entries: "Compendium entries", statistics: "Statistics", type: "Type", unknown: "Unknown item" });
+  Object.assign(translations.es.page.uwcompendium, { categoriesAria: "Categorías del compendio", category: "Categoría", costRequirement: "Coste / requisito", description: "Descripción", details: "Detalles", entries: "Entradas del compendio", statistics: "Estadísticas", type: "Tipo", unknown: "Objeto desconocido" });
+  Object.assign(translations.fr.page.uwcompendium, { categoriesAria: "Catégories du compendium", category: "Catégorie", costRequirement: "Coût / condition", description: "Description", details: "Détails", entries: "Entrées du compendium", statistics: "Statistiques", type: "Type", unknown: "Objet inconnu" });
+
+  Object.assign(translations.en.page.mainui, { mapDataUnavailable: "Map data unavailable", categorySectionHeader: "PLAYER ISLAND" });
+  Object.assign(translations.es.page.mainui, { mapDataUnavailable: "Datos del mapa no disponibles", categorySectionHeader: "ISLA DEL JUGADOR" });
+  Object.assign(translations.fr.page.mainui, { mapDataUnavailable: "Données de carte indisponibles", categorySectionHeader: "ÎLE DU JOUEUR" });
+  Object.assign(translations.en.page.towerdefense, { sectionEyebrow: "Tower Defense", progressionEyebrow: "Progression", chapterInformation: "Chapter information" });
+  Object.assign(translations.es.page.towerdefense, { sectionEyebrow: "Defensa de torres", progressionEyebrow: "Progresión", chapterInformation: "Información del capítulo" });
+  Object.assign(translations.fr.page.towerdefense, { sectionEyebrow: "Tower Defense", progressionEyebrow: "Progression", chapterInformation: "Informations du chapitre" });
+
+  translations.en.page.commands.statusShown = "Showing {count} command{suffix} in {category}.";
+  translations.es.page.bestiary.drops = "Botines";
+  translations.es.page.commands.statusShown = "Mostrando {count} comando{suffix} en {category}.";
+  translations.fr.page.commands.statusShown = "Affichage de {count} commande{suffix} dans {category}.";
+
+  Object.assign(translations.es.page.towerdefense, {
+    back: "Volver",
+    heading: "Defensa de torres de Fractured Underworld",
+    shopTitle: "Tienda de defensa de torres",
+    chapterSelect: "Selección de capítulo",
+    chapter: "Capítulo {number}",
+    levelProgression: "Progresión de niveles",
+    unlockWith: "Desbloquear con {item}",
+    upgradeCost: "Coste de mejora"
+  });
+  Object.assign(translations.fr.page.towerdefense, {
+    back: "Retour",
+    heading: "Tower Defense de Fractured Underworld",
+    shopTitle: "Boutique Tower Defense",
+    chapterSelect: "Sélection du chapitre",
+    chapter: "Chapitre {number}",
+    levelProgression: "Progression des niveaux",
+    unlockWith: "Débloquer avec {item}",
+    upgradeCost: "Coût d'amélioration"
+  });
+
   function getSettings() {
     const stored = storage.getJSON(SETTINGS_STORAGE_KEY, null);
     const defaultSettings = {
@@ -1937,6 +2303,7 @@
   let settingsState = getSettings();
   const subscribers = new Set();
   const missingKeyWarned = new Set();
+  const missingContentKeys = new Set();
 
   function saveSettings(nextSettings) {
     settingsState = Object.assign({}, settingsState, nextSettings || {});
@@ -2002,11 +2369,41 @@
       }
     }
 
-    if (typeof value === "string") {
-      return formatTemplate(value, params || null);
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return formatTemplate(String(value), params || null);
     }
 
-    return value;
+    if (value && typeof value === "object") {
+      console.warn(`Translation key resolved to an object instead of a string: ${key}`);
+      return key;
+    }
+
+    return key;
+  }
+
+  function content(key, fallbackValue, params) {
+    const dictionaries = global.SAOContentTranslations || {};
+    const activeLanguage = getLanguage();
+    const activeDictionary = dictionaries[activeLanguage] || {};
+    const fallbackDictionary = dictionaries[DEFAULT_LANGUAGE] || {};
+    const activeValue = Object.prototype.hasOwnProperty.call(activeDictionary, key)
+      ? activeDictionary[key]
+      : undefined;
+    const dictionaryFallback = Object.prototype.hasOwnProperty.call(fallbackDictionary, key)
+      ? fallbackDictionary[key]
+      : undefined;
+    let value = activeValue !== undefined ? activeValue : dictionaryFallback;
+
+    if (value === undefined) {
+      missingContentKeys.add(String(key));
+      value = fallbackValue === undefined ? key : fallbackValue;
+    }
+
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return formatTemplate(String(value), params || null);
+    }
+
+    return fallbackValue === undefined ? key : fallbackValue;
   }
 
   function injectPageNotice() {
@@ -2056,10 +2453,22 @@
       node.setAttribute("title", t(key));
     });
 
+    scope.querySelectorAll("[data-i18n-alt]").forEach(node => {
+      const key = node.getAttribute("data-i18n-alt");
+      if (!key) return;
+      node.setAttribute("alt", t(key));
+    });
+
     scope.querySelectorAll("[data-i18n-aria-label]").forEach(node => {
       const key = node.getAttribute("data-i18n-aria-label");
       if (!key) return;
       node.setAttribute("aria-label", t(key));
+    });
+
+    scope.querySelectorAll("[data-i18n-content]").forEach(node => {
+      const key = node.getAttribute("data-i18n-content");
+      if (!key) return;
+      node.setAttribute("content", t(key));
     });
 
     const titleNode = document.querySelector("title[data-i18n]");
@@ -2103,8 +2512,8 @@
         z-index: 90;
       }
       .sao-settings-trigger {
-        width: 44px;
-        height: 44px;
+        width: 52.5px;
+        height: 52.5px;
         border-radius: 999px;
         border: 1px solid rgba(115, 185, 255, 0.8);
         background: rgba(9, 16, 28, 0.9);
@@ -2127,16 +2536,18 @@
         outline-offset: 2px;
       }
       .sao-settings-trigger svg {
-        width: 22px;
-        height: 22px;
+        width: 26.25px;
+        height: 26.25px;
         display: block;
       }
       .sao-page-notice {
         position: fixed;
         top: calc(8px + env(safe-area-inset-top));
         right: calc(8px + env(safe-area-inset-right));
+        left: auto;
         z-index: 85;
-        max-width: min(320px, calc(100vw - 16px));
+        width: min(198px, calc(100vw - 150px));
+        max-width: min(198px, calc(100vw - 150px));
         padding: 6px 8px;
         border-radius: 14px;
         border: 1px solid rgba(115, 185, 255, 0.28);
@@ -2332,6 +2743,10 @@
   function resetWalkthroughProgress() {
     WALKTHROUGH_PROGRESS_KEYS.forEach(key => {
       try {
+        if (global.SAOStorage && typeof global.SAOStorage.removeItem === "function") {
+          global.SAOStorage.removeItem(key);
+          return;
+        }
         if (global.localStorage) {
           global.localStorage.removeItem(key);
         }
@@ -2343,8 +2758,9 @@
 
   function createGearIcon() {
     return `
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path fill="currentColor" d="M11.05 2.93c.53-.4 1.37-.4 1.9 0l1.09.83c.25.19.58.26.88.18l1.35-.35c.66-.18 1.35.19 1.58.83l.47 1.31c.1.28.32.5.6.6l1.31.47c.64.23 1.01.92.83 1.58l-.35 1.35c-.08.3-.01.63.18.88l.83 1.09c.4.53.4 1.37 0 1.9l-.83 1.09c-.19.25-.26.58-.18.88l.35 1.35c.18.66-.19 1.35-.83 1.58l-1.31.47c-.28.1-.5.32-.6.6l-.47 1.31c-.23.64-.92 1.01-1.58.83l-1.35-.35a1.1 1.1 0 0 0-.88.18l-1.09.83c-.53.4-1.37.4-1.9 0l-1.09-.83a1.1 1.1 0 0 0-.88-.18l-1.35.35c-.66.18-1.35-.19-1.58-.83l-.47-1.31a1.1 1.1 0 0 0-.6-.6l-1.31-.47a1.29 1.29 0 0 1-.83-1.58l.35-1.35a1.1 1.1 0 0 0-.18-.88l-.83-1.09a1.57 1.57 0 0 1 0-1.9l.83-1.09c.19-.25.26-.58.18-.88l-.35-1.35c-.18-.66.19-1.35.83-1.58l1.31-.47c.28-.1.5-.32.6-.6l.47-1.31c.23-.64.92-1.01 1.58-.83l1.35.35c.3.08.63.01.88-.18zM12 8.1A3.9 3.9 0 1 0 12 15.9 3.9 3.9 0 0 0 12 8.1z"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/>
+        <circle cx="12" cy="12" r="3"/>
       </svg>
     `;
   }
@@ -2549,9 +2965,12 @@
     getLanguage,
     setLanguage,
     t,
+    content,
+    getMissingContentKeys: () => Array.from(missingContentKeys),
     applyTranslations,
     onSettingsChange,
-    mountSettingsMenu
+    mountSettingsMenu,
+    resetWalkthroughProgress
   };
 
   global.SAOI18n = api;

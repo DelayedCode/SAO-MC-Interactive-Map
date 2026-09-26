@@ -1,3 +1,19 @@
+function createVirtualControl(initialValue, propertyName) {
+  const listeners = new Set();
+  return {
+    [propertyName]: initialValue,
+    addEventListener(type, listener) {
+      if (type === "change") listeners.add(listener);
+    },
+    removeEventListener(type, listener) {
+      if (type === "change") listeners.delete(listener);
+    },
+    dispatchEvent(event) {
+      listeners.forEach(listener => listener(event));
+    }
+  };
+}
+
 const elements = {
   mapContainer: document.getElementById("mapContainer"),
   sidebar: document.getElementById("sidebar"),
@@ -10,8 +26,8 @@ const elements = {
   title: document.getElementById("title"),
   content: document.getElementById("content"),
   overlayMappedCoords: document.getElementById("overlayMappedCoords"),
-  floorSelect: document.getElementById("floorSelect"),
-  undergroundToggle: document.getElementById("undergroundToggle"),
+  floorSelect: document.getElementById("floorSelect") || createVirtualControl("playerIsland", "value"),
+  undergroundToggle: document.getElementById("undergroundToggle") || createVirtualControl(false, "checked"),
   searchInput: document.getElementById("search"),
   clearFiltersButton: document.getElementById("clearFilters"),
   zoomLabel: document.getElementById("zoomLabel"),
@@ -20,7 +36,9 @@ const elements = {
   globalToast: document.getElementById("globalToast")
 };
 
-const { mapContainer, sidebar, sidebarResizeHandle, mapLayer, mapImage, undergroundMapImage, mobAreaLayer, markerLayer, title, content, overlayMappedCoords, floorSelect, undergroundToggle, searchInput, clearFiltersButton, zoomLabel, resetViewButton, categoryToggleButtons, globalToast } = elements;
+let categoryToggleButtons = [];
+
+const { mapContainer, sidebar, sidebarResizeHandle, mapLayer, mapImage, undergroundMapImage, mobAreaLayer, markerLayer, title, content, overlayMappedCoords, floorSelect, undergroundToggle, searchInput, clearFiltersButton, zoomLabel, resetViewButton, globalToast } = elements;
 
 function showMainUiRuntimeError(message) {
   const fallbackMessage = message || t("page.mainui.runtimeError");
@@ -42,9 +60,6 @@ function hasRequiredMainUiElements() {
   );
 }
 
-const DATA_ENTRIES = Object.freeze(
-  Object.entries((typeof DATA !== "undefined" && DATA && typeof DATA === "object") ? DATA : {})
-);
 const MARKET_CATEGORIES = new Set([
   "lootBuyers",
   "weaponSellers",
@@ -64,26 +79,35 @@ const CRAFTSMAN_CATEGORIES = new Set([
   "runeCraftsmen",
   "refaire"
 ]);
-const MOB_AREA_LOOKUP = new Map(
-  (typeof MOB_AREAS !== "undefined" && Array.isArray(MOB_AREAS))
-    ? MOB_AREAS.map(area => [area.id, area])
-    : []
-);
+const mapAdapter = window.UnderworldMapAdapter || null;
+let contextData = null;
+let contextDataId = null;
+let contextMobAreaLookup = new Map();
+function getContextData() {
+  const contextId = floorSelect?.value || mapAdapter?.defaultFloor || "";
+  if (contextData && contextDataId === contextId) return contextData;
+  contextDataId = contextId;
+  contextData = mapAdapter?.getContextData?.(contextId) || {
+    markerDataset: {},
+    mobAreaDataset: [],
+    mobAreaMobLookup: {}
+  };
+  contextMobAreaLookup = new Map(contextData.mobAreaDataset.map(area => [area.id, area]));
+  markerSearchCache = null;
+  return contextData;
+}
+function getDataEntries() { return Object.entries(getContextData().markerDataset); }
+function getMobAreas() { return getContextData().mobAreaDataset; }
+function getMobAreaMobLookup() { return getContextData().mobAreaMobLookup; }
+function getMobAreaLookup() { getContextData(); return contextMobAreaLookup; }
 
-function getDataEntries() { return DATA_ENTRIES; }
-
-const sidebarResizeConfig = {
-  min: 260,
-  max: 520,
-  defaultWidth: 320,
-  storageKey: "sao.sidebar.width"
-};
-
-const visitedMarkersStorageKey = "sao.visitedMarkers";
 const mapUiStateStorageKey = "sao.map.uiState";
 const mapWalkthroughStorageKey = "sao.walkthrough.mainui.completed";
 const i18n = window.SAOI18n || null;
 const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const contentLookup = (key, fallback) => (i18n && typeof i18n.content === "function"
+  ? i18n.content(key, fallback)
+  : fallback);
 const storage = window.SAOStorage || {
   getItem() { return null; },
   setItem() {},
@@ -91,40 +115,107 @@ const storage = window.SAOStorage || {
   setJSON() {}
 };
 
-const MAP_LABELS = Object.freeze({
-  playerIsland: "Player Island",
-  gigasCedar: "Gigas Cedar",
-  iceCave: "Ice Cave",
-  rulid: "Rulid",
-  fishingIsland: "Fishing Island"
-});
-
-const MAP_IMAGE_AVAILABILITY = Object.freeze({
-  playerIsland: false,
-  gigasCedar: false,
-  iceCave: false,
+const initialCategoryState = Object.freeze({
+  npc: false,
   rulid: false,
-  fishingIsland: false
+  fishingSpot: false,
+  oakWood: false,
+  copper: false,
+  iron: false,
+  coal: false
 });
 
-const MAIN_CATEGORY_FLOOR_RULES = Object.freeze({
-  npc: null,
-  rulid: Object.freeze(["rulid"]),
-  fishingSpot: Object.freeze(["fishingIsland"]),
-  oakWood: Object.freeze(["gigasCedar"]),
-  copper: Object.freeze(["iceCave"]),
-  iron: Object.freeze(["iceCave"]),
-  coal: Object.freeze(["iceCave"])
-});
+function createSharedMapRuntime() {
+  return (typeof window.createMapRuntime === "function" && window.UnderworldMapAdapter)
+    ? window.createMapRuntime(window.UnderworldMapAdapter, {
+      dom: elements,
+      storage,
+      coordinateDependencies: window.UnderworldMapAdapter.coordinateDependencies,
+      requiredElements: [
+        "mapContainer",
+        "sidebar",
+        "mapLayer",
+        "mapImage",
+        "undergroundMapImage",
+        "mobAreaLayer",
+        "markerLayer",
+        "title",
+        "content",
+        "overlayMappedCoords",
+        "searchInput",
+        "clearFiltersButton",
+        "zoomLabel",
+        "resetViewButton"
+      ]
+      })
+    : null;
+}
+
+let sharedMapRuntime = createSharedMapRuntime();
+
+window.__underworldMapRuntime = sharedMapRuntime;
+
+let pageDisposer = null;
+let pageInitialized = false;
+let walkthroughController = null;
+
+function getPageDisposer() {
+  if (!pageDisposer || pageDisposer.disposed) {
+    pageDisposer = window.createDisposer();
+  }
+  return pageDisposer;
+}
+
+function addPageEventListener(target, type, listener, options) {
+  target.addEventListener(type, listener, options);
+  getPageDisposer().add(() => target.removeEventListener(type, listener, options));
+}
+
+function schedulePageAnimationFrame(stateKey, callback) {
+  const disposer = getPageDisposer();
+  if (disposer.disposed) return null;
+  const handle = window.requestAnimationFrame(() => {
+    if (state[stateKey] === handle) state[stateKey] = null;
+    if (disposer.disposed) return;
+    callback();
+  });
+  state[stateKey] = handle;
+  disposer.add(() => {
+    if (state[stateKey] === handle) state[stateKey] = null;
+    window.cancelAnimationFrame(handle);
+  });
+  return handle;
+}
+
+function schedulePageTimeout(callback, delay) {
+  const disposer = getPageDisposer();
+  if (disposer.disposed) return null;
+  const handle = window.setTimeout(() => {
+    if (disposer.disposed) return;
+    callback();
+  }, delay);
+  disposer.add(() => window.clearTimeout(handle));
+  return handle;
+}
+
+function getMarkerText(marker, field, markerId) {
+  const value = marker && marker[field];
+  const translated = contentLookup(`underworld-map.${markerId || marker?.id || "unknown"}.${field}`, value || "");
+  if (field === "description") {
+    return window.SAOContentTranslations?.translateKnownTerms?.(translated, i18n?.getLanguage?.()) || translated;
+  }
+  return translated;
+}
+
+function getAreaText(area) {
+  return contentLookup(`underworld-map.mob-area.${area?.id || "unknown"}.title`, area?.title || "");
+}
 
 const state = {
   zoom: 1,
   translateX: 0,
   translateY: 0,
   isDragging: false,
-  isResizingSidebar: false,
-  sidebarResizeStartX: 0,
-  sidebarResizeStartWidth: 0,
   dragStartX: 0,
   dragStartY: 0,
   pendingDragClientX: 0,
@@ -136,30 +227,23 @@ const state = {
   pendingPointerEvent: null,
   coordinateRafId: null,
   renderMarkersRafId: null,
-  activeMarkerId: null,
-  visitedMarkerIds: loadVisitedMarkers(),
-  activeCategories: {
-    npc: false,
-    rulid: false,
-    fishingSpot: false,
-    oakWood: false,
-    copper: false,
-    iron: false,
-    coal: false
-  }
+  markerRenderSignature: "",
+  markerCache: new Map(),
 };
 
 function isMainCategoryAvailableForFloor(category, floor) {
-  const allowedFloors = MAIN_CATEGORY_FLOOR_RULES[category];
+  const allowedFloors = mapAdapter?.categoryFloorRules?.[category];
   if (!allowedFloors) return true;
   return allowedFloors.includes(floor);
 }
 
 function syncMainCategoryButtonVisibility() {
   const selectedFloor = floorSelect ? floorSelect.value : "";
+  const visibleCategories = new Set(getIslandCategoriesForFloor(selectedFloor));
+
   categoryToggleButtons.forEach(button => {
     const category = button.dataset.category;
-    const isVisible = isMainCategoryAvailableForFloor(category, selectedFloor);
+    const isVisible = visibleCategories.has(category);
     const listItem = button.closest("li");
     if (listItem) {
       listItem.hidden = !isVisible;
@@ -167,78 +251,117 @@ function syncMainCategoryButtonVisibility() {
     button.hidden = !isVisible;
     button.disabled = !isVisible;
     if (!isVisible) {
-      state.activeCategories[category] = false;
+      sharedMapRuntime.setCategoryState(category, false);
       button.classList.remove("active");
+    }
+  });
+
+  const categoryStates = sharedMapRuntime?.getCategoryStates?.() || {};
+  Object.keys(categoryStates).forEach(category => {
+    if (!visibleCategories.has(category)) {
+      sharedMapRuntime.setCategoryState(category, false);
     }
   });
 }
 
 function getMapLabel(mapKey) {
-  return MAP_LABELS[mapKey] || "Selected Island";
+  const key = `page.mainui.islandOptions.${mapKey}`;
+  const localized = t(key);
+  return localized === key ? t("page.mainui.islandOptions.playerIsland") : localized;
 }
 
-function buildMapPlaceholderDataUri(mapKey, underground = false) {
-  const label = getMapLabel(mapKey);
-  const accent = underground ? "#7bc0ff" : "#9fd4ff";
-  const surface = underground ? "#0d1521" : "#111c2c";
-  const glow = underground ? "rgba(123, 192, 255, 0.22)" : "rgba(159, 212, 255, 0.18)";
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" role="img" aria-label="${label}">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${surface}"/>
-          <stop offset="100%" stop-color="#05070c"/>
-        </linearGradient>
-        <radialGradient id="halo" cx="50%" cy="35%" r="60%">
-          <stop offset="0%" stop-color="${accent}" stop-opacity="0.45"/>
-          <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <rect width="1600" height="1200" fill="url(#bg)"/>
-      <rect width="1600" height="1200" fill="url(#halo)"/>
-      <g opacity="0.24" fill="none" stroke="${accent}" stroke-width="2">
-        <path d="M0 168H1600M0 336H1600M0 504H1600M0 672H1600M0 840H1600M0 1008H1600"/>
-        <path d="M200 0V1200M400 0V1200M600 0V1200M800 0V1200M1000 0V1200M1200 0V1200M1400 0V1200"/>
-      </g>
-      <g fill="${accent}" opacity="0.92">
-        <text x="800" y="520" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="72" font-weight="700">${label}</text>
-        <text x="800" y="610" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="500" fill="${glow}">${t("page.mainui.noImageYet")}</text>
-      </g>
-      <rect x="80" y="80" width="1440" height="1040" rx="34" fill="none" stroke="${accent}" stroke-opacity="0.2" stroke-width="3"/>
-    </svg>
-  `;
+function getIslandCategoriesForFloor(floorKey) {
+  const entries = Object.entries(mapAdapter?.categoryFloorRules || {});
+  const selectedFloor = floorKey || mapAdapter?.defaultFloor || "";
+  return entries
+    .filter(([, allowedFloors]) => !allowedFloors || allowedFloors.includes(selectedFloor))
+    .map(([category]) => category);
+}
 
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+function syncIslandNavigation() {
+  const islandButtons = document.querySelectorAll(".island-nav-button");
+  const selectedFloor = floorSelect?.value || mapAdapter?.defaultFloor || "";
+  islandButtons.forEach(button => {
+    const isActive = button.dataset.island === selectedFloor;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function renderCategorySidebar() {
+  const categoryList = document.getElementById("categoryList");
+  const sectionHeader = document.getElementById("categorySectionHeader");
+  const selectedFloor = floorSelect?.value || mapAdapter?.defaultFloor || "";
+  const categories = getIslandCategoriesForFloor(selectedFloor);
+
+  if (sectionHeader) {
+    const labelText = mapAdapter?.floors?.[selectedFloor]?.label || getMapLabel(selectedFloor);
+    sectionHeader.textContent = labelText.toUpperCase();
+  }
+
+  if (!categoryList) return;
+
+  categoryList.innerHTML = categories.map(category => {
+    const label = t(`page.mainui.categories.${category}`) || category;
+    const active = !!(sharedMapRuntime && sharedMapRuntime.getCategoryState(category));
+    return `
+      <li>
+        <button class="sidebar-list-button${active ? " active" : ""}" type="button" data-category="${category}" aria-pressed="${active ? "true" : "false"}">${label}</button>
+      </li>
+    `;
+  }).join("");
+
+  categoryToggleButtons = categoryList.querySelectorAll(".sidebar-list-button[data-category]");
+  categoryToggleButtons.forEach(button => {
+    const category = button.dataset.category;
+    const isActive = !!(sharedMapRuntime && sharedMapRuntime.getCategoryState(category));
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  const categoryStates = sharedMapRuntime?.getCategoryStates?.() || {};
+  Object.keys(categoryStates).forEach(category => {
+    if (!categories.includes(category)) {
+      sharedMapRuntime.setCategoryState(category, false);
+    }
+  });
+}
+
+function updateMapEmptyState() {
+  const mapEmptyState = document.getElementById("mapEmptyState");
+  const labelEl = document.getElementById("mapEmptyStateLabel");
+  if (!mapEmptyState || !labelEl) return;
+
+  const floorKey = floorSelect?.value || mapAdapter?.defaultFloor || "";
+  const shouldShow = mapAdapter?.assetAvailability?.[floorKey] !== true;
+
+  mapEmptyState.classList.toggle("is-hidden", !shouldShow);
+  labelEl.textContent = t("page.mainui.mapDataUnavailable");
 }
 
 function applyMapSources(mapKey) {
-  const primaryPlaceholder = buildMapPlaceholderDataUri(mapKey, false);
-  const undergroundPlaceholder = buildMapPlaceholderDataUri(mapKey, true);
-  const hasImageAssets = MAP_IMAGE_AVAILABILITY[mapKey] === true;
+  const mapSources = mapAdapter?.mapImageSources?.[mapKey] || {};
+  const hasImageAssets = mapAdapter?.assetAvailability?.[mapKey] === true;
 
   mapImage.alt = `${getMapLabel(mapKey)} ${t("page.mainui.mapSuffix")}`;
   undergroundMapImage.alt = `${getMapLabel(mapKey)} ${t("page.mainui.undergroundSuffix")}`;
+  mapImage.onerror = null;
+  undergroundMapImage.onerror = null;
 
-  if (!hasImageAssets) {
-    mapImage.onerror = null;
-    undergroundMapImage.onerror = null;
-    mapImage.src = primaryPlaceholder;
-    undergroundMapImage.src = undergroundPlaceholder;
+  if (!hasImageAssets || !mapSources.surface || !mapSources.underground) {
+    mapImage.removeAttribute("src");
+    undergroundMapImage.removeAttribute("src");
+    mapImage.style.display = "none";
+    undergroundMapImage.style.display = "none";
+    updateMapEmptyState();
     return;
   }
 
-  mapImage.onerror = () => {
-    mapImage.onerror = null;
-    mapImage.src = primaryPlaceholder;
-  };
-
-  undergroundMapImage.onerror = () => {
-    undergroundMapImage.onerror = null;
-    undergroundMapImage.src = undergroundPlaceholder;
-  };
-
-  mapImage.src = `${mapKey}.png`;
-  undergroundMapImage.src = `${mapKey}underground.png`;
+  mapImage.style.display = "block";
+  undergroundMapImage.style.display = "none";
+  mapImage.src = mapSources.surface;
+  undergroundMapImage.src = mapSources.underground;
+  updateMapEmptyState();
 }
 
 function loadMapUiState() {
@@ -250,38 +373,6 @@ function saveMapUiState(mapState) {
   storage.setJSON(mapUiStateStorageKey, mapState);
 }
 
-function loadVisitedMarkers() {
-  const parsed = storage.getJSON(visitedMarkersStorageKey, []);
-  if (!Array.isArray(parsed)) return new Set();
-  return new Set(parsed.filter(id => typeof id === "string"));
-}
-
-function persistVisitedMarkers() {
-  storage.setJSON(visitedMarkersStorageKey, Array.from(state.visitedMarkerIds));
-}
-
-function getVisitedMarkerKey(floor, id) {
-  return `${String(floor || "unknown")}:${String(id || "")}`;
-}
-
-function isMarkerVisited(floor, id) {
-  const floorAwareKey = getVisitedMarkerKey(floor, id);
-  // Keep backward compatibility with older saves that only stored the raw ID.
-  return state.visitedMarkerIds.has(floorAwareKey) || state.visitedMarkerIds.has(id);
-}
-
-function setMarkerVisited(floor, id, isVisited) {
-  const floorAwareKey = getVisitedMarkerKey(floor, id);
-  if (isVisited) {
-    state.visitedMarkerIds.add(floorAwareKey);
-    state.visitedMarkerIds.delete(id);
-  } else {
-    state.visitedMarkerIds.delete(floorAwareKey);
-    state.visitedMarkerIds.delete(id);
-  }
-  persistVisitedMarkers();
-}
-
 function syncMarkerVisitedClass(id, isVisited) {
   const markerEl = markerLayer.querySelector(`[data-marker-id="${id}"]`);
   if (!markerEl) return;
@@ -289,11 +380,7 @@ function syncMarkerVisitedClass(id, isVisited) {
 }
 
 function supportsVisitedCategory(category) {
-  return category === "biomes" || category === "dungeons" || category === "bossSpawns";
-}
-
-function normalizeSearchValue(value) {
-  return String(value || "").trim().toLowerCase();
+  return mapAdapter?.supportsVisitedCategory?.(category) === true;
 }
 
 function normalizeHexColor(value) {
@@ -356,20 +443,6 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => escapeMap[char]);
 }
 
-function resolveSafeInternalHref(value) {
-  const rawValue = String(value || "").trim();
-  if (!rawValue) return null;
-
-  try {
-    const resolved = new URL(rawValue, window.location.href);
-    if (resolved.origin !== window.location.origin) return null;
-    if (resolved.protocol !== "http:" && resolved.protocol !== "https:") return null;
-    return resolved.href;
-  } catch {
-    return null;
-  }
-}
-
 function getCachedValue(cache, key) {
   if (!cache.has(key)) {
     return undefined;
@@ -398,7 +471,7 @@ function getMobAreaSearchHaystack(area) {
     return cachedValue;
   }
 
-  const haystack = normalizeSearchValue(`${area.id} ${area.title} mob area`);
+  const haystack = sharedMapRuntime.normalizeSearchQuery(`${area.id} ${area.title} ${getAreaText(area)} mob area`);
   setCachedValue(mobAreaSearchCache, area.id, haystack);
   return haystack;
 }
@@ -421,6 +494,7 @@ function getFloorSpecificQuestsUrl(floor, search) {
 let toastTimeoutId = null;
 
 function showToast(message) {
+  if (!pageDisposer || pageDisposer.disposed) return;
   if (!globalToast || !message) return;
 
   globalToast.textContent = message;
@@ -428,7 +502,7 @@ function showToast(message) {
   globalToast.setAttribute("aria-hidden", "false");
 
   window.clearTimeout(toastTimeoutId);
-  toastTimeoutId = window.setTimeout(() => {
+  toastTimeoutId = schedulePageTimeout(() => {
     globalToast.classList.remove("show");
     globalToast.setAttribute("aria-hidden", "true");
   }, 2600);
@@ -440,7 +514,8 @@ const SECTION_PATHS = {
   equipment: "../eCompendium/ecompendium.html",
   quests: "../Quests/quests.html",
   patchnotes: "../Patchnotes/patchnotes.html",
-  towerDefense: "../Tower Defense/towerdefense.html"
+  towerDefense: "../Tower Defense/towerdefense.html",
+  compendium: "../Compendium/compendium.html"
 };
 
 const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
@@ -448,46 +523,21 @@ const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]
 function buildSectionUrl(section, floor) {
   const path = SECTION_PATHS[section] || "#";
   if (path === "#") return path;
-  if (!floor || !FLOOR_AWARE_SECTIONS.has(section)) return path;
-  return `${path}?${new URLSearchParams({ floor }).toString()}`;
-}
-
-function parseUrlState() {
-  const params = new URLSearchParams(window.location.search);
-  const search = params.get("search") || params.get("q") || "";
-  const activeCategories = params.has("categories")
-    ? params.get("categories").split(",").reduce((result, category) => {
-        if (category) result[category] = true;
-        return result;
-      }, {})
-    : {};
-
-  return {
-    floor: params.get("floor"),
-    underground: params.get("underground") === "1",
-    search,
-    activeCategories,
-    hasParams: params.has("floor") || params.has("underground") || params.has("categories") || params.has("search") || params.has("q")
-  };
-}
-
-function buildUrlFromState(mapState) {
-  const params = new URLSearchParams();
-  if (mapState.floor) params.set("floor", mapState.floor);
-  if (mapState.underground) params.set("underground", "1");
-  if (mapState.search) params.set("search", mapState.search);
-  const active = Object.entries(mapState.activeCategories || {})
-    .filter(([, value]) => value)
-    .map(([key]) => key);
-  if (active.length) params.set("categories", active.join(","));
-  return `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+  if (!floor) return path;
+  if (FLOOR_AWARE_SECTIONS.has(section)) {
+    return `${path}?${new URLSearchParams({ floor }).toString()}`;
+  }
+  if (section === "towerDefense" || section === "compendium") {
+    return `${path}?${new URLSearchParams({ floor }).toString()}`;
+  }
+  return path;
 }
 
 function attachSectionNavButtons() {
   const nav = document.querySelector(".top-nav");
   if (!nav) return;
 
-  nav.addEventListener("click", event => {
+  addPageEventListener(nav, "click", event => {
     const messageButton = event.target.closest("button[data-message]");
     if (messageButton) {
       showToast(messageButton.dataset.message);
@@ -497,15 +547,27 @@ function attachSectionNavButtons() {
     const button = event.target.closest("button[data-nav-target]");
     if (!button) return;
 
-    const nextHref = resolveSafeInternalHref(buildSectionUrl(button.dataset.navTarget, floorSelect.value));
+    const nextHref = window.SAOPageUtils.resolveSafeInternalHref(buildSectionUrl(button.dataset.navTarget, floorSelect.value));
     if (!nextHref) return;
+
+    const datasets = window.SAODatasets;
+    if (datasets && datasets.affectedSections.has(button.dataset.navTarget)) {
+      event.preventDefault();
+      datasets.installStyles();
+      datasets.navigate({
+        section: button.dataset.navTarget,
+        url: nextHref,
+        title: button.textContent.trim()
+      });
+      return;
+    }
 
     window.location.href = nextHref;
   });
 }
 
 function buildMobAreaMobListMarkup(areaId, areaFloor) {
-  const mobLookup = (typeof MOB_AREA_MOBS !== "undefined" ? MOB_AREA_MOBS : {});
+  const mobLookup = getMobAreaMobLookup();
   const mobs = mobLookup[areaId] || [];
   if (mobs.length === 0) {
     return `<p>${t("page.mainui.noMobEntries")}</p>`;
@@ -515,13 +577,19 @@ function buildMobAreaMobListMarkup(areaId, areaFloor) {
     <ul class="mob-area-entry-list">
       ${mobs.map(mob => {
         const search = mob.search ? mob.search : mob.name;
-        const areaObj = MOB_AREA_LOOKUP.get(areaId);
+        const mobId = String(mob.id || mob.name || "unknown")
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "") || "unknown";
+        const mobName = contentLookup(`bestiary.mob.${mobId}`, mob.name);
+        const areaObj = getMobAreaLookup().get(areaId);
         const category = areaObj && areaObj.underground === true ? "dungeonMobs" : "regular";
         let href = getFloorSpecificBestiaryUrl(areaFloor, category, search);
         if (category === "dungeonMobs") href += "#dungeonMobs";
         return `
           <li class="mob-area-entry-item">
-            <span class="mob-area-entry-name">${escapeHtml(mob.name)}</span>
+            <span class="mob-area-entry-name">${escapeHtml(mobName)}</span>
             <button type="button" class="mob-area-info-button" data-waypoint-info-href="${escapeHtml(href)}">${t("page.maps.viewWaypointInfo")}</button>
           </li>
         `;
@@ -532,12 +600,13 @@ function buildMobAreaMobListMarkup(areaId, areaFloor) {
 
 function openMobAreaInfo(area) {
   const center = getMobAreaCenter(area);
-  const areaTitle = escapeHtml(area.title || "");
-  const titleText = `${area.title} ${t("page.maps.mobs")}`;
+  const localizedAreaTitle = getAreaText(area);
+  const areaTitle = escapeHtml(localizedAreaTitle);
+  const titleText = `${localizedAreaTitle} ${t("page.maps.mobs")}`;
   const floorText = escapeHtml(String(area.floor || "").replace("floor", `${t("page.maps.floorText")} `));
   const centerX = center ? escapeHtml(center.x) : "--";
   const centerZ = center ? escapeHtml(center.z) : "--";
-  state.activeMarkerId = `mob-area:${area.id}`;
+  sharedMapRuntime.setSelectedMarker(`mob-area:${area.id}`);
   title.textContent = titleText;
   content.innerHTML = `
     <p><strong>${t("page.maps.mobType")}:</strong> ${t("page.maps.mobAreaType")}</p>
@@ -558,7 +627,7 @@ function handleInfoOverlayClick(event) {
   const actionButton = event.target.closest("[data-waypoint-info-href]");
   if (!actionButton || !content.contains(actionButton)) return;
 
-  const href = resolveSafeInternalHref(actionButton.dataset.waypointInfoHref);
+  const href = window.SAOPageUtils.resolveSafeInternalHref(actionButton.dataset.waypointInfoHref);
   if (!href) return;
 
   try { persistStateToHistory(); } catch (e) {}
@@ -574,7 +643,7 @@ function handleInfoOverlayChange(event) {
 
   const targetFloor = visitedToggle.dataset.markerFloor || "";
   const nextVisited = visitedToggle.checked;
-  setMarkerVisited(targetFloor, targetId, nextVisited);
+  sharedMapRuntime.setMarkerVisited(targetFloor, targetId, nextVisited);
   syncMarkerVisitedClass(targetId, nextVisited);
 }
 
@@ -598,9 +667,11 @@ function activateMarkerByElement(markerEl) {
   const markerId = markerEl.dataset.markerId || "";
   if (!markerId) return;
 
+  sharedMapRuntime.setSelectedMarker(markerId);
+
   if (markerId.startsWith("mob-area:")) {
     const areaId = markerId.slice("mob-area:".length);
-    const area = MOB_AREA_LOOKUP.get(areaId);
+    const area = getMobAreaLookup().get(areaId);
     if (area) {
       openMobAreaInfo(area);
     }
@@ -615,159 +686,17 @@ function clearMapFilters() {
     searchInput.value = "";
   }
 
-  Object.keys(state.activeCategories).forEach(category => {
-    state.activeCategories[category] = false;
-  });
+  sharedMapRuntime.clearCategoryState();
+  sharedMapRuntime.clearSearchQuery();
 
   categoryToggleButtons.forEach(button => {
     button.classList.remove("active");
   });
 
-  state.activeMarkerId = null;
+  sharedMapRuntime.clearSelectedMarker();
   setDefaultSidebarMessage();
   scheduleRenderMarkers();
   persistStateToHistory();
-}
-
-function ensureWalkthroughStyles() {
-  if (document.getElementById("sao-walkthrough-style")) return;
-
-  const style = document.createElement("style");
-  style.id = "sao-walkthrough-style";
-  style.textContent = `
-    .sao-tour-overlay {
-      --sao-tour-focus-x: 50vw;
-      --sao-tour-focus-y: 50vh;
-      --sao-tour-focus-radius: 96px;
-      position: fixed;
-      inset: 0;
-      z-index: 120;
-      display: flex;
-      background: transparent;
-      padding: 16px;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.2s ease, visibility 0.2s step-end;
-    }
-    .sao-tour-overlay::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      background: rgba(4, 8, 14, 0.7);
-      -webkit-backdrop-filter: blur(4px);
-      backdrop-filter: blur(4px);
-      -webkit-mask-image: radial-gradient(
-        circle var(--sao-tour-focus-radius) at var(--sao-tour-focus-x) var(--sao-tour-focus-y),
-        transparent 96%,
-        #000 100%
-      );
-      mask-image: radial-gradient(
-        circle var(--sao-tour-focus-radius) at var(--sao-tour-focus-x) var(--sao-tour-focus-y),
-        transparent 96%,
-        #000 100%
-      );
-      pointer-events: none;
-    }
-    .sao-tour-focus-ring {
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 0;
-      height: 0;
-      border: 3px solid rgba(115, 185, 255, 0.95);
-      border-radius: 10px;
-      box-shadow: 0 0 0 2px rgba(4, 8, 14, 0.8);
-      pointer-events: none;
-      opacity: 0;
-    }
-    .sao-tour-overlay.open {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-      transition: opacity 0.2s ease;
-    }
-    .sao-tour-card {
-      position: relative;
-      z-index: 2;
-      width: min(560px, 100%);
-      border-radius: 16px;
-      border: 1px solid rgba(130, 190, 255, 0.5);
-      background: linear-gradient(180deg, rgba(15, 22, 36, 0.98), rgba(8, 14, 24, 0.98));
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-      padding: 14px;
-      color: #eaf2ff;
-      opacity: 0;
-      transform: translateY(10px) scale(0.985);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-    .sao-tour-overlay.open .sao-tour-card {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    .sao-tour-step {
-      margin: 0 0 6px;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #9fb9d7;
-    }
-    .sao-tour-title {
-      margin: 0;
-      font-size: 1rem;
-    }
-    .sao-tour-body {
-      margin: 8px 0 12px;
-      color: #c8d8ea;
-      line-height: 1.55;
-    }
-    .sao-tour-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-    }
-    .sao-tour-actions button {
-      border: 1px solid rgba(130, 190, 255, 0.34);
-      border-radius: 10px;
-      background: rgba(12, 19, 31, 0.92);
-      color: #eaf2ff;
-      min-height: 36px;
-      padding: 8px 12px;
-      cursor: pointer;
-    }
-    .sao-tour-actions button:hover {
-      background: rgba(24, 38, 58, 0.96);
-      border-color: #73b9ff;
-    }
-    .sao-tour-actions button:active {
-      transform: scale(0.98);
-    }
-    .sao-tour-actions button:focus-visible {
-      outline: 2px solid #8bb7ff;
-      outline-offset: 2px;
-    }
-    .sao-tour-focus-target {
-      position: relative;
-      border-radius: 10px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .sao-tour-overlay,
-      .sao-tour-card,
-      .sao-tour-actions button {
-        transition: none;
-      }
-      .sao-tour-actions button:hover {
-        transform: none;
-      }
-    }
-  `;
-
-  document.head.appendChild(style);
 }
 
 function buildWalkthroughSteps() {
@@ -778,17 +707,17 @@ function buildWalkthroughSteps() {
       body: t("page.mainui.walkthrough.step1Body")
     },
     {
-      selector: ".controls",
+      selectors: ["#islandNav", ".controls"],
       title: t("page.mainui.walkthrough.step2Title"),
       body: t("page.mainui.walkthrough.step2Body")
     },
     {
-      selector: "#sidebar",
+      selector: "#categoryList",
       title: t("page.mainui.walkthrough.step3Title"),
       body: t("page.mainui.walkthrough.step3Body")
     },
     {
-      selector: "#mapContainer",
+      selector: "#mapLayer",
       title: t("page.mainui.walkthrough.step4Title"),
       body: t("page.mainui.walkthrough.step4Body")
     }
@@ -796,192 +725,7 @@ function buildWalkthroughSteps() {
 }
 
 function startGuidedWalkthrough(options) {
-  const force = !!(options && options.force);
-  const alreadyCompleted = storage.getItem(mapWalkthroughStorageKey) === "1";
-  if (alreadyCompleted && !force) return;
-
-  ensureWalkthroughStyles();
-
-  const steps = buildWalkthroughSteps();
-  if (!steps.length) return;
-
-  let overlay = document.getElementById("sao-tour-overlay");
-  let stepLabel;
-  let titleEl;
-  let bodyEl;
-  let previousButton;
-  let nextButton;
-  let skipButton;
-  let currentStepIndex = 0;
-  let highlightedElement = null;
-  let focusRing = null;
-
-  function clearHighlight() {
-    if (!highlightedElement) return;
-    highlightedElement.classList.remove("sao-tour-focus-target");
-    highlightedElement = null;
-    if (overlay) {
-      overlay.style.removeProperty("--sao-tour-focus-x");
-      overlay.style.removeProperty("--sao-tour-focus-y");
-      overlay.style.removeProperty("--sao-tour-focus-radius");
-    }
-    if (focusRing) {
-      focusRing.style.opacity = "0";
-      focusRing.style.width = "0";
-      focusRing.style.height = "0";
-    }
-  }
-
-  function markComplete() {
-    storage.setItem(mapWalkthroughStorageKey, "1");
-  }
-
-  function closeTour(markAsComplete) {
-    clearHighlight();
-    if (markAsComplete) {
-      markComplete();
-    }
-    if (overlay) {
-      overlay.classList.remove("open");
-      overlay.setAttribute("aria-hidden", "true");
-    }
-  }
-
-  function renderStep() {
-    const step = steps[currentStepIndex];
-    if (!step) return;
-
-    clearHighlight();
-    const target = document.querySelector(step.selector);
-    if (target) {
-      highlightedElement = target;
-      highlightedElement.classList.add("sao-tour-focus-target");
-      if (overlay) {
-        const rect = target.getBoundingClientRect();
-        const radius = Math.ceil(Math.max(rect.width, rect.height) / 2 + 18);
-        overlay.style.setProperty("--sao-tour-focus-x", `${Math.round(rect.left + rect.width / 2)}px`);
-        overlay.style.setProperty("--sao-tour-focus-y", `${Math.round(rect.top + rect.height / 2)}px`);
-        overlay.style.setProperty("--sao-tour-focus-radius", `${radius}px`);
-      }
-      if (focusRing) {
-        const rect = target.getBoundingClientRect();
-        const ringPadding = 3;
-        const radius = window.getComputedStyle(target).borderRadius || "10px";
-        focusRing.style.left = `${Math.round(rect.left - ringPadding)}px`;
-        focusRing.style.top = `${Math.round(rect.top - ringPadding)}px`;
-        focusRing.style.width = `${Math.round(rect.width + ringPadding * 2)}px`;
-        focusRing.style.height = `${Math.round(rect.height + ringPadding * 2)}px`;
-        focusRing.style.borderRadius = radius;
-        focusRing.style.opacity = "1";
-      }
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      highlightedElement.scrollIntoView({
-        block: "center",
-        inline: "nearest",
-        behavior: prefersReducedMotion ? "auto" : "smooth"
-      });
-    }
-
-    stepLabel.textContent = t("ui.walkthrough.step", {
-      current: currentStepIndex + 1,
-      total: steps.length
-    });
-    titleEl.textContent = step.title;
-    bodyEl.textContent = step.body;
-    previousButton.disabled = currentStepIndex === 0;
-    nextButton.textContent = currentStepIndex === steps.length - 1
-      ? t("ui.walkthrough.finish")
-      : t("ui.walkthrough.next");
-  }
-
-  if (!overlay) {
-    overlay = document.createElement("div");
-    overlay.id = "sao-tour-overlay";
-    overlay.className = "sao-tour-overlay";
-    overlay.setAttribute("aria-hidden", "true");
-
-    focusRing = document.createElement("div");
-    focusRing.className = "sao-tour-focus-ring";
-    overlay.appendChild(focusRing);
-
-    const card = document.createElement("section");
-    card.className = "sao-tour-card";
-    card.setAttribute("role", "dialog");
-    card.setAttribute("aria-modal", "true");
-
-    stepLabel = document.createElement("p");
-    stepLabel.className = "sao-tour-step";
-
-    titleEl = document.createElement("h2");
-    titleEl.className = "sao-tour-title";
-
-    bodyEl = document.createElement("p");
-    bodyEl.className = "sao-tour-body";
-
-    const actions = document.createElement("div");
-    actions.className = "sao-tour-actions";
-
-    skipButton = document.createElement("button");
-    skipButton.type = "button";
-    skipButton.textContent = t("ui.walkthrough.skip");
-
-    previousButton = document.createElement("button");
-    previousButton.type = "button";
-    previousButton.textContent = t("ui.walkthrough.back");
-
-    nextButton = document.createElement("button");
-    nextButton.type = "button";
-    nextButton.textContent = t("ui.walkthrough.next");
-
-    actions.append(skipButton, previousButton, nextButton);
-    card.append(stepLabel, titleEl, bodyEl, actions);
-    overlay.appendChild(card);
-    document.body.appendChild(overlay);
-
-    skipButton.addEventListener("click", () => closeTour(true));
-    previousButton.addEventListener("click", () => {
-      if (currentStepIndex === 0) return;
-      currentStepIndex -= 1;
-      renderStep();
-    });
-    nextButton.addEventListener("click", () => {
-      if (currentStepIndex >= steps.length - 1) {
-        closeTour(true);
-        return;
-      }
-      currentStepIndex += 1;
-      renderStep();
-    });
-
-    overlay.addEventListener("click", event => {
-      if (event.target === overlay) {
-        closeTour(true);
-      }
-    });
-
-    document.addEventListener("keydown", event => {
-      if (!overlay.classList.contains("open")) return;
-      if (event.key === "Escape") {
-        closeTour(true);
-      }
-    });
-  } else {
-    focusRing = overlay.querySelector(".sao-tour-focus-ring");
-    stepLabel = overlay.querySelector(".sao-tour-step");
-    titleEl = overlay.querySelector(".sao-tour-title");
-    bodyEl = overlay.querySelector(".sao-tour-body");
-    const actionButtons = overlay.querySelectorAll(".sao-tour-actions button");
-    skipButton = actionButtons[0];
-    previousButton = actionButtons[1];
-    nextButton = actionButtons[2];
-    skipButton.textContent = t("ui.walkthrough.skip");
-    previousButton.textContent = t("ui.walkthrough.back");
-  }
-
-  currentStepIndex = 0;
-  overlay.classList.add("open");
-  overlay.setAttribute("aria-hidden", "false");
-  renderStep();
+  return walkthroughController?.start(options) || false;
 }
 
 let markerSearchCache = null;
@@ -990,7 +734,7 @@ function ensureMarkerSearchCache() {
   markerSearchCache = new Map(
     getDataEntries().map(([id, marker]) => [
       id,
-      `${id} ${marker.title} ${marker.type}`.toLowerCase()
+      `${id} ${marker.title} ${getMarkerText(marker, "title", id)} ${marker.type} ${getMarkerText(marker, "type", id)}`.toLowerCase()
     ])
   );
 }
@@ -1092,11 +836,11 @@ function updateCoordinatePanelFromEvent(event) {
 }
 
 function requestCoordinatePanelUpdate(event) {
+  if (!pageDisposer || pageDisposer.disposed) return;
   state.pendingPointerEvent = event;
   if (state.coordinateRafId !== null) return;
 
-  state.coordinateRafId = window.requestAnimationFrame(() => {
-    state.coordinateRafId = null;
+  schedulePageAnimationFrame("coordinateRafId", () => {
     if (!state.pendingPointerEvent) return;
     updateCoordinatePanelFromEvent(state.pendingPointerEvent);
     state.pendingPointerEvent = null;
@@ -1106,11 +850,8 @@ function requestCoordinatePanelUpdate(event) {
 function updateTransform() {
   const mapTransform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.zoom})`;
   mapLayer.style.transform = mapTransform;
-  const markerScale = 1 / state.zoom;
-  for (const markerEl of markerLayer.children) {
-    const markerAnchorY = getComputedStyle(markerEl).getPropertyValue("--marker-anchor-y") || "-50%";
-    markerEl.style.transform = `translate(-50%, ${markerAnchorY}) scale(${markerScale.toFixed(6)})`;
-  }
+  markerLayer.style.transform = `scale(${(1 / state.zoom).toFixed(6)})`;
+  markerLayer.style.transformOrigin = "top left";
   zoomLabel.textContent = formatZoomLabel(state.zoom);
 }
 
@@ -1123,6 +864,7 @@ function setZoom(nextZoom, anchorX, anchorY) {
   state.translateY = anchorY - (anchorY - state.translateY) * zoomRatio;
   state.zoom = nextZoom;
   updateTransform();
+  scheduleRenderMarkers();
 }
 
 function resetView() {
@@ -1143,7 +885,7 @@ function setDefaultSidebarMessage() {
 }
 
 function hasActiveMarkerCategories() {
-  return Object.values(state.activeCategories).some(Boolean);
+  return Object.values(sharedMapRuntime.getCategoryStates()).some(Boolean);
 }
 
 function setMarkerEmptyState(filterText) {
@@ -1168,9 +910,9 @@ function setMarkerEmptyState(filterText) {
 function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
   if (!mobAreaLayer) return;
 
-  const mobAreas = (typeof MOB_AREAS !== "undefined" && Array.isArray(MOB_AREAS)) ? MOB_AREAS : [];
+  const mobAreas = getMobAreas();
 
-  const isEnabled = state.activeCategories.mobAreas === true;
+  const isEnabled = sharedMapRuntime.getCategoryState("mobAreas");
   if (!isEnabled || !imgScale) {
     mobAreaLayer.replaceChildren();
     return;
@@ -1204,7 +946,8 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
     polygon.setAttribute("stroke", area.stroke);
 
     const titleEl = document.createElementNS(svgNS, "title");
-    titleEl.textContent = area.title;
+    const areaTitle = getAreaText(area);
+    titleEl.textContent = areaTitle;
     polygon.appendChild(titleEl);
     fragment.appendChild(polygon);
 
@@ -1216,7 +959,7 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
     const maxY = Math.max(...projectedPoints.map(point => point.y));
     const zoneWidth = Math.max(1, maxX - minX);
     const zoneHeight = Math.max(1, maxY - minY);
-    const sizeByWidth = zoneWidth / Math.max(area.title.length * 0.62, 1);
+    const sizeByWidth = zoneWidth / Math.max(areaTitle.length * 0.62, 1);
     const sizeByHeight = zoneHeight * 0.34;
     const labelSize = Math.max(12, Math.min(34, Math.min(sizeByWidth, sizeByHeight)));
 
@@ -1226,7 +969,7 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
     label.setAttribute("y", (centerY - MOB_AREA_LABEL_VERTICAL_OFFSET).toFixed(2));
     label.style.setProperty("--mob-area-label-color", area.stroke);
     label.style.setProperty("--mob-area-label-size", `${labelSize.toFixed(1)}px`);
-    label.textContent = area.title;
+    label.textContent = areaTitle;
     fragment.appendChild(label);
   });
 
@@ -1352,22 +1095,57 @@ function buildCraftsmanMarkerIcon(category) {
 }
 
 function scheduleRenderMarkers() {
+  if (!pageDisposer || pageDisposer.disposed) return;
   if (state.renderMarkersRafId !== null) return;
-  state.renderMarkersRafId = window.requestAnimationFrame(() => {
-    state.renderMarkersRafId = null;
+  schedulePageAnimationFrame("renderMarkersRafId", () => {
     renderMarkers();
   });
 }
 
+function getMarkerRenderSignature(selectedFloor, filterText) {
+  const enabledCategories = Object.entries(sharedMapRuntime.getCategoryStates())
+    .filter(([, enabled]) => enabled)
+    .map(([category]) => category)
+    .sort();
+  const viewportKey = `${Math.round(markerLayer.clientWidth)}x${Math.round(markerLayer.clientHeight)}`;
+  const viewKey = `${Math.round(state.zoom * 1000)}:${Math.round(state.translateX)}:${Math.round(state.translateY)}`;
+  return [selectedFloor, filterText, undergroundToggle.checked ? "underground" : "surface", enabledCategories.join(","), viewportKey, viewKey].join("|");
+}
+
+function getMarkerViewportBounds() {
+  const bounds = {
+    left: -80,
+    top: -80,
+    right: markerLayer.clientWidth + 80,
+    bottom: markerLayer.clientHeight + 80
+  };
+
+  if (!state.zoom || !Number.isFinite(state.zoom)) {
+    return bounds;
+  }
+
+  const mapLeft = -state.translateX;
+  const mapTop = -state.translateY;
+  const mapRight = mapLeft + markerLayer.clientWidth;
+  const mapBottom = mapTop + markerLayer.clientHeight;
+
+  bounds.left = mapLeft - 80;
+  bounds.top = mapTop - 80;
+  bounds.right = mapRight + 80;
+  bounds.bottom = mapBottom + 80;
+  return bounds;
+}
+
 function renderMarkers() {
   const selectedFloor = floorSelect.value;
-  const filterText = normalizeSearchValue(searchInput.value);
-  const mobAreas = (typeof MOB_AREAS !== "undefined" && Array.isArray(MOB_AREAS)) ? MOB_AREAS : [];
-  const fragment = document.createDocumentFragment();
-  let renderedCount = 0;
-  let activeMarkerRendered = false;
+  const filterText = sharedMapRuntime.getSearchQuery();
+  const signature = getMarkerRenderSignature(selectedFloor, filterText);
+  if (state.markerRenderSignature === signature && markerLayer.childElementCount > 0) {
+    return;
+  }
+  state.markerRenderSignature = signature;
 
-  // Precompute letterbox metrics for accurate marker placement
+  const desiredIds = new Set();
   const naturalWidth = mapImage.naturalWidth;
   const naturalHeight = mapImage.naturalHeight;
   const containerW = markerLayer.clientWidth;
@@ -1382,36 +1160,63 @@ function renderMarkers() {
   renderMobAreas(selectedFloor, imgScale, offsetX, offsetY);
 
   ensureMarkerSearchCache();
+  const viewportBounds = getMarkerViewportBounds();
+  let renderedCount = 0;
+  let activeMarkerRendered = false;
+
   getDataEntries().forEach(([id, marker]) => {
     const matchesFloor = marker.floor === selectedFloor;
     const matchesSearch = (markerSearchCache.get(id) || "").includes(filterText);
-
-    const categoryEnabled = state.activeCategories[marker.category] || false;
+    const categoryEnabled = sharedMapRuntime.getCategoryState(marker.category);
     if (!matchesFloor || !categoryEnabled || (filterText && !matchesSearch)) return;
-
-    // Derive pixel position from game coordinates
     if (!imgScale || !marker.coords) return;
+
     const inv = getInverseMarkerCoords(marker, selectedFloor, {
       width: naturalWidth,
       height: naturalHeight
     });
     if (!inv) return;
-    const leftPx = offsetX + inv.rawX * imgScale;
-    const topPx  = offsetY + inv.rawY * imgScale;
 
-    const markerEl = document.createElement("div");
+    const leftPx = offsetX + inv.rawX * imgScale;
+    const topPx = offsetY + inv.rawY * imgScale;
+    const screenX = leftPx * state.zoom + state.translateX;
+    const screenY = topPx * state.zoom + state.translateY;
+    const isVisibleWithinViewport = screenX >= viewportBounds.left && screenX <= viewportBounds.right && screenY >= viewportBounds.top && screenY <= viewportBounds.bottom;
+    if (!isVisibleWithinViewport) return;
+
+    desiredIds.add(id);
+    let markerEl = state.markerCache.get(id);
+    if (!markerEl) {
+      markerEl = document.createElement("div");
+      markerEl.dataset.markerId = id;
+      state.markerCache.set(id, markerEl);
+      markerLayer.appendChild(markerEl);
+    }
+
     const markerType = marker.type.toLowerCase();
+    markerEl.className = `marker ${markerType}`;
+    markerEl.style.left = `${leftPx}px`;
+    markerEl.style.top = `${topPx}px`;
+    markerEl.style.opacity = (() => {
+      const isUnderground = marker.underground === true;
+      return isUnderground
+        ? (undergroundToggle.checked ? 1 : 0.10)
+        : (undergroundToggle.checked ? 0.10 : 1);
+    })();
+    markerEl.style.setProperty("--marker-anchor-y", markerType === "biome" ? "-100%" : "-50%");
+    const markerTitle = getMarkerText(marker, "title", id);
+    markerEl.title = markerTitle;
+    markerEl.tabIndex = 0;
+    markerEl.setAttribute("role", "button");
+    markerEl.setAttribute("aria-label", markerTitle);
+    markerEl.dataset.markerFloor = marker.floor || "";
+
     const isSideQuest = marker.category === "sideQuests";
     const isAlchemist = marker.category === "alchemist";
     const isLumberjack = marker.category === "lumberjack";
     const isCraftsmenCategory = CRAFTSMAN_CATEGORIES.has(marker.category);
     const isMarketCategory = MARKET_CATEGORIES.has(marker.category);
-    markerEl.className = `marker ${markerType}`;
-    markerEl.dataset.markerId = id;
-    markerEl.style.left = `${leftPx}px`;
-    markerEl.style.top  = `${topPx}px`;
-    const markerAnchorY = markerType === "biome" ? "-100%" : "-50%";
-    markerEl.style.setProperty("--marker-anchor-y", markerAnchorY);
+
     if (markerType === "biome") {
       markerEl.innerHTML = `
         <svg class="biome-pin-icon" viewBox="0 0 24 34" aria-hidden="true" focusable="false">
@@ -1477,34 +1282,26 @@ function renderMarkers() {
     } else {
       markerEl.textContent = markerType.charAt(0);
     }
-    markerEl.title = marker.title;
-    markerEl.tabIndex = 0;
-    markerEl.setAttribute("role", "button");
-    markerEl.setAttribute("aria-label", marker.title);
-    const canBeVisited = supportsVisitedCategory(marker.category);
-    markerEl.dataset.markerFloor = marker.floor || "";
-    markerEl.classList.toggle("visited", canBeVisited && isMarkerVisited(marker.floor, id));
-    const isUnderground = marker.underground === true;
-    const opacity = isUnderground
-      ? (undergroundToggle.checked ? 1 : 0.10)
-      : (undergroundToggle.checked ? 0.10 : 1);
-    markerEl.style.opacity = opacity;
-    if (state.activeMarkerId === id) {
+
+    markerEl.classList.toggle("visited", supportsVisitedCategory(marker.category) && sharedMapRuntime.isMarkerVisited(marker.floor, id));
+    if (sharedMapRuntime.getSelectedMarker() === id) {
       markerEl.classList.add("active-marker");
       activeMarkerRendered = true;
+    } else {
+      markerEl.classList.remove("active-marker");
     }
-    fragment.appendChild(markerEl);
+
     renderedCount += 1;
   });
 
-  const mobAreasEnabled = state.activeCategories.mobAreas === true;
-  if (mobAreasEnabled && imgScale) {
-    mobAreas.forEach(area => {
+  if (sharedMapRuntime.getCategoryState("mobAreas") && imgScale) {
+    const mobAreasList = getMobAreas();
+    mobAreasList.forEach(area => {
       if (area.floor !== selectedFloor) return;
       const isAreaUnderground = area.underground === true;
       if (isAreaUnderground !== undergroundToggle.checked) return;
 
-      const waypointTitle = `${area.title} Mobs`;
+      const waypointTitle = `${getAreaText(area)} ${t("page.maps.mobs")}`;
       const searchHaystack = getMobAreaSearchHaystack(area);
       if (filterText && !searchHaystack.includes(filterText)) return;
 
@@ -1519,10 +1316,22 @@ function renderMarkers() {
 
       const leftPx = offsetX + inv.rawX * imgScale;
       const topPx = offsetY + inv.rawY * imgScale;
+      const screenX = leftPx * state.zoom + state.translateX;
+      const screenY = topPx * state.zoom + state.translateY;
+      const isVisibleWithinViewport = screenX >= viewportBounds.left && screenX <= viewportBounds.right && screenY >= viewportBounds.top && screenY <= viewportBounds.bottom;
+      if (!isVisibleWithinViewport) return;
 
-      const markerEl = document.createElement("div");
+      const mobAreaId = `mob-area:${area.id}`;
+      desiredIds.add(mobAreaId);
+      let markerEl = state.markerCache.get(mobAreaId);
+      if (!markerEl) {
+        markerEl = document.createElement("div");
+        markerEl.dataset.markerId = mobAreaId;
+        state.markerCache.set(mobAreaId, markerEl);
+        markerLayer.appendChild(markerEl);
+      }
+
       markerEl.className = "marker mob-area-marker";
-      markerEl.dataset.markerId = `mob-area:${area.id}`;
       markerEl.style.left = `${leftPx}px`;
       markerEl.style.top = `${topPx}px`;
       markerEl.title = waypointTitle;
@@ -1540,36 +1349,44 @@ function renderMarkers() {
           <path class="mob-area-icon-dot" d="M12 10.2a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z"/>
         </svg>
       `;
-      if (state.activeMarkerId === `mob-area:${area.id}`) {
+      if (sharedMapRuntime.getSelectedMarker() === mobAreaId) {
         markerEl.classList.add("active-marker");
         activeMarkerRendered = true;
+      } else {
+        markerEl.classList.remove("active-marker");
       }
 
-      fragment.appendChild(markerEl);
       renderedCount += 1;
     });
   }
 
-  markerLayer.replaceChildren(fragment);
+  for (const existingMarker of Array.from(markerLayer.children)) {
+    const markerId = existingMarker.dataset.markerId;
+    if (!markerId) continue;
+    if (!desiredIds.has(markerId)) {
+      existingMarker.remove();
+      state.markerCache.delete(markerId);
+    }
+  }
 
   if (renderedCount === 0) {
-    state.activeMarkerId = null;
+    sharedMapRuntime.clearSelectedMarker();
     setMarkerEmptyState(filterText);
     return;
   }
 
   if (!activeMarkerRendered) {
-    state.activeMarkerId = null;
+    sharedMapRuntime.clearSelectedMarker();
     setDefaultSidebarMessage();
   }
 }
 
 function openInfo(id) {
-  const marker = DATA[id];
+  const marker = getContextData().markerDataset[id];
   if (!marker) return;
   const canBeVisited = supportsVisitedCategory(marker.category);
   const markerFloor = marker.floor || "";
-  const isVisited = isMarkerVisited(markerFloor, id);
+  const isVisited = sharedMapRuntime.isMarkerVisited(markerFloor, id);
   const waypointQuery = marker.title;
   const visitedLabel = marker.category === "bossSpawns"
     ? t("page.maps.visitedDefeated")
@@ -1581,10 +1398,10 @@ function openInfo(id) {
   const bestiaryHref = getFloorSpecificBestiaryUrl(marker.floor, bossCategory, waypointQuery);
   const questsHref = getFloorSpecificQuestsUrl(marker.floor, waypointQuery);
   const waypointInfoHref = marker.category === "bossSpawns" ? bestiaryHref : questsHref;
-  state.activeMarkerId = id;
-  title.textContent = marker.title;
-  const markerType = escapeHtml(marker.type || "");
-  const markerDescription = escapeHtml(marker.description || "");
+  sharedMapRuntime.setSelectedMarker(id);
+  title.textContent = getMarkerText(marker, "title", id);
+  const markerType = escapeHtml(getMarkerText(marker, "type", id));
+  const markerDescription = escapeHtml(getMarkerText(marker, "description", id));
   const floorText = escapeHtml(String(marker.floor || "").replace("floor", `${t("page.maps.floorText")} `));
   const coordsX = marker.coords && marker.coords.x !== undefined ? escapeHtml(marker.coords.x) : "--";
   const coordsZ = marker.coords && marker.coords.z !== undefined ? escapeHtml(marker.coords.z) : "--";
@@ -1651,17 +1468,18 @@ function startDrag(event) {
 }
 
 function drag(event) {
+  if (!pageDisposer || pageDisposer.disposed) return;
   if (!state.isDragging) return;
   state.pendingDragClientX = event.clientX;
   state.pendingDragClientY = event.clientY;
   if (state.dragRafId !== null) return;
 
-  state.dragRafId = window.requestAnimationFrame(() => {
-    state.dragRafId = null;
+  schedulePageAnimationFrame("dragRafId", () => {
     if (!state.isDragging) return;
     state.translateX = state.pendingDragClientX - state.dragStartX;
     state.translateY = state.pendingDragClientY - state.dragStartY;
     updateTransform();
+    scheduleRenderMarkers();
   });
 }
 
@@ -1671,60 +1489,41 @@ function stopDrag() {
   mapContainer.classList.remove("grabbing");
 }
 
-function clampSidebarWidth(width) {
-  return Math.min(sidebarResizeConfig.max, Math.max(sidebarResizeConfig.min, width));
-}
-
-function applySidebarWidth(width) {
-  const clampedWidth = clampSidebarWidth(width);
-  document.documentElement.style.setProperty("--sidebar-width", `${clampedWidth}px`);
-  syncSidebarResizeHandleAria(clampedWidth);
-  return clampedWidth;
-}
-
-function syncSidebarResizeHandleAria(width) {
-  if (!sidebarResizeHandle) return;
-  sidebarResizeHandle.setAttribute("aria-valuemin", String(sidebarResizeConfig.min));
-  sidebarResizeHandle.setAttribute("aria-valuemax", String(sidebarResizeConfig.max));
-  sidebarResizeHandle.setAttribute("aria-valuenow", String(Math.round(width)));
-  sidebarResizeHandle.setAttribute("aria-valuetext", `${Math.round(width)} pixels`);
-}
-
-function startSidebarResize(event) {
-  if (event.type === "mousedown" && event.button !== 0) return;
-  if (event.type === "pointerdown" && event.pointerType === "mouse" && event.button !== 0) return;
-  event.preventDefault();
-  state.isResizingSidebar = true;
-  state.sidebarResizeStartX = event.clientX;
-  state.sidebarResizeStartWidth = sidebar.getBoundingClientRect().width;
-  document.body.classList.add("resizing-sidebar");
-}
-
-function resizeSidebar(event) {
-  if (!state.isResizingSidebar) return;
-  const deltaX = event.clientX - state.sidebarResizeStartX;
-  const nextWidth = state.sidebarResizeStartWidth - deltaX;
-  applySidebarWidth(nextWidth);
-  scheduleRenderMarkers();
-}
-
-function stopSidebarResize() {
-  if (!state.isResizingSidebar) return;
-  state.isResizingSidebar = false;
-  document.body.classList.remove("resizing-sidebar");
-  const width = clampSidebarWidth(sidebar.getBoundingClientRect().width);
-  storage.setItem(sidebarResizeConfig.storageKey, String(Math.round(width)));
-}
-
 function init() {
+  if (pageInitialized) return;
   if (!hasRequiredMainUiElements()) {
     showMainUiRuntimeError("The map UI is missing required page elements.");
     return;
   }
 
-  const urlState = parseUrlState();
+  getPageDisposer();
+  walkthroughController = window.createWalkthroughController({
+    document,
+    window,
+    storage,
+    storageKey: mapWalkthroughStorageKey,
+    getSteps: buildWalkthroughSteps,
+    translate: t
+  });
+  getPageDisposer().add(() => {
+    walkthroughController?.destroy();
+    walkthroughController = null;
+  });
+  if (!sharedMapRuntime || sharedMapRuntime.isDestroyed()) {
+    sharedMapRuntime = createSharedMapRuntime();
+    window.__underworldMapRuntime = sharedMapRuntime;
+  }
+  if (sharedMapRuntime) {
+    sharedMapRuntime.init();
+  }
+
+  renderCategorySidebar();
+  syncIslandNavigation();
+
+  const urlState = sharedMapRuntime.parseUrlState(window.location.search);
   const savedState = loadMapUiState();
   const initialState = urlState.hasParams ? urlState : (savedState || {});
+  sharedMapRuntime.replaceCategoryState(initialCategoryState);
   const requestedFloor = initialState.floor || floorSelect.value;
   if (requestedFloor && ["gigasCedar", "iceCave", "rulid", "fishingIsland", "playerIsland"].includes(requestedFloor)) {
     floorSelect.value = requestedFloor;
@@ -1733,8 +1532,8 @@ function init() {
     undergroundToggle.checked = Boolean(initialState.underground);
   }
   if (initialState.activeCategories) {
-    Object.keys(state.activeCategories).forEach(key => {
-      state.activeCategories[key] = !!initialState.activeCategories[key];
+    Object.keys(initialCategoryState).forEach(key => {
+      sharedMapRuntime.setCategoryState(key, !!initialState.activeCategories[key]);
     });
   }
   if (searchInput && typeof initialState.search === "string") {
@@ -1744,103 +1543,80 @@ function init() {
     searchInput.setAttribute("aria-label", t("page.mainui.searchPlaceholder"));
   }
 
+  if (sharedMapRuntime) {
+    sharedMapRuntime.setActiveMapContext(floorSelect.value);
+    sharedMapRuntime.setSearchQuery(searchInput ? searchInput.value : "");
+    sharedMapRuntime.initializeSidebarResize({
+      sidebar,
+      handle: sidebarResizeHandle,
+      document,
+      window,
+      onWidthChange: () => scheduleRenderMarkers(),
+      onResizeStart: () => document.body.classList.add("resizing-sidebar"),
+      onResizeEnd: width => {
+        document.body.classList.remove("resizing-sidebar");
+        storage.setItem("sao.sidebar.width", String(Math.round(width)));
+      }
+    });
+  }
+
   applyMapSources(floorSelect.value);
 
-  const persistedWidth = Number(storage.getItem(sidebarResizeConfig.storageKey));
+  const persistedWidth = Number(storage.getItem("sao.sidebar.width"));
   if (Number.isFinite(persistedWidth) && persistedWidth > 0) {
-    applySidebarWidth(persistedWidth);
+    sharedMapRuntime?.setSidebarWidth(persistedWidth);
   } else {
-    applySidebarWidth(sidebarResizeConfig.defaultWidth);
+    sharedMapRuntime?.setSidebarWidth(320);
   }
 
-  mapContainer.addEventListener("mousemove", requestCoordinatePanelUpdate);
-  mapContainer.addEventListener("pointermove", requestCoordinatePanelUpdate);
-  mapContainer.addEventListener("mouseleave", () => {
+  addPageEventListener(mapContainer, "mousemove", requestCoordinatePanelUpdate);
+  addPageEventListener(mapContainer, "pointermove", requestCoordinatePanelUpdate);
+  addPageEventListener(mapContainer, "mouseleave", () => {
     state.pendingPointerEvent = null;
-    overlayMappedCoords.textContent = "X: -- Z: --";
+    overlayMappedCoords.textContent = t("page.mainui.coordinatesPlaceholder");
   });
-  mapContainer.addEventListener("pointerleave", () => {
+  addPageEventListener(mapContainer, "pointerleave", () => {
     state.pendingPointerEvent = null;
-    overlayMappedCoords.textContent = "X: -- Z: --";
+    overlayMappedCoords.textContent = t("page.mainui.coordinatesPlaceholder");
   });
-  mapContainer.addEventListener("wheel", handleWheel, { passive: false });
-  mapContainer.addEventListener("mousedown", startDrag);
-  mapContainer.addEventListener("pointerdown", startDrag);
-  content.addEventListener("click", handleInfoOverlayClick);
-  content.addEventListener("change", handleInfoOverlayChange);
-  markerLayer.addEventListener("click", handleMarkerLayerClick);
-  markerLayer.addEventListener("keydown", handleMarkerLayerKeydown);
-  if (sidebarResizeHandle) {
-    sidebarResizeHandle.addEventListener("mousedown", startSidebarResize);
-    sidebarResizeHandle.addEventListener("pointerdown", startSidebarResize);
-    sidebarResizeHandle.addEventListener("keydown", event => {
-      const currentWidth = sidebar.getBoundingClientRect().width;
-
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        applySidebarWidth(currentWidth + 16);
-        scheduleRenderMarkers();
-        return;
-      }
-
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        applySidebarWidth(currentWidth - 16);
-        scheduleRenderMarkers();
-        return;
-      }
-
-      if (event.key === "Home") {
-        event.preventDefault();
-        applySidebarWidth(sidebarResizeConfig.min);
-        scheduleRenderMarkers();
-        return;
-      }
-
-      if (event.key === "End") {
-        event.preventDefault();
-        applySidebarWidth(sidebarResizeConfig.max);
-        scheduleRenderMarkers();
-      }
-    });
-    sidebarResizeHandle.addEventListener("dblclick", () => {
-      const width = applySidebarWidth(sidebarResizeConfig.defaultWidth);
-      storage.setItem(sidebarResizeConfig.storageKey, String(Math.round(width)));
-      scheduleRenderMarkers();
-    });
-  }
-
-  window.addEventListener("mousemove", event => {
-    resizeSidebar(event);
-    if (!state.isResizingSidebar) {
-      drag(event);
-    }
+  addPageEventListener(mapContainer, "wheel", handleWheel, { passive: false });
+  addPageEventListener(mapContainer, "mousedown", startDrag);
+  addPageEventListener(mapContainer, "pointerdown", startDrag);
+  addPageEventListener(content, "click", handleInfoOverlayClick);
+  addPageEventListener(content, "change", handleInfoOverlayChange);
+  addPageEventListener(markerLayer, "click", handleMarkerLayerClick);
+  addPageEventListener(markerLayer, "keydown", handleMarkerLayerKeydown);
+  addPageEventListener(window, "mousemove", event => {
+    drag(event);
   });
 
-  window.addEventListener("pointermove", event => {
-    resizeSidebar(event);
-    if (!state.isResizingSidebar) {
-      drag(event);
-    }
+  addPageEventListener(window, "pointermove", event => {
+    drag(event);
   }, { passive: false });
 
-  document.addEventListener("mouseup", () => {
+  addPageEventListener(document, "mouseup", () => {
     stopDrag();
-    stopSidebarResize();
   });
-  document.addEventListener("pointerup", () => {
+  addPageEventListener(document, "pointerup", () => {
     stopDrag();
-    stopSidebarResize();
   });
-  document.addEventListener("mouseleave", () => {
+  addPageEventListener(document, "mouseleave", () => {
     stopDrag();
-    stopSidebarResize();
   });
-  window.addEventListener("blur", stopDrag);
-  window.addEventListener("blur", stopSidebarResize);
+  addPageEventListener(window, "blur", stopDrag);
 
-  resetViewButton.addEventListener("click", resetView);
-  floorSelect.addEventListener("change", () => {
+  addPageEventListener(resetViewButton, "click", resetView);
+  document.querySelectorAll(".island-nav-button").forEach(button => {
+    addPageEventListener(button, "click", () => {
+      if (!floorSelect) return;
+      floorSelect.value = button.dataset.island || floorSelect.value;
+      floorSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  });
+  addPageEventListener(floorSelect, "change", () => {
+    sharedMapRuntime?.setActiveMapContext(floorSelect.value);
+    renderCategorySidebar();
+    syncIslandNavigation();
     applyMapSources(floorSelect.value);
     syncMainCategoryButtonVisibility();
     setUndergroundMode(undergroundToggle.checked);
@@ -1848,48 +1624,52 @@ function init() {
     persistStateToHistory();
   });
 
-  undergroundToggle.addEventListener("change", () => {
+  addPageEventListener(undergroundToggle, "change", () => {
     setUndergroundMode(undergroundToggle.checked);
     scheduleRenderMarkers();
     persistStateToHistory();
   });
 
-  searchInput.addEventListener("input", () => {
+  addPageEventListener(searchInput, "input", () => {
+    sharedMapRuntime?.setSearchQuery(searchInput.value);
     scheduleRenderMarkers();
     persistStateToHistory();
   });
 
   if (clearFiltersButton) {
     clearFiltersButton.textContent = t("page.mainui.clearFilters");
-    clearFiltersButton.addEventListener("click", clearMapFilters);
+    addPageEventListener(clearFiltersButton, "click", clearMapFilters);
   }
 
   attachSectionNavButtons();
+  renderCategorySidebar();
+  syncIslandNavigation();
   syncMainCategoryButtonVisibility();
 
-  const compendiumButton = document.querySelector('button[data-message]');
-  if (compendiumButton) {
-    compendiumButton.dataset.message = t("page.mainui.compendiumToast");
-  }
-
-  categoryToggleButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      if (button.disabled) return;
+  const categoryList = document.getElementById("categoryList");
+  if (categoryList) {
+    addPageEventListener(categoryList, "click", event => {
+      const button = event.target.closest(".sidebar-list-button[data-category]");
+      if (!button || button.disabled) return;
       const category = button.dataset.category;
-      const currentlyActive = state.activeCategories[category];
-      state.activeCategories[category] = !currentlyActive;
-      button.classList.toggle("active", !currentlyActive);
+      const nextValue = sharedMapRuntime.toggleCategory(category);
+      button.classList.toggle("active", nextValue);
+      button.setAttribute("aria-pressed", String(nextValue));
       scheduleRenderMarkers();
       persistStateToHistory();
     });
+  }
+
+  categoryToggleButtons.forEach(button => {
     const category = button.dataset.category;
-    button.classList.toggle("active", !!state.activeCategories[category]);
+    button.classList.toggle("active", sharedMapRuntime.getCategoryState(category));
+    button.setAttribute("aria-pressed", String(sharedMapRuntime.getCategoryState(category)));
   });
 
   // Re-render when map image finishes loading (naturalWidth becomes available)
-  mapImage.addEventListener("load", scheduleRenderMarkers);
+  addPageEventListener(mapImage, "load", scheduleRenderMarkers);
   // Re-render on resize so px positions stay accurate
-  window.addEventListener("resize", scheduleRenderMarkers);
+  addPageEventListener(window, "resize", scheduleRenderMarkers);
 
   setUndergroundMode(undergroundToggle.checked);
   scheduleRenderMarkers();
@@ -1901,15 +1681,18 @@ function init() {
   // Seed history state so popstate/pageshow can restore it later
   persistStateToHistory();
 
-  window.setTimeout(() => {
+  schedulePageTimeout(() => {
     startGuidedWalkthrough({ force: false });
   }, 250);
 
-  document.addEventListener("sao:walkthroughrestart", () => {
+  addPageEventListener(document, "sao:walkthroughrestart", () => {
     startGuidedWalkthrough({ force: true });
   });
 
-  document.addEventListener("sao:languagechange", () => {
+  addPageEventListener(document, "sao:languagechange", () => {
+    markerSearchCache = null;
+    state.markerRenderSignature = "";
+    scheduleRenderMarkers();
     if (clearFiltersButton) {
       clearFiltersButton.textContent = t("page.mainui.clearFilters");
     }
@@ -1923,23 +1706,50 @@ function init() {
       compendiumButton.dataset.message = t("page.mainui.compendiumToast");
     }
 
-    if (state.activeMarkerId && state.activeMarkerId.startsWith("mob-area:")) {
-      const areaId = state.activeMarkerId.slice("mob-area:".length);
-      const area = MOB_AREA_LOOKUP.get(areaId);
+    const selectedMarkerId = sharedMapRuntime.getSelectedMarker();
+    if (selectedMarkerId && selectedMarkerId.startsWith("mob-area:")) {
+      const areaId = selectedMarkerId.slice("mob-area:".length);
+      const area = getMobAreaLookup().get(areaId);
       if (area) {
         openMobAreaInfo(area);
         return;
       }
     }
-    if (state.activeMarkerId && DATA[state.activeMarkerId]) {
-      openInfo(state.activeMarkerId);
+    if (selectedMarkerId && getContextData().markerDataset[selectedMarkerId]) {
+      openInfo(selectedMarkerId);
       return;
     }
     setDefaultSidebarMessage();
   });
+  addPageEventListener(window, "pageshow", () => {
+    syncStateFromDom();
+  });
+  addPageEventListener(window, "popstate", () => {
+    syncStateFromDom();
+  });
+  pageInitialized = true;
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+function destroyUnderworldMapRuntime() {
+  if (pageDisposer) pageDisposer.dispose();
+  pageInitialized = false;
+  state.isDragging = false;
+  state.pendingPointerEvent = null;
+  state.markerCache.clear();
+  state.coordinateRafId = null;
+  state.renderMarkersRafId = null;
+  state.dragRafId = null;
+  toastTimeoutId = null;
+  markerLayer?.replaceChildren?.();
+  if (sharedMapRuntime && !sharedMapRuntime.isDestroyed()) {
+    sharedMapRuntime.destroy();
+  }
+}
+
+window.__destroyUnderworldMapRuntime = destroyUnderworldMapRuntime;
+window.__initUnderworldMapRuntime = init;
+
+addPageEventListener(window, "DOMContentLoaded", () => {
   try {
     ensureMarkerSearchCache();
     init();
@@ -1954,7 +1764,7 @@ function syncStateFromDom() {
   // If history contains explicit mapState, restore from it (stronger guarantee).
   // Otherwise parse URL query params or fall back to DOM state.
   const hist = history.state?.mapState || null;
-  const urlState = parseUrlState();
+  const urlState = sharedMapRuntime.parseUrlState(window.location.search);
   const mapState = urlState.hasParams ? urlState : hist;
 
   if (mapState) {
@@ -1963,6 +1773,7 @@ function syncStateFromDom() {
     if (searchInput && typeof mapState.search === "string") {
       searchInput.value = mapState.search;
     }
+    sharedMapRuntime.setSearchQuery(searchInput ? searchInput.value : "");
 
     // Restore underground checkbox and visual mode
     if (undergroundToggle) undergroundToggle.checked = Boolean(mapState.underground);
@@ -1970,12 +1781,12 @@ function syncStateFromDom() {
 
     // Restore category active flags and update DOM classes
     if (mapState.activeCategories) {
-      Object.keys(state.activeCategories).forEach(key => {
-        state.activeCategories[key] = !!mapState.activeCategories[key];
+      Object.keys(initialCategoryState).forEach(key => {
+        sharedMapRuntime.setCategoryState(key, !!mapState.activeCategories[key]);
       });
       categoryToggleButtons.forEach(button => {
         const cat = button.dataset.category;
-        const active = !!state.activeCategories[cat];
+        const active = sharedMapRuntime.getCategoryState(cat);
         button.classList.toggle('active', active);
       });
     }
@@ -1987,6 +1798,8 @@ function syncStateFromDom() {
     }
   } else {
     // Ensure map images match the selected floor
+    renderCategorySidebar();
+    syncIslandNavigation();
     applyMapSources(floorSelect.value);
 
     // Apply underground visual mode based on the checkbox (bfcache may restore the control state)
@@ -1995,7 +1808,7 @@ function syncStateFromDom() {
     // Sync category buttons into runtime state so render uses the restored UI classes
     categoryToggleButtons.forEach(button => {
       const cat = button.dataset.category;
-      state.activeCategories[cat] = button.classList.contains("active");
+      sharedMapRuntime.setCategoryState(cat, button.classList.contains("active"));
     });
     syncMainCategoryButtonVisibility();
   }
@@ -2011,11 +1824,12 @@ function persistStateToHistory() {
       floor: floorSelect ? floorSelect.value : null,
       underground: undergroundToggle ? Boolean(undergroundToggle.checked) : false,
       search: searchInput ? searchInput.value.trim() : "",
-      activeCategories: { ...state.activeCategories }
+      activeCategories: sharedMapRuntime.getCategoryStates()
     };
     saveMapUiState(mapState);
     const payload = Object.assign({}, history.state || {}, { mapState });
-    history.replaceState(payload, document.title, buildUrlFromState(mapState));
+    const query = sharedMapRuntime.serializeUrlState(mapState);
+    history.replaceState(payload, document.title, `${window.location.pathname}${query ? `?${query}` : ""}`);
   } catch (e) {
     // Silently ignore storage errors; not critical
   }
@@ -2024,13 +1838,4 @@ function persistStateToHistory() {
 // When navigating via history (back/forward) or from bfcache restore, the browser
 // may restore form control states but the runtime state can be stale. Listen for
 // these events and reconcile DOM -> runtime state.
-window.addEventListener("pageshow", () => {
-  syncStateFromDom();
-});
-window.addEventListener("popstate", () => {
-  syncStateFromDom();
-});
-
-
-
-
+//

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="page.uwcompendium.title">Fractured Underworld Compendium | SAO MC</title>
+  <link rel="stylesheet" href="compendium.css">
+</head>
+<body>
+  <div class="page">
+    <nav class="top-nav" data-i18n-aria-label="ui.nav.sectionAria" aria-label="Section navigation">
+      <button type="button" data-nav-target="towerDefense" data-i18n="page.mainui.towerDefenseNav">Tower Defense</button>
+      <button type="button" data-nav-target="compendium" data-i18n="page.mainui.compendiumNav">Compendium</button>
+      <button type="button" data-nav-target="mainui" data-i18n="page.uwcompendium.map">Go back to Map</button>
+    </nav>
+    <main class="panel">
+      <h1 data-i18n="page.uwcompendium.title">Fractured Underworld Compendium</h1>
+      <div id="categoryNav" class="category-nav" role="tablist" data-i18n-aria-label="page.uwcompendium.categoriesAria" aria-label="Compendium categories"></div>
+      <div class="panel-header">
+        <div>
+          <p id="status" role="status" aria-live="polite" data-i18n="ui.common.loading">Loading...</p>
+          <h2 id="listTitle" class="list-title" data-i18n="page.uwcompendium.entries">Compendium entries</h2>
+        </div>
+        <label class="search-label" for="compendiumSearch"><span data-i18n="page.uwcompendium.searchLabel">Search</span><input id="compendiumSearch" type="search" data-i18n-placeholder="page.uwcompendium.searchPlaceholder" placeholder="Search compendium..." autocomplete="off"></label>
+      </div>
+      <section id="entryList" class="entry-list" aria-live="polite" aria-atomic="true"></section>
+    </main>
+  </div>
+  <script src="../../shared/sao-storage.js"></script>
+  <script src="../../shared/sao-i18n.js"></script>
+  <script src="../../shared/sao-content-translations.js"></script>
+  <script src="../../shared/sao-datasets.js"></script>
+  <script src="compendium_current.js"></script>
+  <script src="compendium.js"></script>
+</body>
+</html>

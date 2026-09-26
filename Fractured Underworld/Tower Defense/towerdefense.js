@@ -4,11 +4,55 @@ const infoSheet = document.getElementById("towerDefenseInfoSheet");
 const infoSheetTitle = document.getElementById("infoSheetTitle");
 const infoSheetContent = document.getElementById("towerDefenseInfoSheetContent");
 const shopList = document.getElementById("towerDefenseShopList");
+const shopCount = document.getElementById("towerDefenseShopCount");
 const toast = document.getElementById("towerDefenseToast");
+const backButton = document.getElementById("towerDefenseBackButton");
+const isCurrentDataset = window.SAODatasets?.getDatasetFromLocation() === "current";
+
+if (backButton) {
+  const floor = new URLSearchParams(window.location.search).get("floor");
+  if (floor) {
+    backButton.href = `../Main UI/mainui.html?${new URLSearchParams({ floor }).toString()}`;
+  }
+}
 let toastTimeoutId = null;
 let lastFocusedElement = null;
 const i18n = window.SAOI18n || null;
 const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const content = (key, fallback) => (i18n && typeof i18n.content === "function"
+  ? i18n.content(key, fallback)
+  : fallback);
+
+function localizeChapterButtons() {
+  openInfoSheetButtons.forEach(button => {
+    button.textContent = t("page.towerdefense.chapter", {
+      number: button.dataset.chapter || ""
+    });
+  });
+}
+
+function getTowerDefenseId(item) {
+  if (item.id) return item.id;
+  const legacyIds = {
+    "Mage Skeleton": "mageSkeleton",
+    "Archer Skeleton": "archerSkeleton",
+    "Swordsman Skeleton": "swordsmanSkeleton"
+  };
+  if (legacyIds[item.name]) return legacyIds[item.name];
+  return String(item.name || "unknown")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "unknown";
+}
+
+function getTowerDefenseText(item, field, fallback) {
+  const itemId = getTowerDefenseId(item);
+  const legacyField = field === "universalUpgradeCosts" ? "upgradeCosts" : field;
+  const legacyKey = `page.towerdefense.shopItems.${itemId}.${legacyField}`;
+  const legacyValue = t(legacyKey);
+  const canonicalValue = fallback === undefined ? item[field] : fallback;
+  return content(`towerDefense.${itemId}.${field}`, legacyValue === legacyKey ? canonicalValue : legacyValue);
+}
 
 function showToast(message) {
   if (!toast || !message) return;
@@ -25,6 +69,20 @@ function showToast(message) {
 }
 
 function buildDefaultInfoSheetMarkup() {
+  if (isCurrentDataset) {
+    const selectedEntry = activeTowerDefenseEntries.find(entry => entry.chapter === selectedChapterForSheet);
+    if (!selectedEntry) {
+      return `<p>${t("page.towerdefense.insufficientInfo")}</p>`;
+    }
+    const chapterId = `chapter-${selectedEntry.chapter}`;
+    return `
+      <table class="info-table">
+        <thead><tr><th>${t("page.towerdefense.arcHead")}</th><th>${t("page.towerdefense.rewardsHead")}</th><th>${t("page.towerdefense.wavesHead")}</th></tr></thead>
+        <tbody><tr><td>${content(`towerDefense.${chapterId}.arc`, selectedEntry.arc)}</td><td>${content(`towerDefense.${chapterId}.rewards`, selectedEntry.rewards)}</td><td>${content(`towerDefense.${chapterId}.waves`, selectedEntry.waves)}</td></tr></tbody>
+      </table>
+    `;
+  }
+
   return `
     <table class="info-table">
       <thead>
@@ -36,21 +94,14 @@ function buildDefaultInfoSheetMarkup() {
       </thead>
       <tbody>
         <tr>
-          <td>Arc 1 - Tutorial (Boar Planes)</td>
-          <td>
-            Pouch of 100 Col (100%), Utility Crystal (25%), Minor PvE Rune (8%),
-            Dungeon Key (4%), Fern (Habitat Item) (30%), Frosted Lantern (Habitat Item) (20%),
-            Campfire (Habitat Item) (20%)
-          </td>
-          <td>5 Waves, On the Fifth wave a reskinned pumba spawns as the boss.</td>
+          <td>${t("page.towerdefense.arc1Title")}</td>
+          <td>${t("page.towerdefense.arc1Rewards")}</td>
+          <td>${t("page.towerdefense.arc1Waves")}</td>
         </tr>
         <tr>
-          <td>Arc 2 - Medium (Boar Zones)</td>
-          <td>
-            500 Col Purse (100%), Utility Crystal (40%), Minor PvE Rune (18%),
-            Dungeon Key (12%), Fern (Habitat) (30%), Hay Bale (Habitat) (20%)
-          </td>
-          <td>6 Waves, On the Sixth wave a reskinned pumba spawns as the boss.</td>
+          <td>${t("page.towerdefense.arc2Title")}</td>
+          <td>${t("page.towerdefense.arc2Rewards")}</td>
+          <td>${t("page.towerdefense.arc2Waves")}</td>
         </tr>
       </tbody>
     </table>
@@ -99,25 +150,49 @@ const shopItems = [
   },
 ];
 
+const activeTowerDefenseEntries = isCurrentDataset
+  ? (window.SAO_CURRENT_TOWER_DEFENSE_DATA?.entries || [])
+  : shopItems;
+let selectedChapterForSheet = 1;
+
 function renderShopItems() {
   if (!shopList) return;
 
-  shopList.innerHTML = shopItems.map(item => `
+  if (shopCount) {
+    shopCount.textContent = String(activeTowerDefenseEntries.length);
+  }
+
+  shopList.innerHTML = activeTowerDefenseEntries.map(item => `
     <article class="shop-item">
       <div class="shop-item-header">
-        <h3 class="shop-item-name">${item.name}</h3>
-        <span class="shop-item-cost">${item.invocationCost}</span>
+        <div>
+          <p class="shop-item-kicker">Unit</p>
+          <h3 class="shop-item-name">${getTowerDefenseText(item, "name")}</h3>
+        </div>
+        <div class="shop-item-cost">
+          <span>Invocation</span>
+          <strong>${getTowerDefenseText(item, "invocationCost")}</strong>
+        </div>
       </div>
-      <p class="shop-item-meta">${t("page.towerdefense.unlockWith", { item: item.unlockRequirement })}</p>
-      <ul class="shop-item-stats">
-        <li>${item.levelOne}</li>
-      </ul>
+      <div class="shop-item-unlock">
+        <span>Unlock requirement</span>
+        <strong>${getTowerDefenseText(item, "unlockRequirement")}</strong>
+      </div>
+      <div class="shop-item-section">
+        <h4>Base stats</h4>
+        <p class="shop-item-base-stat">${getTowerDefenseText(item, "levelOne")}</p>
+      </div>
       <div class="shop-item-progression">
         <h4>${t("page.towerdefense.levelProgression")}</h4>
         <ul>
-          ${item.progression.map(step => `<li>${step}</li>`).join("")}
+          ${item.progression.map((step, index) => {
+            const progressionKey = ["one", "two", "three", "four"][index] || String(index);
+            const legacyKey = `page.towerdefense.shopItems.${getTowerDefenseId(item)}.progression.${progressionKey}`;
+            const legacyValue = t(legacyKey);
+            return `<li>${content(`towerDefense.${getTowerDefenseId(item)}.progression.${index}`, legacyValue === legacyKey ? step : legacyValue)}</li>`;
+          }).join("")}
         </ul>
-        <div class="shop-item-upgrade-costs">${item.universalUpgradeCosts}</div>
+        <div class="shop-item-upgrade-costs"><span>Upgrade costs</span><strong>${getTowerDefenseText(item, "universalUpgradeCosts")}</strong></div>
       </div>
     </article>
   `).join("");
@@ -126,12 +201,19 @@ function renderShopItems() {
 function openInfoSheet(event) {
   const button = event.currentTarget;
   const selectedChapter = Number(button.dataset.chapter || 1);
+  selectedChapterForSheet = selectedChapter;
+
+  openInfoSheetButtons.forEach(chapterButton => {
+    const isActive = chapterButton === button;
+    chapterButton.classList.toggle("is-active", isActive);
+    chapterButton.setAttribute("aria-pressed", String(isActive));
+  });
 
   if (!infoSheet || !infoSheetTitle || !infoSheetContent) return;
 
   if (selectedChapter === 1) {
     lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    infoSheetTitle.textContent = t("page.towerdefense.infoSheetTitle");
+    infoSheetTitle.textContent = t("page.towerdefense.chapter", { number: selectedChapter });
     infoSheetContent.innerHTML = buildDefaultInfoSheetMarkup();
     infoSheet.classList.add("open");
     infoSheet.setAttribute("aria-hidden", "false");
@@ -155,6 +237,7 @@ function closeInfoSheet(options = {}) {
 }
 
 renderShopItems();
+localizeChapterButtons();
 
 openInfoSheetButtons.forEach(button => {
   button.addEventListener("click", openInfoSheet);
@@ -180,9 +263,10 @@ document.addEventListener("keydown", event => {
 });
 
 document.addEventListener("sao:languagechange", () => {
+  localizeChapterButtons();
   renderShopItems();
   if (infoSheet && infoSheet.classList.contains("open")) {
-    infoSheetTitle.textContent = t("page.towerdefense.infoSheetTitle");
+    infoSheetTitle.textContent = t("page.towerdefense.chapter", { number: selectedChapterForSheet });
     infoSheetContent.innerHTML = buildDefaultInfoSheetMarkup();
   }
 });

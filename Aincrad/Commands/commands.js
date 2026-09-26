@@ -3,6 +3,9 @@ const DEFAULT_CATEGORY = "communication";
 const commandsUiStateStorageKey = "sao.commands.uiState";
 const i18n = window.SAOI18n || null;
 const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const content = (key, fallback) => (i18n && typeof i18n.content === "function"
+  ? i18n.content(key, fallback)
+  : fallback);
 const storage = window.SAOStorage || {
   getItem() { return null; },
   setItem() {},
@@ -345,16 +348,50 @@ const commandEntries = [
   }
 ];
 
+const activeCommandEntries = window.SAODatasets?.getDatasetFromLocation() === "current"
+  ? (window.SAO_CURRENT_COMMAND_ENTRIES || [])
+  : commandEntries;
+const excludedCategoryKeys = new Set(
+  String(document.querySelector("[data-command-exclude-categories]")?.dataset.commandExcludeCategories || "")
+    .split(",")
+    .map(category => category.trim())
+    .filter(Boolean)
+);
+const visibleCategories = categories.filter(category => !excludedCategoryKeys.has(category.key));
+const visibleCommandEntries = activeCommandEntries.filter(entry => !excludedCategoryKeys.has(entry.category));
+
+function getCommandId(entry) {
+  return entry.id || String(entry.command || "unknown")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "unknown";
+}
+
+visibleCommandEntries.forEach(entry => {
+  window.SAOContentTranslations?.registerCommandEntry?.(entry, getCommandId(entry));
+});
+
+function getCommandText(entry, field) {
+  return content(`command.${getCommandId(entry)}.${field}`, entry[field] || "");
+}
+
 // Build lookup structures used by the runtime
 const commandsByCategory = new Map();
-commandEntries.forEach(entry => {
+visibleCommandEntries.forEach(entry => {
   const list = commandsByCategory.get(entry.category) || [];
   list.push(entry);
   commandsByCategory.set(entry.category, list);
 });
 
-const commandSearchIndex = commandEntries.map(entry => {
-  const haystack = [entry.command, entry.usage, entry.example, categoryLabelMap.get(entry.category) || ""].join(" ").toLowerCase();
+const commandSearchIndex = visibleCommandEntries.map(entry => {
+  const haystack = [
+    entry.command,
+    entry.usage,
+    entry.example,
+    getCommandText(entry, "usage"),
+    getCommandText(entry, "example"),
+    categoryLabelMap.get(entry.category) || ""
+  ].join(" ").toLowerCase();
   return { entry, haystack };
 });
 
@@ -402,7 +439,7 @@ function createCategoryFilters(activeCategory) {
 
   wrap.replaceChildren();
 
-  categories.forEach(category => {
+  visibleCategories.forEach(category => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `list-tab${category.key === activeCategory ? " is-active" : ""}`;
@@ -475,11 +512,11 @@ function renderCommandTable(entries) {
     commandCell.textContent = entry.command;
 
     const usageCell = document.createElement("td");
-    usageCell.textContent = entry.usage;
+    usageCell.textContent = getCommandText(entry, "usage");
 
     const exampleCell = document.createElement("td");
     exampleCell.className = "example-cell";
-    exampleCell.textContent = entry.example;
+    exampleCell.textContent = getCommandText(entry, "example");
 
     row.append(commandCell, usageCell, exampleCell);
     tbody.appendChild(row);
@@ -496,7 +533,7 @@ function initCommandsRuntime() {
   let uiState = loadCommandsUiState();
 
   let activeCategory = params.get("category") || uiState.category || DEFAULT_CATEGORY;
-  if (!categories.some(category => category.key === activeCategory)) {
+  if (!visibleCategories.some(category => category.key === activeCategory)) {
     activeCategory = DEFAULT_CATEGORY;
   }
 

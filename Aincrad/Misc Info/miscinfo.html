@@ -187,41 +187,89 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="miscinfo.css">
+  <link rel="stylesheet" href="../../shared/aincrad-ui.css">
 </head>
 <body>
-  <header class="topbar">
-    <h1 class="title" data-i18n="page.miscinfo.heading">Misc. Info</h1>
-    <button id="backToMapButton" type="button" data-i18n="page.miscinfo.back">Go back to Menu</button>
-  </header>
+  <div class="page">
+    <nav class="nav" data-i18n-aria-label="ui.nav.sectionAria" aria-label="Section navigation">
+      <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Map</button>
+      <button type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
+      <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
+      <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
+      <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
+      <button type="button" data-nav-target="menu"><span class="nav-icon" aria-hidden="true"><svg class="nav-icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6H2M2 6l4-4M2 6l4 4"/></svg></span><span data-i18n="ui.nav.menu">Go back to Menu</span></button>
+    </nav>
 
-  <main class="content">
-    <div class="button-list">
-      <button class="menu-button" id="playerLevelsButton" type="button" data-i18n="page.miscinfo.playerLevels" aria-expanded="false" aria-controls="playerLevelsDetails">Player Levels</button>
-      <div class="details" id="playerLevelsDetails" hidden aria-live="polite" aria-atomic="true" data-i18n="page.miscinfo.playerLevelsDetails">Level 1 -> 2: 150 XP</div>
-    </div>
-  </main>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow" data-i18n="page.miscinfo.eyebrow">Aincrad reference</p>
+        <h1 data-i18n="page.miscinfo.heading">Misc. Info</h1>
+        <p class="subtitle" data-i18n="page.miscinfo.subtitle">Useful reference information about Aincrad, progression, systems, and the website.</p>
+      </div>
+      <span class="dataset-badge" data-i18n="page.miscinfo.referenceHub">Reference hub</span>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="section-panel" aria-labelledby="progressionHeading">
+        <div class="section-heading">
+          <div><p class="section-kicker" data-i18n="page.miscinfo.progression">Progression</p><h2 id="progressionHeading" data-i18n="page.miscinfo.playerProgression">Player Progression</h2></div>
+          <span class="section-count" data-i18n="page.miscinfo.xpThresholds">XP thresholds</span>
+        </div>
+        <div id="progressionTableRoot"></div>
+      </section>
+
+      <section class="section-panel full-width" aria-labelledby="gameSystemsHeading">
+        <div class="section-heading"><div><p class="section-kicker" data-i18n="page.miscinfo.aincradSystems">Aincrad systems</p><h2 id="gameSystemsHeading" data-i18n="page.miscinfo.gameSystems">Game Systems</h2></div></div>
+        <div class="system-grid">
+          <a class="system-card" href="../Quests/quests.html"><strong data-i18n="ui.nav.quests">Quests</strong><p data-i18n="page.miscinfo.questsCardText">Search quests by NPC, location, requirements, rewards, and completion state.</p></a>
+          <a class="system-card" href="../eCompendium/ecompendium.html"><strong data-i18n="ui.nav.equipment">Equipment</strong><p data-i18n="page.miscinfo.equipmentCardText">Browse equipment categories, levels, rarity, descriptions, statistics, and crafting resources.</p></a>
+          <a class="system-card" href="../Bestiary/bestiary.html"><strong data-i18n="ui.nav.bestiary">Bestiary</strong><p data-i18n="page.miscinfo.bestiaryCardText">Review bosses, dungeon mobs, regular mobs, aggressiveness, XP, and drops.</p></a>
+          <a class="system-card" href="../Map/maps.html"><strong data-i18n="ui.nav.maps">Maps</strong><p data-i18n="page.miscinfo.mapsCardText">Explore floor maps with searchable markers, categories, coordinates, and underground layers.</p></a>
+        </div>
+      </section>
+
+      <section class="section-panel" aria-labelledby="skillsHeading">
+        <div class="section-heading"><div><p class="section-kicker" data-i18n="page.miscinfo.skillsHeading">Skills</p><h2 id="skillsHeading" data-i18n="page.miscinfo.skillsHeading">Skills</h2></div></div>
+        <div class="reference-grid">
+          <article class="reference-card wide">
+            <p data-i18n="page.miscinfo.skillsUnavailable">Skill information is not available yet.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-panel" aria-labelledby="projectHeading">
+        <div class="section-heading"><div><p class="section-kicker" data-i18n="page.miscinfo.projectReference">Project reference</p><h2 id="projectHeading" data-i18n="page.miscinfo.projectInformation">Website / Project Information</h2></div></div>
+        <div class="project-grid">
+          <article class="project-card"><h3 data-i18n="page.miscinfo.projectHeading">Project</h3><p data-i18n="page.miscinfo.projectText">Static fan-made SAO MC reference website hosted on GitHub Pages.</p></article>
+          <article class="project-card"><h3 data-i18n="page.miscinfo.languagesHeading">Languages</h3><p data-i18n="page.miscinfo.languagesText">English, Español, and Français are available through the shared language system.</p></article>
+        </div>
+      </section>
+
+      <section class="section-panel full-width command-shell" aria-labelledby="commandsHeading" data-command-exclude-categories="media,useless">
+        <details class="reference-details" open>
+          <summary id="commandsHeading" data-i18n="page.miscinfo.commandReference">Command Reference</summary>
+          <div class="reference-details-content">
+            <p data-i18n="page.miscinfo.commandReferenceText">Search the existing command catalog by category, command, usage, or example.</p>
+            <div class="command-toolbar">
+              <div id="categoryFilters" class="list-tabs" role="tablist" data-i18n-aria-label="page.commands.tablistAria" aria-label="Command categories"></div>
+              <label class="command-search" for="commandSearch"><span data-i18n="page.commands.searchLabel">Search commands</span><input id="commandSearch" type="search" data-i18n-placeholder="page.commands.searchPlaceholder" placeholder="Search by command, usage, or example..." autocomplete="off"></label>
+            </div>
+            <p id="status" role="status" aria-live="polite" data-i18n="page.miscinfo.loadingCommands">Loading commands...</p>
+            <div id="commandTableRoot" aria-live="polite" aria-atomic="true"></div>
+          </div>
+        </details>
+      </section>
+
+    </main>
+  </div>
 
   <script src="../../shared/sao-storage.js"></script>
   <script src="../../shared/sao-i18n.js"></script>
-  <script>
-    const backToMapButton = document.getElementById("backToMapButton");
-    backToMapButton.addEventListener("click", () => {
-      window.location.href = "../../index.html";
-    });
-
-    const playerLevelsButton = document.getElementById("playerLevelsButton");
-    const playerLevelsDetails = document.getElementById("playerLevelsDetails");
-
-    playerLevelsButton.addEventListener("click", () => {
-      const isHidden = playerLevelsDetails.hasAttribute("hidden");
-      if (isHidden) {
-        playerLevelsDetails.removeAttribute("hidden");
-        playerLevelsButton.setAttribute("aria-expanded", "true");
-      } else {
-        playerLevelsDetails.setAttribute("hidden", "hidden");
-        playerLevelsButton.setAttribute("aria-expanded", "false");
-      }
-    });
-  </script>
+  <script src="../../shared/sao-content-translations.js"></script>
+  <script src="../../shared/sao-datasets.js"></script>
+  <script src="../Commands/commands_current.js"></script>
+  <script src="../Commands/commands.js"></script>
+  <script src="miscinfo.js"></script>
 </body>
 </html>

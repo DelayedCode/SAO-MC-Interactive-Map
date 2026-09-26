@@ -122,10 +122,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Force": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Assassin"
+                "Class": "Assassin",
+                "Defense": "7.2",
+                "Health": "62",
+                "2 Piece Set Bonus": "+10% Critical Hit Chance, +15% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.7% Movement Speed, +0.2 Stamina Regen",
+                "4 Piece Set Bonus": "+10 Damage, +1 Lifesteal, +0.25 Health Regen"
             }
         },
         {
@@ -149,10 +154,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Defense Car": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Warrior"
+                "Class": "Warrior",
+                "Defense": "7",
+                "Health": "60",
+                "2 Piece Set Bonus": "+8 Stamina, +0.3 Stamina Regen",
+                "3 Piece Set Bonus": "+7% Damage Reduction, +5 Knockback Resistance",
+                "4 Piece Set Bonus": "+3.5 Block Mastery, +2.5 Block Power, +0.25 Health Regen"
             }
         },
         {
@@ -176,11 +186,16 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "2",
                 "Requirement: Defense Car": "2",
                 "Class": "Warrior",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.5",
+                "Health": "72",
+                "2 Piece Set Bonus": "+8 Stamina, +0.3 Stamina Regen",
+                "3 Piece Set Bonus": "+7% Damage Reduction, +5 Knockback Resistance",
+                "4 Piece Set Bonus": "+3.5 Block Mastery, +2.5 Block Power, +0.25 Health Regen"
             }
         },
         {
@@ -204,10 +219,15 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Defense Car": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Warrior"
+                "Class": "Warrior",
+                "Defense": "7.4",
+                "Health": "64",
+                "2 Piece Set Bonus": "+8 Stamina, +0.3 Stamina Regen",
+                "3 Piece Set Bonus": "+7% Damage Reduction, +5 Knockback Resistance",
+                "4 Piece Set Bonus": "+3.5 Block Mastery, +2.5 Block Power, +0.25 Health Regen"
             }
         },
         {
@@ -231,10 +251,15 @@ window.FLOOR_3_DATA = {
                     "amount": 24
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "2",
                 "Requirement: Defense Car": "2",
-                "Class": "Warrior"
+                "Class": "Warrior",
+                "Defense": "7.8",
+                "Health": "67.98",
+                "2 Piece Set Bonus": "+8 Stamina, +0.3 Stamina Regen",
+                "3 Piece Set Bonus": "+7% Damage Reduction, +5 Knockback Resistance",
+                "4 Piece Set Bonus": "+3.5 Block Mastery, +2.5 Block Power, +0.25 Health Regen"
             }
         },
         {
@@ -242,7 +267,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Rare",
             "level": 15,
             "description": "Forged from pure amethyst crystals, this armor radiates mystical power.",
-            "set": "Hunting Amethyst Set",
+            "set": "Hunter Amethyst Set",
             "craftingLocation": "the Amethyst Armorsmith",
             "craftingResources": [
                 {
@@ -258,10 +283,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Force": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Archer"
+                "Class": "Archer",
+                "Defense": "6.6",
+                "Health": "56",
+                "2 Piece Set Bonus": "+15% Critical Hit Chance, +10% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.6% Movement Speed, +2.5 Evasion, +0.1 Stamina Regen",
+                "4 Piece Set Bonus": "+10 Attack Speed, +12 Damage"
             }
         },
         {
@@ -269,7 +299,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Rare",
             "level": 15,
             "description": "Forged from pure amethyst crystals, this armor radiates mystical power.",
-            "set": "Hunting Amethyst Set",
+            "set": "Hunter Amethyst Set",
             "craftingLocation": "the Amethyst Armorsmith",
             "craftingResources": [
                 {
@@ -285,11 +315,16 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "2",
                 "Requirement: Force": "2",
                 "Class": "Archer",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "7.8",
+                "Health": "67.98",
+                "2 Piece Set Bonus": "+15% Critical Hit Chance, +10% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.6% Movement Speed, +2.5 Evasion, +0.1 Stamina Regen",
+                "4 Piece Set Bonus": "+10 Attack Speed, +12 Damage"
             }
         },
         {
@@ -297,7 +332,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Rare",
             "level": 15,
             "description": "Forged from pure amethyst crystals, this armor radiates mystical power.",
-            "set": "Hunting Amethyst Set",
+            "set": "Hunter Amethyst Set",
             "craftingLocation": "the Amethyst Armorsmith",
             "craftingResources": [
                 {
@@ -313,10 +348,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "2",
                 "Requirement: Force": "2",
-                "Class": "Archer"
+                "Class": "Archer",
+                "Defense": "7",
+                "Health": "60",
+                "2 Piece Set Bonus": "+15% Critical Hit Chance, +10% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.6% Movement Speed, +2.5 Evasion, +0.1 Stamina Regen",
+                "4 Piece Set Bonus": "+10 Attack Speed, +12 Damage"
             }
         },
         {
@@ -324,7 +364,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Rare",
             "level": 15,
             "description": "Forged from pure amethyst crystals, this armor radiates mystical power.",
-            "set": "Hunting Amethyst Set",
+            "set": "Hunter Amethyst Set",
             "craftingLocation": "the Amethyst Armorsmith",
             "craftingResources": [
                 {
@@ -340,10 +380,15 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Force": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Archer"
+                "Class": "Archer",
+                "Defense": "7.4",
+                "Health": "64",
+                "2 Piece Set Bonus": "+15% Critical Hit Chance, +10% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.6% Movement Speed, +2.5 Evasion, +0.1 Stamina Regen",
+                "4 Piece Set Bonus": "+10 Attack Speed, +12 Damage"
             }
         },
         {
@@ -351,7 +396,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Rare",
             "level": 15,
             "description": "Forged from pure amethyst crystals, this armor radiates mystical power.",
-            "set": "Magic Amethyst Set",
+            "set": "Magical Amethyst Set",
             "craftingLocation": "the Amethyst Armorsmith",
             "craftingResources": [
                 {
@@ -367,10 +412,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Intelligence": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Mage"
+                "Class": "Mage",
+                "Defense": "6.6",
+                "Health": "56",
+                "2 Piece Set Bonus": "+20 Mana, +5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+5 Hatred, +0.4 Mana Regen",
+                "4 Piece Set Bonus": "+1 Lifesteal, +5 Magic Damage, +5 Critical Skill Hit Damage"
             }
         },
         {
@@ -378,7 +428,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Rare",
             "level": 15,
             "description": "Forged from pure amethyst crystals, this armor radiates mystical power.",
-            "set": "Magic Amethyst Set",
+            "set": "Magical Amethyst Set",
             "craftingLocation": "the Amethyst Armorsmith",
             "craftingResources": [
                 {
@@ -394,11 +444,16 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Intelligence": "2",
                 "Requirement: Vitality": "2",
                 "Class": "Mage",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "7.8",
+                "Health": "67.98",
+                "2 Piece Set Bonus": "+20 Mana, +5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+5 Hatred, +0.4 Mana Regen",
+                "4 Piece Set Bonus": "+1 Lifesteal, +5 Magic Damage, +5 Critical Skill Hit Damage"
             }
         },
         {
@@ -406,7 +461,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Rare",
             "level": 15,
             "description": "Forged from pure amethyst crystals, this armor radiates mystical power.",
-            "set": "Magic Amethyst Set",
+            "set": "Magical Amethyst Set",
             "craftingLocation": "the Amethyst Armorsmith",
             "craftingResources": [
                 {
@@ -422,10 +477,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Intelligence": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Mage"
+                "Class": "Mage",
+                "Defense": "7",
+                "Health": "60",
+                "2 Piece Set Bonus": "+20 Mana, +5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+5 Hatred, +0.4 Mana Regen",
+                "4 Piece Set Bonus": "+1 Lifesteal, +5 Magic Damage, +5 Critical Skill Hit Damage"
             }
         },
         {
@@ -433,7 +493,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Rare",
             "level": 15,
             "description": "Forged from pure amethyst crystals, this armor radiates mystical power.",
-            "set": "Magic Amethyst Set",
+            "set": "Magical Amethyst Set",
             "craftingLocation": "the Amethyst Armorsmith",
             "craftingResources": [
                 {
@@ -449,10 +509,15 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "2",
                 "Requirement: Intelligence": "2",
-                "Class": "Mage"
+                "Class": "Mage",
+                "Defense": "7.4",
+                "Health": "64",
+                "2 Piece Set Bonus": "+20 Mana, +5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+5 Hatred, +0.4 Mana Regen",
+                "4 Piece Set Bonus": "+1 Lifesteal, +5 Magic Damage, +5 Critical Skill Hit Damage"
             }
         },
         {
@@ -476,10 +541,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Force": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Assassin"
+                "Class": "Assassin",
+                "Defense": "6.8",
+                "Health": "57.98",
+                "2 Piece Set Bonus": "+10% Critical Hit Chance, +15% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.7% Movement Speed, +0.2 Stamina Regen",
+                "4 Piece Set Bonus": "+10 Damage, +1 Lifesteal, +0.25 Health Regen"
             }
         },
         {
@@ -503,11 +573,16 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Force": "2",
                 "Requirement: Vitality": "2",
                 "Class": "Assassin",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8",
+                "Health": "70",
+                "2 Piece Set Bonus": "+10% Critical Hit Chance, +15% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.7% Movement Speed, +0.2 Stamina Regen",
+                "4 Piece Set Bonus": "+10 Damage, +1 Lifesteal, +0.25 Health Regen"
             }
         },
         {
@@ -531,10 +606,15 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "2",
                 "Requirement: Force": "2",
-                "Class": "Assassin"
+                "Class": "Assassin",
+                "Defense": "7.6",
+                "Health": "66",
+                "2 Piece Set Bonus": "+10% Critical Hit Chance, +15% Critical Hit Damage",
+                "3 Piece Set Bonus": "+0.7% Movement Speed, +0.2 Stamina Regen",
+                "4 Piece Set Bonus": "+10 Damage, +1 Lifesteal, +0.25 Health Regen"
             }
         },
         {
@@ -558,10 +638,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "2",
                 "Requirement: Spirit": "2",
-                "Class": "Shaman"
+                "Class": "Shaman",
+                "Defense": "6.6",
+                "Health": "56",
+                "2 Piece Set Bonus": "+15 Mana, +0.6 Mana Regen",
+                "3 Piece Set Bonus": "+7 Hatred, +0.35% Movement Speed",
+                "4 Piece Set Bonus": "+5 Healing Bonus, +0.2 Health Regen, +10 Attack Speed"
             }
         },
         {
@@ -585,11 +670,16 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Spirit": "2",
                 "Requirement: Vitality": "2",
                 "Class": "Shaman",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "7.8",
+                "Health": "67.98",
+                "2 Piece Set Bonus": "+15 Mana, +0.6 Mana Regen",
+                "3 Piece Set Bonus": "+7 Hatred, +0.35% Movement Speed",
+                "4 Piece Set Bonus": "+5 Healing Bonus, +0.2 Health Regen, +10 Attack Speed"
             }
         },
         {
@@ -613,10 +703,15 @@ window.FLOOR_3_DATA = {
                     "amount": 32
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Spirit": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Shaman"
+                "Class": "Shaman",
+                "Defense": "7",
+                "Health": "60",
+                "2 Piece Set Bonus": "+15 Mana, +0.6 Mana Regen",
+                "3 Piece Set Bonus": "+7 Hatred, +0.35% Movement Speed",
+                "4 Piece Set Bonus": "+5 Healing Bonus, +0.2 Health Regen, +10 Attack Speed"
             }
         },
         {
@@ -640,10 +735,15 @@ window.FLOOR_3_DATA = {
                     "amount": 48
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Spirit": "2",
                 "Requirement: Vitality": "2",
-                "Class": "Shaman"
+                "Class": "Shaman",
+                "Defense": "7.4",
+                "Health": "64",
+                "2 Piece Set Bonus": "+15 Mana, +0.6 Mana Regen",
+                "3 Piece Set Bonus": "+7 Hatred, +0.35% Movement Speed",
+                "4 Piece Set Bonus": "+5 Healing Bonus, +0.2 Health Regen, +10 Attack Speed"
             }
         },
         {
@@ -651,13 +751,18 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Woods Assassin Set",
+            "set": "Reaper Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "1",
                 "Requirement: Force": "1",
                 "Class": "Assassin",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.6",
+                "Health": "71",
+                "2 Piece Set Bonus": "+12.5% Critical Hit Chance, +17.5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+6.5 Evasion, +0.85% Movement Speed, +0.35 Stamina Regen",
+                "4 Piece Set Bonus": "+13 Damage, +1.25 Lifesteal"
             }
         },
         {
@@ -665,12 +770,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Woodland Archer Set",
+            "set": "Hunter Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Dexterity": "1",
                 "Requirement: Vitality": "1",
-                "Class": "Archer"
+                "Class": "Archer",
+                "Defense": "7.8",
+                "Health": "62",
+                "2 Piece Set Bonus": "+12.5% Critical Hit Chance, +17.5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+4 Evasion, +0.7% Movement Speed, +0.2 Stamina Regen",
+                "4 Piece Set Bonus": "+13 Damage, +0.2 Attack Speed"
             }
         },
         {
@@ -678,12 +788,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Woods Assassin Set",
+            "set": "Reaper Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "1",
                 "Requirement: Force": "1",
-                "Class": "Assassin"
+                "Class": "Assassin",
+                "Defense": "7.8",
+                "Health": "62",
+                "2 Piece Set Bonus": "+12.5% Critical Hit Chance, +17.5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+6.5 Evasion, +0.85% Movement Speed, +0.35 Stamina Regen",
+                "4 Piece Set Bonus": "+13 Damage, +1.25 Lifesteal"
             }
         },
         {
@@ -691,7 +806,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Woodland Archer Set",
+            "set": "Hunter Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
             "craftingResources": [
                 {
@@ -711,12 +826,17 @@ window.FLOOR_3_DATA = {
                     "amount": 20
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Defense Car": "4",
                 "Requirement: Vitality": "1",
                 "Requirement: Dexterity": "1",
                 "Class": "Archer",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.2",
+                "Health": "67",
+                "2 Piece Set Bonus": "+12.5% Critical Hit Chance, +17.5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+4 Evasion, +0.7% Movement Speed, +0.2 Stamina Regen",
+                "4 Piece Set Bonus": "+13 Damage, +0.2 Attack Speed"
             }
         },
         {
@@ -724,13 +844,18 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Woodland Archer Set",
+            "set": "Hunter Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Dexterity": "1",
                 "Requirement: Vitality": "1",
                 "Class": "Archer",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.4",
+                "Health": "69",
+                "2 Piece Set Bonus": "+12.5% Critical Hit Chance, +17.5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+4 Evasion, +0.7% Movement Speed, +0.2 Stamina Regen",
+                "4 Piece Set Bonus": "+13 Damage, +0.2 Attack Speed"
             }
         },
         {
@@ -738,13 +863,18 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Woods Assassin Set",
+            "set": "Reaper Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Force": "1",
                 "Requirement: Vitality": "1",
                 "Class": "Assassin",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "9",
+                "Health": "75",
+                "2 Piece Set Bonus": "+12.5% Critical Hit Chance, +17.5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+6.5 Evasion, +0.85% Movement Speed, +0.35 Stamina Regen",
+                "4 Piece Set Bonus": "+13 Damage, +1.25 Lifesteal"
             }
         },
         {
@@ -752,13 +882,18 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Fierce Ancient Wood Set",
+            "set": "Fierce Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "1",
                 "Requirement: Defense Car": "1",
                 "Class": "Warrior",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "9.2",
+                "Health": "77",
+                "2 Piece Set Bonus": "+10 Stamina, +0.5 Stamina Regen",
+                "3 Piece Set Bonus": "+8.5% Damage Reduction, +7.5 Knockback Resistance",
+                "4 Piece Set Bonus": "+3.5 Block Power, +5 Block Mastery, +0.35 Health Regen"
             }
         },
         {
@@ -766,13 +901,18 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Fierce Ancient Wood Set",
+            "set": "Fierce Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Defense Car": "1",
                 "Requirement: Vitality": "1",
                 "Class": "Warrior",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.8",
+                "Health": "73",
+                "2 Piece Set Bonus": "+10 Stamina, +0.5 Stamina Regen",
+                "3 Piece Set Bonus": "+8.5% Damage Reduction, +7.5 Knockback Resistance",
+                "4 Piece Set Bonus": "+3.5 Block Power, +5 Block Mastery, +0.35 Health Regen"
             }
         },
         {
@@ -780,12 +920,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Fierce Ancient Wood Set",
+            "set": "Fierce Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Defense Car": "1",
                 "Requirement: Vitality": "1",
-                "Class": "Warrior"
+                "Class": "Warrior",
+                "Defense": "8",
+                "Health": "64",
+                "2 Piece Set Bonus": "+10 Stamina, +0.5 Stamina Regen",
+                "3 Piece Set Bonus": "+8.5% Damage Reduction, +7.5 Knockback Resistance",
+                "4 Piece Set Bonus": "+3.5 Block Power, +5 Block Mastery, +0.35 Health Regen"
             }
         },
         {
@@ -793,12 +938,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Woods Assassin Set",
+            "set": "Reaper Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Force": "1",
                 "Requirement: Vitality": "1",
-                "Class": "Assassin"
+                "Class": "Assassin",
+                "Defense": "8.2",
+                "Health": "67",
+                "2 Piece Set Bonus": "+12.5% Critical Hit Chance, +17.5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+6.5 Evasion, +0.85% Movement Speed, +0.35 Stamina Regen",
+                "4 Piece Set Bonus": "+13 Damage, +1.25 Lifesteal"
             }
         },
         {
@@ -806,12 +956,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Fierce Ancient Wood Set",
+            "set": "Fierce Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Defense Car": "1",
                 "Requirement: Vitality": "1",
-                "Class": "Warrior"
+                "Class": "Warrior",
+                "Defense": "8.4",
+                "Health": "69",
+                "2 Piece Set Bonus": "+10 Stamina, +0.5 Stamina Regen",
+                "3 Piece Set Bonus": "+8.5% Damage Reduction, +7.5 Knockback Resistance",
+                "4 Piece Set Bonus": "+3.5 Block Power, +5 Block Mastery, +0.35 Health Regen"
             }
         },
         {
@@ -819,12 +974,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Woodland Archer Set",
+            "set": "Hunter Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "1",
                 "Requirement: Dexterity": "1",
-                "Class": "Archer"
+                "Class": "Archer",
+                "Defense": "8",
+                "Health": "65",
+                "2 Piece Set Bonus": "+12.5% Critical Hit Chance, +17.5% Critical Hit Damage",
+                "3 Piece Set Bonus": "+4 Evasion, +0.7% Movement Speed, +0.2 Stamina Regen",
+                "4 Piece Set Bonus": "+13 Damage, +0.2 Attack Speed"
             }
         },
         {
@@ -832,12 +992,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Wood Shaman Set",
+            "set": "Wild Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Spirit": "1",
                 "Requirement: Vitality": "1",
-                "Class": "Shaman"
+                "Class": "Shaman",
+                "Defense": "8",
+                "Health": "65",
+                "2 Piece Set Bonus": "+20 Mana, +0.8 Mana Regen",
+                "3 Piece Set Bonus": "+8.5 Hatred, +0.5% Movement Speed",
+                "4 Piece Set Bonus": "+6 Healing Bonus, +0.3 Health Regen, +0.2 Attack Speed"
             }
         },
         {
@@ -845,7 +1010,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Wood Mage Set",
+            "set": "Magical Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
             "craftingResources": [
                 {
@@ -865,11 +1030,16 @@ window.FLOOR_3_DATA = {
                     "amount": 20
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Intelligence": "1",
                 "Requirement: Vitality": "1",
                 "Class": "Mage",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.2",
+                "Health": "67",
+                "2 Piece Set Bonus": "+25 Mana, +6.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+7 Hatred, +0.6 Mana Regen",
+                "4 Piece Set Bonus": "+7.8 Magic Damage, +7.5 Critical Skill Hit Damage, +1.5 Lifesteal"
             }
         },
         {
@@ -877,12 +1047,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Wood Mage Set",
+            "set": "Magical Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Intelligence": "1",
                 "Requirement: Vitality": "1",
-                "Class": "Mage"
+                "Class": "Mage",
+                "Defense": "7.8",
+                "Health": "62",
+                "2 Piece Set Bonus": "+25 Mana, +6.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+7 Hatred, +0.6 Mana Regen",
+                "4 Piece Set Bonus": "+7.8 Magic Damage, +7.5 Critical Skill Hit Damage, +1.5 Lifesteal"
             }
         },
         {
@@ -890,12 +1065,17 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Wood Mage Set",
+            "set": "Magical Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "1",
                 "Requirement: Intelligence": "1",
-                "Class": "Mage"
+                "Class": "Mage",
+                "Defense": "8",
+                "Health": "65",
+                "2 Piece Set Bonus": "+25 Mana, +6.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+7 Hatred, +0.6 Mana Regen",
+                "4 Piece Set Bonus": "+7.8 Magic Damage, +7.5 Critical Skill Hit Damage, +1.5 Lifesteal"
             }
         },
         {
@@ -903,13 +1083,18 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Wood Mage Set",
+            "set": "Magical Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "1",
                 "Requirement: Intelligence": "1",
                 "Class": "Mage",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.4",
+                "Health": "69",
+                "2 Piece Set Bonus": "+25 Mana, +6.5% Critical Skill Hit Chance",
+                "3 Piece Set Bonus": "+7 Hatred, +0.6 Mana Regen",
+                "4 Piece Set Bonus": "+7.8 Magic Damage, +7.5 Critical Skill Hit Damage, +1.5 Lifesteal"
             }
         },
         {
@@ -917,11 +1102,16 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Wood Shaman Set",
+            "set": "Wild Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Spirit": "1",
-                "Class": "Shaman"
+                "Class": "Shaman",
+                "Defense": "7.8",
+                "Health": "62",
+                "2 Piece Set Bonus": "+20 Mana, +0.8 Mana Regen",
+                "3 Piece Set Bonus": "+8.5 Hatred, +0.5% Movement Speed",
+                "4 Piece Set Bonus": "+6 Healing Bonus, +0.3 Health Regen, +0.2 Attack Speed"
             }
         },
         {
@@ -929,13 +1119,18 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Wood Shaman Set",
+            "set": "Wild Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
-            "stats": {
+            "stats":                                     {
                 "Requirement: Vitality": "1",
                 "Requirement: Spirit": "1",
                 "Class": "Shaman",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.4",
+                "Health": "69",
+                "2 Piece Set Bonus": "+20 Mana, +0.8 Mana Regen",
+                "3 Piece Set Bonus": "+8.5 Hatred, +0.5% Movement Speed",
+                "4 Piece Set Bonus": "+6 Healing Bonus, +0.3 Health Regen, +0.2 Attack Speed"
             }
         },
         {
@@ -943,7 +1138,7 @@ window.FLOOR_3_DATA = {
             "rarity": "Legendary",
             "level": 18,
             "description": "Crafted from ancient wood and enchanted moss, this armor vibrates to the rhythm of the forest.",
-            "set": "Ancient Wood Shaman Set",
+            "set": "Wild Ancient Woods Set",
             "craftingLocation": "the Ancient Wood Armorsmith",
             "craftingResources": [
                 {
@@ -963,11 +1158,16 @@ window.FLOOR_3_DATA = {
                     "amount": 20
                 }
             ],
-            "stats": {
+            "stats":                                     {
                 "Requirement: Spirit": "1",
                 "Requirement: Vitality": "1",
                 "Class": "Shaman",
-                "Rune Slots": 1
+                "Rune Slots": 1,
+                "Defense": "8.2",
+                "Health": "67",
+                "2 Piece Set Bonus": "+20 Mana, +0.8 Mana Regen",
+                "3 Piece Set Bonus": "+8.5 Hatred, +0.5% Movement Speed",
+                "4 Piece Set Bonus": "+6 Healing Bonus, +0.3 Health Regen, +0.2 Attack Speed"
             }
         }
     ],
@@ -2704,7 +2904,7 @@ window.FLOOR_3_DATA = {
             }
         },
         {
-            "name": "Amethyst Bracelet",
+            "name": "Thief's Bracelet",
             "rarity": "Rare",
             "level": 15,
             "description": "A tenacious and sturdy bracelet to easily steal from your enemies. Slot: bracelet",
@@ -2724,12 +2924,9 @@ window.FLOOR_3_DATA = {
                 }
             ],
             "stats": {
-                "Defense": "2",
                 "Critical Hit Chance": "5%",
-                "Stamina Regeneration": "0.3/s",
-                "Requirement: Vitality": "1",
-                "Requirement: Dexterity": "1",
-                "Requirement: Force": "2"
+                "Defense": "2",
+                "Stamina Regeneration": "0.3/s"
             }
         },
         {
@@ -3446,7 +3643,13 @@ window.FLOOR_3_DATA = {
                 "Physical Damage": "3%",
                 "Requirement: Intelligence": "2",
                 "Requirement: Dexterity": "2",
-                "Requirement: Force": "2"
+                "Requirement: Force": "2",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3467,7 +3670,13 @@ window.FLOOR_3_DATA = {
                 "Health Regeneration": "0.5/s",
                 "Defense": "2.5",
                 "Requirement: Defense Car": "2",
-                "Requirement: Vitality": "2"
+                "Requirement: Vitality": "2",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3482,7 +3691,13 @@ window.FLOOR_3_DATA = {
                 "Flight Of Life": "1%",
                 "Attack Speed": "0.3",
                 "Requirement: Force": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3525,7 +3740,13 @@ window.FLOOR_3_DATA = {
                 "Bonus Healing": "5",
                 "Magic Damage": "5%",
                 "Attack Speed": "0.2",
-                "Requirement: Spirit": "4"
+                "Requirement: Spirit": "4",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3539,7 +3760,13 @@ window.FLOOR_3_DATA = {
                 "Blocking Mastery": "5%",
                 "Health": "50",
                 "Requirement: Defense Car": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3576,7 +3803,13 @@ window.FLOOR_3_DATA = {
             "description": "Mask to conceal one's identity and inspire terror. Slot: Gloves",
             "set": "Seven Shadow Soldiers",
             "stats": {
-                "Damage Reduction": "-15%"
+                "Damage Reduction": "-15%",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3590,7 +3823,13 @@ window.FLOOR_3_DATA = {
                 "Magic Damage": "10%",
                 "Mana": "5",
                 "Requirement: Intelligence": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3604,7 +3843,13 @@ window.FLOOR_3_DATA = {
                 "Stamina Regeneration": "0.5/s",
                 "Physical Damage": "8%",
                 "Requirement: Vitality": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3644,7 +3889,13 @@ window.FLOOR_3_DATA = {
                 "Damage Critical Hits": "12.5%",
                 "Projectile Damage": "3.5%",
                 "Requirement: Dexterity": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3658,7 +3909,13 @@ window.FLOOR_3_DATA = {
                 "Magic Damage": "5%",
                 "Attack Speed": "0.2",
                 "Requirement: Spirit": "4",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         }
     ],

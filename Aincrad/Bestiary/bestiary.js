@@ -1,4 +1,13 @@
 function getMobDataSources() {
+  if (window.SAODatasets?.getDatasetFromLocation() === "current") {
+    return window.SAO_CURRENT_BESTIARY_DATA?.[getRequestedFloor()] || {
+      regular: "",
+      boss: "",
+      dungeonMobs: "",
+      dungeonBoss: ""
+    };
+  }
+
   return Object.freeze({
     regular: window.REGULAR_MOB_DATA || "",
     boss: window.BOSS_MOB_DATA || "",
@@ -9,6 +18,9 @@ function getMobDataSources() {
 
 const i18n = window.SAOI18n || null;
 const t = (key, params) => (i18n ? i18n.t(key, params) : key);
+const content = (key, fallback) => (i18n && typeof i18n.content === "function"
+  ? i18n.content(key, fallback)
+  : fallback);
 const loadedBestiaryFloors = new Set();
 
 const bestiaryUiStateStorageKey = "sao.bestiary.uiState";
@@ -56,9 +68,18 @@ function parseDropToken(token) {
 
   return {
     item,
+    id: slugifyContentId(item),
     chance,
     notesText: notes.length ? ` (${notes.join(", ")})` : ""
   };
+}
+
+function slugifyContentId(value) {
+  return String(value || "n-a")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "n-a";
 }
 
 function buildMobList(rawData) {
@@ -67,11 +88,28 @@ function buildMobList(rawData) {
     .split("\n")
     .map(line => line.split("\t"))
     .filter(parts => parts.length >= 3)
-    .map(([name, dropsRaw, xpRaw]) => ({
-      name: name.trim(),
-      xp: (xpRaw || "").trim() || "N/A",
-      drops: (dropsRaw || "").split(",").map(parseDropToken)
-    }))
+    .map(([name, dropsRaw, xpRaw]) => {
+      const mob = {
+        name: name.trim(),
+        id: slugifyContentId(name),
+        xp: (xpRaw || "").trim() || "N/A",
+        drops: (dropsRaw || "").split(",").map(parseDropToken)
+      };
+      const contentRegistry = window.SAOContentTranslations;
+      if (contentRegistry?.register) {
+        const mobKey = `bestiary.mob.${mob.id}`;
+        contentRegistry.register(mobKey, mob.name,
+          contentRegistry.es[mobKey] || mob.name,
+          contentRegistry.fr[mobKey] || mob.name);
+        mob.drops.forEach(drop => {
+          const dropKey = `bestiary.item.${drop.id}`;
+          contentRegistry.register(dropKey, drop.item,
+            contentRegistry.es[dropKey] || contentRegistry.translateKnownTerms?.(drop.item, "es") || drop.item,
+            contentRegistry.fr[dropKey] || contentRegistry.translateKnownTerms?.(drop.item, "fr") || drop.item);
+        });
+      }
+      return mob;
+    })
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -228,7 +266,8 @@ function createDropList(drops) {
   sortedDrops.forEach(drop => {
     const row = document.createElement("li");
     const itemText = document.createElement("span");
-    itemText.textContent = `${drop.item}${drop.notesText}`;
+    const itemLabel = content(`bestiary.item.${drop.id}`, drop.item);
+    itemText.textContent = `${itemLabel}${drop.notesText}`;
 
     const chanceText = document.createElement("strong");
     chanceText.textContent = drop.chance !== null ? `${drop.chance}%` : t("page.bestiary.na");
@@ -247,7 +286,7 @@ function createMobCard(mob) {
 
   const title = document.createElement("h2");
   title.className = "mob-name";
-  title.textContent = mob.name;
+  title.textContent = content(`bestiary.mob.${mob.id}`, mob.name);
 
   const meta = document.createElement("div");
   meta.className = "mob-meta";
@@ -405,7 +444,10 @@ function initBestiaryRuntime() {
     const activeMobs = MOB_GROUPS[activeCategory] || [];
     const query = mobSearch.value.trim().toLowerCase();
     const visibleMobs = query
-      ? activeMobs.filter(mob => mob.name.toLowerCase().includes(query))
+      ? activeMobs.filter(mob => {
+          const localizedName = content(`bestiary.mob.${mob.id}`, mob.name).toLowerCase();
+          return mob.name.toLowerCase().includes(query) || localizedName.includes(query);
+        })
       : activeMobs;
 
     status.textContent = t("page.bestiary.statusShown", {
@@ -479,6 +521,12 @@ function initBestiaryRuntime() {
 
 document.addEventListener("DOMContentLoaded", () => {
   try {
+    const isCurrentDataset = window.SAODatasets?.getDatasetFromLocation() === "current";
+    if (isCurrentDataset) {
+      initBestiaryRuntime();
+      return;
+    }
+
     if (window.REGULAR_MOB_DATA && window.BOSS_MOB_DATA && window.DUNGEON_MOB_DATA && window.DUNGEON_BOSS_MOB_DATA) {
       initBestiaryRuntime();
       return;

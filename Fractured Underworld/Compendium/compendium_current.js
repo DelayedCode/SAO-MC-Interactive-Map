@@ -1,0 +1,1 @@
+window.SAO_CURRENT_FU_COMPENDIUM_DATA = [];

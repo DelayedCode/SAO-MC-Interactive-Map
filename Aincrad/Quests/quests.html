@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAO Quests</title>
+  <title data-i18n="page.quests.title">SAO Quests</title>
   <link rel="icon" type="image/svg+xml" href="quest-logo.svg?v=2">
   <link rel="stylesheet" href="quests.css">
+  <link rel="stylesheet" href="../../shared/aincrad-ui.css">
 </head>
 <body>
   <div class="page">
     <div class="nav">
-      <button type="button" data-nav-target="maps">Maps</button>
-      <button type="button" data-nav-target="bestiary">Bestiary</button>
-      <button type="button" data-nav-target="equipment">Equipment</button>
-      <button type="button" data-nav-target="patchnotes">Patchnotes</button>
-      <button type="button" data-nav-target="commands">Commands</button>
+      <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Map</button>
+      <button type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
+      <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
+      <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
+      <button type="button" data-nav-target="miscinfo" data-i18n="ui.nav.miscinfo">Misc. Info</button>
+      <button type="button" data-nav-target="menu"><span class="nav-icon" aria-hidden="true"><svg class="nav-icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6H2M2 6l4-4M2 6l4 4"/></svg></span><span data-i18n="ui.nav.menu">Go back to Menu</span></button>
     </div>
     <div class="panel">
       <h1 class="quests-title">
-        <svg class="quests-logo" viewBox="0 0 64 64" role="img" aria-label="Quests logo">
+        <svg class="quests-logo" viewBox="0 0 64 64" role="img" data-i18n-aria-label="page.quests.logoAria" aria-label="Quests logo">
           <defs>
             <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#3b7b57"/>
@@ -37,20 +39,27 @@
           <circle cx="44" cy="44" r="10" fill="#2e8f5c" stroke="#d9ffe9" stroke-width="1.8"/>
           <path d="M39.5 44l3.3 3.5 6-6.6" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span>Quests</span>
+        <span data-i18n="page.quests.heading">Quests</span>
       </h1>
       <div class="panel-header">
-        <p id="status">Loading...</p>
+        <p id="status" data-i18n="ui.common.loading">Loading...</p>
         <label class="search-label" for="questSearch">
-          <span>Search quests</span>
-          <input id="questSearch" type="search" placeholder="Search by any column..." autocomplete="off">
+          <span data-i18n="page.quests.searchLabel">Search quests</span>
+          <input id="questSearch" type="search" data-i18n-placeholder="page.quests.searchPlaceholder" placeholder="Search by any column..." autocomplete="off">
         </label>
+      </div>
+      <div class="quest-type-filter" role="group" data-i18n-aria-label="page.quests.questTypeFilterAria" aria-label="Quest type filter">
+        <button type="button" class="quest-type-button" data-quest-type="main" data-i18n="page.quests.questTypes.main">Main Quests</button>
+        <button type="button" class="quest-type-button is-active" data-quest-type="side" data-i18n="page.quests.questTypes.side">Side Quests</button>
       </div>
       <div id="questTableRoot"></div>
     </div>
   </div>
   <script src="../../shared/sao-storage.js"></script>
-  <script src="../../shared/sao-i18n.js"></script>
+  <script src="../../shared/sao-i18n.js?v=quest-filters"></script>
+  <script src="../../shared/sao-content-translations.js"></script>
+  <script src="../../shared/sao-datasets.js"></script>
+  <script src="quests_current.js"></script>
   <script src="quests.js"></script>
 </body>
 </html>

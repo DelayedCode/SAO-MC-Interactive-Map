@@ -50,7 +50,7 @@
   <header>
     <div class="header-main">
       <h1 data-i18n="page.towerdefense.heading">Fractured Underworld Tower Defense</h1>
-      <a class="header-back-button" href="../Main UI/mainui.html" data-i18n="page.towerdefense.back">Go back</a>
+      <a id="towerDefenseBackButton" class="header-back-button" href="../Main UI/mainui.html" data-i18n="page.towerdefense.back">Go back</a>
     </div>
   </header>
 
@@ -58,21 +58,33 @@
     <section class="layout-grid" data-i18n-aria-label="page.towerdefense.sectionsAria" aria-label="Tower Defense sections">
       <div class="layout-left">
         <section class="intro-card chapter-card" data-i18n-aria-label="page.towerdefense.chapterOverviewAria" aria-label="Tower Defense chapter overview">
-          <h2 data-i18n="page.towerdefense.chapterSelect">Chapter Select</h2>
+          <div class="section-heading">
+            <div>
+              <p class="section-eyebrow" data-i18n="page.towerdefense.sectionEyebrow">Tower Defense</p>
+              <h2 data-i18n="page.towerdefense.chapterSelect">Chapter Select</h2>
+            </div>
+            <span class="section-count">6</span>
+          </div>
           <div class="shop-list chapter-list" data-i18n-aria-label="page.towerdefense.chapterListAria" aria-label="Tower Defense chapter list">
-            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="1" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 1</button>
-            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="2" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 2</button>
-            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="3" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 3</button>
-            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="4" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 4</button>
-            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="5" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 5</button>
-            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="6" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet">Chapter 6</button>
+            <button class="chapter-button is-active" type="button" data-open-info-sheet="true" data-chapter="1" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet" aria-pressed="true"></button>
+            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="2" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet" aria-pressed="false"></button>
+            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="3" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet" aria-pressed="false"></button>
+            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="4" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet" aria-pressed="false"></button>
+            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="5" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet" aria-pressed="false"></button>
+            <button class="chapter-button" type="button" data-open-info-sheet="true" data-chapter="6" aria-haspopup="dialog" aria-controls="towerDefenseInfoSheet" aria-pressed="false"></button>
           </div>
         </section>
       </div>
 
       <aside class="layout-right" data-i18n-aria-label="page.towerdefense.shopSectionAria" aria-label="Tower Defense shop section">
         <section class="intro-card shop-card">
-          <h2 data-i18n="page.towerdefense.shopTitle">Tower Defense Shop</h2>
+          <div class="section-heading">
+            <div>
+              <p class="section-eyebrow" data-i18n="page.towerdefense.progressionEyebrow">Progression</p>
+              <h2 data-i18n="page.towerdefense.shopTitle">Tower Defense Shop</h2>
+            </div>
+            <span class="section-count" id="towerDefenseShopCount">0</span>
+          </div>
           <div id="towerDefenseShopList" class="shop-list" data-i18n-aria-label="page.towerdefense.shopListAria" aria-label="Tower Defense shop list"></div>
         </section>
       </aside>
@@ -83,7 +95,10 @@
     <div class="info-sheet-backdrop" data-close-info-sheet="true"></div>
     <section class="info-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="infoSheetTitle">
       <header class="info-sheet-header">
-        <h2 id="infoSheetTitle" data-i18n="page.towerdefense.infoSheetTitle">Tower Defense Info Sheet</h2>
+        <div>
+          <p class="section-eyebrow" data-i18n="page.towerdefense.chapterInformation">Chapter information</p>
+          <h2 id="infoSheetTitle" data-i18n="page.towerdefense.infoSheetTitle">Tower Defense Info Sheet</h2>
+        </div>
         <button id="closeInfoSheetButton" class="close-button" type="button" data-i18n-aria-label="page.towerdefense.closeInfoSheet" aria-label="Close info sheet" data-i18n="ui.settings.closeLabel">Close</button>
       </header>
 
@@ -95,6 +110,9 @@
 
   <script src="../../shared/sao-storage.js"></script>
   <script src="../../shared/sao-i18n.js"></script>
+  <script src="../../shared/sao-content-translations.js"></script>
+  <script src="../../shared/sao-datasets.js"></script>
+  <script src="towerdefense_current.js"></script>
   <script src="towerdefense.js"></script>
 </body>
 </html>

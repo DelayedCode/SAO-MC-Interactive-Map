@@ -48,26 +48,21 @@
 </head>
 <body>
   <header>
-    <nav class="top-nav" aria-label="Primary">
+    <nav class="top-nav" data-i18n-aria-label="ui.nav.primaryAria" aria-label="Primary">
       <button class="top-button" type="button" data-nav-target="towerDefense" data-i18n="page.mainui.towerDefenseNav">Tower Defense</button>
-      <button class="top-button" type="button" data-message="Not enough information released yet to make a page!" data-i18n="page.mainui.compendiumNav">Compendium</button>
+      <button class="top-button" type="button" data-nav-target="compendium" data-i18n="page.mainui.compendiumNav">Compendium</button>
       <a class="top-button" href="../../index.html" data-i18n="ui.nav.menu">Go back to Menu</a>
     </nav>
+    <div class="island-nav" id="islandNav" data-i18n-aria-label="ui.nav.islandAria" aria-label="Island navigation">
+      <button class="island-nav-button is-active" type="button" data-island="playerIsland" data-i18n="page.mainui.islandOptions.playerIsland" aria-pressed="true">Player Island</button>
+      <button class="island-nav-button" type="button" data-island="gigasCedar" data-i18n="page.mainui.islandOptions.gigasCedar" aria-pressed="false">Gigas Cedar</button>
+      <button class="island-nav-button" type="button" data-island="iceCave" data-i18n="page.mainui.islandOptions.iceCave" aria-pressed="false">Ice Cave</button>
+      <button class="island-nav-button" type="button" data-island="rulid" data-i18n="page.mainui.islandOptions.rulid" aria-pressed="false">Rulid</button>
+      <button class="island-nav-button" type="button" data-island="fishingIsland" data-i18n="page.mainui.islandOptions.fishingIsland" aria-pressed="false">Fishing Island</button>
+    </div>
     <div class="header-main">
       <h1 data-i18n="page.mainui.title">SAO Interactive Map</h1>
       <div class="controls">
-        <label for="floorSelect" data-i18n="page.mainui.islandLabel">Island:</label>
-        <select id="floorSelect">
-          <option value="playerIsland" selected data-i18n="page.mainui.islandOptions.playerIsland">Player Island</option>
-          <option value="gigasCedar" data-i18n="page.mainui.islandOptions.gigasCedar">Gigas Cedar</option>
-          <option value="iceCave" data-i18n="page.mainui.islandOptions.iceCave">Ice Cave</option>
-          <option value="rulid" data-i18n="page.mainui.islandOptions.rulid">Rulid</option>
-          <option value="fishingIsland" data-i18n="page.mainui.islandOptions.fishingIsland">Fishing Island</option>
-        </select>
-        <label class="underground-toggle-wrapper" for="undergroundToggle">
-          <span data-i18n="page.mainui.undergroundLabel">Underground:</span>
-          <input type="checkbox" id="undergroundToggle">
-        </label>
         <input type="text" id="search" data-i18n-placeholder="page.mainui.searchPlaceholder" placeholder="Search markers...">
         <button id="clearFilters" class="control-action" type="button" data-i18n="page.mainui.clearFilters">Clear Filters</button>
       </div>
@@ -79,13 +74,18 @@
   <main>
     <section id="mapContainer">
       <div id="mapLayer">
-        <img id="mapImage" alt="Map floor" decoding="async" fetchpriority="high">
-        <img id="undergroundMapImage" class="underground-map" alt="Underground overlay" decoding="async" fetchpriority="low">
+        <img id="mapImage" data-i18n-alt="page.maps.mapAlt" alt="Map floor" decoding="async" fetchpriority="high">
+        <img id="undergroundMapImage" data-i18n-alt="page.maps.undergroundAlt" alt="Underground overlay" decoding="async" fetchpriority="low">
         <svg id="mobAreaLayer" aria-hidden="true"></svg>
         <div id="markers"></div>
+        <div id="mapEmptyState" class="map-empty-state" aria-live="polite">
+          <div class="map-empty-state-panel">
+            <div class="map-empty-state-body" id="mapEmptyStateLabel" data-i18n="page.mainui.mapDataUnavailable">Map data unavailable</div>
+          </div>
+        </div>
       </div>
       <div id="coordinateDisplay">
-        <div id="overlayMappedCoords">X: -- Z: --</div>
+        <div id="overlayMappedCoords" data-i18n="page.mainui.coordinatesPlaceholder">X: -- Z: --</div>
       </div>
       <div id="zoomControls">
         <button id="resetView" type="button" data-i18n="page.mainui.resetView">Reset View</button>
@@ -101,26 +101,23 @@
       </div>
     </section>
 
-    <div id="sidebarResizeHandle" role="separator" tabindex="0" aria-label="Resize sidebar" aria-orientation="vertical"></div>
+    <div id="sidebarResizeHandle" role="separator" tabindex="0" data-i18n-aria-label="page.maps.sidebarResizeAria" aria-label="Resize sidebar" aria-orientation="vertical"></div>
 
     <aside id="sidebar">
       <div class="sidebar-section">
-        <div class="sidebar-section-title" data-i18n="page.mainui.categoryMainTitle">Category: Main</div>
-        <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="npc" data-i18n="page.mainui.categories.npc">NPC</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="rulid" data-i18n="page.mainui.categories.rulid">Wheat Spawn</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="fishingSpot" data-i18n="page.mainui.categories.fishingSpot">Fishing Spot</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="oakWood" data-i18n="page.mainui.categories.oakWood">Oak Wood</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="copper" data-i18n="page.mainui.categories.copper">Copper</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="iron" data-i18n="page.mainui.categories.iron">Iron</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="coal" data-i18n="page.mainui.categories.coal">Coal</button></li>
-        </ul>
+        <div class="sidebar-section-title" id="categorySectionHeader" data-i18n="page.mainui.categorySectionHeader">PLAYER ISLAND</div>
+        <ul id="categoryList" class="sidebar-list"></ul>
       </div>
     </aside>
   </main>
 
   <script src="../../shared/sao-storage.js"></script>
   <script src="../../shared/sao-i18n.js"></script>
-  <script src="mainui.js"></script>
+  <script src="../../shared/sao-content-translations.js"></script>
+  <script src="../../shared/sao-datasets.js"></script>
+  <script src="../../shared/sao-walkthrough.js"></script>
+  <script src="../../shared/map-runtime.js"></script>
+  <script src="adapter.js"></script>
+  <script src="mainui.js?v=header-layout"></script>
 </body>
 </html>

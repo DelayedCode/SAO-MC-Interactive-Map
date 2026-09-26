@@ -1,0 +1,1 @@
+window.SAO_CURRENT_MISC_INFO_ENTRIES = [];

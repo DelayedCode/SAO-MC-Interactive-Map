@@ -45,33 +45,36 @@
     }
   </script>
   <link rel="stylesheet" href="maps.css">
+  <link rel="stylesheet" href="../../shared/sao-dropdown.css">
 </head>
 <body>
   <header>
-    <nav class="top-nav" aria-label="Primary">
-      <button class="top-button" type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patch Notes</button>
+    <nav class="top-nav" data-i18n-aria-label="ui.nav.primaryAria" aria-label="Primary">
       <button class="top-button" type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
-      <button class="top-button" type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment Compendium</button>
+      <button class="top-button" type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
       <button class="top-button" type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
-      <button class="top-button" type="button" data-nav-target="commands" data-i18n="ui.nav.commands">Commands</button>
+      <button class="top-button" type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
       <button class="top-button" type="button" data-nav-target="miscinfo" data-i18n="ui.nav.miscinfo">Misc. Info</button>
-      <button class="top-button" type="button" data-nav-target="menu" data-i18n="ui.nav.menu">Go back to Menu</button>
+      <button class="top-button" type="button" data-nav-target="menu"><span class="nav-icon" aria-hidden="true"><svg class="nav-icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6H2M2 6l4-4M2 6l4 4"/></svg></span><span data-i18n="ui.nav.menu">Go back to Menu</span></button>
     </nav>
     <div class="header-main">
       <h1 data-i18n="page.maps.title">SAO Interactive Map</h1>
       <div class="controls">
         <label for="floorSelect" data-i18n="page.maps.floorLabel">Floor:</label>
-        <select id="floorSelect">
-          <option value="floor1">Floor 1 - The Town of Beginnings</option>
-          <option value="floor2">Floor 2 - Arid Desert</option>
-          <option value="floor3">Floor 3 - The Forest of Wandering</option>
-        </select>
+        <div class="sao-select-wrap" id="floorSelectWrap">
+          <select id="floorSelect">
+            <option value="floor1" data-i18n="page.maps.floorOptions.floor1">Floor 1 - The Town of Beginnings</option>
+            <option value="floor2" data-i18n="page.maps.floorOptions.floor2">Floor 2 - Arid Desert</option>
+            <option value="floor3" data-i18n="page.maps.floorOptions.floor3">Floor 3 - The Forest of Wandering</option>
+          </select>
+          <span class="sao-select-arrow" aria-hidden="true"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path class="arrow-closed" d="M2 6.5 5 3.5l3 3"/><path class="arrow-open" d="M2 3.5 5 6.5l3-3"/></svg></span>
+        </div>
         <label class="underground-toggle-wrapper" for="undergroundToggle">
           <span data-i18n="page.maps.undergroundLabel">Underground:</span>
           <input type="checkbox" id="undergroundToggle">
         </label>
         <input type="text" id="search" data-i18n-placeholder="page.maps.searchPlaceholder" placeholder="Search markers...">
-        <button id="clearFilters" class="control-action" type="button">Clear Filters</button>
+        <button id="clearFilters" class="control-action" type="button" data-i18n="page.maps.clearFilters">Clear Filters</button>
       </div>
     </div>
   </header>
@@ -79,13 +82,13 @@
   <main>
     <section id="mapContainer">
       <div id="mapLayer">
-        <img id="mapImage" data-i18n-aria-label="page.maps.mapAlt" alt="Map floor" decoding="async" fetchpriority="high">
-        <img id="undergroundMapImage" class="underground-map" data-i18n-aria-label="page.maps.undergroundAlt" alt="Underground overlay" decoding="async" fetchpriority="low">
+        <img id="mapImage" data-i18n-aria-label="page.maps.mapAlt" data-i18n-alt="page.maps.mapAlt" alt="Map floor" decoding="async" fetchpriority="high">
+        <img id="undergroundMapImage" class="underground-map" data-i18n-aria-label="page.maps.undergroundAlt" data-i18n-alt="page.maps.undergroundAlt" alt="Underground overlay" decoding="async" fetchpriority="low">
         <svg id="mobAreaLayer" aria-hidden="true"></svg>
         <div id="markers"></div>
       </div>
       <div id="coordinateDisplay">
-        <div id="overlayMappedCoords">X: -- Z: --</div>
+        <div id="overlayMappedCoords" data-i18n="page.maps.coordinatesPlaceholder">X: -- Z: --</div>
       </div>
       <div id="zoomControls">
         <button id="resetView" type="button" data-i18n="page.maps.resetView">Reset View</button>
@@ -101,56 +104,56 @@
       </div>
     </section>
 
-    <div id="sidebarResizeHandle" role="separator" tabindex="0" aria-label="Resize sidebar" aria-orientation="vertical"></div>
+    <div id="sidebarResizeHandle" role="separator" tabindex="0" data-i18n-aria-label="page.maps.sidebarResizeAria" aria-label="Resize sidebar" aria-orientation="vertical"></div>
 
     <aside id="sidebar">
       <div class="sidebar-section">
-        <div class="sidebar-section-title">Category: Main</div>
+        <div class="sidebar-section-title" data-i18n="page.maps.categoryMainTitle">Main</div>
         <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="biomes">Biomes</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="bossSpawns">Boss Spawns</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="dungeons">Dungeons</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="farmingSpots">Farming Spots</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="mobAreas">Mob Areas</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="biomes" data-i18n="page.maps.categories.biomes">Biomes</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="bossSpawns" data-i18n="page.maps.categories.bossSpawns">Boss Spawns</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="dungeons" data-i18n="page.maps.categories.dungeons">Dungeons</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="farmingSpots" data-i18n="page.maps.categories.farmingSpots">Farming Spots</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="mobAreas" data-i18n="page.maps.categories.mobAreas">Mob Areas</button></li>
         </ul>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-section-title">Category: Quests</div>
+        <div class="sidebar-section-title" data-i18n="page.maps.categoryQuestsTitle">Quests</div>
         <ul class="sidebar-list">
-          <li>Main Quests</li>
-          <li><button class="sidebar-list-button" type="button" data-category="sideQuests">Side Quests</button></li>
+          <li><button class="sidebar-list-button" type="button" data-i18n="page.maps.categories.main">Main Quests</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="sideQuests" data-i18n="page.maps.categories.sideQuests">Side</button></li>
         </ul>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-section-title">Category: Journeymen</div>
+        <div class="sidebar-section-title" data-i18n="page.maps.categoryJourneymenTitle">Journeymen</div>
         <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="alchemist">Alchemist</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="lumberjack">Lumberjack</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="alchemist" data-i18n="page.maps.categories.alchemist">Alchemist</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="lumberjack" data-i18n="page.maps.categories.lumberjack">Lumberjack</button></li>
         </ul>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-section-title">Category: Market</div>
+        <div class="sidebar-section-title" data-i18n="page.maps.categoryMarketTitle">Market</div>
         <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="accessoriesMerchants">Accessories Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="consumablesMerchants">Consumables Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="equipmentMerchants">Equipment Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="lootBuyers">Loot Buyers</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="occultMerchants">Occult Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="toolMerchants">Tool Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="travelingMerchants">Traveling Merchants</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="weaponSellers">Weapon Sellers</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="accessoriesMerchants" data-i18n="page.maps.categories.accessoriesMerchants">Accessories Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="consumablesMerchants" data-i18n="page.maps.categories.consumablesMerchants">Consumables Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="equipmentMerchants" data-i18n="page.maps.categories.equipmentMerchants">Equipment Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="lootBuyers" data-i18n="page.maps.categories.lootBuyers">Loot Buyers</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="occultMerchants" data-i18n="page.maps.categories.occultMerchants">Occult Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="toolMerchants" data-i18n="page.maps.categories.toolMerchants">Tool Merchant</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="travelingMerchants" data-i18n="page.maps.categories.travelingMerchants">Traveling Merchants</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="weaponSellers" data-i18n="page.maps.categories.weaponSellers">Weapon Sellers</button></li>
         </ul>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-section-title">Category: Craftsmen</div>
+        <div class="sidebar-section-title" data-i18n="page.maps.categoryCraftsmenTitle">Craftsmen</div>
         <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="accessoriesBlacksmith">Accessories Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="armorBlacksmith">Armor Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="ingotBlacksmith">Ingot Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="keyBlacksmith">Key Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="refaire">Refaire</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="runeCraftsmen">Rune Craftsmen</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="weaponsmith">Weaponsmith</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="accessoriesBlacksmith" data-i18n="page.maps.categories.accessoriesBlacksmith">Accessories Blacksmith</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="armorBlacksmith" data-i18n="page.maps.categories.armorBlacksmith">Armor Blacksmith</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="ingotBlacksmith" data-i18n="page.maps.categories.ingotBlacksmith">Ingot Blacksmith</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="keyBlacksmith" data-i18n="page.maps.categories.keyBlacksmith">Key Blacksmith</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="refaire" data-i18n="page.maps.categories.refaire">Refaire</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="runeCraftsmen" data-i18n="page.maps.categories.runeCraftsmen">Rune Craftsmen</button></li>
+          <li><button class="sidebar-list-button" type="button" data-category="weaponsmith" data-i18n="page.maps.categories.weaponsmith">Weaponsmith</button></li>
         </ul>
       </div>
     </aside>
@@ -161,7 +164,13 @@
   <script src="maps_floor2.js"></script>
   <script src="maps_floor3.js"></script>
   <script src="../../shared/sao-storage.js"></script>
-  <script src="../../shared/sao-i18n.js"></script>
+  <script src="../../shared/sao-i18n.js?v=aincrad-map-labels"></script>
+  <script src="../../shared/sao-content-translations.js"></script>
+  <script src="../../shared/sao-datasets.js"></script>
+  <script src="../../shared/sao-walkthrough.js"></script>
+  <script src="../../shared/map-runtime.js"></script>
+  <script src="../../shared/sao-dropdown.js"></script>
+  <script src="adapter.js"></script>
   <script src="maps.js"></script>
 </body>
 </html>

@@ -45,17 +45,18 @@
     }
   </script>
   <link rel="stylesheet" href="commands.css">
+  <link rel="stylesheet" href="../../shared/aincrad-ui.css">
 </head>
 <body>
   <div class="page">
-    <nav class="nav" aria-label="Section navigation">
-      <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Maps</button>
+    <nav class="nav" data-i18n-aria-label="ui.nav.sectionAria" aria-label="Section navigation">
+      <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Map</button>
       <button type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
       <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
       <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
       <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
-      <button type="button" data-nav-target="commands" data-i18n="ui.nav.commands">Commands</button>
-      <button type="button" data-nav-target="menu" data-i18n="ui.nav.menu">Go back to Menu</button>
+      <button type="button" data-nav-target="miscinfo" data-i18n="ui.nav.miscinfo">Misc. Info</button>
+      <button type="button" data-nav-target="menu"><span class="nav-icon" aria-hidden="true"><svg class="nav-icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6H2M2 6l4-4M2 6l4 4"/></svg></span><span data-i18n="ui.nav.menu">Go back to Menu</span></button>
     </nav>
 
     <div class="panel">
@@ -77,6 +78,9 @@
 
   <script src="../../shared/sao-storage.js"></script>
   <script src="../../shared/sao-i18n.js"></script>
+  <script src="../../shared/sao-content-translations.js"></script>
+  <script src="../../shared/sao-datasets.js"></script>
+  <script src="commands_current.js"></script>
   <script src="commands.js"></script>
 </body>
 </html>

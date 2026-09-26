@@ -47,10 +47,14 @@
 </script>
 
 <link rel="stylesheet" href="ecompendium.css">
+<link rel="stylesheet" href="../../shared/aincrad-ui.css">
 
 <script defer src="../../shared/sao-storage.js"></script>
 <script defer src="../../shared/sao-i18n.js"></script>
+<script defer src="../../shared/sao-content-translations.js"></script>
+<script defer src="../../shared/sao-datasets.js"></script>
 <script defer src="../../shared/sao-runtime-utils.js"></script>
+<script defer src="ecompendium_current.js"></script>
 <script defer src="ecompendium.js"></script>
 </head>
 
@@ -58,20 +62,20 @@
 
 <div class="page">
 
-    <nav class="nav" aria-label="Section navigation">
-        <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Maps</button>
-        <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
+    <nav class="nav" data-i18n-aria-label="ui.nav.sectionAria" aria-label="Section navigation">
+        <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Map</button>
+        <button type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
         <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
         <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
-        <button type="button" data-nav-target="commands" data-i18n="ui.nav.commands">Commands</button>
-        <button type="button" data-nav-target="menu" data-i18n="ui.nav.menu">Go back to Menu</button>
+        <button type="button" data-nav-target="miscinfo" data-i18n="ui.nav.miscinfo">Misc. Info</button>
+        <button type="button" data-nav-target="menu"><span class="nav-icon" aria-hidden="true"><svg class="nav-icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6H2M2 6l4-4M2 6l4 4"/></svg></span><span data-i18n="ui.nav.menu">Go back to Menu</span></button>
     </nav>
 
     <div class="panel">
 
         <h1 data-i18n="page.ecompendium.heading">Equipment Compendium</h1>
 
-        <div class="list-tabs" role="tablist" aria-label="Equipment categories">
+        <div class="list-tabs" role="tablist" data-i18n-aria-label="page.ecompendium.categoriesAria" aria-label="Equipment categories">
 
             <button class="list-tab" data-category="accessory" data-i18n="page.ecompendium.listTitles.accessory">Accessories</button>
             <button class="list-tab" data-category="armor" data-i18n="page.ecompendium.listTitles.armor">Armor</button>
@@ -90,7 +94,7 @@
 
         <div class="panel-header">
 
-            <p id="status" role="status" aria-live="polite">Loading...</p>
+            <p id="status" role="status" aria-live="polite" data-i18n="ui.common.loading">Loading...</p>
 
             <label class="search-label">
                 <span data-i18n="page.ecompendium.searchLabel">Search</span>

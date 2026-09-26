@@ -3689,7 +3689,13 @@ window.FLOOR_1_DATA = {
                 "Mana": "5",
                 "Health": "5",
                 "Stamina Regeneration": "0.2/s",
-                "Requirement: Spirit": "1"
+                "Requirement: Spirit": "1",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3711,7 +3717,13 @@ window.FLOOR_1_DATA = {
                 "Stamina": "1.5",
                 "Mana": "3",
                 "Health": "10",
-                "Requirement: Vitality": "1"
+                "Requirement: Vitality": "1",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3775,7 +3787,13 @@ window.FLOOR_1_DATA = {
                 "Defense": "2",
                 "Physical Damage": "3%",
                 "Magic Damage": "2%",
-                "Requirement: Defense Car": "1"
+                "Requirement: Defense Car": "1",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -3798,7 +3816,13 @@ window.FLOOR_1_DATA = {
                 "Critical Hit Chance": "5%",
                 "Physical Damage": "2.5%",
                 "Requirement: Dexterity": "3",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -4008,7 +4032,13 @@ window.FLOOR_1_DATA = {
                 "Critical Hit Chance": "5%",
                 "Omnivampirism": "1.5%",
                 "Attack Speed": "0.1",
-                "Requirement: Force": "1"
+                "Requirement: Force": "1",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -4144,7 +4174,13 @@ window.FLOOR_1_DATA = {
                 "Critical Chance Skill": "3.5%",
                 "Magic Damage": "2.5%",
                 "Requirement: Intelligence": "3",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
@@ -4222,7 +4258,13 @@ window.FLOOR_1_DATA = {
                 "Movement Speed": "7.5%",
                 "Stamina": "5",
                 "Requirement: Dexterity": "3",
-                "Unique": "Yes"
+                "Unique": "Yes",
+                "2 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "3 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "4 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "5 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "6 Piece Set Bonus": "+1.5/s Health Regeneration",
+                "7 Piece Set Bonus": "+1.5/s Health Regeneration",
             }
         },
         {
