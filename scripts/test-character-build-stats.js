@@ -1,20 +1,15 @@
 const assert = require("assert");
-const fs = require("fs");
-const vm = require("vm");
+const { loadScript } = require("./harness-helpers");
 
 const context = { console, window: {}, globalThis: {} };
 context.window = context;
 context.globalThis = context;
 
-function load(file) {
-  vm.runInNewContext(fs.readFileSync(file, "utf8"), context, { filename: file });
-}
-
-[1, 2, 3].forEach(floor => load(`Aincrad/eCompendium/ecompendium_floor${floor}.js`));
-load("Aincrad/Character Build/character-build-icons.js");
-load("Aincrad/Character Build/character-build-data.js");
-load("Aincrad/Character Build/character-build-calculator.js");
-load("Aincrad/Character Build/character-build-adapter.js");
+[1, 2, 3].forEach((floor) => loadScript(`Aincrad/eCompendium/ecompendium_floor${floor}.js`, context));
+loadScript("Aincrad/Character Build/character-build-icons.js", context);
+loadScript("Aincrad/Character Build/character-build-data.js", context);
+loadScript("Aincrad/Character Build/character-build-calculator.js", context);
+loadScript("Aincrad/Character Build/character-build-adapter.js", context);
 
 const adapter = context.CharacterBuildAdapter;
 const calculator = context.CharacterBuildCalculator;
@@ -40,32 +35,35 @@ function collectSourceEquipment() {
     const data = context[`FLOOR_${floor}_DATA`];
     for (const [category, entries] of Object.entries(data)) {
       if (!equipmentCategories.has(category)) continue;
-      entries.forEach((entry, index) => records.push({
-        floor: `floor${floor}`,
-        category,
-        index,
-        name: entry.name,
-        stats: entry.stats || {}
-      }));
+      entries.forEach((entry, index) =>
+        records.push({
+          floor: `floor${floor}`,
+          category,
+          index,
+          name: entry.name,
+          stats: entry.stats || {}
+        })
+      );
     }
   }
   return records;
-}
-
-function statsSignature(stats) {
-  return JSON.stringify(Object.entries(stats).sort(([left], [right]) => left.localeCompare(right)));
 }
 
 const sourceRecords = collectSourceEquipment();
 const normalizedRecords = adapter.getItems("beta");
 const audit = adapter.getAuditReport();
 const runes = adapter.getRunes("beta");
-const armorRecords = normalizedRecords.filter(item => item.category === "armor");
-const runeCapacity = item => adapter.getRuneSlots(item);
+const armorRecords = normalizedRecords.filter((item) => item.category === "armor");
+const runeCapacity = (item) => adapter.getRuneSlots(item);
 
 assert.strictEqual(sourceRecords.length, 542);
 assert.strictEqual(normalizedRecords.length, 542);
-assert.deepStrictEqual(Array.from(new Set(normalizedRecords.map(item => item.category))).sort(), ["accessory", "armor", "tool", "weapon"]);
+assert.deepStrictEqual(Array.from(new Set(normalizedRecords.map((item) => item.category))).sort(), [
+  "accessory",
+  "armor",
+  "tool",
+  "weapon"
+]);
 assert.strictEqual(audit.totalBetaEquipmentRecords, 542);
 assert.strictEqual(audit.totalSuccessfullyClassified, 542);
 assert.strictEqual(audit.totalUnclassified, 0);
@@ -76,16 +74,19 @@ assert.strictEqual(audit.missingStatsByCategory.armor.length, 0);
 assert.strictEqual(audit.missingStatsByCategory.accessory.length, 0);
 assert.strictEqual(audit.missingStatsByCategory.weapon.length, 0);
 assert.strictEqual(audit.missingStatsByCategory.tool.length, 0);
-assert.deepStrictEqual(Array.from(audit.missingStatsByCategory.tool, item => item.itemName), []);
+assert.deepStrictEqual(
+  Array.from(audit.missingStatsByCategory.tool, (item) => item.itemName),
+  []
+);
 assert.strictEqual(runes.length, 32);
 assert.strictEqual(adapter.getMaxRuneSlots("beta"), 2);
-assert.strictEqual(armorRecords.filter(item => runeCapacity(item) === 0).length, 95);
-assert.strictEqual(armorRecords.filter(item => runeCapacity(item) === 1).length, 20);
-assert.strictEqual(armorRecords.filter(item => runeCapacity(item) === 2).length, 8);
+assert.strictEqual(armorRecords.filter((item) => runeCapacity(item) === 0).length, 95);
+assert.strictEqual(armorRecords.filter((item) => runeCapacity(item) === 1).length, 20);
+assert.strictEqual(armorRecords.filter((item) => runeCapacity(item) === 2).length, 8);
 
-const zeroRuneArmor = armorRecords.find(item => runeCapacity(item) === 0);
-const oneRuneArmor = armorRecords.find(item => runeCapacity(item) === 1);
-const maxRuneArmor = armorRecords.find(item => runeCapacity(item) === adapter.getMaxRuneSlots("beta"));
+const zeroRuneArmor = armorRecords.find((item) => runeCapacity(item) === 0);
+const oneRuneArmor = armorRecords.find((item) => runeCapacity(item) === 1);
+const maxRuneArmor = armorRecords.find((item) => runeCapacity(item) === adapter.getMaxRuneSlots("beta"));
 assert(zeroRuneArmor && oneRuneArmor && maxRuneArmor);
 const firstRune = runes[0];
 const secondRune = runes[1];
@@ -120,77 +121,262 @@ const verifiedEquipment = {
   "Unyielding Shield": { set: null, stats: { Defense: "2.9", Health: "24.99" } },
   "Fierce Amethyst Boots": { set: "Fierce Amethyst Set", stats: { Defense: "7", Health: "60" } }
 };
-const verifiedItemNames = new Set(Object.keys(verifiedEquipment));
-
-const unrestrictedCombat = normalizedRecords.filter(item => item.category !== "accessory" && item.classes.length === 0);
+const unrestrictedCombat = normalizedRecords.filter(
+  (item) => item.category !== "accessory" && item.classes.length === 0
+);
 assert(unrestrictedCombat.length > 0);
 const mainHandItems = adapter.getItemsForSlot("beta", "main-weapon", "mage");
-const mainHandTools = mainHandItems.filter(item => item.category === "tool");
-assert(mainHandItems.some(item => item.category === "weapon"));
+const mainHandTools = mainHandItems.filter((item) => item.category === "tool");
+assert(mainHandItems.some((item) => item.category === "weapon"));
 assert(mainHandTools.length > 0);
-assert.deepStrictEqual(Array.from(mainHandTools, item => item.name), [
-  "Chipped Axe", "Cracked Pickaxe", "Metal Axe", "Metal Hoe", "Metal Pickaxe", "Twisted Sickle",
-  "Necrotic Ax", "Necrotic Hoe", "Necrotic Pickaxe", "Savannah Ax", "Savannah Hoe", "Savannah Pickaxe",
-  "Reinforced Ax", "Reinforced Hoe", "Reinforced Pickaxe"
-]);
+assert.deepStrictEqual(
+  Array.from(mainHandTools, (item) => item.name),
+  [
+    "Chipped Axe",
+    "Cracked Pickaxe",
+    "Metal Axe",
+    "Metal Hoe",
+    "Metal Pickaxe",
+    "Twisted Sickle",
+    "Necrotic Ax",
+    "Necrotic Hoe",
+    "Necrotic Pickaxe",
+    "Savannah Ax",
+    "Savannah Hoe",
+    "Savannah Pickaxe",
+    "Reinforced Ax",
+    "Reinforced Hoe",
+    "Reinforced Pickaxe"
+  ]
+);
 for (const utilityTool of ["Magic Brush", "Torch", "Wooden Fishing Rod"]) {
-  assert(!mainHandItems.some(item => item.name === utilityTool));
+  assert(!mainHandItems.some((item) => item.name === utilityTool));
 }
 for (const [name, expected] of Object.entries(verifiedEquipment)) {
-  const item = normalizedRecords.find(entry => entry.name === name);
+  const item = normalizedRecords.find((entry) => entry.name === name);
   assert(item, `${name} should exist exactly by name`);
   if (expected.set) assert.strictEqual(item.set, expected.set, `${name} should use the verified set name`);
   for (const [statName, expectedValue] of Object.entries(expected.stats)) {
     assert.strictEqual(item.stats[statName], expectedValue, `${name} ${statName} should match the verified value`);
   }
-  const gameplayKeys = Object.keys(item.stats).filter(key => !["Class", "Rune Slots", "Unique", "Two-Handed", "Requirement: Force", "Requirement: Vitality", "Requirement: Defense Car"].includes(key) && !/^Requirement:/.test(key));
+  const gameplayKeys = Object.keys(item.stats).filter(
+    (key) =>
+      ![
+        "Class",
+        "Rune Slots",
+        "Unique",
+        "Two-Handed",
+        "Requirement: Force",
+        "Requirement: Vitality",
+        "Requirement: Defense Car"
+      ].includes(key) && !/^Requirement:/.test(key)
+  );
   if (expected.stats && Object.keys(expected.stats).length === 0) {
     assert.strictEqual(gameplayKeys.length, 0, `${name} should remain statless`);
   }
 }
-assert(adapter.getItemsForSlot("beta", "main-weapon", "mage").some(item => item.name === "Metal Axe"));
-assert(adapter.getItemsForSlot("beta", "main-weapon", "mage").filter(item => item.searchText.includes("harvest power")).length > 0);
-assert(adapter.getItemsForSlot("beta", "main-weapon", "mage").filter(item => item.rarity === "Rare").some(item => item.category === "tool"));
-assert(adapter.getItemsForSlot("beta", "main-weapon", "mage").some(item => item.name === "Chipped Axe"));
-assert(adapter.getItemsForSlot("beta", "main-weapon", "mage").some(item => item.name === "Metal Axe"));
+assert(adapter.getItemsForSlot("beta", "main-weapon", "mage").some((item) => item.name === "Metal Axe"));
+assert(
+  adapter.getItemsForSlot("beta", "main-weapon", "mage").filter((item) => item.searchText.includes("harvest power"))
+    .length > 0
+);
+assert(
+  adapter
+    .getItemsForSlot("beta", "main-weapon", "mage")
+    .filter((item) => item.rarity === "Rare")
+    .some((item) => item.category === "tool")
+);
+assert(adapter.getItemsForSlot("beta", "main-weapon", "mage").some((item) => item.name === "Chipped Axe"));
+assert(adapter.getItemsForSlot("beta", "main-weapon", "mage").some((item) => item.name === "Metal Axe"));
 for (const classId of classes) {
-  for (const item of normalizedRecords.filter(record => record.category !== "accessory")) {
+  for (const item of normalizedRecords.filter((record) => record.category !== "accessory")) {
     const slotId = slotIds[item.slot];
     if (!slotId) continue;
-    const available = adapter.getItemsForSlot("beta", slotId, classId).some(candidate => candidate.id === item.id);
-    assert.strictEqual(available, item.classes.length === 0 || item.classes.includes(classId), `${item.name} availability for ${classId}`);
+    const available = adapter.getItemsForSlot("beta", slotId, classId).some((candidate) => candidate.id === item.id);
+    assert.strictEqual(
+      available,
+      item.classes.length === 0 || item.classes.includes(classId),
+      `${item.name} availability for ${classId}`
+    );
   }
-  for (const [slot, type] of Object.entries({ amulet: "Amulet", "ring-1": "Ring", bracelet: "Bracelet", glove: "Glove", "artifact-1": "Artifact" })) {
-    const expected = normalizedRecords.filter(item => item.category === "accessory" && item.type === type).length;
-    assert.strictEqual(adapter.getItemsForSlot("beta", slot, classId).length, expected, `${type} filtering for ${classId}`);
+  for (const [slot, type] of Object.entries({
+    amulet: "Amulet",
+    "ring-1": "Ring",
+    bracelet: "Bracelet",
+    glove: "Glove",
+    "artifact-1": "Artifact"
+  })) {
+    const expected = normalizedRecords.filter((item) => item.category === "accessory" && item.type === type).length;
+    assert.strictEqual(
+      adapter.getItemsForSlot("beta", slot, classId).length,
+      expected,
+      `${type} filtering for ${classId}`
+    );
   }
 }
 
 const calculated = calculator.calculateBuildStats({
   equipment: {
-    first: { stats: { Health: "20", Damage: "5%", "Flight Of Life": "1.5%", "Requirement: Vitality": "3", Unique: "Yes" } },
+    first: {
+      stats: { Health: "20", Damage: "5%", "Flight Of Life": "1.5%", "Requirement: Vitality": "3", Unique: "Yes" }
+    },
     second: { stats: { Health: "-2.5", Damage: "3", "Blocking Mastery": "2.5%", "2 Piece Set Bonus": "+5 Damage" } },
     third: { stats: { Health: "0", "Crouch Speed": "250" } }
   },
   isAvailable: () => true
 });
-assert.strictEqual(calculated.Health.flat, 18.5);
-assert.strictEqual(calculated.Damage.flat, 4);
+assert.strictEqual(calculated.Health.flat, 17.5);
+assert.strictEqual(calculated.Damage.flat, 3);
 assert.strictEqual(calculated.Damage.percent, 5);
-assert.strictEqual(calculated["Flight Of Life"].percent, 1.5);
-assert.strictEqual(calculated["Block Proficiency"].percent, 2.5);
-assert.strictEqual(calculated["Crouching Speed"].flat, 251);
+assert(!Object.prototype.hasOwnProperty.call(calculated, "Flight Of Life"));
+assert(!Object.prototype.hasOwnProperty.call(calculated, "Block Proficiency"));
+assert(!Object.prototype.hasOwnProperty.call(calculated, "Crouching Speed"));
 assert(!Object.prototype.hasOwnProperty.call(calculated, "Requirement: Vitality"));
 assert(!Object.prototype.hasOwnProperty.call(calculated, "2 Piece Set Bonus"));
 
-const unsupportedTool = normalizedRecords.find(item => item.name === "Metal Axe");
-const unsupportedToolResult = calculator.calculateBuildStats({ equipment: { "main-weapon": unsupportedTool }, isAvailable: () => true });
-assert.deepStrictEqual(unsupportedToolResult, calculator.calculateBuildStats({ equipment: {}, isAvailable: () => true }));
+/* The Character Build stat system holds exactly the supported stats and every default value is zero. */
+const expectedSupportedStats = [
+  "Damage",
+  "Magic Damage",
+  "Skill Damage",
+  "Projectile Damage",
+  "Attack Speed",
+  "Critical Hit Chance",
+  "Critical Hit Damage",
+  "Skill Critical Hit Chance",
+  "Skill Critical Hit Damage",
+  "Defense",
+  "Health",
+  "Evasion",
+  "Damage Reduction",
+  "Tenacity",
+  "Movement Speed",
+  "Mana",
+  "Stamina",
+  "Health Regeneration",
+  "Mana Regeneration",
+  "Stamina Regeneration"
+];
+assert.deepStrictEqual(Array.from(calculator.supportedStats).sort(), [...expectedSupportedStats].sort());
+assert.strictEqual(calculator.supportedStats.has("Block"), false, "Block is not a supported Character Build stat");
+assert.strictEqual(calculator.normalizeStatName("Block"), null);
+assert.strictEqual(
+  calculator.normalizeStatName("Dodge"),
+  "Evasion",
+  "the data's Dodge maps onto the canonical Evasion stat"
+);
+assert.strictEqual(calculator.normalizeStatName("Attack Damage"), "Damage");
+assert.strictEqual(calculator.normalizeStatName("Bonus Attack Speed"), "Attack Speed");
+assert.strictEqual(calculator.normalizeStatName("Critical Damage"), "Critical Hit Damage");
+assert.strictEqual(calculator.normalizeStatName("ability damage"), "Skill Damage");
+assert.strictEqual(calculator.normalizeStatName("Bonus Movement Speed"), "Movement Speed");
+const baseStats = calculator.createBaseStats();
+assert.deepStrictEqual(Object.keys(baseStats).sort(), [...expectedSupportedStats].sort());
+Object.entries(baseStats).forEach(([stat, value]) => {
+  assert.strictEqual(value.flat, 0, `${stat} base flat value`);
+  assert.strictEqual(value.percent, 0, `${stat} base percent value`);
+});
+const zeroBuild = calculator.calculateBuildStats({
+  level: 1,
+  classId: "archer",
+  equipment: {},
+  isAvailable: () => true
+});
+assert.deepStrictEqual(zeroBuild, baseStats);
+
+/* Per-level class gains: level 1 is the base, so a build receives (level - 1) increments. */
+const expectedClassBonuses = {
+  assassin: {
+    flat: { Health: 1.25, "Health Regeneration": 0.1, "Mana Regeneration": 0.1, "Stamina Regeneration": 0.1 },
+    percent: { "Critical Hit Damage": 0.25 }
+  },
+  archer: {
+    flat: { Health: 1.25, "Health Regeneration": 0.1, "Mana Regeneration": 0.1, "Stamina Regeneration": 0.1 },
+    percent: { "Critical Hit Chance": 0.25 }
+  },
+  guerrier: {
+    flat: { Health: 1.5, "Health Regeneration": 0.1, "Mana Regeneration": 0.1, "Stamina Regeneration": 0.1 },
+    percent: {}
+  },
+  mage: {
+    flat: { Health: 1.25, "Health Regeneration": 0.1, "Mana Regeneration": 0.1, "Stamina Regeneration": 0.1 },
+    percent: { "Skill Critical Hit Damage": 0.25 }
+  },
+  shaman: {
+    flat: { Health: 1.25, "Health Regeneration": 0.1, "Mana Regeneration": 0.1, "Stamina Regeneration": 0.1 },
+    percent: { "Skill Critical Hit Chance": 0.25 }
+  },
+  "martial-artist": { flat: {}, percent: {} }
+};
+assert.deepStrictEqual(
+  Object.keys(calculator.classLevelBonuses).sort(),
+  Object.keys(expectedClassBonuses)
+    .filter((classId) => classId !== "martial-artist")
+    .sort()
+);
+function assertLevelScaling(classId, level, increments) {
+  const result = calculator.calculateBuildStats({ level, classId, equipment: {}, isAvailable: () => true });
+  const expected = expectedClassBonuses[classId];
+  calculator.supportedStats.forEach((stat) => {
+    assert.ok(
+      Math.abs(result[stat].flat - (Number(expected.flat[stat]) || 0) * increments) < 1e-9,
+      `${classId} level ${level}: ${stat} flat`
+    );
+    assert.ok(
+      Math.abs(result[stat].percent - (Number(expected.percent[stat]) || 0) * increments) < 1e-9,
+      `${classId} level ${level}: ${stat} percent`
+    );
+  });
+}
+Object.keys(expectedClassBonuses).forEach((classId) => {
+  assertLevelScaling(classId, 1, 0);
+  assertLevelScaling(classId, 2, 1);
+  assertLevelScaling(classId, 15, 14);
+  assertLevelScaling(classId, 25, 24);
+});
+assert.strictEqual(
+  calculator.calculateBuildStats({ level: 25, classId: "archer", equipment: {}, isAvailable: () => true }).Health.flat,
+  30
+);
+assert.strictEqual(
+  calculator.calculateBuildStats({ level: 25, classId: "guerrier", equipment: {}, isAvailable: () => true }).Health
+    .flat,
+  36
+);
+
+/* The data's Dodge set bonus flows through the normal calculation path. */
+const ninjaPieces = normalizedRecords.filter((item) => item.set === "Ninja").slice(0, 2);
+assert.strictEqual(ninjaPieces.length, 2);
+const ninjaWithBonuses = calculator.calculateBuildStats({
+  equipment: Object.fromEntries(ninjaPieces.map((item, index) => [`ninja-${index}`, item])),
+  isAvailable: () => true
+});
+const ninjaWithoutBonuses = calculator.calculateBuildStats({
+  equipment: Object.fromEntries(ninjaPieces.map((item, index) => [`ninja-${index}`, { ...item, setBonuses: [] }])),
+  isAvailable: () => true
+});
+assert.strictEqual(ninjaWithBonuses.Evasion.percent - ninjaWithoutBonuses.Evasion.percent, 1.5);
+
+const unsupportedTool = normalizedRecords.find((item) => item.name === "Metal Axe");
+const unsupportedToolResult = calculator.calculateBuildStats({
+  equipment: { "main-weapon": unsupportedTool },
+  isAvailable: () => true
+});
+assert.deepStrictEqual(
+  unsupportedToolResult,
+  calculator.calculateBuildStats({ equipment: {}, isAvailable: () => true })
+);
 const supportedTool = { category: "tool", stats: { Health: "7", "Effect: Harvest Power": "99" } };
-const supportedToolResult = calculator.calculateBuildStats({ equipment: { "main-weapon": supportedTool }, isAvailable: () => true });
-assert.strictEqual(supportedToolResult.Health.flat, 8);
+const supportedToolResult = calculator.calculateBuildStats({
+  equipment: { "main-weapon": supportedTool },
+  isAvailable: () => true
+});
+assert.strictEqual(supportedToolResult.Health.flat, 7);
 assert(!Object.prototype.hasOwnProperty.call(supportedToolResult, "Effect: Harvest Power"));
-assert.deepStrictEqual(supportedToolResult, calculator.calculateBuildStats({ equipment: { "main-weapon": supportedTool }, isAvailable: () => true }));
+assert.deepStrictEqual(
+  supportedToolResult,
+  calculator.calculateBuildStats({ equipment: { "main-weapon": supportedTool }, isAvailable: () => true })
+);
 
 const singleItem = { stats: { Defense: "5" } };
 const singleBuild = { equipment: { helmet: singleItem }, isAvailable: () => true };
@@ -201,9 +387,14 @@ assert.strictEqual(singleResult.Defense.flat - removedResult.Defense.flat, 5);
 assert.deepStrictEqual(singleResult, repeatedResult);
 
 function setBuild(setName, count, includeBonuses = true, slotOffset = 0) {
-  const pieces = normalizedRecords.filter(item => item.set === setName).slice(0, count);
+  const pieces = normalizedRecords.filter((item) => item.set === setName).slice(0, count);
   return {
-    equipment: Object.fromEntries(pieces.map((item, index) => [`set-${setName}-${slotOffset + index}`, includeBonuses ? item : { ...item, setBonuses: [] }])),
+    equipment: Object.fromEntries(
+      pieces.map((item, index) => [
+        `set-${setName}-${slotOffset + index}`,
+        includeBonuses ? item : { ...item, setBonuses: [] }
+      ])
+    ),
     isAvailable: () => true
   };
 }
@@ -227,7 +418,7 @@ const combinedSets = calculator.calculateBuildStats({
   equipment: { ...setBuild("Titan", 3).equipment, ...setBuild("Guardian", 2, true, 10).equipment },
   isAvailable: () => true
 });
-assert.strictEqual(combinedSets.Defense.flat - titanThree.Defense.flat - (guardianTwo.Defense.flat - 1), 0);
+assert.strictEqual(combinedSets.Defense.flat - titanThree.Defense.flat - guardianTwo.Defense.flat, 0);
 assert.strictEqual(combinedSets["Critical Hit Damage"].percent - guardianTwo["Critical Hit Damage"].percent, 0);
 assert.strictEqual(combinedSets["Critical Hit Damage"].percent, 25);
 
@@ -238,8 +429,12 @@ const expectedOccultBonuses = Array.from({ length: 6 }, (_, index) => ({
   sourceValue: "+1.5/s Health Regeneration",
   effects: [{ value: "+1.5", stat: "Health Regeneration", raw: "+1.5/s Health Regeneration" }]
 }));
-for (const [setName, expectedCount] of [[occultSetNames[0], 7], [occultSetNames[1], 9], [occultSetNames[2], 11]]) {
-  const pieces = normalizedRecords.filter(item => item.set === setName);
+for (const [setName, expectedCount] of [
+  [occultSetNames[0], 7],
+  [occultSetNames[1], 9],
+  [occultSetNames[2], 11]
+]) {
+  const pieces = normalizedRecords.filter((item) => item.set === setName);
   assert.equal(pieces.length, expectedCount, `${setName}: expected set piece count`);
   for (const item of pieces) {
     if (item.name === "Occult Boots") {
@@ -247,24 +442,46 @@ for (const [setName, expectedCount] of [[occultSetNames[0], 7], [occultSetNames[
       assert.equal(item.setBonuses.length, 0, "Occult Boots remains without individual or copied set stats");
       continue;
     }
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(item.setBonuses)), expectedOccultBonuses, `${item.name}: all Occult thresholds parse`);
+    assert.deepStrictEqual(
+      JSON.parse(JSON.stringify(item.setBonuses)),
+      expectedOccultBonuses,
+      `${item.name}: all Occult thresholds parse`
+    );
   }
   const equipped = pieces.slice(0, 2);
   const equipment = Object.fromEntries(equipped.map((item, index) => [`occult-${index}`, item]));
-  const withoutBonuses = Object.fromEntries(equipped.map((item, index) => [`occult-${index}`, { ...item, setBonuses: [] }]));
+  const withoutBonuses = Object.fromEntries(
+    equipped.map((item, index) => [`occult-${index}`, { ...item, setBonuses: [] }])
+  );
   const withBonuses = calculator.calculateBuildStats({ equipment, isAvailable: () => true });
   const without = calculator.calculateBuildStats({ equipment: withoutBonuses, isAvailable: () => true });
-  assert.equal(withBonuses["Health Regeneration"].flat - without["Health Regeneration"].flat, 1.5, `${setName}: two pieces activate +1.5/s regeneration`);
+  assert.equal(
+    withBonuses["Health Regeneration"].flat - without["Health Regeneration"].flat,
+    1.5,
+    `${setName}: two pieces activate +1.5/s regeneration`
+  );
 }
 
-console.log(JSON.stringify({
-  sourceRecords: sourceRecords.length,
-  normalizedRecords: normalizedRecords.length,
-  classified: audit.totalSuccessfullyClassified,
-  distinctStatistics: Object.keys(audit.statisticInventory).length,
-  calculatedStatistics: audit.calculatedStatistics,
-  preservedButUnsupportedStatistics: audit.preservedButUnsupportedStatistics,
-  unrestrictedCombatRecords: unrestrictedCombat.length,
-  setTests: { titanThree: "passed", titanFourCumulative: "passed", multiSet: "passed", repeatedCalculation: "passed", occultThresholds: "passed" },
-  status: "passed"
-}, null, 2));
+console.log(
+  JSON.stringify(
+    {
+      sourceRecords: sourceRecords.length,
+      normalizedRecords: normalizedRecords.length,
+      classified: audit.totalSuccessfullyClassified,
+      distinctStatistics: Object.keys(audit.statisticInventory).length,
+      calculatedStatistics: audit.calculatedStatistics,
+      preservedButUnsupportedStatistics: audit.preservedButUnsupportedStatistics,
+      unrestrictedCombatRecords: unrestrictedCombat.length,
+      setTests: {
+        titanThree: "passed",
+        titanFourCumulative: "passed",
+        multiSet: "passed",
+        repeatedCalculation: "passed",
+        occultThresholds: "passed"
+      },
+      status: "passed"
+    },
+    null,
+    2
+  )
+);

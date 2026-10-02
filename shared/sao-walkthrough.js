@@ -1,13 +1,9 @@
 (function (globalObject) {
   "use strict";
 
-  const DEFAULT_TRANSLATION = (key, params) => {
-    if (params && typeof params === "object") {
-      return Object.entries(params).reduce((value, [name, replacement]) =>
-        value.replace(`{${name}}`, String(replacement)), key);
-    }
-    return key;
-  };
+  /* Placeholder substitution is shared with the page helpers instead of being re-declared. */
+  const DEFAULT_TRANSLATION =
+    (globalObject.SAOPageHelpers && globalObject.SAOPageHelpers.formatMessage) || ((key) => key);
 
   const STYLE_TEXT = `
     .sao-tour-overlay {
@@ -139,9 +135,10 @@
     const storageKey = String(config.storageKey || "");
     const getSteps = typeof config.getSteps === "function" ? config.getSteps : () => [];
     const translate = typeof config.translate === "function" ? config.translate : DEFAULT_TRANSLATION;
-    const getTarget = typeof config.getTarget === "function"
-      ? config.getTarget
-      : selector => documentObject?.querySelector?.(selector) || null;
+    const getTarget =
+      typeof config.getTarget === "function"
+        ? config.getTarget
+        : (selector) => documentObject?.querySelector?.(selector) || null;
     let overlay = null;
     let highlightedElements = [];
     let listeners = [];
@@ -154,8 +151,8 @@
     function getTargetRadius(targets) {
       if (!targets?.length) return 10;
       const radii = targets
-        .map(target => Number.parseFloat(windowObject?.getComputedStyle?.(target)?.borderRadius) || 0)
-        .filter(value => Number.isFinite(value));
+        .map((target) => Number.parseFloat(windowObject?.getComputedStyle?.(target)?.borderRadius) || 0)
+        .filter((value) => Number.isFinite(value));
       return radii.length ? Math.max(...radii, 10) : 10;
     }
 
@@ -166,11 +163,11 @@
     }
 
     function clearHighlight() {
-      highlightedElements.forEach(element => element.classList.remove("sao-tour-focus-target"));
+      highlightedElements.forEach((element) => element.classList.remove("sao-tour-focus-target"));
       highlightedElements = [];
       const focusRing = overlay?.querySelector?.(".sao-tour-focus-ring");
       if (overlay) {
-        overlay.querySelectorAll?.(".sao-tour-shade").forEach(shade => {
+        overlay.querySelectorAll?.(".sao-tour-shade").forEach((shade) => {
           shade.style.left = "0";
           shade.style.top = "0";
           shade.style.width = "0";
@@ -185,27 +182,25 @@
     }
 
     function resolveTargets(step) {
-      const selectors = Array.isArray(step?.selectors)
-        ? step.selectors
-        : step?.selector
-          ? [step.selector]
-          : [];
+      const selectors = Array.isArray(step?.selectors) ? step.selectors : step?.selector ? [step.selector] : [];
       if (typeof config.getTargets === "function") {
         return (config.getTargets(step) || []).filter(Boolean);
       }
       return selectors
-        .map(selector => getTarget(selector, step))
-        .flatMap(target => Array.isArray(target) ? target : target ? [target] : [])
+        .map((selector) => getTarget(selector, step))
+        .flatMap((target) => (Array.isArray(target) ? target : target ? [target] : []))
         .filter(Boolean);
     }
 
     function getCombinedRect(targets) {
-      const rects = targets.map(target => target.getBoundingClientRect()).filter(rect => rect.width > 0 && rect.height > 0);
+      const rects = targets
+        .map((target) => target.getBoundingClientRect())
+        .filter((rect) => rect.width > 0 && rect.height > 0);
       if (!rects.length) return null;
-      const left = Math.min(...rects.map(rect => rect.left));
-      const top = Math.min(...rects.map(rect => rect.top));
-      const right = Math.max(...rects.map(rect => rect.right));
-      const bottom = Math.max(...rects.map(rect => rect.bottom));
+      const left = Math.min(...rects.map((rect) => rect.left));
+      const top = Math.min(...rects.map((rect) => rect.top));
+      const right = Math.max(...rects.map((rect) => rect.right));
+      const bottom = Math.max(...rects.map((rect) => rect.bottom));
       return { left, top, width: right - left, height: bottom - top };
     }
 
@@ -227,7 +222,12 @@
         { left: 0, top: 0, width: "100%", height: `${top}px` },
         { left: 0, top: `${bottom}px`, width: "100%", height: `${Math.max(0, windowObject.innerHeight - bottom)}px` },
         { left: 0, top: `${top}px`, width: `${left}px`, height: `${height}px` },
-        { left: `${right}px`, top: `${top}px`, width: `${Math.max(0, windowObject.innerWidth - right)}px`, height: `${height}px` }
+        {
+          left: `${right}px`,
+          top: `${top}px`,
+          width: `${Math.max(0, windowObject.innerWidth - right)}px`,
+          height: `${height}px`
+        }
       ];
       shades.forEach((shade, index) => {
         const position = positions[index];
@@ -263,14 +263,17 @@
         const below = rect.top + rect.height + margin;
         const above = rect.top - cardRect.height - margin;
         top = below + cardRect.height <= windowObject.innerHeight - margin || above < margin ? below : above;
-        left = Math.min(Math.max(margin, rect.left + (rect.width - width) / 2), windowObject.innerWidth - width - margin);
+        left = Math.min(
+          Math.max(margin, rect.left + (rect.width - width) / 2),
+          windowObject.innerWidth - width - margin
+        );
       }
       card.style.left = `${Math.max(margin, left)}px`;
       card.style.top = `${Math.min(Math.max(margin, top), Math.max(margin, windowObject.innerHeight - cardRect.height - margin))}px`;
     }
 
     function syncOverlayParent(targets) {
-      const dialog = targets.find(target => target.closest?.("dialog"))?.closest?.("dialog");
+      const dialog = targets.find((target) => target.closest?.("dialog"))?.closest?.("dialog");
       const parent = dialog || documentObject.body;
       if (overlay?.parentNode !== parent) parent?.appendChild?.(overlay);
     }
@@ -363,10 +366,10 @@
         overlay.currentStepIndex += 1;
         renderStep(overlay.steps);
       });
-      addListener(overlay, "click", event => {
+      addListener(overlay, "click", (event) => {
         if (event.target === overlay) closeTour(true);
       });
-      addListener(documentObject, "keydown", event => {
+      addListener(documentObject, "keydown", (event) => {
         if (!overlay?.classList.contains("open")) return;
         if (event.key === "Escape") closeTour(true);
         if (event.key === "ArrowLeft" && overlay.currentStepIndex > 0) {
@@ -401,7 +404,7 @@
       const focusRing = overlay.querySelector(".sao-tour-focus-ring");
       if (targets.length) {
         highlightedElements = targets;
-        highlightedElements.forEach(target => target.classList.add("sao-tour-focus-target"));
+        highlightedElements.forEach((target) => target.classList.add("sao-tour-focus-target"));
         const reducedMotion = windowObject.matchMedia("(prefers-reduced-motion: reduce)").matches;
         targets[0].scrollIntoView?.({
           block: "center",
@@ -427,9 +430,10 @@
       actionButtons[0].textContent = translate("ui.walkthrough.skip");
       actionButtons[1].textContent = translate("ui.walkthrough.back");
       actionButtons[1].disabled = overlay.currentStepIndex === 0;
-      actionButtons[2].textContent = overlay.currentStepIndex === steps.length - 1
-        ? translate("ui.walkthrough.finish")
-        : translate("ui.walkthrough.next");
+      actionButtons[2].textContent =
+        overlay.currentStepIndex === steps.length - 1
+          ? translate("ui.walkthrough.finish")
+          : translate("ui.walkthrough.next");
       positionCard(getCombinedRect(targets));
       actionButtons[2].focus?.();
     }
@@ -472,7 +476,7 @@
       config.onClose?.();
       activeStep = null;
       clearHighlight();
-      listeners.forEach(cleanup => cleanup());
+      listeners.forEach((cleanup) => cleanup());
       listeners = [];
       overlay?.remove?.();
       overlay = null;

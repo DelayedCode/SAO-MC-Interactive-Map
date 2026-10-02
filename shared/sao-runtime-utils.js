@@ -1,15 +1,8 @@
-(function(global) {
+(function (global) {
   "use strict";
 
   function loadTaggedScriptOnce(options) {
-    const {
-      cache,
-      cacheKey,
-      tagAttribute,
-      src,
-      onReady,
-      onError
-    } = options || {};
+    const { cache, cacheKey, tagAttribute, src, onReady, onError } = options || {};
 
     if (!tagAttribute || !src) {
       throw new Error("loadTaggedScriptOnce requires tagAttribute and src.");
@@ -31,17 +24,25 @@
         return;
       }
 
-      existingScript.addEventListener("load", () => {
-        cache?.add?.(key);
-        onReady?.();
-      }, { once: true });
-      existingScript.addEventListener("error", () => {
-        if (typeof onError === "function") {
-          onError();
-          return;
-        }
-        onReady?.();
-      }, { once: true });
+      existingScript.addEventListener(
+        "load",
+        () => {
+          cache?.add?.(key);
+          onReady?.();
+        },
+        { once: true }
+      );
+      existingScript.addEventListener(
+        "error",
+        () => {
+          if (typeof onError === "function") {
+            onError();
+            return;
+          }
+          onReady?.();
+        },
+        { once: true }
+      );
       return;
     }
 
@@ -49,18 +50,26 @@
     script.src = src;
     script.async = false;
     script.setAttribute(tagAttribute, key);
-    script.addEventListener("load", () => {
-      script.dataset.loaded = "true";
-      cache?.add?.(key);
-      onReady?.();
-    }, { once: true });
-    script.addEventListener("error", () => {
-      if (typeof onError === "function") {
-        onError();
-        return;
-      }
-      onReady?.();
-    }, { once: true });
+    script.addEventListener(
+      "load",
+      () => {
+        script.dataset.loaded = "true";
+        cache?.add?.(key);
+        onReady?.();
+      },
+      { once: true }
+    );
+    script.addEventListener(
+      "error",
+      () => {
+        if (typeof onError === "function") {
+          onError();
+          return;
+        }
+        onReady?.();
+      },
+      { once: true }
+    );
 
     document.head.appendChild(script);
   }

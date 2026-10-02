@@ -2,12 +2,20 @@
   "name": "sao-mc-interactive-map",
   "version": "1.0.0",
   "description": "Static fan-made SAO MC reference website hosted on GitHub Pages.",
-  "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node scripts/test-persistence.js && node scripts/test-coordinates.js && node scripts/test-walkthrough.js && node scripts/test-map-runtime.js && node scripts/test-map-adapter.js && node scripts/test-map-image-assets.js && node scripts/test-underworld-adapter.js && node scripts/test-rendering.js && node scripts/test-clustering.js && node scripts/test-shared-runtime-helpers.js && node scripts/test-shared-map-ui.js && node scripts/test-navigation-resolver.js && node scripts/test-page-lifecycle.js && node scripts/test-ecompendium-performance.js && node scripts/test-localization-render-path.js && node scripts/test-localization-underworld-map.js && node scripts/test-equipment-data-quality.js && node scripts/test-character-build-reset.js && node scripts/test-character-build-stats.js && node scripts/check-localization.js",
+    "test:browser": "node scripts/run-browser-tests.js core",
+    "test:smoke": "node scripts/run-browser-tests.js smoke",
+    "test:ui": "node scripts/run-browser-tests.js ui",
+    "test:all": "npm test && node scripts/run-browser-tests.js all",
+    "serve": "node scripts/serve-static.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "repository": {
     "type": "git",
@@ -23,5 +31,10 @@
   "homepage": "https://github.com/DelayedCode/SAO-MC-Interactive-Map#readme",
   "dependencies": {
     "playwright": "^1.63.0"
+  },
+  "devDependencies": {
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
+    "sharp": "^0.35.5"
   }
 }

@@ -11,6 +11,7 @@
 
   const categories = Object.freeze({
     npc: true,
+    mainQuests: true,
     rulid: true,
     fishingSpot: true,
     oakWood: true,
@@ -21,6 +22,7 @@
 
   const categoryFloorRules = Object.freeze({
     npc: null,
+    mainQuests: null,
     rulid: Object.freeze(["rulid"]),
     fishingSpot: Object.freeze(["fishingIsland"]),
     oakWood: Object.freeze(["gigasCedar"]),
@@ -38,23 +40,13 @@
   });
   const markerDataset = globalObject.DATA && typeof globalObject.DATA === "object" ? globalObject.DATA : {};
   const mobAreaDataset = Array.isArray(globalObject.MOB_AREAS) ? globalObject.MOB_AREAS : [];
-  const mobAreaMobLookup = globalObject.MOB_AREA_MOBS && typeof globalObject.MOB_AREA_MOBS === "object"
-    ? globalObject.MOB_AREA_MOBS
-    : {};
-  function getContextData(contextId) {
-    const markerEntries = Object.entries(markerDataset)
-      .filter(([, marker]) => marker && marker.floor === contextId);
-    const mobAreas = mobAreaDataset.filter(area => area && area.floor === contextId);
-    const areaIds = new Set(mobAreas.map(area => area.id));
-    const mobAreasMobs = Object.fromEntries(
-      Object.entries(mobAreaMobLookup).filter(([areaId]) => areaIds.has(areaId))
-    );
-    return Object.freeze({
-      markerDataset: Object.freeze(Object.fromEntries(markerEntries)),
-      mobAreaDataset: Object.freeze(mobAreas.slice()),
-      mobAreaMobLookup: Object.freeze(mobAreasMobs)
-    });
-  }
+  const mobAreaMobLookup =
+    globalObject.MOB_AREA_MOBS && typeof globalObject.MOB_AREA_MOBS === "object" ? globalObject.MOB_AREA_MOBS : {};
+  const getContextData = globalObject.SAOMapRuntime.createContextDataResolver({
+    markerDataset,
+    mobAreaDataset,
+    mobAreaMobLookup
+  });
   function supportsVisitedCategory() {
     return false;
   }
@@ -82,11 +74,8 @@
     mobAreaMobLookup,
     getContextData,
     navigationSections: Object.freeze({ towerDefense: true, compendium: true, menu: true }),
-    sectionPaths: Object.freeze({
-      towerDefense: "../Tower Defense/towerdefense.html",
-      compendium: "../Compendium/compendium.html",
-      menu: "../../index.html"
-    }),
+    /* Reuses the canonical Fractured Underworld route table from shared/sao-page-utils.js. */
+    sectionPaths: (globalObject.SAOPageUtils && globalObject.SAOPageUtils.UNDERWORLD_SECTION_PATHS) || {},
     walkthroughSteps: Object.freeze([
       { title: "Navigation" },
       { title: "Map Controls" },

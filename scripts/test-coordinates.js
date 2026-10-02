@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { readPngDimensions } = require("./harness-helpers");
 
 const root = path.resolve(__dirname, "..");
 const mapDataSource = fs.readFileSync(path.join(root, "Aincrad", "Map", "mapData.js"), "utf8");
@@ -20,15 +21,6 @@ for (const floor of [1, 2, 3]) {
 
 const { CALIBRATION_MAP_SIZE, MAP_CALIBRATION, mapWebsiteCoordinates, invertMapCoordinates } = context.__coordinateApi;
 const data = vm.runInContext("DATA", context);
-
-function readPngDimensions(filePath) {
-  const bytes = fs.readFileSync(filePath);
-  assert.equal(bytes.toString("ascii", 1, 4), "PNG", `${filePath} is not a PNG file`);
-  return {
-    width: bytes.readUInt32BE(16),
-    height: bytes.readUInt32BE(20)
-  };
-}
 
 function assertClose(actual, expected, message, tolerance = 1e-9) {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${message}: expected ${expected}, got ${actual}`);
@@ -64,9 +56,21 @@ for (const floor of ["floor1", "floor2", "floor3"]) {
 
   const gameCases = [
     { x: calibration.centerGame.x, z: calibration.centerGame.z, label: "calibration center" },
-    { x: calibration.centerGame.x + calibration.radiusGame * 0.75, z: calibration.centerGame.z + calibration.radiusGame * 0.75, label: "positive game coordinates" },
-    { x: calibration.centerGame.x - calibration.radiusGame * 0.75, z: calibration.centerGame.z - calibration.radiusGame * 0.75, label: "negative-side game coordinates" },
-    { x: calibration.centerGame.x + calibration.radiusGame, z: calibration.centerGame.z - calibration.radiusGame, label: "calibration boundary" }
+    {
+      x: calibration.centerGame.x + calibration.radiusGame * 0.75,
+      z: calibration.centerGame.z + calibration.radiusGame * 0.75,
+      label: "positive game coordinates"
+    },
+    {
+      x: calibration.centerGame.x - calibration.radiusGame * 0.75,
+      z: calibration.centerGame.z - calibration.radiusGame * 0.75,
+      label: "negative-side game coordinates"
+    },
+    {
+      x: calibration.centerGame.x + calibration.radiusGame,
+      z: calibration.centerGame.z - calibration.radiusGame,
+      label: "calibration boundary"
+    }
   ];
 
   for (const game of gameCases) {
@@ -78,7 +82,7 @@ for (const floor of ["floor1", "floor2", "floor3"]) {
 
 for (const floor of ["floor1", "floor2", "floor3"]) {
   const dimensions = readPngDimensions(path.join(root, "Aincrad", "Map", `${floor}.png`));
-  const marker = Object.values(data).find(entry => entry.floor === floor && entry.coords);
+  const marker = Object.values(data).find((entry) => entry.floor === floor && entry.coords);
   assert.ok(marker, `${floor} has a marker with coordinates`);
 
   const raw = invertMapCoordinates(marker.coords.x, marker.coords.z, floor, dimensions);
@@ -86,10 +90,8 @@ for (const floor of ["floor1", "floor2", "floor3"]) {
   assertGamePointClose(game, marker.coords, `${floor} marker ${marker.title}`);
 }
 
-const waypoint = Object.values(data).find(entry =>
-  entry.floor === "floor2" &&
-  entry.type === "Quest" &&
-  entry.coords
+const waypoint = Object.values(data).find(
+  (entry) => entry.floor === "floor2" && entry.type === "Quest" && entry.coords
 );
 assert.ok(waypoint, "a floor 2 waypoint with coordinates is present");
 const waypointDimensions = readPngDimensions(path.join(root, "Aincrad", "Map", "floor2.png"));

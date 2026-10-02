@@ -1,48 +1,11 @@
-﻿:root {
-  --sidebar-width: 300px;
-  --text: #f5f7ff;
-  --muted: #97b1cf;
-  --accent: #73b9ff;
-}
+/* Fractured Underworld Main UI map page styles. The map UI this page shares with the Aincrad map
+   (chrome, marker colours, controls and their responsive rules) lives in ../../shared/sao-map-ui.css,
+   which is linked before this file; what stays here is Underworld-specific. */
 
-html, body {
-  height: 100%;
-}
-
-html {
-  overflow-x: hidden;
-}
-
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: var(--text);
-  background: radial-gradient(circle at 20% 10%, rgba(115, 185, 255, 0.16), transparent 18%),
-              radial-gradient(circle at 85% 15%, rgba(88, 167, 255, 0.12), transparent 24%),
-              linear-gradient(180deg, #060b14 0%, #081120 55%, #05080f 100%);
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: radial-gradient(circle at top center, rgba(115, 185, 255, 0.08), transparent 22%),
-                    radial-gradient(circle at bottom left, rgba(86, 142, 215, 0.06), transparent 20%);
-  pointer-events: none;
-}
-
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 40%);
-  pointer-events: none;
-}
+/* Rules that both map stylesheets declare identically but which also compete with page-local
+   rules of the same selector, so source order decides the outcome. They stay at the top of this
+   page sheet (losing to this page's own later rules, as they did before they were de-duplicated);
+   everything that is purely shared lives in shared/sao-map-ui.css. */
 
 header {
   padding: 8px 16px 10px;
@@ -56,13 +19,46 @@ header {
   z-index: 5;
 }
 
-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 0 0 18px 18px;
-  box-shadow: inset 0 0 0 1px rgba(130, 190, 255, 0.12);
-  pointer-events: none;
+* {
+  scrollbar-color: rgba(160, 190, 235, 0.5) rgba(14, 20, 34, 0.8);
+  scrollbar-width: thin;
+}
+
+#zoomControls button {
+  padding: 6px 9px;
+  border: none;
+  border-radius: 7px;
+  background: rgba(15, 21, 34, 0.96);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.78rem;
+}
+
+#zoomLabel {
+  min-width: 40px;
+  text-align: center;
+  font-size: 0.78rem;
+}
+
+#title,
+#content,
+#content p,
+#content li,
+#content span,
+#content label,
+#content strong,
+.sidebar-section-title,
+.mob-area-entry-name {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: text;
+}
+
+:root {
+  --sidebar-width: 300px;
+  --text: #f5f7ff;
+  --muted: #97b1cf;
+  --accent: #73b9ff;
 }
 
 .global-toast {
@@ -79,7 +75,9 @@ header::before {
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
   z-index: 40;
   text-align: center;
 }
@@ -114,7 +112,11 @@ header::before {
   justify-content: center;
   white-space: normal;
   line-height: 1.2;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .top-button:hover,
@@ -123,10 +125,6 @@ header::before {
   border-color: var(--accent);
   background: rgba(20, 30, 48, 0.95);
   box-shadow: 0 10px 30px rgba(17, 35, 70, 0.18);
-}
-
-.top-button:active {
-  transform: translateY(0) scale(0.98);
 }
 
 .header-main {
@@ -162,7 +160,11 @@ header::before {
   min-height: 30px;
   padding: 8px 10px;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .island-nav-button:hover,
@@ -175,7 +177,9 @@ header::before {
 .island-nav-button.is-active {
   background: linear-gradient(180deg, rgba(17, 27, 42, 0.98), rgba(12, 17, 29, 0.96));
   border-color: rgba(130, 190, 255, 0.38);
-  box-shadow: inset 0 0 0 1px rgba(130, 190, 255, 0.18), 0 0 0 1px rgba(130, 190, 255, 0.08);
+  box-shadow:
+    inset 0 0 0 1px rgba(130, 190, 255, 0.18),
+    0 0 0 1px rgba(130, 190, 255, 0.08);
   color: var(--text);
 }
 
@@ -191,10 +195,6 @@ header h1 {
   gap: 8px;
   flex-wrap: wrap;
   max-width: 100%;
-}
-
-.controls > * {
-  min-width: 0;
 }
 
 .controls label,
@@ -215,7 +215,9 @@ header h1 {
   background: rgba(14, 20, 33, 0.92);
   color: var(--text);
   outline: none;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .controls input[type="text"] {
@@ -240,23 +242,9 @@ header h1 {
   color: var(--text);
   padding: 7px 12px;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.control-action:hover,
-.control-action:focus-visible {
-  border-color: var(--accent);
-  background: rgba(20, 30, 48, 0.98);
-}
-
-.control-action:active {
-  transform: scale(0.98);
-}
-
-.controls select:focus,
-.controls input[type="text"]:focus {
-  border-color: var(--accent);
-  background-color: rgba(18, 28, 46, 0.98);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .underground-toggle-wrapper {
@@ -277,12 +265,9 @@ header h1 {
   box-sizing: border-box;
   position: relative;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.underground-toggle-wrapper input[type="checkbox"]:checked {
-  background: rgba(12, 20, 31, 0.96);
-  border-color: rgba(148, 167, 191, 0.7);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .underground-toggle-wrapper input[type="checkbox"]:checked::after {
@@ -322,46 +307,33 @@ main {
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
 }
 
+/* Stationary viewport backdrop (same treatment as the Aincrad map): the checker/grid pattern
+   belongs to the viewport, so the map/content layer pans across a fixed grid. The square size is
+   driven by --map-grid-size (set from the map's zoom state), so the squares scale with zoom while
+   the grid stays anchored to the viewport. */
 #mapContainer::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(115, 185, 255, 0.03), transparent 32%);
-  pointer-events: none;
-}
-
-#mapLayer {
-  position: relative;
-  transform-origin: top left;
-  width: calc(100% - 52px);
-  height: calc(100% - 52px);
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 26px;
-  overflow: visible;
-  background: linear-gradient(180deg, rgba(13, 19, 31, 0.9), rgba(8, 12, 18, 0.95));
-}
-
-#mapLayer::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(130, 190, 255, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(130, 190, 255, 0.09) 1px, transparent 1px);
-  background-size: 48px 48px;
-  opacity: 0.2;
-  border-radius: inherit;
+    linear-gradient(rgba(130, 190, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(130, 190, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(115, 185, 255, 0.03), transparent 32%);
+  background-size:
+    var(--map-grid-size, 48px) var(--map-grid-size, 48px),
+    var(--map-grid-size, 48px) var(--map-grid-size, 48px),
+    100% 100%;
   pointer-events: none;
 }
 
-#mapLayer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(circle at 50% 35%, rgba(115, 185, 255, 0.12), transparent 42%);
-  pointer-events: none;
+/* Transparent content layer that fills the viewport. It carries no background of its own, so any
+   map artwork floats on the viewport backdrop and content may extend past it. */
+#mapLayer {
+  position: relative;
+  transform-origin: top left;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 #sidebarResizeHandle {
@@ -377,25 +349,11 @@ main {
   border-radius: 10px;
   position: relative;
   z-index: 15;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
   margin-left: 0;
   margin-right: 0;
-}
-
-#sidebarResizeHandle:hover {
-  background: rgba(18, 30, 48, 0.62);
-  box-shadow: inset 0 0 0 1px rgba(130, 190, 255, 0.12);
-}
-
-#sidebarResizeHandle::before {
-  content: "";
-  position: absolute;
-  inset: calc(50% - 20px) 50%;
-  transform: translateX(-50%);
-  width: 3px;
-  height: 36px;
-  border-radius: 999px;
-  background: rgba(115, 185, 255, 0.28);
 }
 
 #sidebar {
@@ -450,12 +408,6 @@ main {
   overflow-y: auto;
 }
 
-#infoOverlay .sidebar-section {
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
 #infoOverlay .sidebar-section-title {
   margin-bottom: 8px;
   font-size: 0.95rem;
@@ -464,59 +416,10 @@ main {
   letter-spacing: 0.15em;
 }
 
-#content {
-  color: var(--text);
-}
-
 #content p {
   margin: 0;
   line-height: 1.65;
   color: var(--muted);
-}
-
-* {
-  scrollbar-color: rgba(160, 190, 235, 0.5) rgba(14, 20, 34, 0.8);
-  scrollbar-width: thin;
-}
-
-*::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-*::-webkit-scrollbar-track {
-  background: rgba(14, 20, 34, 0.8);
-}
-
-*::-webkit-scrollbar-thumb {
-  background: rgba(130, 190, 255, 0.35);
-  border-radius: 10px;
-  border: 2px solid transparent;
-  background-clip: content-box;
-}
-
-*::-webkit-scrollbar-corner {
-  background: rgba(14, 20, 34, 0.8);
-}
-
-#mapContainer.grabbing {
-  cursor: grabbing;
-}
-
-#mapLayer img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-}
-
-#mapLayer img.underground-map {
-  position: absolute;
-  inset: 0;
-  opacity: 1;
-  pointer-events: none;
-  display: none;
 }
 
 #coordinateDisplay {
@@ -534,32 +437,6 @@ main {
   min-width: 130px;
 }
 
-#mobAreaLayer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 2;
-}
-
-#mobAreaLayer .mob-area-polygon {
-  stroke-width: 2;
-  stroke-dasharray: 8 6;
-}
-
-#mobAreaLayer .mob-area-label {
-  fill: var(--mob-area-label-color, #ffffff);
-  font-size: var(--mob-area-label-size, 14px);
-  font-weight: 700;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.72);
-  stroke-width: 3px;
-  stroke-linejoin: round;
-}
-
 .map-empty-state {
   position: absolute;
   inset: 0;
@@ -567,7 +444,9 @@ main {
   display: grid;
   place-items: center;
   pointer-events: none;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
 }
 
 .map-empty-state.is-hidden {
@@ -577,40 +456,42 @@ main {
 
 .map-empty-state-panel {
   display: grid;
-  gap: 6px;
+  gap: 10px;
   justify-items: center;
   min-width: min(320px, calc(100% - 32px));
-  padding: 16px 18px 14px;
+  padding: 20px 24px 18px;
   border-radius: 16px;
   border: 1px solid rgba(130, 190, 255, 0.18);
   background: linear-gradient(180deg, rgba(10, 17, 28, 0.82), rgba(7, 12, 20, 0.9));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 10px 26px rgba(0,0,0,0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 26px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(4px);
 }
 
-.map-empty-state-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: rgba(151, 177, 207, 0.78);
+.map-empty-state-header {
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-
-.map-empty-state-body {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(191, 206, 228, 0.88);
+  color: #9cc7e7;
   text-align: center;
 }
 
-#markers {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  transform-origin: top left;
-  transform-box: fill-box;
+.map-empty-state-body {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: center;
+}
+
+.map-empty-state-footer {
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(151, 177, 207, 0.82);
+  text-align: center;
 }
 
 .marker {
@@ -626,7 +507,10 @@ main {
   font-weight: 700;
   border: 2px solid rgba(255, 255, 255, 0.9);
   pointer-events: auto;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease;
   transform-origin: 50% var(--marker-origin-y);
   transform: translate(-50%, var(--marker-anchor-y)) scale(var(--marker-scale, 1));
 }
@@ -636,70 +520,100 @@ main {
   box-shadow: 0 0 18px rgba(115, 185, 255, 0.32);
 }
 
-.marker:focus-visible {
-  outline: 3px solid #8bb7ff;
-  outline-offset: 3px;
-}
-
 .marker.active-marker {
   box-shadow: 0 0 24px rgba(115, 185, 255, 0.45);
   transform: translate(-50%, var(--marker-anchor-y)) scale(calc(var(--marker-scale, 1) * 1.18));
 }
 
-.marker.boss {background:#c0392b; color:#fff;}
-.marker.chest {background:#f39c12; color:#111;}
-.marker.npc {background:#2980b9; color:#fff;}
-.marker.quest {background:#27ae60; color:#fff;}
-.marker.side-quest-marker {background:#1f8f58; color:#fff;}
+/* Clustered waypoints: the same compact grouped counter the Aincrad map uses, clearly
+   distinct from a single marker while staying restrained. The anchor variables make the
+   cluster centre on its coordinate like every other marker. */
+.marker.cluster-marker {
+  --marker-anchor-y: -50%;
+  --marker-origin-y: 50%;
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle at 50% 32%, #2f7fb8, #123c58 78%);
+  color: #eaf6ff;
+  border: 1px solid rgba(191, 229, 255, 0.85);
+  box-shadow:
+    0 0 0 3px rgba(31, 111, 178, 0.24),
+    0 0 10px rgba(115, 185, 255, 0.28);
+  font-variant-numeric: tabular-nums;
+}
 
-.marker.alchemist-marker {background: #2b7fa0; border-color: #d8f4ff;}
-.marker.lumberjack-marker {background: #8b5a2b; border-color: #ffe6bf;}
-.marker.weaponsmith-marker {background: #4d607a; border-color: #dbe6f8;}
-.marker.armorBlacksmith-marker {background: #4f6788; border-color: #deebff;}
-.marker.ingotBlacksmith-marker {background: #7d5b33; border-color: #f7dfb7;}
-.marker.keyBlacksmith-marker {background: #79611f; border-color: #ffefb7;}
-.marker.accessoriesBlacksmith-marker {background: #2f5f96; border-color: #d6e8ff;}
-.marker.refaire-marker {background: #6e5f39; border-color: #f2dfb0;}
-.marker.lootBuyers-marker {background: #7a6321; border-color: #ffefb0;}
-.marker.weaponSellers-marker {background: #4f6077; border-color: #d9e7f7;}
-.marker.travelingMerchants-marker {background: #6c5a43; border-color: #f0e4ca;}
-.marker.equipmentMerchants-marker {background: #4f6b8e; border-color: #dfebff;}
-.marker.toolMerchants-marker {background: #3f666c; border-color: #d7f4f7;}
-.marker.accessoriesMerchants-marker {background: #8a5f2d; border-color: #ffe9bf;}
-.marker.occultMerchants-marker {background: #5b3a88; border-color: #eadcff;}
-.marker.consumablesMerchants-marker {background: #8a4d3e; border-color: #ffe0d4;}
-.marker.mob-area-marker {background: var(--mob-marker-bg, #5a4ed1); border-color: var(--mob-marker-contrast, #e6e2ff);}
-.marker.dungeon {background:#d72638; color:#fff;}
-.marker.dungeon .dungeon-icon,
-.marker.boss .boss-icon,
-.marker.quest .quest-icon,
-.marker.side-quest-marker .quest-icon,
-.marker.alchemist-marker .alchemist-icon,
-.marker.lumberjack-marker .lumberjack-icon,
-.marker.craftsman-marker .craftsman-icon,
-.marker.market-marker .market-icon {
-  width: 20px;
-  height: 20px;
-  display: block;
+.marker.cluster-marker .cluster-count {
+  font-size: 0.74rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
 }
-.marker.visited {background:#2ecc71; color:#fff; border-color:#d6ffe6;}
-.marker.visited:hover {box-shadow:0 0 18px rgba(46, 204, 113, .35);}
-.marker.biome.visited .biome-pin-icon path:first-child {fill:#2ecc71;}
-.marker.biome {
-  --marker-anchor-y: -100%;
-  --marker-origin-y: 100%;
-  width:24px;
-  height:34px;
-  border:none;
-  border-radius:0;
-  background:transparent;
-  color:transparent;
-  box-shadow:none;
+
+.marker.cluster-marker:hover {
+  box-shadow:
+    0 0 0 3px rgba(31, 111, 178, 0.34),
+    0 0 16px rgba(115, 185, 255, 0.45);
 }
-.marker.biome .biome-pin-icon {
-  width:24px;
-  height:34px;
-  display:block;
+
+.marker.cluster-marker.active-marker {
+  box-shadow:
+    0 0 0 3px rgba(31, 111, 178, 0.45),
+    0 0 22px rgba(115, 185, 255, 0.55);
+}
+
+/* Cluster member list inside the info panel: compact, expandable per waypoint. */
+#content .cluster-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+#content .cluster-entry details {
+  border: 1px solid rgba(130, 190, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(8, 15, 25, 0.6);
+}
+
+#content .cluster-entry details[open] summary {
+  border-bottom: 1px solid rgba(130, 190, 255, 0.16);
+  color: #ffffff;
+}
+
+#content .cluster-entry summary {
+  padding: 7px 9px;
+  color: #dcebfc;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+#content .cluster-entry-body {
+  padding: 8px 9px 9px;
+}
+
+#content .cluster-entry-body p {
+  margin: 0 0 5px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+#content .cluster-entry-body strong {
+  color: #cfe1f7;
+}
+
+#content .cluster-entry-body .waypoint-info-row {
+  margin-top: 7px;
+}
+
+@media (max-width: 700px) {
+  #content .cluster-list {
+    max-height: 200px;
+  }
 }
 
 .sidebar-section {
@@ -716,12 +630,6 @@ main {
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-#sidebar > .sidebar-section .sidebar-section-title {
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(115, 185, 255, 0.12);
-  color: var(--muted);
 }
 
 .sidebar-list {
@@ -750,7 +658,11 @@ main {
   min-height: 38px;
   border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sidebar-list-button:hover,
@@ -761,118 +673,25 @@ main {
   box-shadow: inset 0 0 0 1px rgba(130, 190, 255, 0.08);
 }
 
-.sidebar-list-button:active {
-  transform: scale(0.99);
+#content .visited-toggle-label input {
+  margin: 0;
 }
 
-.waypoint-info-button {
-  margin: 8px 0 12px;
-  padding: 10px 12px;
-  border: 1px solid rgba(115, 185, 255, 0.18);
-  border-radius: 14px;
-  background: rgba(17, 24, 38, 0.95);
-  color: var(--text);
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.waypoint-info-button:hover {background: rgba(115, 185, 255, 0.12);}
-
-.waypoint-info-button:active {transform: scale(0.98);}
-
-#content .waypoint-info-row {margin-bottom: 10px;}
-
-#content .visited-toggle-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text);
-  font-size: 0.95rem;
-}
-
-#content .visited-toggle-label input {margin: 0;}
-
-.mob-area-entry-list {
-  list-style: none;
-  margin: 4px 0 10px;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-
-.mob-area-entry-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid rgba(115, 185, 255, 0.14);
-  border-radius: 16px;
-  background: rgba(16, 21, 34, 0.95);
-}
-
-.mob-area-entry-name {
-  font-size: 0.92rem;
-  color: var(--text);
-}
-
-.mob-area-info-button {
-  padding: 8px 10px;
-  border: 1px solid rgba(115, 185, 255, 0.18);
-  border-radius: 14px;
-  background: rgba(13, 18, 28, 0.96);
-  color: var(--text);
-  cursor: pointer;
-  font-size: 0.84rem;
-}
-
-.mob-area-info-button:hover {background: rgba(115, 185, 255, 0.12);}
-
-.mob-area-info-button:active {transform: scale(0.98);}
-
+/* Compact single-row zoom bar, matching the Aincrad zoom-control presentation. */
 #zoomControls {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 14px 16px;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
   background: rgba(10, 15, 23, 0.88);
   position: absolute;
   left: 16px;
   bottom: 16px;
   z-index: 8;
-  border-radius: 18px;
+  border-radius: 10px;
   border: 1px solid rgba(130, 190, 255, 0.14);
 }
-
-#zoomControls button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 14px;
-  background: rgba(15, 21, 34, 0.96);
-  color: var(--text);
-  cursor: pointer;
-  font-size: 0.92rem;
-}
-
-#zoomControls button:hover {background: rgba(115, 185, 255, 0.12);}
-
-#zoomControls button:active {transform: scale(0.98);}
-
-#zoomLabel {
-  min-width: 56px;
-  text-align: left;
-  font-size: 0.95rem;
-}
-
-#title, #content, #content p, #content li, #content span, #content label, #content strong, .sidebar-section-title, .mob-area-entry-name {
-  user-select: text;
-  -webkit-user-select: text;
-  -webkit-touch-callout: text;
-}
-
-#content {cursor: text;}
-body.resizing-sidebar {cursor: col-resize; user-select: none;}
 
 @media (max-width: 980px) {
   main {
@@ -882,21 +701,53 @@ body.resizing-sidebar {cursor: col-resize; user-select: none;}
     min-height: 0;
     overflow: visible;
   }
-  #sidebarResizeHandle {display: none;}
-  #mapContainer {width: 100%; min-width: 0; min-height: 320px;}
-  #sidebar {position: static; width: 100%; max-width: none; min-width: 0; max-height: none;}
-  .header-main {align-items: center;}
-  .island-nav {grid-template-columns: repeat(2, minmax(0, 1fr));}
+  #sidebarResizeHandle {
+    display: none;
+  }
+  #mapContainer {
+    width: 100%;
+    min-width: 0;
+    min-height: 440px;
+  }
+  /* The stacked layout gives the map panel its own scroll-free height, so the "no map data"
+     panel is anchored below the category overlay instead of sitting underneath it. */
+  .map-empty-state {
+    place-items: end center;
+    padding: 0 12px 76px;
+  }
+  #sidebar {
+    position: static;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    max-height: none;
+  }
+  .header-main {
+    align-items: center;
+  }
+  .island-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 900px) {
-  .controls {flex-direction: column; align-items: stretch;}
-  #search, .control-action {width: 100%;}
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #search,
+  .control-action {
+    width: 100%;
+  }
 }
 
 @media (max-width: 700px) {
-  header {padding: 14px 16px 18px;}
-  .top-nav {grid-template-columns: repeat(2, minmax(0, 1fr));}
+  header {
+    padding: 14px 16px 18px;
+  }
+  .top-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .controls {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -907,8 +758,37 @@ body.resizing-sidebar {cursor: col-resize; user-select: none;}
   .control-action {
     grid-column: 1 / -1;
   }
-  .controls select, .controls input[type="text"] {width: 100%;}
-  main {padding: 10px 10px 14px;}
+  .controls select,
+  .controls input[type="text"] {
+    width: 100%;
+  }
+  main {
+    padding: 10px 10px 14px;
+  }
+  /* Trim the zoom bar and the coordinate readout so the pair fits on one line on small phones.
+     The trim alone is not enough once the reset button carries a longer localized label
+     ("Réinitialiser la vue" / "Restablecer vista"), so the narrowest phones stack the readout
+     above the bar instead of letting the two pills overlap. */
+  #zoomControls {
+    left: 12px;
+    bottom: 12px;
+    padding: 4px 5px;
+  }
+  #zoomControls button {
+    padding: 5px 7px;
+    font-size: 0.72rem;
+  }
+  #zoomLabel {
+    min-width: 30px;
+    font-size: 0.72rem;
+  }
+  #coordinateDisplay {
+    right: 12px;
+    bottom: 12px;
+    padding: 8px 10px;
+    min-width: 108px;
+    font-size: 0.74rem;
+  }
   #infoOverlay {
     left: 10px;
     right: 10px;
@@ -948,7 +828,9 @@ body.resizing-sidebar {cursor: col-resize; user-select: none;}
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -962,5 +844,17 @@ body.resizing-sidebar {cursor: col-resize; user-select: none;}
   .marker:hover,
   .marker.active-marker {
     transform: translate(-50%, var(--marker-anchor-y)) scale(var(--marker-scale, 1));
+  }
+}
+
+/* The phone-width readout rule has to stay last in this sheet: it must keep beating this page's own
+   #coordinateDisplay rule, exactly as it did before the shared rules were de-duplicated. */
+
+@media (max-width: 480px) {
+  /* One row cannot hold both pills at phone widths once the labels are translated, so the zoom
+     bar keeps the map's bottom-left corner and the coordinate readout is lifted clear above it
+     (they can then never overlap, whatever length the reset label has in a given language). */
+  #coordinateDisplay {
+    bottom: 64px;
   }
 }

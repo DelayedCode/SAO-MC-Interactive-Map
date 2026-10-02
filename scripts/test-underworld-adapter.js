@@ -2,29 +2,9 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { createDom } = require("./harness-helpers");
 
 const root = path.resolve(__dirname, "..");
-
-function createDom() {
-  return {
-    mapContainer: {},
-    sidebar: {},
-    mapLayer: {},
-    mapImage: {},
-    undergroundMapImage: {},
-    mobAreaLayer: {},
-    markerLayer: {},
-    title: {},
-    content: {},
-    overlayMappedCoords: {},
-    floorSelect: {},
-    undergroundToggle: {},
-    searchInput: {},
-    clearFiltersButton: {},
-    zoomLabel: {},
-    resetViewButton: {}
-  };
-}
 
 const data = {
   npcOne: {
@@ -74,7 +54,16 @@ assert.equal(adapter.id, "underworld");
 assert.equal(adapter.translationNamespace, "page.mainui");
 assert.equal(adapter.defaultFloor, "playerIsland");
 assert.deepEqual(Object.keys(adapter.floors), ["playerIsland", "gigasCedar", "iceCave", "rulid", "fishingIsland"]);
-assert.deepEqual(Object.keys(adapter.categories), ["npc", "rulid", "fishingSpot", "oakWood", "copper", "iron", "coal"]);
+assert.deepEqual(Object.keys(adapter.categories), [
+  "npc",
+  "mainQuests",
+  "rulid",
+  "fishingSpot",
+  "oakWood",
+  "copper",
+  "iron",
+  "coal"
+]);
 assert.equal(adapter.markerDataset, data, "existing Underworld marker data remains accessible");
 assert.equal(adapter.mobAreaDataset, mobAreas, "existing Underworld area data remains accessible");
 assert.equal(adapter.mobAreaMobLookup, mobAreaMobs, "existing Underworld mob lookup remains accessible");
@@ -91,10 +80,22 @@ for (const floor of Object.keys(adapter.floors)) {
   assert.equal(adapter.mapImageSources[floor].surface, null);
   assert.equal(adapter.mapImageSources[floor].underground, null);
 }
-assert.equal(adapter.supportsVisitedCategory("npc"), false, "Underworld visitability is explicitly disabled for its current data contract");
+assert.equal(
+  adapter.supportsVisitedCategory("npc"),
+  false,
+  "Underworld visitability is explicitly disabled for its current data contract"
+);
 assert.equal(adapter.supportsVisitedCategory("rulid"), false, "Underworld category visitability remains explicit");
-assert.equal(adapter.categoryFloorRules.copper.includes("iceCave"), true, "Underworld category rules are adapter-owned");
-assert.equal(adapter.mapImageSources.iceCave.placeholder, true, "Underworld image source configuration remains placeholder-backed");
+assert.equal(
+  adapter.categoryFloorRules.copper.includes("iceCave"),
+  true,
+  "Underworld category rules are adapter-owned"
+);
+assert.equal(
+  adapter.mapImageSources.iceCave.placeholder,
+  true,
+  "Underworld image source configuration remains placeholder-backed"
+);
 
 assert.equal(adapter.coordinateDependencies.mapWebsiteCoordinates, null, "forward coordinate support remains optional");
 assert.equal(adapter.coordinateDependencies.invertMapCoordinates, null, "inverse coordinate support remains optional");
@@ -120,20 +121,51 @@ assert.equal(runtime.isDestroyed(), true);
 assert.equal(context.window.DATA.npcOne.title, "Underworld NPC", "destroy does not corrupt Underworld globals");
 assert.equal(context.window.MOB_AREAS[0].id, "areaOne", "destroy does not corrupt area globals");
 
-const underworldControllerSource = fs.readFileSync(path.join(root, "Fractured Underworld", "Main UI", "mainui.js"), "utf8");
-assert.equal(underworldControllerSource.includes("typeof DATA"), false, "Underworld controller does not read DATA directly");
-assert.equal(underworldControllerSource.includes("typeof MOB_AREAS"), false, "Underworld controller does not read MOB_AREAS directly");
-assert.equal(underworldControllerSource.includes("typeof MOB_AREA_MOBS"), false, "Underworld controller does not read MOB_AREA_MOBS directly");
+const underworldControllerSource = fs.readFileSync(
+  path.join(root, "Fractured Underworld", "Main UI", "mainui.js"),
+  "utf8"
+);
+assert.equal(
+  underworldControllerSource.includes("typeof DATA"),
+  false,
+  "Underworld controller does not read DATA directly"
+);
+assert.equal(
+  underworldControllerSource.includes("typeof MOB_AREAS"),
+  false,
+  "Underworld controller does not read MOB_AREAS directly"
+);
+assert.equal(
+  underworldControllerSource.includes("typeof MOB_AREA_MOBS"),
+  false,
+  "Underworld controller does not read MOB_AREA_MOBS directly"
+);
 assert.equal(/\bDATA\[/.test(underworldControllerSource), false, "Underworld controller does not index DATA directly");
-assert.equal(underworldControllerSource.includes("MAP_IMAGE_AVAILABILITY"), false, "Underworld image availability is adapter-owned");
-assert.equal(underworldControllerSource.includes("MAIN_CATEGORY_FLOOR_RULES"), false, "Underworld category floor rules are adapter-owned");
-assert.equal(underworldControllerSource.includes('category === "biomes"'), false, "Underworld has no Aincrad visitability list");
+assert.equal(
+  underworldControllerSource.includes("MAP_IMAGE_AVAILABILITY"),
+  false,
+  "Underworld image availability is adapter-owned"
+);
+assert.equal(
+  underworldControllerSource.includes("MAIN_CATEGORY_FLOOR_RULES"),
+  false,
+  "Underworld category floor rules are adapter-owned"
+);
+assert.equal(
+  underworldControllerSource.includes('category === "biomes"'),
+  false,
+  "Underworld has no Aincrad visitability list"
+);
 assert.match(underworldControllerSource, /mapAdapter\?\.supportsVisitedCategory/);
 assert.match(underworldControllerSource, /mapAdapter\?\.mapImageSources/);
 assert.match(underworldControllerSource, /mapAdapter\?\.categoryFloorRules/);
 
 for (const forbidden of ["playerIsland", "gigasCedar", "iceCave", "rulid", "fishingIsland", "page.mainui."]) {
-  assert.equal(runtimeSource.includes(forbidden), false, `shared runtime has no Underworld-specific constant: ${forbidden}`);
+  assert.equal(
+    runtimeSource.includes(forbidden),
+    false,
+    `shared runtime has no Underworld-specific constant: ${forbidden}`
+  );
 }
 for (const forbidden of [
   "MAP_CALIBRATION",
@@ -142,7 +174,11 @@ for (const forbidden of [
   "function mapWebsiteCoordinates",
   "function invertMapCoordinates"
 ]) {
-  assert.equal(adapterSource.includes(forbidden), false, `adapter does not copy coordinate implementation: ${forbidden}`);
+  assert.equal(
+    adapterSource.includes(forbidden),
+    false,
+    `adapter does not copy coordinate implementation: ${forbidden}`
+  );
 }
 
 console.log("Underworld adapter regression tests passed.");

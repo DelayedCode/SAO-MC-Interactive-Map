@@ -7,7 +7,7 @@ Set-Location $RootPath
 $workspaceRoot = (Resolve-Path ".").Path
 
 $htmlFiles = Get-ChildItem -Recurse -File -Filter *.html |
-  Where-Object { $_.FullName -notmatch "\\.git\\|\\.venv\\" }
+  Where-Object { $_.FullName -notmatch "[\\/](\.git|\.venv|\.devin|node_modules|dist|coverage)[\\/]" }
 
 function Convert-ToUrlPath {
   param([string]$Path)

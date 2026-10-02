@@ -1,9 +1,15 @@
 const CALIBRATION_MAP_SIZE = 900;
 
 const MAP_CALIBRATION = {
+  /* Floor 1 carries a small alignment correction in centerGame: the coordinate grid sat 3 units
+     high in X and 14 units low in Z against the artwork, so the reference center is offset by
+     (-3, +14) from its measured value. The projection math, the scale
+     (radiusGame/radiusPixel) and every stored waypoint coordinate are unchanged - this only
+     shifts where the existing coordinate grid sits on the floor 1 artwork. The shift is applied
+     in whole game units, so all distances and neighbouring readings stay consistent. */
   floor1: {
     centerPixel: { x: 450, y: 450 },
-    centerGame: { x: 2545.6, z: 2550 },
+    centerGame: { x: 2542.6, z: 2551 },
     radiusPixel: 450,
     radiusGame: 2498.1
   },
@@ -74,7 +80,9 @@ function invertMapCoordinates(x, z, floor, dimensions) {
 }
 
 function normalizeFloorAndUnderground(layer) {
-  const normalized = String(layer || "").trim().toLowerCase();
+  const normalized = String(layer || "")
+    .trim()
+    .toLowerCase();
   if (normalized === "surface" || normalized === "underground") {
     return { floor: "floor2", underground: normalized === "underground" };
   }
@@ -101,7 +109,9 @@ function slugifyName(value) {
 }
 
 function normalizeWaypointType(type) {
-  const normalized = String(type || "").trim().toLowerCase();
+  const normalized = String(type || "")
+    .trim()
+    .toLowerCase();
   if (/biome|r[eé]gion/.test(normalized)) return "Biome";
   if (/dungeon/.test(normalized)) return "Dungeon";
   if (/boss/.test(normalized)) return "Boss";
@@ -110,7 +120,10 @@ function normalizeWaypointType(type) {
 }
 
 function inferCategory(type) {
-  const normalized = String(type || "").trim().toLowerCase().replace(/_/g, " ");
+  const normalized = String(type || "")
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, " ");
   switch (normalized) {
     case "alchemist":
       return "alchemist";
@@ -156,7 +169,7 @@ function inferCategory(type) {
 }
 function createMap2WaypointEntries(lines) {
   const existingMarkers = new Set(
-    Object.values(DATA || {}).map(marker => `${marker.type}:${marker.coords?.x}:${marker.coords?.z}`)
+    Object.values(DATA || {}).map((marker) => `${marker.type}:${marker.coords?.x}:${marker.coords?.z}`)
   );
 
   return lines.reduce((result, line) => {
@@ -198,4 +211,3 @@ function createMap2WaypointEntries(lines) {
 const DATA = {};
 
 const MOB_AREAS = [];
-

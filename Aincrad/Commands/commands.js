@@ -2,16 +2,8 @@ const DEFAULT_FLOOR = "floor1";
 const DEFAULT_CATEGORY = "communication";
 const commandsUiStateStorageKey = "sao.commands.uiState";
 const i18n = window.SAOI18n || null;
-const t = (key, params) => (i18n ? i18n.t(key, params) : key);
-const content = (key, fallback) => (i18n && typeof i18n.content === "function"
-  ? i18n.content(key, fallback)
-  : fallback);
-const storage = window.SAOStorage || {
-  getItem() { return null; },
-  setItem() {},
-  getJSON(_key, fallbackValue) { return fallbackValue; },
-  setJSON() {}
-};
+const { t, content } = window.SAOPageHelpers.createTranslators(i18n);
+const storage = window.SAOPageHelpers.getStorage();
 
 const categories = [
   { key: "communication", labelKey: "page.commands.categories.communication" },
@@ -32,7 +24,7 @@ function getCategoryLabel(categoryKey) {
 
 function refreshCategoryLabelMap() {
   categoryLabelMap.clear();
-  categories.forEach(category => {
+  categories.forEach((category) => {
     categoryLabelMap.set(category.key, getCategoryLabel(category.key));
   });
 }
@@ -44,7 +36,8 @@ const commandEntries = [
     category: "communication",
     command: "/friend add/remove/accept/deny/list [Name]",
     usage: "Friend system (Broken Right Now)",
-    example: "/friend add Username (Sends Username a friend request)\n/friend remove Username (Removes Username as a friend)\n/friend accept Username (Accepts Username's friend request)\n/friend deny Username (Denies Username's friend request)\n/friend list (Shows your whole friend list and extra info)"
+    example:
+      "/friend add Username (Sends Username a friend request)\n/friend remove Username (Removes Username as a friend)\n/friend accept Username (Accepts Username's friend request)\n/friend deny Username (Denies Username's friend request)\n/friend list (Shows your whole friend list and extra info)"
   },
   {
     category: "communication",
@@ -56,13 +49,15 @@ const commandEntries = [
     category: "communication",
     command: "/p [Message]",
     usage: "Party chat shortcut",
-    example: "/p Message (Like \"/party chat\", it sends a message in your party chat only to see but it does not toggle it.)"
+    example:
+      '/p Message (Like "/party chat", it sends a message in your party chat only to see but it does not toggle it.)'
   },
   {
     category: "communication",
     command: "/party chat/help/info/leave/list/invite [Name]",
     usage: "Party management",
-    example: "/party chat (Toggles your chat into party chat. Run the command again to turn it off.)\n/party help (Shows party commands)\n/party info (Shows info of the party you are currently in)\n/party leave (Leaves the party you are currently in)\n/party list (Shows current online parties)\n/party invite Username (Invites Username to your party)"
+    example:
+      "/party chat (Toggles your chat into party chat. Run the command again to turn it off.)\n/party help (Shows party commands)\n/party info (Shows info of the party you are currently in)\n/party leave (Leaves the party you are currently in)\n/party list (Shows current online parties)\n/party invite Username (Invites Username to your party)"
   },
   {
     category: "communication",
@@ -74,7 +69,8 @@ const commandEntries = [
     category: "communication",
     command: "/r [Message]",
     usage: "Reply to the last private message",
-    example: "/r Message (Replies to the private message you may have just gotten or to someone who just replied to your private message)"
+    example:
+      "/r Message (Replies to the private message you may have just gotten or to someone who just replied to your private message)"
   },
   {
     category: "communication",
@@ -133,20 +129,22 @@ const commandEntries = [
   {
     category: "dungeons",
     command: "/nextdungeon:dungeon",
-    usage: "Opens dungeon help and dungeon commands (Less compacted compared to \"/nd\")",
+    usage: 'Opens dungeon help and dungeon commands (Less compacted compared to "/nd")',
     example: "/nextdungeon:dungeon"
   },
   {
     category: "dungeons",
     command: "/queue restore/status/leave/batch",
     usage: "Queue management for dungeons or lobbies",
-    example: "/queue restore (I dont want to explain what this cmd does)\n/queue status (Shows your current spot in your queue)\n/queue leave (Leaves your current lobby queue)\n/queue batch (Shows random info)"
+    example:
+      "/queue restore (I dont want to explain what this cmd does)\n/queue status (Shows your current spot in your queue)\n/queue leave (Leaves your current lobby queue)\n/queue batch (Shows random info)"
   },
   {
     category: "economy",
     command: "/ah auction/history/sell/profile/search/stash/top",
     usage: "Auction House commands",
-    example: "/ah (Just opens the basic Auction House)\n/ah auction 5 (Price) 1 (Amount)\n/ah history (Lets you see your Auction House history)\n/ah history Username (Lets you see Username's Auction House history)\n/ah sell 5 (Price) 1 (Amount)\n/ah profile (Lets you see your Auction House profile)\n/ah profile Username (Lets you see Username's Auction House profile)\n/ah search seller Username (Lets you see all Username's current auctions/sells)\n/ah search Pumba (Shows matching listings where Pumba is the first word)\n/ah stash (If no-one buys your item in the time frame and it goes off sale, they go here)\n/ah top (Shows you the top people of the Auction House leaderboard)"
+    example:
+      "/ah (Just opens the basic Auction House)\n/ah auction 5 (Price) 1 (Amount)\n/ah history (Lets you see your Auction House history)\n/ah history Username (Lets you see Username's Auction House history)\n/ah sell 5 (Price) 1 (Amount)\n/ah profile (Lets you see your Auction House profile)\n/ah profile Username (Lets you see Username's Auction House profile)\n/ah search seller Username (Lets you see all Username's current auctions/sells)\n/ah search Pumba (Shows matching listings where Pumba is the first word)\n/ah stash (If no-one buys your item in the time frame and it goes off sale, they go here)\n/ah top (Shows you the top people of the Auction House leaderboard)"
   },
   {
     category: "economy",
@@ -277,14 +275,16 @@ const commandEntries = [
   {
     category: "media",
     command: "/music play/stop/volume [URL]",
-    usage: "Music player command, currently appears broken or disabled. This may be better kept staff-only (Broken Right Now?)",
+    usage:
+      "Music player command, currently appears broken or disabled. This may be better kept staff-only (Broken Right Now?)",
     example: "/music play [URL] (Plays music)\n/music stop (Stops music)\n/music volume [0-100] (Changes music volume)"
   },
   {
     category: "media",
     command: "/voice enable/disable/mute/unmute",
     usage: "Voice chat controls",
-    example: "/voice enable (Lets you hear players)\n/voice disable (Doesnt let you hear players)\n/voice mute (Mutes your mic)\n/voice unmute (Unmutes your mic)"
+    example:
+      "/voice enable (Lets you hear players)\n/voice disable (Doesnt let you hear players)\n/voice mute (Mutes your mic)\n/voice unmute (Unmutes your mic)"
   },
   {
     category: "navigation",
@@ -337,37 +337,44 @@ const commandEntries = [
   {
     category: "useless",
     command: "/mesinfractions",
-    usage: "Appears to be a staff moderation command but can be run by players; remove from this list after Underworld release if still inactive",
+    usage:
+      "Appears to be a staff moderation command but can be run by players; remove from this list after Underworld release if still inactive",
     example: "/mesinfractions"
   },
   {
     category: "useless",
     command: "/sanctions",
-    usage: "Appears to be a staff moderation command but can be run by players; remove from this list after Underworld release if still inactive",
+    usage:
+      "Appears to be a staff moderation command but can be run by players; remove from this list after Underworld release if still inactive",
     example: "/sanctions"
   }
 ];
 
-const activeCommandEntries = window.SAODatasets?.getDatasetFromLocation() === "current"
-  ? (window.SAO_CURRENT_COMMAND_ENTRIES || [])
-  : commandEntries;
+const activeCommandEntries =
+  window.SAODatasets?.getDatasetFromLocation() === "current"
+    ? window.SAO_CURRENT_COMMAND_ENTRIES || []
+    : commandEntries;
 const excludedCategoryKeys = new Set(
   String(document.querySelector("[data-command-exclude-categories]")?.dataset.commandExcludeCategories || "")
     .split(",")
-    .map(category => category.trim())
+    .map((category) => category.trim())
     .filter(Boolean)
 );
-const visibleCategories = categories.filter(category => !excludedCategoryKeys.has(category.key));
-const visibleCommandEntries = activeCommandEntries.filter(entry => !excludedCategoryKeys.has(entry.category));
+const visibleCategories = categories.filter((category) => !excludedCategoryKeys.has(category.key));
+const visibleCommandEntries = activeCommandEntries.filter((entry) => !excludedCategoryKeys.has(entry.category));
 
 function getCommandId(entry) {
-  return entry.id || String(entry.command || "unknown")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "unknown";
+  return (
+    entry.id ||
+    String(entry.command || "unknown")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") ||
+    "unknown"
+  );
 }
 
-visibleCommandEntries.forEach(entry => {
+visibleCommandEntries.forEach((entry) => {
   window.SAOContentTranslations?.registerCommandEntry?.(entry, getCommandId(entry));
 });
 
@@ -377,13 +384,13 @@ function getCommandText(entry, field) {
 
 // Build lookup structures used by the runtime
 const commandsByCategory = new Map();
-visibleCommandEntries.forEach(entry => {
+visibleCommandEntries.forEach((entry) => {
   const list = commandsByCategory.get(entry.category) || [];
   list.push(entry);
   commandsByCategory.set(entry.category, list);
 });
 
-const commandSearchIndex = visibleCommandEntries.map(entry => {
+const commandSearchIndex = visibleCommandEntries.map((entry) => {
   const haystack = [
     entry.command,
     entry.usage,
@@ -391,7 +398,9 @@ const commandSearchIndex = visibleCommandEntries.map(entry => {
     getCommandText(entry, "usage"),
     getCommandText(entry, "example"),
     categoryLabelMap.get(entry.category) || ""
-  ].join(" ").toLowerCase();
+  ]
+    .join(" ")
+    .toLowerCase();
   return { entry, haystack };
 });
 
@@ -404,20 +413,7 @@ function saveCommandsUiState(nextState) {
   storage.setJSON(commandsUiStateStorageKey, nextState);
 }
 
-function getRequestedFloor() {
-  const requestedFloor = new URLSearchParams(window.location.search).get("floor");
-  return requestedFloor && /^floor[123]$/.test(requestedFloor) ? requestedFloor : DEFAULT_FLOOR;
-}
-
-function attachSectionNavButtons() {
-  const pageUtils = window.SAOPageUtils;
-  if (!pageUtils || typeof pageUtils.attachSectionNavButtons !== "function") {
-    console.warn("Commands navigation helper is unavailable.");
-    return;
-  }
-
-  pageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
-}
+const getRequestedFloor = () => window.SAOPageHelpers.getRequestedFloor(DEFAULT_FLOOR);
 
 function showCommandsLoadError() {
   const status = document.getElementById("status");
@@ -439,7 +435,7 @@ function createCategoryFilters(activeCategory) {
 
   wrap.replaceChildren();
 
-  visibleCategories.forEach(category => {
+  visibleCategories.forEach((category) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `list-tab${category.key === activeCategory ? " is-active" : ""}`;
@@ -457,7 +453,7 @@ function setActiveCategoryFilter(activeCategory) {
   const wrap = document.getElementById("categoryFilters");
   if (!wrap) return;
 
-  wrap.querySelectorAll("button[data-category]").forEach(button => {
+  wrap.querySelectorAll("button[data-category]").forEach((button) => {
     const isActive = button.dataset.category === activeCategory;
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-selected", isActive ? "true" : "false");
@@ -492,11 +488,7 @@ function renderCommandTable(entries) {
 
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
-  [
-    t("page.commands.colCommand"),
-    t("page.commands.colUsage"),
-    t("page.commands.colExample")
-  ].forEach(label => {
+  [t("page.commands.colCommand"), t("page.commands.colUsage"), t("page.commands.colExample")].forEach((label) => {
     const th = document.createElement("th");
     th.textContent = label;
     headerRow.appendChild(th);
@@ -505,7 +497,7 @@ function renderCommandTable(entries) {
 
   const tbody = document.createElement("tbody");
 
-  entries.forEach(entry => {
+  entries.forEach((entry) => {
     const row = document.createElement("tr");
 
     const commandCell = document.createElement("td");
@@ -533,14 +525,14 @@ function initCommandsRuntime() {
   let uiState = loadCommandsUiState();
 
   let activeCategory = params.get("category") || uiState.category || DEFAULT_CATEGORY;
-  if (!visibleCategories.some(category => category.key === activeCategory)) {
+  if (!visibleCategories.some((category) => category.key === activeCategory)) {
     activeCategory = DEFAULT_CATEGORY;
   }
 
   let searchValue = params.get("search") || uiState.search || "";
   let renderRafId = null;
 
-  attachSectionNavButtons();
+  window.SAOPageUtils?.attachSectionNavButtons?.(".nav", getRequestedFloor);
   createCategoryFilters(activeCategory);
 
   if (searchInput) {
@@ -586,7 +578,7 @@ function initCommandsRuntime() {
 
   const categoryFilters = document.getElementById("categoryFilters");
   if (categoryFilters) {
-    categoryFilters.addEventListener("click", event => {
+    categoryFilters.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-category]");
       if (!button) return;
 
@@ -599,7 +591,7 @@ function initCommandsRuntime() {
       applyFilters();
     });
 
-    categoryFilters.addEventListener("keydown", event => {
+    categoryFilters.addEventListener("keydown", (event) => {
       const button = event.target.closest("button[data-category]");
       if (!button) return;
 

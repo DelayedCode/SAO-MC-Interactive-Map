@@ -146,7 +146,8 @@ window.QUEST_ENTRIES_BY_FLOOR.floor3 = [
     npcName: "Shingetsou",
     city: "Triyag",
     coordinates: "628 / 1440",
-    requirements: "Find Shingetsou's mysterious wife in the Lands of Earan (531 / 1062) -> Go back to Shingestsou (628 / 1440) and Give 1 Savanna axe",
+    requirements:
+      "Find Shingetsou's mysterious wife in the Lands of Earan (531 / 1062) -> Go back to Shingestsou (628 / 1440) and Give 1 Savanna axe",
     questName: "A very strange lumberjack",
     xpReward: "N/A",
     colReward: "N/A",
@@ -156,7 +157,8 @@ window.QUEST_ENTRIES_BY_FLOOR.floor3 = [
     npcName: "Sanji",
     city: "Lysaat",
     coordinates: "427 / 774",
-    requirements: "Save Zoe in the Swamps of Triyag (751,67,1423) You won't be able to Save Rayan! -> Save Rayan in the Caverns of Misty Lousp (864,53,833) You won't be able to Save Zoe!",
+    requirements:
+      "Save Zoe in the Swamps of Triyag (751,67,1423) You won't be able to Save Rayan! -> Save Rayan in the Caverns of Misty Lousp (864,53,833) You won't be able to Save Zoe!",
     questName: "2 Paths, 1 Choice",
     xpReward: "N/A",
     colReward: "N/A",
@@ -166,7 +168,8 @@ window.QUEST_ENTRIES_BY_FLOOR.floor3 = [
     npcName: "Sylva",
     city: "Triyag",
     coordinates: "583 / 1428",
-    requirements: "10 Juvenial Bark, Ravaging Bark 5 -> Forge at Gromdar (358 / 591) 1 Orichalcum ingot -> Wait 20 Minutes -> Recover 1 Orichalcum ingot",
+    requirements:
+      "10 Juvenial Bark, Ravaging Bark 5 -> Forge at Gromdar (358 / 591) 1 Orichalcum ingot -> Wait 20 Minutes -> Recover 1 Orichalcum ingot",
     questName: "The Dance of the Sleeping Treants",
     xpReward: 1443,
     colReward: "N/A",
@@ -186,7 +189,8 @@ window.QUEST_ENTRIES_BY_FLOOR.floor3 = [
     npcName: "Zilda",
     city: "Ilmarin",
     coordinates: "1068 / 919",
-    requirements: "Access Ilmarin by accessing the Zumfut portal at night (1172,109,685) -> 10 Woodclaw, 5 Misty Tail -> Return to Zilda in the evening with the offerings (1068,192,919)",
+    requirements:
+      "Access Ilmarin by accessing the Zumfut portal at night (1172,109,685) -> 10 Woodclaw, 5 Misty Tail -> Return to Zilda in the evening with the offerings (1068,192,919)",
     questName: "The legend of Zilda",
     xpReward: 1443,
     colReward: "N/A",

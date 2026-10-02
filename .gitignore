@@ -2,6 +2,12 @@
 .venv/
 venv/
 
+# Node dependencies
+node_modules/
+
+# AI tool artifacts
+.devin/
+
 # Editor and OS artifacts
 .vscode/
 .idea/
@@ -17,6 +23,7 @@ build/
 *.log
 *.tmp
 *.bak
+tmp_*.js
 
 # Python cache
 __pycache__/

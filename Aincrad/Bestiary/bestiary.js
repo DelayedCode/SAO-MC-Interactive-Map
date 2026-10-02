@@ -1,11 +1,13 @@
 function getMobDataSources() {
   if (window.SAODatasets?.getDatasetFromLocation() === "current") {
-    return window.SAO_CURRENT_BESTIARY_DATA?.[getRequestedFloor()] || {
-      regular: "",
-      boss: "",
-      dungeonMobs: "",
-      dungeonBoss: ""
-    };
+    return (
+      window.SAO_CURRENT_BESTIARY_DATA?.[getRequestedFloor()] || {
+        regular: "",
+        boss: "",
+        dungeonMobs: "",
+        dungeonBoss: ""
+      }
+    );
   }
 
   return Object.freeze({
@@ -17,19 +19,11 @@ function getMobDataSources() {
 }
 
 const i18n = window.SAOI18n || null;
-const t = (key, params) => (i18n ? i18n.t(key, params) : key);
-const content = (key, fallback) => (i18n && typeof i18n.content === "function"
-  ? i18n.content(key, fallback)
-  : fallback);
+const { t, content } = window.SAOPageHelpers.createTranslators(i18n);
 const loadedBestiaryFloors = new Set();
 
 const bestiaryUiStateStorageKey = "sao.bestiary.uiState";
-const storage = window.SAOStorage || {
-  getItem() { return null; },
-  setItem() {},
-  getJSON(_key, fallbackValue) { return fallbackValue; },
-  setJSON() {}
-};
+const storage = window.SAOPageHelpers.getStorage();
 
 function loadBestiaryUiState() {
   const parsed = storage.getJSON(bestiaryUiStateStorageKey, {});
@@ -42,7 +36,7 @@ function saveBestiaryUiState(nextState) {
 
 function parseDropToken(token) {
   const cleaned = token.trim();
-  const groups = [...cleaned.matchAll(/\(([^)]+)\)/g)].map(match => match[1].trim());
+  const groups = [...cleaned.matchAll(/\(([^)]+)\)/g)].map((match) => match[1].trim());
   const notes = [];
   let chance = null;
 
@@ -51,7 +45,7 @@ function parseDropToken(token) {
     chance = Number(explicitChanceMatch[1]);
   }
 
-  groups.forEach(group => {
+  groups.forEach((group) => {
     const chanceMatch = group.match(/^(\d+(?:\.\d+)?)%$/);
     if (chanceMatch) {
       chance = Number(chanceMatch[1]);
@@ -74,20 +68,15 @@ function parseDropToken(token) {
   };
 }
 
-function slugifyContentId(value) {
-  return String(value || "n-a")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "n-a";
-}
+/* Bestiary ids fall back to "n-a" instead of the project-wide "unknown" token. */
+const slugifyContentId = (value) => window.SAOPageHelpers.slugifyContentId(value, "n-a");
 
 function buildMobList(rawData) {
   return String(rawData || "")
     .trim()
     .split("\n")
-    .map(line => line.split("\t"))
-    .filter(parts => parts.length >= 3)
+    .map((line) => line.split("\t"))
+    .filter((parts) => parts.length >= 3)
     .map(([name, dropsRaw, xpRaw]) => {
       const mob = {
         name: name.trim(),
@@ -98,14 +87,20 @@ function buildMobList(rawData) {
       const contentRegistry = window.SAOContentTranslations;
       if (contentRegistry?.register) {
         const mobKey = `bestiary.mob.${mob.id}`;
-        contentRegistry.register(mobKey, mob.name,
+        contentRegistry.register(
+          mobKey,
+          mob.name,
           contentRegistry.es[mobKey] || mob.name,
-          contentRegistry.fr[mobKey] || mob.name);
-        mob.drops.forEach(drop => {
+          contentRegistry.fr[mobKey] || mob.name
+        );
+        mob.drops.forEach((drop) => {
           const dropKey = `bestiary.item.${drop.id}`;
-          contentRegistry.register(dropKey, drop.item,
+          contentRegistry.register(
+            dropKey,
+            drop.item,
             contentRegistry.es[dropKey] || contentRegistry.translateKnownTerms?.(drop.item, "es") || drop.item,
-            contentRegistry.fr[dropKey] || contentRegistry.translateKnownTerms?.(drop.item, "fr") || drop.item);
+            contentRegistry.fr[dropKey] || contentRegistry.translateKnownTerms?.(drop.item, "fr") || drop.item
+          );
         });
       }
       return mob;
@@ -137,19 +132,30 @@ const LIST_TITLES = {
   dungeonMobs: "page.bestiary.listTitleDungeonMobs"
 };
 
+const STATUS_KEYS = {
+  boss: "page.bestiary.statusShownBoss",
+  regular: "page.bestiary.statusShownRegular",
+  dungeonBoss: "page.bestiary.statusShownDungeonBoss",
+  dungeonMobs: "page.bestiary.statusShownDungeonMobs"
+};
+
 function getListTitle(category) {
   return t(LIST_TITLES[category] || "page.bestiary.heading");
 }
 
+function getStatusKey(category) {
+  return STATUS_KEYS[category] || "page.bestiary.statusShown";
+}
+
 const AGGRESSIVENESS_BY_NAME = {
   "Corrupted Pumba": "Neutral",
-  "Albal": "Neutral",
+  Albal: "Neutral",
   "Colossal Guardian": "Aggressive",
-  "Gorbel": "Aggressive",
+  Gorbel: "Aggressive",
   "Ice Bear": "Aggressive",
-  "Nymbréa": "Aggressive",
+  Nymbréa: "Aggressive",
   "Illfang the Kobold Lord": "Aggressive",
-  "Kazor": "Aggressive",
+  Kazor: "Aggressive",
   "Sinister White Wolf": "Neutral",
   "Sinister Black Wolf": "Neutral",
   "Mini Treant": "Aggressive",
@@ -169,13 +175,13 @@ const AGGRESSIVENESS_BY_NAME = {
   "Bandit Archer": "Aggressive",
   "Bandit Assassin": "Aggressive",
   "Sturdy Bandit": "Aggressive",
-  "Nephentes": "Aggressive",
+  Nephentes: "Aggressive",
   "Shark Fish": "Aggressive",
   "Forest Spider": "Aggressive",
   "Ice Spiritist": "Aggressive",
   "Ice Golem": "Aggressive",
-  "Deer": "Aggressive",
-  "Ika": "Aggressive",
+  Deer: "Aggressive",
+  Ika: "Aggressive",
   "Small Kobold": "Aggressive",
   "The Mischievous Archer": "Aggressive",
   "Kobold Warrior": "Aggressive",
@@ -191,27 +197,27 @@ const AGGRESSIVENESS_BY_NAME = {
   "Hunting Spider": "Aggressive",
   "Venomous Spider": "Aggressive",
   "Strangler Spider": "Aggressive",
-  "Vyrmos": "Aggressive",
-  "Tornak": "Aggressive",
+  Vyrmos: "Aggressive",
+  Tornak: "Aggressive",
   "Narax the Cursed Skeleton": "Aggressive",
-  "Nasgul": "Aggressive",
+  Nasgul: "Aggressive",
   "Fallen Guardian": "Aggressive",
   "Fallen Herald": "Aggressive",
   "Fallen Reaper": "Aggressive",
   "Ornstein, Fallen Devastator": "Aggressive",
   "Smough, Fallen Devastator": "Aggressive",
-  "Pricilia": "Aggressive",
-  "Yula": "Aggressive",
-  "Jira": "Aggressive",
-  "Kamilia": "Aggressive",
+  Pricilia: "Aggressive",
+  Yula: "Aggressive",
+  Jira: "Aggressive",
+  Kamilia: "Aggressive",
   "Monstrous Bull": "Aggressive",
-  "Taurus": "Aggressive",
+  Taurus: "Aggressive",
   "Forest Bear": "Neutral",
   "Winnie, Man's Best Friend": "Neutral",
   "Mountain Wolf": "Neutral",
   "Savanes Wolf": "Neutral",
-  "Worker": "Aggressive",
-  "Dardroyal": "Aggressive",
+  Worker: "Aggressive",
+  Dardroyal: "Aggressive",
   "Melisara, Ruler of the Hive": "Aggressive",
   "Fire Harpy": "Aggressive",
   "Earthy Harpy": "Aggressive",
@@ -238,7 +244,7 @@ const AGGRESSIVENESS_BY_NAME = {
   "Rugiboeuf, The Guardian": "Aggressive",
   "Warrior Sand Skeleton": "Aggressive",
   "Skeleton of the Archer Sands": "Aggressive",
-  "Guardian": "Aggressive"
+  Guardian: "Aggressive"
 };
 
 function getAggressivenessClass(value) {
@@ -263,7 +269,7 @@ function createDropList(drops) {
     return bChance - aChance;
   });
 
-  sortedDrops.forEach(drop => {
+  sortedDrops.forEach((drop) => {
     const row = document.createElement("li");
     const itemText = document.createElement("span");
     const itemLabel = content(`bestiary.item.${drop.id}`, drop.item);
@@ -283,6 +289,7 @@ function createMobCard(mob) {
   const card = document.createElement("article");
   card.className = "mob-card";
   const aggressiveness = AGGRESSIVENESS_BY_NAME[mob.name] || "Aggressive";
+  const normalizedAggression = String(aggressiveness).toLowerCase();
 
   const title = document.createElement("h2");
   title.className = "mob-name";
@@ -294,7 +301,7 @@ function createMobCard(mob) {
   const aggressivenessLabel = document.createElement("span");
   aggressivenessLabel.textContent = t("page.bestiary.aggressiveness");
   const aggressivenessValue = document.createElement("strong");
-  aggressivenessValue.className = getAggressivenessClass(aggressiveness);
+  aggressivenessValue.className = `${getAggressivenessClass(aggressiveness)} mob-aggressive-${normalizedAggression}`;
   aggressivenessValue.textContent = getAggressivenessLabel(aggressiveness);
   aggressivenessRow.append(aggressivenessLabel, aggressivenessValue);
 
@@ -317,20 +324,7 @@ function createMobCard(mob) {
 
 const DEFAULT_BESTIARY_FLOOR = "floor1";
 
-function getRequestedFloor() {
-  const requestedFloor = new URLSearchParams(window.location.search).get("floor");
-  return requestedFloor && /^floor[123]$/.test(requestedFloor) ? requestedFloor : DEFAULT_BESTIARY_FLOOR;
-}
-
-function attachSectionNavButtons() {
-  const pageUtils = window.SAOPageUtils;
-  if (!pageUtils || typeof pageUtils.attachSectionNavButtons !== "function") {
-    console.warn("Bestiary navigation helper is unavailable.");
-    return;
-  }
-
-  pageUtils.attachSectionNavButtons(".nav", getRequestedFloor);
-}
+const getRequestedFloor = () => window.SAOPageHelpers.getRequestedFloor(DEFAULT_BESTIARY_FLOOR);
 
 function loadFloorMobData(floorKey, onReady, onError) {
   const runtimeUtils = window.SAORuntimeUtils;
@@ -363,7 +357,7 @@ function showBestiaryLoadError() {
 
 function initBestiaryRuntime() {
   refreshMobGroups();
-  attachSectionNavButtons();
+  window.SAOPageUtils?.attachSectionNavButtons?.(".nav", getRequestedFloor);
 
   const status = document.getElementById("status");
   const mobList = document.getElementById("mobList");
@@ -388,7 +382,7 @@ function initBestiaryRuntime() {
   }
 
   function applyLocalizedTabLabels() {
-    tabButtons.forEach(button => {
+    tabButtons.forEach((button) => {
       button.textContent = getListTitle(button.dataset.category);
       button.setAttribute("role", "tab");
       button.setAttribute("aria-controls", "mobList");
@@ -430,7 +424,7 @@ function initBestiaryRuntime() {
       }
     };
     saveBestiaryUiState(bestiaryUiState);
-    tabButtons.forEach(button => {
+    tabButtons.forEach((button) => {
       button.classList.toggle("is-active", button.dataset.category === category);
       const isActive = button.dataset.category === category;
       button.setAttribute("aria-selected", isActive ? "true" : "false");
@@ -444,13 +438,18 @@ function initBestiaryRuntime() {
     const activeMobs = MOB_GROUPS[activeCategory] || [];
     const query = mobSearch.value.trim().toLowerCase();
     const visibleMobs = query
-      ? activeMobs.filter(mob => {
+      ? activeMobs.filter((mob) => {
           const localizedName = content(`bestiary.mob.${mob.id}`, mob.name).toLowerCase();
-          return mob.name.toLowerCase().includes(query) || localizedName.includes(query);
+          const dropHaystack = (mob.drops || [])
+            .map((drop) => `${drop.item} ${drop.notesText}`.toLowerCase())
+            .join(" ");
+          return (
+            mob.name.toLowerCase().includes(query) || localizedName.includes(query) || dropHaystack.includes(query)
+          );
         })
       : activeMobs;
 
-    status.textContent = t("page.bestiary.statusShown", {
+    status.textContent = t(getStatusKey(activeCategory), {
       visible: visibleMobs.length,
       total: activeMobs.length
     });
@@ -460,8 +459,13 @@ function initBestiaryRuntime() {
       return;
     }
 
+    if (visibleMobs.length === 0) {
+      mobList.innerHTML = `<p class="empty-state">${t("page.bestiary.emptyCategory", { category: getListTitle(activeCategory) })}</p>`;
+      return;
+    }
+
     const fragment = document.createDocumentFragment();
-    visibleMobs.forEach(mob => {
+    visibleMobs.forEach((mob) => {
       fragment.appendChild(createMobCard(mob));
     });
 
@@ -479,9 +483,9 @@ function initBestiaryRuntime() {
     saveBestiaryUiState(bestiaryUiState);
     scheduleRenderMobs();
   });
-  tabButtons.forEach(button => {
+  tabButtons.forEach((button) => {
     button.addEventListener("click", () => setActiveTab(button.dataset.category));
-    button.addEventListener("keydown", event => {
+    button.addEventListener("keydown", (event) => {
       if (event.key === "ArrowRight") {
         event.preventDefault();
         focusTabByOffset(button, 1);

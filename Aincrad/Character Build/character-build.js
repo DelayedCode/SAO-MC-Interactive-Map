@@ -20,22 +20,42 @@
     "page.characterBuild.prototypeDataOnly": "Prototype data only"
   };
   const t = (key, params) => {
-    const template = i18n ? i18n.t(key, params) : (fallbackLabels[key] || key);
-    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_match, token) => params && Object.prototype.hasOwnProperty.call(params, token) ? String(params[token]) : `{${token}}`);
+    const template = i18n ? i18n.t(key, params) : fallbackLabels[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_match, token) =>
+      params && Object.prototype.hasOwnProperty.call(params, token) ? String(params[token]) : `{${token}}`
+    );
   };
-  const content = (key, fallback, params) => i18n && typeof i18n.content === "function" ? i18n.content(key, fallback, params) : fallback;
+  const content = (key, fallback, params) =>
+    i18n && typeof i18n.content === "function" ? i18n.content(key, fallback, params) : fallback;
   function dataKey(value) {
-    const key = String(value || "").replace(/[^a-zA-Z0-9]+(.)/g, (_match, character) => character.toUpperCase()).replace(/[^a-zA-Z0-9]/g, "");
+    const key = String(value || "")
+      .replace(/[^a-zA-Z0-9]+(.)/g, (_match, character) => character.toUpperCase())
+      .replace(/[^a-zA-Z0-9]/g, "");
     return key ? key.charAt(0).toLowerCase() + key.slice(1) : "";
   }
-  function localizeClass(classId, fallback) { return t(`page.characterBuild.classes.${classId}`, null) === `page.characterBuild.classes.${classId}` ? fallback : t(`page.characterBuild.classes.${classId}`); }
-  function localizeSlot(slot) { const key = `page.characterBuild.slotNames.${slot.id}`; return t(key, null) === key ? slot.name : t(key); }
-  function localizeStat(stat) { const key = `page.characterBuild.statNames.${dataKey(stat)}`; return t(key, null) === key ? stat : t(key); }
-  function localizeGroup(group) { const key = `page.characterBuild.groupNames.${dataKey(group)}`; return t(key, null) === key ? group : t(key); }
+  function localizeClass(classId, fallback) {
+    return t(`page.characterBuild.classes.${classId}`, null) === `page.characterBuild.classes.${classId}`
+      ? fallback
+      : t(`page.characterBuild.classes.${classId}`);
+  }
+  function localizeSlot(slot) {
+    const key = `page.characterBuild.slotNames.${slot.id}`;
+    return t(key, null) === key ? slot.name : t(key);
+  }
+  function localizeStat(stat) {
+    const key = `page.characterBuild.statNames.${dataKey(stat)}`;
+    return t(key, null) === key ? stat : t(key);
+  }
+  function localizeGroup(group) {
+    const key = `page.characterBuild.groupNames.${dataKey(group)}`;
+    return t(key, null) === key ? group : t(key);
+  }
   function localizeClassLabel(label) {
     const normalized = String(label || "").toLowerCase();
     const classId = normalized === "warrior" || normalized === "guerrier" ? "guerrier" : normalized;
-    return t(`page.characterBuild.classes.${classId}`, null) === `page.characterBuild.classes.${classId}` ? label : localizeClass(classId, label).split(" /")[0];
+    return t(`page.characterBuild.classes.${classId}`, null) === `page.characterBuild.classes.${classId}`
+      ? label
+      : localizeClass(classId, label).split(" /")[0];
   }
   function localizeRarity(rarity) {
     return window.SAOContentTranslations?.translateKnownTerms?.(rarity, i18n?.getLanguage?.()) || rarity;
@@ -44,24 +64,43 @@
     const match = String(effect || "").match(/^([^:]+):\s*(.*)$/);
     if (!match) return String(effect || "");
     const language = i18n?.getLanguage?.() || "en";
-    const translate = value => window.SAOContentTranslations?.translateKnownTerms?.(value, language) || value;
+    const translate = (value) => window.SAOContentTranslations?.translateKnownTerms?.(value, language) || value;
     const statLabel = localizeStat(match[1]);
     return `${statLabel === match[1] ? translate(match[1]) : statLabel}: ${translate(match[2])}`;
   }
   function registerCharacterBuildTranslations() {
-    Object.entries(data.prototypeSkillTrees || {}).forEach(([classId, nodes]) => nodes.forEach(node => {
-      window.SAOContentTranslations?.registerCharacterBuildNode?.(node, classId, node.branch);
-    }));
+    Object.entries(data.prototypeSkillTrees || {}).forEach(([classId, nodes]) =>
+      nodes.forEach((node) => {
+        window.SAOContentTranslations?.registerCharacterBuildNode?.(node, classId, node.branch);
+      })
+    );
   }
-  function localizeSkillName(node) { return content(`characterBuild.skill.${node.id}.name`, node.name); }
+  function localizeSkillName(node) {
+    return content(`characterBuild.skill.${node.id}.name`, node.name);
+  }
   function localizeSkillDescription(node) {
     const classLabel = localizeClass(state.classId, state.classId);
-    const branchLabel = node.branch === "branch-a" ? t("page.characterBuild.branchA") : node.branch === "branch-b" ? t("page.characterBuild.branchB") : t("page.characterBuild.branchCore");
-    return content(`characterBuild.skill.${node.id}.description`, `Prototype ${node.branch} node for ${state.classId}.`, { branch: branchLabel, classId: classLabel });
+    const branchLabel =
+      node.branch === "branch-a"
+        ? t("page.characterBuild.branchA")
+        : node.branch === "branch-b"
+          ? t("page.characterBuild.branchB")
+          : t("page.characterBuild.branchCore");
+    return content(
+      `characterBuild.skill.${node.id}.description`,
+      `Prototype ${node.branch} node for ${state.classId}.`,
+      { branch: branchLabel, classId: classLabel }
+    );
   }
   const storage = window.SAOStorage || { getJSON: (_key, fallback) => fallback, setJSON() {} };
+  /* The site-wide dataset default is "beta" (shared/sao-datasets.js getDataset falls back to it
+     for a missing or invalid dataset). The "current" equipment dataset ships as an empty stub,
+     so defaulting the builder to it left every slot picker with nothing to list on a first
+     visit. Defaulting to the same dataset the rest of the site uses keeps the picker usable;
+     the Source toggle still offers "current" for when that dataset is filled in. */
+  const DEFAULT_SOURCE = "beta";
   const state = {
-    source: "current",
+    source: DEFAULT_SOURCE,
     activeSlot: "1",
     level: 1,
     classId: data.classes[0].id,
@@ -73,22 +112,30 @@
     rarity: ""
   };
   const buildSlots = {
-    "1": { source: "current", level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} },
-    "2": { source: "current", level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} },
-    "3": { source: "current", level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} }
+    1: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} },
+    2: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} },
+    3: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} }
   };
   const buildStateKey = "sao.characterBuild.foundation";
 
-  function $(id) { return document.getElementById(id); }
+  function $(id) {
+    return document.getElementById(id);
+  }
   function mountIcons() {
-    document.querySelectorAll("[data-cb-icon]").forEach(element => {
+    document.querySelectorAll("[data-cb-icon]").forEach((element) => {
       element.innerHTML = window.CharacterBuildIcons.markup(element.dataset.cbIcon);
     });
   }
-  function escapeHtml(value) { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#39;"); }
-  function normalize(value) { return String(value || "").toLowerCase(); }
-  function activeBuild() { return buildSlots[state.activeSlot].equipment; }
-  function activeSkillState() { return buildSlots[state.activeSlot]; }
+  const { escapeHtml } = window.SAOPageHelpers;
+  function normalize(value) {
+    return String(value || "").toLowerCase();
+  }
+  function activeBuild() {
+    return buildSlots[state.activeSlot].equipment;
+  }
+  function activeSkillState() {
+    return buildSlots[state.activeSlot];
+  }
   function syncActiveConfiguration() {
     const active = activeSkillState();
     state.source = active.source;
@@ -104,18 +151,29 @@
   }
   function restoreBuildState(target, saved) {
     if (!saved || typeof saved !== "object") return;
-    target.source = saved.source === "beta" ? "beta" : "current";
+    target.source = saved.source === "current" ? "current" : DEFAULT_SOURCE;
     target.level = Math.min(25, Math.max(1, Number(saved.level) || 1));
-    target.classId = data.classes.some(item => item.id === saved.classId) ? saved.classId : target.classId;
+    target.classId = data.classes.some((item) => item.id === saved.classId) ? saved.classId : target.classId;
     target.equipment = saved.equipment && typeof saved.equipment === "object" ? saved.equipment : {};
     target.runes = saved.runes && typeof saved.runes === "object" ? saved.runes : {};
-    target.selectedSkills = saved.selectedSkills && typeof saved.selectedSkills === "object" ? saved.selectedSkills : {};
+    target.selectedSkills =
+      saved.selectedSkills && typeof saved.selectedSkills === "object" ? saved.selectedSkills : {};
   }
-  function slotById(slotId) { return data.slots.find(slot => slot.id === slotId); }
-  function currentSkillTree() { return data.prototypeSkillTrees[state.classId] || []; }
-  function selectedSkillNodes() { return currentSkillTree().filter(node => activeSkillState().selectedSkills[node.id]); }
-  function activeItems() { return adapter.getItems(state.source); }
-  function activeRunes() { return adapter.getRunes(state.source); }
+  function slotById(slotId) {
+    return data.slots.find((slot) => slot.id === slotId);
+  }
+  function currentSkillTree() {
+    return data.prototypeSkillTrees[state.classId] || [];
+  }
+  function selectedSkillNodes() {
+    return currentSkillTree().filter((node) => activeSkillState().selectedSkills[node.id]);
+  }
+  function activeItems() {
+    return adapter.getItems(state.source);
+  }
+  function activeRunes() {
+    return adapter.getRunes(state.source);
+  }
   const characterBuildScriptCache = new Set();
   function ensureEquipmentDataLoaded(source, onReady, onError) {
     const runtime = window.SAORuntimeUtils;
@@ -155,7 +213,7 @@
       }
     };
 
-    scripts.forEach(src => {
+    scripts.forEach((src) => {
       runtime.loadTaggedScriptOnce({
         cache: characterBuildScriptCache,
         cacheKey: src,
@@ -166,12 +224,25 @@
       });
     });
   }
-  function itemIsClassCompatible(item, classId = state.classId) { return adapter.isItemCompatibleWithClass(item, classId); }
-  function slotItems() { return adapter.getItemsForSlot(state.source, state.pickerSlot, state.classId); }
-  function iconForType(type) { return data.slots.find(slot => slot.type === type)?.icon || data.slots[0].icon; }
-  function displayText(item, field) { return adapter.getText(item, field) || ""; }
-  function rarityClass(rarity) { return rarity ? `rarity-${normalize(rarity).replace(/[^a-z0-9]+/g, "-")}` : ""; }
-  function className(classId) { const item = data.classes.find(candidate => candidate.id === classId); return item ? localizeClass(classId, item.name).split(" /")[0] : classId; }
+  function itemIsClassCompatible(item, classId = state.classId) {
+    return adapter.isItemCompatibleWithClass(item, classId);
+  }
+  function slotItems() {
+    return adapter.getItemsForSlot(state.source, state.pickerSlot, state.classId);
+  }
+  function iconForType(type) {
+    return data.slots.find((slot) => slot.type === type)?.icon || data.slots[0].icon;
+  }
+  function displayText(item, field) {
+    return adapter.getText(item, field) || "";
+  }
+  function rarityClass(rarity) {
+    return rarity ? `rarity-${normalize(rarity).replace(/[^a-z0-9]+/g, "-")}` : "";
+  }
+  function className(classId) {
+    const item = data.classes.find((candidate) => candidate.id === classId);
+    return item ? localizeClass(classId, item.name).split(" /")[0] : classId;
+  }
 
   function selectedRunesForSlot(slotId) {
     const runes = activeSkillState().runes || {};
@@ -180,7 +251,7 @@
 
   function canonicalRune(rune) {
     if (!rune) return null;
-    return activeRunes().find(candidate => candidate.runeKey === rune.runeKey || candidate.id === rune.id) || null;
+    return activeRunes().find((candidate) => candidate.runeKey === rune.runeKey || candidate.id === rune.id) || null;
   }
 
   function calculationEquipment() {
@@ -188,11 +259,13 @@
     Object.entries(activeBuild()).forEach(([slotId, item]) => {
       const capacity = adapter.getRuneSlots(item);
       if (!capacity) return;
-      selectedRunesForSlot(slotId).slice(0, capacity).forEach((selected, index) => {
-        const rune = canonicalRune(selected);
-        if (!rune) return;
-        equipment[`rune:${slotId}:${index}`] = Object.freeze({ ...rune, isBuildRune: true });
-      });
+      selectedRunesForSlot(slotId)
+        .slice(0, capacity)
+        .forEach((selected, index) => {
+          const rune = canonicalRune(selected);
+          if (!rune) return;
+          equipment[`rune:${slotId}:${index}`] = Object.freeze({ ...rune, isBuildRune: true });
+        });
     });
     return equipment;
   }
@@ -206,7 +279,7 @@
     const saved = storage.getJSON(buildStateKey, null);
     if (!saved || typeof saved !== "object") return;
     if (saved.builds && typeof saved.builds === "object") {
-      Object.keys(buildSlots).forEach(slotId => restoreBuildState(buildSlots[slotId], saved.builds[slotId]));
+      Object.keys(buildSlots).forEach((slotId) => restoreBuildState(buildSlots[slotId], saved.builds[slotId]));
       state.activeSlot = Object.prototype.hasOwnProperty.call(buildSlots, saved.activeSlot) ? saved.activeSlot : "1";
     } else {
       restoreBuildState(buildSlots["1"], saved);
@@ -223,29 +296,29 @@
   }
 
   function renderConfiguration() {
-    $("buildSlot").innerHTML = Object.keys(buildSlots).map(slotId => `<option value="${slotId}">${escapeHtml(t("page.characterBuild.buildNumber", { number: slotId }))}</option>`).join("");
+    $("buildSlot").innerHTML = Object.keys(buildSlots)
+      .map(
+        (slotId) =>
+          `<option value="${slotId}">${escapeHtml(t("page.characterBuild.buildNumber", { number: slotId }))}</option>`
+      )
+      .join("");
     $("buildSlot").value = state.activeSlot;
     $("characterLevel").value = state.level;
     $("levelValue").value = state.level;
     $("levelValue").textContent = state.level;
     const baseValue = document.querySelector(".base-value");
-    if (baseValue) baseValue.textContent = t("page.characterBuild.base", { level: 1 });
+    if (baseValue) baseValue.textContent = t("page.characterBuild.base", { level: state.level });
     const slotCount = document.querySelector(".section-count");
     if (slotCount) slotCount.textContent = t("page.characterBuild.slots", { count: 14 });
     $("characterLevel").style.setProperty("--level-progress", `${((state.level - 1) / 24) * 100}%`);
-    $("characterClass").innerHTML = data.classes.map(item => `<option value="${item.id}">${escapeHtml(localizeClass(item.id, item.name))}</option>`).join("");
+    $("characterClass").innerHTML = data.classes
+      .map((item) => `<option value="${item.id}">${escapeHtml(localizeClass(item.id, item.name))}</option>`)
+      .join("");
     $("characterClass").value = state.classId;
-    document.querySelectorAll("[data-source]").forEach(button => button.classList.toggle("is-active", button.dataset.source === state.source));
+    document
+      .querySelectorAll("[data-source]")
+      .forEach((button) => button.classList.toggle("is-active", button.dataset.source === state.source));
     $("skillClassLabel").textContent = `/ ${className(state.classId)}`;
-  }
-
-  function refreshBuildUi() {
-    setFilterOptions();
-    renderConfiguration();
-    renderSlots();
-    renderStats();
-    renderSkills();
-    if ($("equipmentDialog").open) renderItems();
   }
 
   function setLevelFromPointer(event) {
@@ -258,38 +331,50 @@
 
   function renderSlots() {
     const groups = [
-      { name: "armor", container: $("armorSlots"), matches: slot => slot.group === "armor" },
-      { name: "accessory", container: $("accessorySlots"), matches: slot => slot.group === "accessory" && !["main-weapon", "offhand"].includes(slot.id) },
-      { name: "weapon", container: $("weaponSlots"), matches: slot => ["main-weapon", "offhand"].includes(slot.id) }
+      { name: "armor", container: $("armorSlots"), matches: (slot) => slot.group === "armor" },
+      {
+        name: "accessory",
+        container: $("accessorySlots"),
+        matches: (slot) => slot.group === "accessory" && !["main-weapon", "offhand"].includes(slot.id)
+      },
+      { name: "weapon", container: $("weaponSlots"), matches: (slot) => ["main-weapon", "offhand"].includes(slot.id) }
     ];
-    groups.forEach(group => {
-      group.container.innerHTML = data.slots.filter(group.matches).map(slot => {
-        const item = activeBuild()[slot.id];
-        const available = item && adapter.isAvailable(item, state.source, slot.id, state.classId);
-        const itemLabel = item ? displayText(item, "name") || item.name : "";
-        const rarity = item?.rarity ? `<span class="slot-empty ${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>` : "";
-        const runeControls = group.name === "armor" && item && available
-          ? Array.from({ length: adapter.getRuneSlots(item) }, (_, index) => {
-            const rune = canonicalRune(selectedRunesForSlot(slot.id)[index]);
-            const slotLabel = localizeSlot(slot);
-            const label = rune ? displayText(rune, "name") || rune.name : t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 });
-            return `<button class="rune-button${rune ? " is-filled" : ""}" type="button" data-rune-slot="${index}" data-armor-slot="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 }))}"><span>R${index + 1}</span><strong>${escapeHtml(label)}</strong></button>`;
-          }).join("")
-          : "";
-        const slotLabel = localizeSlot(slot);
-        return `<div class="equipment-slot-wrap"><button class="slot-button${item ? " is-filled" : ""}${item && !available ? " is-unavailable" : ""}" type="button" data-slot-id="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectSlot", { slot: slotLabel }))}">
+    groups.forEach((group) => {
+      group.container.innerHTML = data.slots
+        .filter(group.matches)
+        .map((slot) => {
+          const item = activeBuild()[slot.id];
+          const available = item && adapter.isAvailable(item, state.source, slot.id, state.classId);
+          const itemLabel = item ? displayText(item, "name") || item.name : "";
+          const rarity = item?.rarity
+            ? `<span class="slot-empty ${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>`
+            : "";
+          const runeControls =
+            group.name === "armor" && item && available
+              ? Array.from({ length: adapter.getRuneSlots(item) }, (_, index) => {
+                  const rune = canonicalRune(selectedRunesForSlot(slot.id)[index]);
+                  const slotLabel = localizeSlot(slot);
+                  const label = rune
+                    ? displayText(rune, "name") || rune.name
+                    : t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 });
+                  return `<button class="rune-button${rune ? " is-filled" : ""}" type="button" data-rune-slot="${index}" data-armor-slot="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 }))}"><span>R${index + 1}</span><strong>${escapeHtml(label)}</strong></button>`;
+                }).join("")
+              : "";
+          const slotLabel = localizeSlot(slot);
+          return `<div class="equipment-slot-wrap"><button class="slot-button${item ? " is-filled" : ""}${item && !available ? " is-unavailable" : ""}" type="button" data-slot-id="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectSlot", { slot: slotLabel }))}"${item && !available ? ` aria-disabled="true" title="${escapeHtml(t("page.characterBuild.unavailable"))}"` : ""}>
           <span class="slot-icon" aria-hidden="true">${slot.icon}</span>
           <span class="slot-name">${escapeHtml(slotLabel)}</span>
           ${item ? `<span class="slot-item">${escapeHtml(itemLabel)}</span>${rarity}<span class="slot-empty">${available ? t("page.characterBuild.equipped") : t("page.characterBuild.unavailable")}</span>` : `<span class="slot-empty">${t("page.characterBuild.emptySlot")}</span>`}
         </button>${runeControls ? `<div class="rune-controls" aria-label="${escapeHtml(t("page.characterBuild.runeSlots", { slot: slotLabel }))}">${runeControls}</div>` : ""}</div>`;
-      }).join("");
+        })
+        .join("");
     });
   }
 
   function renderStats() {
     const statsGroups = $("statsGroups");
     const previousGroups = [...statsGroups.querySelectorAll(".stats-group")];
-    const openGroups = new Set(previousGroups.filter(group => group.open).map(group => group.dataset.statsGroup));
+    const openGroups = new Set(previousGroups.filter((group) => group.open).map((group) => group.dataset.statsGroup));
     const calculated = calculator.calculateBuildStats({
       equipment: calculationEquipment(),
       source: state.source,
@@ -299,66 +384,113 @@
       isAvailable: isCalculationItemAvailable
     });
     const hasPreviousState = previousGroups.length > 0;
-    statsGroups.innerHTML = Object.entries(calculator.groups).map(([group, entries], index) => {
-      const isOpen = hasPreviousState ? openGroups.has(String(index)) : false;
-      return `<details class="stats-group" data-stats-group="${index}"${isOpen ? " open" : ""}><summary>${escapeHtml(localizeGroup(group))}</summary><ul class="stat-list">${entries.map(stat => `<li><span>${escapeHtml(localizeStat(stat))}</span><strong>${calculator.formatValue(calculated[stat])}</strong></li>`).join("")}</ul></details>`;
-    }).join("");
+    const baseStats = calculator.createBaseStats ? calculator.createBaseStats() : null;
+    const equippedCount = Object.values(calculationEquipment()).filter(Boolean).length;
+    const summary = statsGroups && document.querySelector(".stats-panel .base-value");
+    if (summary) {
+      summary.textContent = [
+        `${t("page.characterBuild.level")} ${state.level}`,
+        localizeClass(state.classId, state.classId),
+        `${equippedCount} ${t("page.characterBuild.equipped")}`
+      ].join(" · ");
+    }
+    statsGroups.innerHTML = Object.entries(calculator.groups)
+      .map(([group, entries], index) => {
+        const isOpen = hasPreviousState ? openGroups.has(String(index)) : false;
+        return `<details class="stats-group" data-stats-group="${index}"${isOpen ? " open" : ""}><summary>${escapeHtml(localizeGroup(group))}</summary><ul class="stat-list">${entries
+          .map((stat) => {
+            const total = calculated[stat];
+            const base = baseStats ? baseStats[stat] : null;
+            const modified = Boolean(base && total && (total.flat !== base.flat || total.percent !== base.percent));
+            const baseTitle = modified
+              ? ` title="${escapeHtml(t("page.characterBuild.base", { level: calculator.formatValue(base) }))}"`
+              : "";
+            return `<li><span>${escapeHtml(localizeStat(stat))}</span><strong${baseTitle}>${calculator.formatValue(total)}${modified ? " *" : ""}</strong></li>`;
+          })
+          .join("")}</ul></details>`;
+      })
+      .join("");
   }
 
   function skillNodeState(node) {
-    const statusLabel = key => t(`page.characterBuild.${key}`);
-    if (activeSkillState().selectedSkills[node.id]) return { name: "selected", label: statusLabel("selected"), reason: t("page.characterBuild.alreadyUnlocked") };
-    const missing = node.prerequisites.filter(id => !activeSkillState().selectedSkills[id]);
+    const statusLabel = (key) => t(`page.characterBuild.${key}`);
+    if (activeSkillState().selectedSkills[node.id])
+      return { name: "selected", label: statusLabel("selected"), reason: t("page.characterBuild.alreadyUnlocked") };
+    const missing = node.prerequisites.filter((id) => !activeSkillState().selectedSkills[id]);
     if (missing.length) {
-      const requirementNames = missing.map(id => {
-        const prerequisite = currentSkillTree().find(item => item.id === id);
-        return prerequisite ? localizeSkillName(prerequisite) : id;
-      }).join(", ");
-      return { name: "locked", label: statusLabel("locked"), reason: t("page.characterBuild.requiresSkills", { value: requirementNames }) };
+      const requirementNames = missing
+        .map((id) => {
+          const prerequisite = currentSkillTree().find((item) => item.id === id);
+          return prerequisite ? localizeSkillName(prerequisite) : id;
+        })
+        .join(", ");
+      return {
+        name: "locked",
+        label: statusLabel("locked"),
+        reason: t("page.characterBuild.requiresSkills", { value: requirementNames })
+      };
     }
     return { name: "available", label: statusLabel("available"), reason: t("page.characterBuild.readyToUnlock") };
   }
 
-  function formatSkillEffects(node) { return node.effects.map(effect => `${localizeStat(effect.stat)}: ${effect.value}`).join(" / "); }
+  function formatSkillEffects(node) {
+    return node.effects.map((effect) => `${localizeStat(effect.stat)}: ${effect.value}`).join(" / ");
+  }
 
   function renderSkillDetail(nodeId) {
-    const node = currentSkillTree().find(item => item.id === nodeId) || currentSkillTree()[0];
+    const node = currentSkillTree().find((item) => item.id === nodeId) || currentSkillTree()[0];
     if (!node || !$("skillDetail")) return;
     const status = skillNodeState(node);
     const prerequisites = node.prerequisites.length
-      ? node.prerequisites.map(id => { const prerequisite = currentSkillTree().find(item => item.id === id); return prerequisite ? localizeSkillName(prerequisite) : id; }).join(", ")
+      ? node.prerequisites
+          .map((id) => {
+            const prerequisite = currentSkillTree().find((item) => item.id === id);
+            return prerequisite ? localizeSkillName(prerequisite) : id;
+          })
+          .join(", ")
       : t("page.characterBuild.none");
-    $("skillDetail").innerHTML = `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(localizeSkillDescription(node))}</span><span>${escapeHtml(t("page.characterBuild.requires", { value: prerequisites }))}</span><span>${escapeHtml(t("page.characterBuild.effect", { value: formatSkillEffects(node) }))}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
+    $("skillDetail").innerHTML =
+      `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(localizeSkillDescription(node))}</span><span>${escapeHtml(t("page.characterBuild.requires", { value: prerequisites }))}</span><span>${escapeHtml(t("page.characterBuild.effect", { value: formatSkillEffects(node) }))}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
   }
 
   function renderSkills() {
     const skills = currentSkillTree();
-    const nodesById = new Map(skills.map(node => [node.id, node]));
-    const connections = skills.flatMap(node => node.prerequisites.map(parentId => {
-      const parent = nodesById.get(parentId);
-      const active = activeSkillState().selectedSkills[node.id] || activeSkillState().selectedSkills[parentId];
-      return parent ? `<line class="skill-connection${active ? " is-active" : ""}" x1="${parent.x}" y1="${parent.y}" x2="${node.x}" y2="${node.y}"></line>` : "";
-    })).join("");
-    const nodes = skills.map(node => {
-      const status = skillNodeState(node);
-      const selected = status.name === "selected";
-      return `<button class="skill-node is-${status.name}" type="button" data-skill-id="${node.id}" style="--node-x:${node.x}%;--node-y:${node.y}%" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-icon" aria-hidden="true">${node.icon}</span><span class="skill-name">${escapeHtml(localizeSkillName(node))}</span><span class="skill-effect">${escapeHtml(formatSkillEffects(node))}</span></button>`;
-    }).join("");
-    $("skillTree").innerHTML = `<div class="skill-tree-toolbar"><span>${t("page.characterBuild.prototypeTree")}</span><span class="skill-tree-hint">${t("page.characterBuild.prototypeDataOnly")}</span></div><div class="skill-tree-viewport"><div class="skill-tree-canvas"><svg class="skill-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${connections}</svg>${nodes}</div></div><div id="skillDetail" class="skill-detail" aria-live="polite"></div>`;
+    const nodesById = new Map(skills.map((node) => [node.id, node]));
+    const connections = skills
+      .flatMap((node) =>
+        node.prerequisites.map((parentId) => {
+          const parent = nodesById.get(parentId);
+          const active = activeSkillState().selectedSkills[node.id] || activeSkillState().selectedSkills[parentId];
+          return parent
+            ? `<line class="skill-connection${active ? " is-active" : ""}" x1="${parent.x}" y1="${parent.y}" x2="${node.x}" y2="${node.y}"></line>`
+            : "";
+        })
+      )
+      .join("");
+    const nodes = skills
+      .map((node) => {
+        const status = skillNodeState(node);
+        const selected = status.name === "selected";
+        return `<button class="skill-node is-${status.name}" type="button" data-skill-id="${node.id}" style="--node-x:${node.x}%;--node-y:${node.y}%" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-icon" aria-hidden="true">${node.icon}</span><span class="skill-name">${escapeHtml(localizeSkillName(node))}</span><span class="skill-effect">${escapeHtml(formatSkillEffects(node))}</span></button>`;
+      })
+      .join("");
+    $("skillTree").innerHTML =
+      `<div class="skill-tree-toolbar"><span>${t("page.characterBuild.prototypeTree")}</span><span class="skill-tree-hint">${t("page.characterBuild.prototypeDataOnly")}</span></div><div class="skill-tree-viewport"><div class="skill-tree-canvas"><svg class="skill-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${connections}</svg>${nodes}</div></div><div id="skillDetail" class="skill-detail" aria-live="polite"></div>`;
     renderSkillDetail(skills[0]?.id);
   }
 
   function setFilterOptions() {
     const sourceItems = state.pickerMode === "rune" ? activeRunes() : activeItems();
-    const rarities = [...new Set(sourceItems.map(item => item.rarity).filter(Boolean))];
-    $("rarityFilter").innerHTML = `<option value="">${t("page.characterBuild.allRarities")}</option>${rarities.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+    const rarities = [...new Set(sourceItems.map((item) => item.rarity).filter(Boolean))];
+    $("rarityFilter").innerHTML =
+      `<option value="">${t("page.characterBuild.allRarities")}</option>${rarities.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
     $("rarityFilter").value = state.rarity;
   }
 
   function matchingItems() {
     const query = normalize(state.search);
     const sourceItems = state.pickerMode === "rune" ? activeRunes() : slotItems();
-    return sourceItems.filter(item => {
+    return sourceItems.filter((item) => {
       const textMatch = !query || item.searchText.includes(query);
       const rarityMatch = !state.rarity || item.rarity === state.rarity;
       const levelMatch = item.levelRequirement === null || item.levelRequirement <= state.level;
@@ -369,15 +501,24 @@
   function renderItems() {
     const items = matchingItems();
     const slot = state.pickerMode === "rune" ? slotById(state.pickerArmorSlot) : slotById(state.pickerSlot);
-    $("itemList").innerHTML = items.length ? items.map(item => {
-      const effects = item.effects.length ? `<p class="item-effect">${escapeHtml(item.effects.map(localizeItemEffect).join(" / "))}</p>` : "";
-      const level = item.levelRequirement === null ? "" : `<span>${escapeHtml(t("page.characterBuild.itemLevel", { level: item.levelRequirement }))}</span>`;
-      const classes = item.classLabel ? `<span>${escapeHtml(localizeClassLabel(item.classLabel))}</span>` : "";
-      const set = item.set
-        ? `<span>${escapeHtml(t("page.ecompendium.labels.set"))}: ${escapeHtml(window.SAOContentTranslations?.translateKnownTerms?.(item.set, i18n?.getLanguage?.()) || item.set)}</span>`
-        : "";
-      return `<article class="item-card"><div class="item-icon" aria-hidden="true">${item.type ? iconForType(item.type) : window.CharacterBuildIcons.markup("rune")}</div><div><h3>${escapeHtml(displayText(item, "name") || item.name)}</h3><div class="item-meta"><span>${state.pickerMode === "rune" ? t("page.characterBuild.rune") : escapeHtml(item.type)}</span>${item.rarity ? `<span class="${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>` : ""}${level}${classes}${set}</div>${effects}${item.description ? `<p class="item-description">${escapeHtml(displayText(item, "description") || item.description)}</p>` : ""}</div><button class="equip-button" type="button" data-${state.pickerMode === "rune" ? "rune" : "item"}-id="${item.id}">${t("page.characterBuild.select")}</button></article>`;
-    }).join("") : `<div class="empty-state">${escapeHtml(t("page.characterBuild.noMatchingItems", { slot: slot?.name || "rune", level: state.level }))}</div>`;
+    $("itemList").innerHTML = items.length
+      ? items
+          .map((item) => {
+            const effects = item.effects.length
+              ? `<p class="item-effect">${escapeHtml(item.effects.map(localizeItemEffect).join(" / "))}</p>`
+              : "";
+            const level =
+              item.levelRequirement === null
+                ? ""
+                : `<span>${escapeHtml(t("page.characterBuild.itemLevel", { level: item.levelRequirement }))}</span>`;
+            const classes = item.classLabel ? `<span>${escapeHtml(localizeClassLabel(item.classLabel))}</span>` : "";
+            const set = item.set
+              ? `<span>${escapeHtml(t("page.ecompendium.labels.set"))}: ${escapeHtml(window.SAOContentTranslations?.translateKnownTerms?.(item.set, i18n?.getLanguage?.()) || item.set)}</span>`
+              : "";
+            return `<article class="item-card"><div class="item-icon" aria-hidden="true">${item.type ? iconForType(item.type) : window.CharacterBuildIcons.markup("rune")}</div><div><h3>${escapeHtml(displayText(item, "name") || item.name)}</h3><div class="item-meta"><span>${state.pickerMode === "rune" ? t("page.characterBuild.rune") : escapeHtml(item.type)}</span>${item.rarity ? `<span class="${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>` : ""}${level}${classes}${set}</div>${effects}${item.description ? `<p class="item-description">${escapeHtml(displayText(item, "description") || item.description)}</p>` : ""}</div><button class="equip-button" type="button" data-${state.pickerMode === "rune" ? "rune" : "item"}-id="${item.id}">${t("page.characterBuild.select")}</button></article>`;
+          })
+          .join("")
+      : `<div class="empty-state">${escapeHtml(t("page.characterBuild.noMatchingItems", { slot: slot?.name || "rune", level: state.level }))}</div>`;
   }
 
   function openPicker(slotId) {
@@ -406,7 +547,10 @@
     state.pickerRuneIndex = runeIndex;
     state.search = "";
     state.rarity = "";
-    $("dialogTitle").textContent = t("page.characterBuild.selectRuneFor", { number: runeIndex + 1, slot: localizeSlot(slotById(armorSlotId)) });
+    $("dialogTitle").textContent = t("page.characterBuild.selectRuneFor", {
+      number: runeIndex + 1,
+      slot: localizeSlot(slotById(armorSlotId))
+    });
     $("itemSearch").value = "";
     $("pickerNotice").textContent = "";
     setFilterOptions();
@@ -416,7 +560,7 @@
   }
 
   function equipItem(itemId) {
-    const item = slotItems().find(entry => entry.id === itemId);
+    const item = slotItems().find((entry) => entry.id === itemId);
     if (!item || !state.pickerSlot || !itemIsClassCompatible(item, state.classId)) return;
     const weaponSlot = item.type === "Main Weapon" || item.type === "Offhand";
     const otherSlot = state.pickerSlot === "main-weapon" ? "offhand" : "main-weapon";
@@ -433,10 +577,13 @@
 
   function equipRune(runeId) {
     const armor = activeBuild()[state.pickerArmorSlot];
-    const rune = activeRunes().find(item => item.id === runeId);
-    if (!armor || !rune || state.pickerRuneIndex === null || state.pickerRuneIndex >= adapter.getRuneSlots(armor)) return;
+    const rune = activeRunes().find((item) => item.id === runeId);
+    if (!armor || !rune || state.pickerRuneIndex === null || state.pickerRuneIndex >= adapter.getRuneSlots(armor))
+      return;
     if (!activeSkillState().runes || typeof activeSkillState().runes !== "object") activeSkillState().runes = {};
-    const selected = Array.isArray(activeSkillState().runes[state.pickerArmorSlot]) ? [...activeSkillState().runes[state.pickerArmorSlot]] : [];
+    const selected = Array.isArray(activeSkillState().runes[state.pickerArmorSlot])
+      ? [...activeSkillState().runes[state.pickerArmorSlot]]
+      : [];
     selected[state.pickerRuneIndex] = rune;
     activeSkillState().runes[state.pickerArmorSlot] = selected;
     saveState();
@@ -447,20 +594,25 @@
 
   function removeIncompatibleEquipment() {
     const equipment = activeBuild();
-    Object.keys(equipment).forEach(slotId => {
+    Object.keys(equipment).forEach((slotId) => {
       if (!itemIsClassCompatible(equipment[slotId], state.classId)) delete equipment[slotId];
     });
   }
 
   function unlockSkill(skillId) {
-    const node = currentSkillTree().find(item => item.id === skillId);
+    const node = currentSkillTree().find((item) => item.id === skillId);
     if (!node) return;
     const status = skillNodeState(node);
     if (status.name === "selected") {
-      const hasSelectedDescendant = currentSkillTree().some(candidate => activeSkillState().selectedSkills[candidate.id] && candidate.prerequisites.includes(node.id));
+      const hasSelectedDescendant = currentSkillTree().some(
+        (candidate) => activeSkillState().selectedSkills[candidate.id] && candidate.prerequisites.includes(node.id)
+      );
       if (hasSelectedDescendant) {
         renderSkillDetail(skillId);
-        $("skillDetail").insertAdjacentHTML("beforeend", `<span>${escapeHtml(t("page.characterBuild.deselectDependent"))}</span>`);
+        $("skillDetail").insertAdjacentHTML(
+          "beforeend",
+          `<span>${escapeHtml(t("page.characterBuild.deselectDependent"))}</span>`
+        );
         return;
       }
       delete activeSkillState().selectedSkills[node.id];
@@ -490,7 +642,9 @@
   function ensureWalkthroughDialog() {
     const dialog = $("equipmentDialog");
     if (dialog?.open) return;
-    const firstSlot = document.querySelector("#armorSlots [data-slot-id], #accessorySlots [data-slot-id], #weaponSlots [data-slot-id]");
+    const firstSlot = document.querySelector(
+      "#armorSlots [data-slot-id], #accessorySlots [data-slot-id], #weaponSlots [data-slot-id]"
+    );
     firstSlot?.click();
     walkthroughOpenedDialog = Boolean(dialog?.open);
   }
@@ -501,17 +655,65 @@
 
   function buildWalkthroughSteps() {
     return [
-      { selector: "[data-walkthrough='character-build-title']", title: t("page.characterBuild.walkthrough.step1Title"), body: t("page.characterBuild.walkthrough.step1Body") },
-      { selector: "#characterLevel", title: t("page.characterBuild.walkthrough.step2Title"), body: t("page.characterBuild.walkthrough.step2Body") },
-      { selector: "#equipmentHeading", title: t("page.characterBuild.walkthrough.step3Title"), body: t("page.characterBuild.walkthrough.step3Body") },
-      { selector: "#armorSlots", title: t("page.characterBuild.walkthrough.step4Title"), body: t("page.characterBuild.walkthrough.step4Body") },
-      { selector: "#equipmentDialog .dialog-shell", title: t("page.characterBuild.walkthrough.step5Title"), body: t("page.characterBuild.walkthrough.step5Body"), onEnter: ensureWalkthroughDialog },
-      { selector: "#rarityFilter", title: t("page.characterBuild.walkthrough.step6Title"), body: t("page.characterBuild.walkthrough.step6Body"), onEnter: ensureWalkthroughDialog, onExit: closeWalkthroughDialog },
-      { selector: "#statsHeading", title: t("page.characterBuild.walkthrough.step7Title"), body: t("page.characterBuild.walkthrough.step7Body") },
-      { selector: "#skillsHeading", title: t("page.characterBuild.walkthrough.step8Title"), body: t("page.characterBuild.walkthrough.step8Body") },
-      { selector: "#buildSlot", title: t("page.characterBuild.walkthrough.step9Title"), body: t("page.characterBuild.walkthrough.step9Body") },
-      { selector: ".source-control", title: t("page.characterBuild.walkthrough.step10Title"), body: t("page.characterBuild.walkthrough.step10Body") },
-      { selector: ".page-header", title: t("page.characterBuild.walkthrough.step11Title"), body: t("page.characterBuild.walkthrough.step11Body") }
+      {
+        selector: "[data-walkthrough='character-build-title']",
+        title: t("page.characterBuild.walkthrough.step1Title"),
+        body: t("page.characterBuild.walkthrough.step1Body")
+      },
+      {
+        /* The whole level section: the level bar plus its label and the level numbers. */
+        selector: ".level-control",
+        title: t("page.characterBuild.walkthrough.step2Title"),
+        body: t("page.characterBuild.walkthrough.step2Body")
+      },
+      {
+        selector: "#equipmentHeading",
+        title: t("page.characterBuild.walkthrough.step3Title"),
+        body: t("page.characterBuild.walkthrough.step3Body")
+      },
+      {
+        selector: "#armorSlots",
+        title: t("page.characterBuild.walkthrough.step4Title"),
+        body: t("page.characterBuild.walkthrough.step4Body")
+      },
+      {
+        selector: "#equipmentDialog .dialog-shell",
+        title: t("page.characterBuild.walkthrough.step5Title"),
+        body: t("page.characterBuild.walkthrough.step5Body"),
+        onEnter: ensureWalkthroughDialog
+      },
+      {
+        selector: "#rarityFilter",
+        title: t("page.characterBuild.walkthrough.step6Title"),
+        body: t("page.characterBuild.walkthrough.step6Body"),
+        onEnter: ensureWalkthroughDialog,
+        onExit: closeWalkthroughDialog
+      },
+      {
+        selector: "#statsHeading",
+        title: t("page.characterBuild.walkthrough.step7Title"),
+        body: t("page.characterBuild.walkthrough.step7Body")
+      },
+      {
+        selector: "#skillsHeading",
+        title: t("page.characterBuild.walkthrough.step8Title"),
+        body: t("page.characterBuild.walkthrough.step8Body")
+      },
+      {
+        selector: "#buildSlot",
+        title: t("page.characterBuild.walkthrough.step9Title"),
+        body: t("page.characterBuild.walkthrough.step9Body")
+      },
+      {
+        selector: ".source-control",
+        title: t("page.characterBuild.walkthrough.step10Title"),
+        body: t("page.characterBuild.walkthrough.step10Body")
+      },
+      {
+        selector: ".page-header",
+        title: t("page.characterBuild.walkthrough.step11Title"),
+        body: t("page.characterBuild.walkthrough.step11Body")
+      }
     ];
   }
 
@@ -520,38 +722,78 @@
   }
 
   function bindEvents() {
-    document.querySelector(".nav").addEventListener("click", event => {
-      const button = event.target.closest("[data-nav-target]");
-      if (!button) return;
-      const path = { maps: "../Map/maps.html", equipment: "../eCompendium/ecompendium.html", menu: "../../index.html" }[button.dataset.navTarget];
-      if (path) window.location.href = path;
-    });
-    $("armorSlots").addEventListener("click", event => {
+    const pageUtils = window.SAOPageUtils;
+    if (pageUtils && typeof pageUtils.attachSectionNavButtons === "function") {
+      pageUtils.attachSectionNavButtons(".nav", null);
+    }
+    $("armorSlots").addEventListener("click", (event) => {
       const runeButton = event.target.closest("[data-rune-slot]");
       if (runeButton) return openRunePicker(runeButton.dataset.armorSlot, Number(runeButton.dataset.runeSlot));
       const button = event.target.closest("[data-slot-id]");
       if (button) openPicker(button.dataset.slotId);
     });
-    $("accessorySlots").addEventListener("click", event => { const button = event.target.closest("[data-slot-id]"); if (button) openPicker(button.dataset.slotId); });
-    $("weaponSlots").addEventListener("click", event => { const button = event.target.closest("[data-slot-id]"); if (button) openPicker(button.dataset.slotId); });
-    document.querySelectorAll("[data-source]").forEach(button => button.addEventListener("click", () => {
-      state.source = button.dataset.source;
-      activeSkillState().source = state.source;
-      renderConfiguration();
-      ensureEquipmentDataLoaded(state.source, () => {
-        setFilterOptions();
+    $("accessorySlots").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-slot-id]");
+      if (button) openPicker(button.dataset.slotId);
+    });
+    $("weaponSlots").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-slot-id]");
+      if (button) openPicker(button.dataset.slotId);
+    });
+    document.querySelectorAll("[data-source]").forEach((button) =>
+      button.addEventListener("click", () => {
+        state.source = button.dataset.source;
+        activeSkillState().source = state.source;
         renderConfiguration();
-        renderSlots();
-        renderStats();
-        if ($("equipmentDialog").open) renderItems();
+        ensureEquipmentDataLoaded(
+          state.source,
+          () => {
+            setFilterOptions();
+            renderConfiguration();
+            renderSlots();
+            renderStats();
+            if ($("equipmentDialog").open) renderItems();
+            saveState();
+          },
+          () => renderConfiguration()
+        );
         saveState();
-      }, () => renderConfiguration());
+      })
+    );
+    $("characterLevel").addEventListener("input", (event) => {
+      state.level = Number(event.target.value);
+      activeSkillState().level = state.level;
+      renderConfiguration();
+      renderStats();
+      if ($("equipmentDialog").open) renderItems();
       saveState();
-    }));
-    $("characterLevel").addEventListener("input", event => { state.level = Number(event.target.value); activeSkillState().level = state.level; renderConfiguration(); renderStats(); if ($("equipmentDialog").open) renderItems(); saveState(); });
-    $("characterLevel").addEventListener("pointerdown", event => { if (event.button === 0) setLevelFromPointer(event); });
-    $("characterClass").addEventListener("change", event => { state.classId = event.target.value; activeSkillState().classId = state.classId; activeSkillState().selectedSkills = {}; removeIncompatibleEquipment(); renderConfiguration(); renderSlots(); renderStats(); renderSkills(); if ($("equipmentDialog").open) renderItems(); saveState(); });
-    $("buildSlot").addEventListener("change", event => { if (!Object.prototype.hasOwnProperty.call(buildSlots, event.target.value)) return; state.activeSlot = event.target.value; syncActiveConfiguration(); setFilterOptions(); renderConfiguration(); renderSlots(); renderStats(); renderSkills(); saveState(); });
+    });
+    $("characterLevel").addEventListener("pointerdown", (event) => {
+      if (event.button === 0) setLevelFromPointer(event);
+    });
+    $("characterClass").addEventListener("change", (event) => {
+      state.classId = event.target.value;
+      activeSkillState().classId = state.classId;
+      activeSkillState().selectedSkills = {};
+      removeIncompatibleEquipment();
+      renderConfiguration();
+      renderSlots();
+      renderStats();
+      renderSkills();
+      if ($("equipmentDialog").open) renderItems();
+      saveState();
+    });
+    $("buildSlot").addEventListener("change", (event) => {
+      if (!Object.prototype.hasOwnProperty.call(buildSlots, event.target.value)) return;
+      state.activeSlot = event.target.value;
+      syncActiveConfiguration();
+      setFilterOptions();
+      renderConfiguration();
+      renderSlots();
+      renderStats();
+      renderSkills();
+      saveState();
+    });
     document.addEventListener("sao:languagechange", () => {
       renderConfiguration();
       renderSlots();
@@ -561,18 +803,35 @@
     });
     $("resetBuild").addEventListener("click", resetBuild);
     $("closeDialog").addEventListener("click", () => $("equipmentDialog").close());
-    $("equipmentDialog").addEventListener("click", event => { if (event.target === $("equipmentDialog")) $("equipmentDialog").close(); });
-    $("itemSearch").addEventListener("input", event => { state.search = event.target.value; renderItems(); });
-    $("rarityFilter").addEventListener("change", event => { state.rarity = event.target.value; renderItems(); });
-    $("itemList").addEventListener("click", event => {
+    $("equipmentDialog").addEventListener("click", (event) => {
+      if (event.target === $("equipmentDialog")) $("equipmentDialog").close();
+    });
+    $("itemSearch").addEventListener("input", (event) => {
+      state.search = event.target.value;
+      renderItems();
+    });
+    $("rarityFilter").addEventListener("change", (event) => {
+      state.rarity = event.target.value;
+      renderItems();
+    });
+    $("itemList").addEventListener("click", (event) => {
       const runeButton = event.target.closest("[data-rune-id]");
       if (runeButton) return equipRune(runeButton.dataset.runeId);
       const button = event.target.closest("[data-item-id]");
       if (button) equipItem(button.dataset.itemId);
     });
-    $("skillTree").addEventListener("click", event => { const button = event.target.closest("[data-skill-id]"); if (button) unlockSkill(button.dataset.skillId); });
-    $("skillTree").addEventListener("pointerover", event => { const button = event.target.closest("[data-skill-id]"); if (button) renderSkillDetail(button.dataset.skillId); });
-    $("skillTree").addEventListener("focusin", event => { const button = event.target.closest("[data-skill-id]"); if (button) renderSkillDetail(button.dataset.skillId); });
+    $("skillTree").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-skill-id]");
+      if (button) unlockSkill(button.dataset.skillId);
+    });
+    $("skillTree").addEventListener("pointerover", (event) => {
+      const button = event.target.closest("[data-skill-id]");
+      if (button) renderSkillDetail(button.dataset.skillId);
+    });
+    $("skillTree").addEventListener("focusin", (event) => {
+      const button = event.target.closest("[data-skill-id]");
+      if (button) renderSkillDetail(button.dataset.skillId);
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -599,13 +858,17 @@
     renderStats();
     renderSkills();
     bindEvents();
-    ensureEquipmentDataLoaded(state.source, () => {
-      setFilterOptions();
-      renderConfiguration();
-      renderSlots();
-      renderStats();
-      renderSkills();
-    }, () => renderConfiguration());
+    ensureEquipmentDataLoaded(
+      state.source,
+      () => {
+        setFilterOptions();
+        renderConfiguration();
+        renderSlots();
+        renderStats();
+        renderSkills();
+      },
+      () => renderConfiguration()
+    );
     if (walkthroughController) startGuidedWalkthrough();
   });
 })();

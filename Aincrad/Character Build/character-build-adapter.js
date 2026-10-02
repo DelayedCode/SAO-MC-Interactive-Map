@@ -28,7 +28,7 @@
     "Metal Pickaxe": "Main Weapon",
     "Magic Brush": null,
     "Twisted Sickle": "Main Weapon",
-    "Torch": null,
+    Torch: null,
     "Wooden Fishing Rod": null,
     "Necrotic Ax": "Main Weapon",
     "Necrotic Hoe": "Main Weapon",
@@ -41,22 +41,25 @@
     "Reinforced Pickaxe": "Main Weapon"
   });
 
-  const intentionalNoStatItems = Object.freeze(new Set([
-    "Boots of the Foam",
-    "Red Christmas Mittens",
-    "Occult Boots",
-    "Magic Brush",
-    "Torch",
-    "Wooden Fishing Rod"
-  ]));
-
+  const intentionalNoStatItems = Object.freeze(
+    new Set([
+      "Boots of the Foam",
+      "Red Christmas Mittens",
+      "Occult Boots",
+      "Magic Brush",
+      "Torch",
+      "Wooden Fishing Rod"
+    ])
+  );
 
   function slugify(value) {
-    return String(value || "unknown")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "unknown";
+    return (
+      String(value || "unknown")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "unknown"
+    );
   }
 
   function getSourceRecords(source) {
@@ -112,11 +115,13 @@
         if (!match) return null;
         const effects = String(value || "")
           .split(/,\s*/)
-          .map(effect => effect.trim())
+          .map((effect) => effect.trim())
           .filter(Boolean)
-          .map(effect => {
+          .map((effect) => {
             const effectMatch = effect.match(/^([+-]?\d+(?:\.\d+)?%?)(?:\/s)?\s+(.+)$/);
-            return effectMatch ? { value: effectMatch[1], stat: effectMatch[2].trim(), raw: effect } : { value: null, stat: null, raw: effect };
+            return effectMatch
+              ? { value: effectMatch[1], stat: effectMatch[2].trim(), raw: effect }
+              : { value: null, stat: null, raw: effect };
           });
         return { threshold: Number(match[1]), sourceKey: key, sourceValue: String(value), effects };
       })
@@ -127,7 +132,7 @@
     const keys = Object.keys(stats || {});
     if (!keys.length) return false;
     if (category === "tool") return true;
-    return keys.some(key => {
+    return keys.some((key) => {
       const classification = global.CharacterBuildCalculator?.classifyStatName?.(key);
       return classification === "calculated" || classification === "conditional";
     });
@@ -139,9 +144,9 @@
     const classNames = new Set();
     String(rawClass)
       .split(/[,/]|\s*\band\b\s*/i)
-      .map(value => value.trim())
+      .map((value) => value.trim())
       .filter(Boolean)
-      .forEach(value => {
+      .forEach((value) => {
         const normalized = value.toLowerCase();
         const mapped = classIds.get(normalized);
         if (mapped) classNames.add(mapped);
@@ -232,10 +237,7 @@
 
     global.SAOContentTranslations?.registerEquipmentEntry?.(entry, slugify, { fields: ["name", "description"] });
 
-    const searchText = [entry.name, category, entry.description, ...effects]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
+    const searchText = [entry.name, category, entry.description, ...effects].filter(Boolean).join(" ").toLowerCase();
 
     return Object.freeze({
       id,
@@ -246,12 +248,16 @@
       originalCategory: category,
       slot: slotType,
       set: entry.set || null,
-      setBonuses: Object.freeze(setBonuses.map(bonus => Object.freeze({
-        threshold: bonus.threshold,
-        sourceKey: bonus.sourceKey,
-        sourceValue: bonus.sourceValue,
-        effects: Object.freeze(bonus.effects.map(effect => Object.freeze(effect)))
-      }))),
+      setBonuses: Object.freeze(
+        setBonuses.map((bonus) =>
+          Object.freeze({
+            threshold: bonus.threshold,
+            sourceKey: bonus.sourceKey,
+            sourceValue: bonus.sourceValue,
+            effects: Object.freeze(bonus.effects.map((effect) => Object.freeze(effect)))
+          })
+        )
+      ),
       rarity: entry.rarity || null,
       levelRequirement: Number.isFinite(Number(entry.level)) ? Number(entry.level) : null,
       classes: normalizeClasses(stats),
@@ -281,16 +287,24 @@
     const storage = global.SAOStorage;
     if (!storage || typeof storage.getJSON !== "function") return null;
     const cached = storage.getJSON(betaCacheKey, null);
-    if (!cached || cached.version !== betaCacheVersion || cached.dataSignature !== betaDataSignature() || !Array.isArray(cached.items)) return null;
+    if (
+      !cached ||
+      cached.version !== betaCacheVersion ||
+      cached.dataSignature !== betaDataSignature() ||
+      !Array.isArray(cached.items)
+    )
+      return null;
     return cached;
   }
 
   function captureEquipmentTranslations() {
     const translations = global.SAOContentTranslations;
     if (!translations?.en || !translations.es || !translations.fr) return null;
-    return Object.fromEntries(Object.keys(translations.en)
-      .filter(key => key.startsWith("equipment."))
-      .map(key => [key, { en: translations.en[key], es: translations.es[key], fr: translations.fr[key] }]));
+    return Object.fromEntries(
+      Object.keys(translations.en)
+        .filter((key) => key.startsWith("equipment."))
+        .map((key) => [key, { en: translations.en[key], es: translations.es[key], fr: translations.fr[key] }])
+    );
   }
 
   function restoreEquipmentTranslations(snapshot) {
@@ -321,7 +335,7 @@
         const cached = getBetaCache();
         if (cached) {
           restoreEquipmentTranslations(cached.translations);
-          const cachedItems = Object.freeze(cached.items.map(item => Object.freeze(item)));
+          const cachedItems = Object.freeze(cached.items.map((item) => Object.freeze(item)));
           normalizedCache.set(normalizedSource, cachedItems);
           return cachedItems;
         }
@@ -341,7 +355,12 @@
     const unclassifiedItems = [];
     const artifactFallbackItems = [];
     const missingStatsByCategory = { armor: [], accessory: [], weapon: [], tool: [] };
-    const categoryCounts = Object.fromEntries(["armor", "accessory", "weapon", "tool"].map(category => [category, { total: 0, withStats: 0, withoutStats: 0 }]));
+    const categoryCounts = Object.fromEntries(
+      ["armor", "accessory", "weapon", "tool"].map((category) => [
+        category,
+        { total: 0, withStats: 0, withoutStats: 0 }
+      ])
+    );
     const setAudit = new Map();
     const statisticInventory = new Map();
     const uninterpretedStatistics = [];
@@ -379,14 +398,17 @@
                 originalCategory: category,
                 set: entry.set || null,
                 statsField: Object.prototype.hasOwnProperty.call(entry, "stats")
-                  ? Object.keys(stats).length ? "metadata-only" : "empty"
+                  ? Object.keys(stats).length
+                    ? "metadata-only"
+                    : "empty"
                   : "missing",
                 statistics: stats,
                 normalizedType: slotType
               });
             }
           }
-          const isArtifactFallback = category === "accessory" && slotType === "Artifact" && !hasExplicitAccessoryKeyword(entry.name);
+          const isArtifactFallback =
+            category === "accessory" && slotType === "Artifact" && !hasExplicitAccessoryKeyword(entry.name);
 
           const knownTool = category === "tool" && Object.prototype.hasOwnProperty.call(toolSlotMap, entry.name);
           if (slotType || knownTool) {
@@ -401,17 +423,19 @@
                 rawCategory: category,
                 classRestriction: normalizedClass,
                 statistics: stats,
-                reason: "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
+                reason:
+                  "Accessory name did not contain Bracelet, Glove, Ring, Amulet, or Necklace, so the Artifact fallback was used."
               });
             }
           } else {
-            const reason = category === "armor"
-              ? "Armor name did not match Helmet, Chestplate, Leggings, or Boots keywords."
-              : category === "accessory"
-                ? "Accessory name did not match Bracelet, Glove, Ring, Amulet, or Necklace keywords."
-                : category === "tool"
-                  ? "Tool is not present in the centralized Tool slot map."
-                : "Weapon name did not match a recognized shield or main-weapon classification rule.";
+            const reason =
+              category === "armor"
+                ? "Armor name did not match Helmet, Chestplate, Leggings, or Boots keywords."
+                : category === "accessory"
+                  ? "Accessory name did not match Bracelet, Glove, Ring, Amulet, or Necklace keywords."
+                  : category === "tool"
+                    ? "Tool is not present in the centralized Tool slot map."
+                    : "Weapon name did not match a recognized shield or main-weapon classification rule.";
             unclassifiedItems.push({
               itemName: entry.name,
               floor,
@@ -424,7 +448,7 @@
           }
 
           if (normalizedClass.length) {
-            normalizedClass.forEach(classId => {
+            normalizedClass.forEach((classId) => {
               classCounts[classId] = (classCounts[classId] || 0) + 1;
             });
           } else {
@@ -447,10 +471,13 @@
             const summary = setAudit.get(entry.set) || { pieceCount: 0, items: new Set(), thresholds: new Map() };
             summary.pieceCount += 1;
             summary.items.add(entry.name);
-            setBonuses.forEach(bonus => {
-              const threshold = summary.thresholds.get(bonus.threshold) || { sourceValues: new Set(), effects: new Map() };
+            setBonuses.forEach((bonus) => {
+              const threshold = summary.thresholds.get(bonus.threshold) || {
+                sourceValues: new Set(),
+                effects: new Map()
+              };
               threshold.sourceValues.add(bonus.sourceValue);
-              bonus.effects.forEach(effect => {
+              bonus.effects.forEach((effect) => {
                 if (!effect.stat) return;
                 const effectValues = threshold.effects.get(effect.stat) || new Set();
                 effectValues.add(effect.value);
@@ -464,19 +491,29 @@
       });
     });
 
-    const statisticsByClassification = Object.freeze(Object.fromEntries(["calculated", "metadata", "conditional", "unsupported", "unverified"].map(classification => [
-      classification,
-      Object.freeze([...statisticInventory].filter(([, value]) => value.classification === classification).map(([key]) => key))
-    ])));
+    const statisticsByClassification = Object.freeze(
+      Object.fromEntries(
+        ["calculated", "metadata", "conditional", "unsupported", "unverified"].map((classification) => [
+          classification,
+          Object.freeze(
+            [...statisticInventory].filter(([, value]) => value.classification === classification).map(([key]) => key)
+          )
+        ])
+      )
+    );
     const setBonusAuditEntries = {};
     setAudit.forEach((summary, setName) => {
       const thresholds = {};
-      [...summary.thresholds].sort(([left], [right]) => left - right).forEach(([threshold, value]) => {
-        thresholds[threshold] = Object.freeze({
-          sourceValues: Object.freeze([...value.sourceValues]),
-          effects: Object.freeze(Object.fromEntries([...value.effects].map(([stat, values]) => [stat, Object.freeze([...values])])))
+      [...summary.thresholds]
+        .sort(([left], [right]) => left - right)
+        .forEach(([threshold, value]) => {
+          thresholds[threshold] = Object.freeze({
+            sourceValues: Object.freeze([...value.sourceValues]),
+            effects: Object.freeze(
+              Object.fromEntries([...value.effects].map(([stat, values]) => [stat, Object.freeze([...values])]))
+            )
+          });
         });
-      });
       setBonusAuditEntries[setName] = Object.freeze({
         pieceCount: summary.pieceCount,
         items: Object.freeze([...summary.items]),
@@ -492,17 +529,57 @@
       countsBySlot: Object.freeze(slotCounts),
       countsByFloor: Object.freeze(floorCounts),
       countsByClassRestriction: Object.freeze(classCounts),
-      countsByCategory: Object.freeze(Object.fromEntries(Object.entries(categoryCounts).map(([category, counts]) => [category, Object.freeze({ ...counts })]))),
-      missingStatsByCategory: Object.freeze(Object.fromEntries(Object.entries(missingStatsByCategory).map(([category, items]) => [category, Object.freeze(items.map(item => Object.freeze(item)))]))),
+      countsByCategory: Object.freeze(
+        Object.fromEntries(
+          Object.entries(categoryCounts).map(([category, counts]) => [category, Object.freeze({ ...counts })])
+        )
+      ),
+      missingStatsByCategory: Object.freeze(
+        Object.fromEntries(
+          Object.entries(missingStatsByCategory).map(([category, items]) => [
+            category,
+            Object.freeze(items.map((item) => Object.freeze(item)))
+          ])
+        )
+      ),
       toolSlotMap,
       unclassifiedItems: Object.freeze(unclassifiedItems),
       artifactFallbackItems: Object.freeze(artifactFallbackItems),
-      statisticInventory: Object.freeze(Object.fromEntries([...statisticInventory].map(([key, value]) => [key, Object.freeze({ count: value.count, values: Object.freeze([...value.values]), classification: value.classification, normalizedName: value.normalizedName })]))),
+      statisticInventory: Object.freeze(
+        Object.fromEntries(
+          [...statisticInventory].map(([key, value]) => [
+            key,
+            Object.freeze({
+              count: value.count,
+              values: Object.freeze([...value.values]),
+              classification: value.classification,
+              normalizedName: value.normalizedName
+            })
+          ])
+        )
+      ),
       statisticsByClassification,
-      calculatedStatistics: Object.freeze([...new Set([...statisticInventory].filter(([, value]) => value.classification === "calculated").map(([, value]) => value.normalizedName).filter(Boolean))]),
-      displayedStatistics: Object.freeze([...new Set([...statisticInventory].filter(([, value]) => value.classification === "calculated").map(([, value]) => value.normalizedName).filter(Boolean))]),
+      calculatedStatistics: Object.freeze([
+        ...new Set(
+          [...statisticInventory]
+            .filter(([, value]) => value.classification === "calculated")
+            .map(([, value]) => value.normalizedName)
+            .filter(Boolean)
+        )
+      ]),
+      displayedStatistics: Object.freeze([
+        ...new Set(
+          [...statisticInventory]
+            .filter(([, value]) => value.classification === "calculated")
+            .map(([, value]) => value.normalizedName)
+            .filter(Boolean)
+        )
+      ]),
       calculatedSetBonusStatistics: statisticsByClassification.conditional,
-      preservedButUnsupportedStatistics: Object.freeze([...statisticsByClassification.metadata, ...statisticsByClassification.unsupported]),
+      preservedButUnsupportedStatistics: Object.freeze([
+        ...statisticsByClassification.metadata,
+        ...statisticsByClassification.unsupported
+      ]),
       setBonusAudit,
       uninterpretedStatistics: Object.freeze(uninterpretedStatistics)
     });
@@ -534,12 +611,12 @@
     };
     const type = slotTypes[slotId];
     return getItems(source)
-      .filter(item => item.slot === type)
-      .filter(item => classId == null || isItemCompatibleWithClass(item, classId));
+      .filter((item) => item.slot === type)
+      .filter((item) => classId == null || isItemCompatibleWithClass(item, classId));
   }
 
   function isAvailable(item, source, slotId, classId = null) {
-    return getItemsForSlot(source, slotId, classId).some(candidate => candidate.equipmentKey === item?.equipmentKey);
+    return getItemsForSlot(source, slotId, classId).some((candidate) => candidate.equipmentKey === item?.equipmentKey);
   }
 
   function getText(item, field) {
@@ -560,6 +637,8 @@
     getText,
     toolSlotMap,
     getAuditReport: buildAuditReport,
-    get cacheSize() { return normalizedCache.size; }
+    get cacheSize() {
+      return normalizedCache.size;
+    }
   });
 })(window);

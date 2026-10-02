@@ -8,9 +8,15 @@ const root = path.resolve(__dirname, "..");
 function classList() {
   const values = new Set();
   return {
-    add(...names) { names.forEach(name => values.add(name)); },
-    remove(...names) { names.forEach(name => values.delete(name)); },
-    contains(name) { return values.has(name); }
+    add(...names) {
+      names.forEach((name) => values.add(name));
+    },
+    remove(...names) {
+      names.forEach((name) => values.delete(name));
+    },
+    contains(name) {
+      return values.has(name);
+    }
   };
 }
 
@@ -22,7 +28,9 @@ function eventTarget() {
       if (!listeners.has(type)) listeners.set(type, new Set());
       listeners.get(type).add(listener);
     },
-    removeEventListener(type, listener) { listeners.get(type)?.delete(listener); },
+    removeEventListener(type, listener) {
+      listeners.get(type)?.delete(listener);
+    },
     dispatch(type, event = {}) {
       for (const listener of listeners.get(type) || []) listener({ type, target: this, ...event });
     }
@@ -48,29 +56,45 @@ function node(tagName) {
     classList: classList(),
     style: {
       values: new Map(),
-      setProperty(name, value) { this.values.set(name, value); },
-      removeProperty(name) { this.values.delete(name); }
+      setProperty(name, value) {
+        this.values.set(name, value);
+      },
+      removeProperty(name) {
+        this.values.delete(name);
+      }
     },
     textContent: "",
     disabled: false,
-    appendChild(child) { children.push(child); child.parentNode = this; return child; },
-    append(...items) { items.forEach(item => this.appendChild(item)); },
+    appendChild(child) {
+      children.push(child);
+      child.parentNode = this;
+      return child;
+    },
+    append(...items) {
+      items.forEach((item) => this.appendChild(item));
+    },
     remove() {
       if (!this.parentNode) return;
       const index = this.parentNode.children.indexOf(this);
       if (index >= 0) this.parentNode.children.splice(index, 1);
       this.parentNode = null;
     },
-    setAttribute(name, value) { this[name] = String(value); },
-    getBoundingClientRect() { return { left: 10, top: 20, width: 100, height: 40 }; },
-    scrollIntoView(options) { this.scrollOptions = options; },
+    setAttribute(name, value) {
+      this[name] = String(value);
+    },
+    getBoundingClientRect() {
+      return { left: 10, top: 20, width: 100, height: 40 };
+    },
+    scrollIntoView(options) {
+      this.scrollOptions = options;
+    },
     querySelector(selector) {
       if (!selector.startsWith(".")) return null;
-      return findDescendant(children, child => child.className === selector.slice(1));
+      return findDescendant(children, (child) => child.className === selector.slice(1));
     },
     querySelectorAll(selector) {
       if (selector === ".sao-tour-actions button") {
-        const actions = findDescendant(children, child => child.className === "sao-tour-actions");
+        const actions = findDescendant(children, (child) => child.className === "sao-tour-actions");
         return actions ? actions.children : [];
       }
       return [];
@@ -85,16 +109,22 @@ function createDocument() {
     ...eventTarget(),
     body: node("body"),
     head: node("head"),
-    createElement(tagName) { return node(tagName); },
+    createElement(tagName) {
+      return node(tagName);
+    },
     getElementById(id) {
       const value = nodes.get(id);
       return value && value.parentNode ? value : null;
     },
-    querySelector(selector) { return nodes.get(selector) || null; },
-    register(selector, value) { nodes.set(selector, value); }
+    querySelector(selector) {
+      return nodes.get(selector) || null;
+    },
+    register(selector, value) {
+      nodes.set(selector, value);
+    }
   };
   const originalAppend = documentObject.body.appendChild.bind(documentObject.body);
-  documentObject.body.appendChild = child => {
+  documentObject.body.appendChild = (child) => {
     if (child.id) nodes.set(child.id, child);
     originalAppend(child);
     return child;
@@ -107,27 +137,61 @@ const target = node("button");
 documentObject.register("#target", target);
 const windowObject = {
   document: documentObject,
-  getComputedStyle() { return { borderRadius: "4px" }; },
-  matchMedia() { return { matches: false }; }
+  getComputedStyle() {
+    return { borderRadius: "4px" };
+  },
+  matchMedia() {
+    return { matches: false };
+  }
 };
 const storage = {
   values: new Map(),
-  getItem(key) { return this.values.get(key) || null; },
-  setItem(key, value) { this.values.set(key, String(value)); }
+  getItem(key) {
+    return this.values.get(key) || null;
+  },
+  setItem(key, value) {
+    this.values.set(key, String(value));
+  }
 };
-const context = vm.createContext({ console, window: windowObject, globalThis: windowObject, document: documentObject, Map, Set, Object, Array, String, Boolean, Number, Math });
-vm.runInContext(fs.readFileSync(path.join(root, "shared", "sao-walkthrough.js"), "utf8"), context, { filename: "shared/sao-walkthrough.js" });
+const context = vm.createContext({
+  console,
+  window: windowObject,
+  globalThis: windowObject,
+  document: documentObject,
+  Map,
+  Set,
+  Object,
+  Array,
+  String,
+  Boolean,
+  Number,
+  Math
+});
+vm.runInContext(fs.readFileSync(path.join(root, "shared", "sao-walkthrough.js"), "utf8"), context, {
+  filename: "shared/sao-walkthrough.js"
+});
 
-const translated = (key, params) => ({
-  "ui.walkthrough.step": "Step {current} of {total}",
-  "ui.walkthrough.skip": "Skip",
-  "ui.walkthrough.back": "Back",
-  "ui.walkthrough.next": "Next",
-  "ui.walkthrough.finish": "Finish"
-}[key] || key).replace("{current}", String(params?.current ?? "")).replace("{total}", String(params?.total ?? ""));
+const translated = (key, params) =>
+  (
+    ({
+      "ui.walkthrough.step": "Step {current} of {total}",
+      "ui.walkthrough.skip": "Skip",
+      "ui.walkthrough.back": "Back",
+      "ui.walkthrough.next": "Next",
+      "ui.walkthrough.finish": "Finish"
+    })[key] || key
+  )
+    .replace("{current}", String(params?.current ?? ""))
+    .replace("{total}", String(params?.total ?? ""));
 const i18nSource = fs.readFileSync(path.join(root, "shared", "sao-i18n.js"), "utf8");
-assert.match(i18nSource, /(?:["']discordBody["']|\bdiscordBody)\s*:\s*"Open quick links to the SAO MC Support Website, SAO MC Discord, and my Discord Profile\."/);
-assert.match(i18nSource, /(?:["']step1Body["']|\bstep1Body)\s*:\s*"Use the top row to open Tower Defense, open the Compendium, or return to the Menu\."/);
+assert.match(
+  i18nSource,
+  /(?:["']discordBody["']|\bdiscordBody)\s*:\s*"Open quick links to the SAO MC Support Website, SAO MC Discord, and my Discord Profile\."/
+);
+assert.match(
+  i18nSource,
+  /(?:["']step1Body["']|\bstep1Body)\s*:\s*"Use the top row to open Tower Defense, open the Compendium, or return to the Menu\."/
+);
 const steps = [
   { selector: "#target", title: "First", body: "First body" },
   { selector: "#target", title: "Second", body: "Second body" }
@@ -184,7 +248,7 @@ const customTargetController = context.window.createWalkthroughController({
   storage,
   storageKey: "walkthrough.custom-target.completed",
   getSteps: () => [{ selector: "custom-target", title: "Custom", body: "Custom body" }],
-  getTarget: selector => {
+  getTarget: (selector) => {
     requestedSelector = selector;
     return target;
   },

@@ -1,176 +1,501 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
-  <title data-i18n="page.maps.title">Aincrad Interactive Map | SAO MC</title>
-  <meta name="description" content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references.">
-  <meta name="keywords" content="Aincrad map, SAO MC map, dungeon waypoints, biome locations, SAO Minecraft">
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <meta name="author" content="DelayedCode">
-  <meta name="theme-color" content="#0b121a">
-  <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html">
-  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
-  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
-  <link rel="manifest" href="../../site.webmanifest">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="SAO MC Interactive Map">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:title" content="Aincrad Interactive Map | SAO MC">
-  <meta property="og:description" content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references.">
-  <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html">
-  <meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
-  <meta property="og:image:alt" content="Preview of the SAO MC interactive map website">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Aincrad Interactive Map | SAO MC">
-  <meta name="twitter:description" content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references.">
-  <meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Aincrad Interactive Map",
-      "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html",
-      "description": "Interactive Aincrad floor map with filterable waypoints and location details.",
-      "isPartOf": {
-        "@type": "WebSite",
-        "name": "SAO MC Interactive Map",
-        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
-      },
-      "inLanguage": "en"
-    }
-  </script>
-  <link rel="stylesheet" href="maps.css">
-  <link rel="stylesheet" href="../../shared/sao-dropdown.css">
-</head>
-<body>
-  <header>
-    <nav class="top-nav" data-i18n-aria-label="ui.nav.primaryAria" aria-label="Primary">
-      <button class="top-button" type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
-      <button class="top-button" type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
-      <button class="top-button" type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
-      <button class="top-button" type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
-      <button class="top-button" type="button" data-nav-target="miscinfo" data-i18n="ui.nav.miscinfo">Misc. Info</button>
-      <button class="top-button" type="button" data-nav-target="menu"><span class="nav-icon" aria-hidden="true"><svg class="nav-icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6H2M2 6l4-4M2 6l4 4"/></svg></span><span data-i18n="ui.nav.menu">Go back to Menu</span></button>
-    </nav>
-    <div class="header-main">
-      <h1 data-i18n="page.maps.title">SAO Interactive Map</h1>
-      <div class="controls">
-        <label for="floorSelect" data-i18n="page.maps.floorLabel">Floor:</label>
-        <div class="sao-select-wrap" id="floorSelectWrap">
-          <select id="floorSelect">
-            <option value="floor1" data-i18n="page.maps.floorOptions.floor1">Floor 1 - The Town of Beginnings</option>
-            <option value="floor2" data-i18n="page.maps.floorOptions.floor2">Floor 2 - Arid Desert</option>
-            <option value="floor3" data-i18n="page.maps.floorOptions.floor3">Floor 3 - The Forest of Wandering</option>
-          </select>
-          <span class="sao-select-arrow" aria-hidden="true"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path class="arrow-closed" d="M2 6.5 5 3.5l3 3"/><path class="arrow-open" d="M2 3.5 5 6.5l3-3"/></svg></span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+    />
+    <title data-i18n="page.maps.title">Aincrad Interactive Map | SAO MC</title>
+    <meta
+      name="description"
+      content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references."
+    />
+    <meta name="keywords" content="Aincrad map, SAO MC map, dungeon waypoints, biome locations, SAO Minecraft" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="author" content="DelayedCode" />
+    <meta name="theme-color" content="#0b121a" />
+    <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+    <link rel="manifest" href="../../site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SAO MC Interactive Map" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Aincrad Interactive Map | SAO MC" />
+    <meta
+      property="og:description"
+      content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references."
+    />
+    <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html" />
+    <meta
+      property="og:image"
+      content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png"
+    />
+    <meta property="og:image:alt" content="Preview of the SAO MC interactive map website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Aincrad Interactive Map | SAO MC" />
+    <meta
+      name="twitter:description"
+      content="Explore the SAO MC Aincrad interactive map with floor selectors, marker filters, waypoint details, and in-world navigation references."
+    />
+    <meta
+      name="twitter:image"
+      content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Aincrad Interactive Map",
+        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html",
+        "description": "Interactive Aincrad floor map with filterable waypoints and location details.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "SAO MC Interactive Map",
+          "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
+        },
+        "inLanguage": "en"
+      }
+    </script>
+    <link rel="stylesheet" href="../../shared/sao-map-ui.css" />
+    <link rel="stylesheet" href="maps.css" />
+    <link rel="stylesheet" href="../../shared/sao-dropdown.css" />
+    <link rel="stylesheet" href="../../shared/sao-polish.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="top-nav" data-i18n-aria-label="ui.nav.primaryAria" aria-label="Primary">
+        <button class="top-button" type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">
+          Bestiary
+        </button>
+        <button class="top-button" type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">
+          Equipment
+        </button>
+        <button class="top-button" type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
+        <button class="top-button" type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">
+          Patchnotes
+        </button>
+        <button class="top-button" type="button" data-nav-target="miscinfo" data-i18n="ui.nav.miscinfo">
+          Misc. Info
+        </button>
+        <button class="top-button" type="button" data-nav-target="menu">
+          <span class="nav-icon" aria-hidden="true"
+            ><svg
+              class="nav-icon-arrow"
+              viewBox="0 0 12 12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M10 6H2M2 6l4-4M2 6l4 4" /></svg></span
+          ><span data-i18n="ui.nav.menu">Go back to Menu</span>
+        </button>
+      </nav>
+      <div class="header-main">
+        <h1 data-i18n="page.maps.title">SAO Interactive Map</h1>
+        <div class="controls">
+          <label for="floorSelect" data-i18n="page.maps.floorLabel">Floor:</label>
+          <div class="sao-select-wrap" id="floorSelectWrap">
+            <select id="floorSelect">
+              <option value="floor1" data-i18n="page.maps.floorOptions.floor1">Floor 1 - The Town of Beginnings</option>
+              <option value="floor2" data-i18n="page.maps.floorOptions.floor2">Floor 2 - Arid Desert</option>
+              <option value="floor3" data-i18n="page.maps.floorOptions.floor3">
+                Floor 3 - The Forest of Wandering
+              </option>
+            </select>
+            <span class="sao-select-arrow" aria-hidden="true"
+              ><svg
+                viewBox="0 0 10 10"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path class="arrow-closed" d="M2 6.5 5 3.5l3 3" />
+                <path class="arrow-open" d="M2 3.5 5 6.5l3-3" /></svg
+            ></span>
+          </div>
+          <label class="underground-toggle-wrapper" for="undergroundToggle">
+            <span data-i18n="page.maps.undergroundLabel">Underground:</span>
+            <input type="checkbox" id="undergroundToggle" />
+          </label>
+          <input
+            type="text"
+            id="search"
+            data-i18n-placeholder="page.maps.searchPlaceholder"
+            placeholder="Search markers..."
+          />
+          <button id="clearFilters" class="control-action" type="button" data-i18n="page.maps.clearFilters">
+            Clear Filters
+          </button>
         </div>
-        <label class="underground-toggle-wrapper" for="undergroundToggle">
-          <span data-i18n="page.maps.undergroundLabel">Underground:</span>
-          <input type="checkbox" id="undergroundToggle">
-        </label>
-        <input type="text" id="search" data-i18n-placeholder="page.maps.searchPlaceholder" placeholder="Search markers...">
-        <button id="clearFilters" class="control-action" type="button" data-i18n="page.maps.clearFilters">Clear Filters</button>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main>
-    <section id="mapContainer">
-      <div id="mapLayer">
-        <img id="mapImage" data-i18n-aria-label="page.maps.mapAlt" data-i18n-alt="page.maps.mapAlt" alt="Map floor" decoding="async" fetchpriority="high">
-        <img id="undergroundMapImage" class="underground-map" data-i18n-aria-label="page.maps.undergroundAlt" data-i18n-alt="page.maps.undergroundAlt" alt="Underground overlay" decoding="async" fetchpriority="low">
-        <svg id="mobAreaLayer" aria-hidden="true"></svg>
-        <div id="markers"></div>
-      </div>
-      <div id="coordinateDisplay">
-        <div id="overlayMappedCoords" data-i18n="page.maps.coordinatesPlaceholder">X: -- Z: --</div>
-      </div>
-      <div id="zoomControls">
-        <button id="resetView" type="button" data-i18n="page.maps.resetView">Reset View</button>
-        <span id="zoomLabel">1x</span>
-      </div>
-      <div id="infoOverlay">
-        <div class="sidebar-section">
-          <div class="sidebar-section-title" id="title" data-i18n="page.maps.defaultInfoTitle">Select a marker</div>
-          <div id="content" aria-live="polite" aria-atomic="true">
-            <p data-i18n="page.maps.defaultInfoBody">Choose a marker on the map to see details here.</p>
+    <main>
+      <section id="mapContainer">
+        <div id="mapLayer">
+          <img
+            id="mapImage"
+            data-i18n-aria-label="page.maps.mapAlt"
+            data-i18n-alt="page.maps.mapAlt"
+            alt="Map floor"
+            decoding="async"
+            fetchpriority="high"
+          />
+          <img
+            id="undergroundMapImage"
+            class="underground-map"
+            data-i18n-aria-label="page.maps.undergroundAlt"
+            data-i18n-alt="page.maps.undergroundAlt"
+            alt="Underground overlay"
+            decoding="async"
+            fetchpriority="low"
+          />
+          <svg id="mobAreaLayer" aria-hidden="true"></svg>
+          <div id="markers"></div>
+        </div>
+        <div id="coordinateDisplay">
+          <div id="overlayMappedCoords" data-i18n="page.maps.coordinatesPlaceholder">X: -- Z: --</div>
+        </div>
+        <div id="zoomControls">
+          <button
+            id="zoomOut"
+            type="button"
+            data-polish-zoom="out"
+            data-i18n-aria-label="page.maps.zoomOut"
+            aria-label="Zoom out"
+          >
+            −
+          </button>
+          <button id="resetView" type="button" data-i18n="page.maps.resetView">Reset View</button>
+          <button
+            id="zoomIn"
+            type="button"
+            data-polish-zoom="in"
+            data-i18n-aria-label="page.maps.zoomIn"
+            aria-label="Zoom in"
+          >
+            +
+          </button>
+          <span id="zoomLabel">1x</span>
+        </div>
+        <div id="infoOverlay">
+          <div class="sidebar-section">
+            <div class="sidebar-section-title" id="title" data-i18n="page.maps.defaultInfoTitle">Select a marker</div>
+            <div id="content" aria-live="polite" aria-atomic="true">
+              <p data-i18n="page.maps.defaultInfoBody">Choose a marker on the map to see details here.</p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <div id="sidebarResizeHandle" role="separator" tabindex="0" data-i18n-aria-label="page.maps.sidebarResizeAria" aria-label="Resize sidebar" aria-orientation="vertical"></div>
+      <div
+        id="sidebarResizeHandle"
+        role="separator"
+        tabindex="0"
+        data-i18n-aria-label="page.maps.sidebarResizeAria"
+        aria-label="Resize sidebar"
+        aria-orientation="vertical"
+      ></div>
 
-    <aside id="sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-section-title" data-i18n="page.maps.categoryMainTitle">Main</div>
-        <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="biomes" data-i18n="page.maps.categories.biomes">Biomes</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="bossSpawns" data-i18n="page.maps.categories.bossSpawns">Boss Spawns</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="dungeons" data-i18n="page.maps.categories.dungeons">Dungeons</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="farmingSpots" data-i18n="page.maps.categories.farmingSpots">Farming Spots</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="mobAreas" data-i18n="page.maps.categories.mobAreas">Mob Areas</button></li>
-        </ul>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-section-title" data-i18n="page.maps.categoryQuestsTitle">Quests</div>
-        <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-i18n="page.maps.categories.main">Main Quests</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="sideQuests" data-i18n="page.maps.categories.sideQuests">Side</button></li>
-        </ul>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-section-title" data-i18n="page.maps.categoryJourneymenTitle">Journeymen</div>
-        <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="alchemist" data-i18n="page.maps.categories.alchemist">Alchemist</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="lumberjack" data-i18n="page.maps.categories.lumberjack">Lumberjack</button></li>
-        </ul>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-section-title" data-i18n="page.maps.categoryMarketTitle">Market</div>
-        <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="accessoriesMerchants" data-i18n="page.maps.categories.accessoriesMerchants">Accessories Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="consumablesMerchants" data-i18n="page.maps.categories.consumablesMerchants">Consumables Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="equipmentMerchants" data-i18n="page.maps.categories.equipmentMerchants">Equipment Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="lootBuyers" data-i18n="page.maps.categories.lootBuyers">Loot Buyers</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="occultMerchants" data-i18n="page.maps.categories.occultMerchants">Occult Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="toolMerchants" data-i18n="page.maps.categories.toolMerchants">Tool Merchant</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="travelingMerchants" data-i18n="page.maps.categories.travelingMerchants">Traveling Merchants</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="weaponSellers" data-i18n="page.maps.categories.weaponSellers">Weapon Sellers</button></li>
-        </ul>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-section-title" data-i18n="page.maps.categoryCraftsmenTitle">Craftsmen</div>
-        <ul class="sidebar-list">
-          <li><button class="sidebar-list-button" type="button" data-category="accessoriesBlacksmith" data-i18n="page.maps.categories.accessoriesBlacksmith">Accessories Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="armorBlacksmith" data-i18n="page.maps.categories.armorBlacksmith">Armor Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="ingotBlacksmith" data-i18n="page.maps.categories.ingotBlacksmith">Ingot Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="keyBlacksmith" data-i18n="page.maps.categories.keyBlacksmith">Key Blacksmith</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="refaire" data-i18n="page.maps.categories.refaire">Refaire</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="runeCraftsmen" data-i18n="page.maps.categories.runeCraftsmen">Rune Craftsmen</button></li>
-          <li><button class="sidebar-list-button" type="button" data-category="weaponsmith" data-i18n="page.maps.categories.weaponsmith">Weaponsmith</button></li>
-        </ul>
-      </div>
-    </aside>
-  </main>
+      <aside id="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title" data-i18n="page.maps.categoryMainTitle">Main</div>
+          <ul class="sidebar-list">
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="biomes"
+                data-i18n="page.maps.categories.biomes"
+              >
+                Biomes
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="bossSpawns"
+                data-i18n="page.maps.categories.bossSpawns"
+              >
+                Boss Spawns
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="dungeons"
+                data-i18n="page.maps.categories.dungeons"
+              >
+                Dungeons
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="farmingSpots"
+                data-i18n="page.maps.categories.farmingSpots"
+              >
+                Farming Spots
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="mobAreas"
+                data-i18n="page.maps.categories.mobAreas"
+              >
+                Mob Areas
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title" data-i18n="page.maps.categoryQuestsTitle">Quests</div>
+          <ul class="sidebar-list">
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="mainQuests"
+                data-i18n="page.maps.categories.main"
+              >
+                Main Quests
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="sideQuests"
+                data-i18n="page.maps.categories.sideQuests"
+              >
+                Side
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title" data-i18n="page.maps.categoryJourneymenTitle">Journeymen</div>
+          <ul class="sidebar-list">
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="alchemist"
+                data-i18n="page.maps.categories.alchemist"
+              >
+                Alchemist
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="lumberjack"
+                data-i18n="page.maps.categories.lumberjack"
+              >
+                Lumberjack
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title" data-i18n="page.maps.categoryMarketTitle">Market</div>
+          <ul class="sidebar-list">
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="accessoriesMerchants"
+                data-i18n="page.maps.categories.accessoriesMerchants"
+              >
+                Accessories Merchant
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="consumablesMerchants"
+                data-i18n="page.maps.categories.consumablesMerchants"
+              >
+                Consumables Merchant
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="equipmentMerchants"
+                data-i18n="page.maps.categories.equipmentMerchants"
+              >
+                Equipment Merchant
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="lootBuyers"
+                data-i18n="page.maps.categories.lootBuyers"
+              >
+                Loot Buyers
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="occultMerchants"
+                data-i18n="page.maps.categories.occultMerchants"
+              >
+                Occult Merchant
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="toolMerchants"
+                data-i18n="page.maps.categories.toolMerchants"
+              >
+                Tool Merchant
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="travelingMerchants"
+                data-i18n="page.maps.categories.travelingMerchants"
+              >
+                Traveling Merchants
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="weaponSellers"
+                data-i18n="page.maps.categories.weaponSellers"
+              >
+                Weapon Sellers
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title" data-i18n="page.maps.categoryCraftsmenTitle">Craftsmen</div>
+          <ul class="sidebar-list">
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="accessoriesBlacksmith"
+                data-i18n="page.maps.categories.accessoriesBlacksmith"
+              >
+                Accessories Blacksmith
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="armorBlacksmith"
+                data-i18n="page.maps.categories.armorBlacksmith"
+              >
+                Armor Blacksmith
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="ingotBlacksmith"
+                data-i18n="page.maps.categories.ingotBlacksmith"
+              >
+                Ingot Blacksmith
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="keyBlacksmith"
+                data-i18n="page.maps.categories.keyBlacksmith"
+              >
+                Key Blacksmith
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="refaire"
+                data-i18n="page.maps.categories.refaire"
+              >
+                Refaire
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="runeCraftsmen"
+                data-i18n="page.maps.categories.runeCraftsmen"
+              >
+                Rune Craftsmen
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
+                data-category="weaponsmith"
+                data-i18n="page.maps.categories.weaponsmith"
+              >
+                Weaponsmith
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </main>
 
-  <script src="mapData.js"></script>
-  <script src="maps_floor1.js"></script>
-  <script src="maps_floor2.js"></script>
-  <script src="maps_floor3.js"></script>
-  <script src="../../shared/sao-storage.js"></script>
-  <script src="../../shared/sao-i18n.js?v=aincrad-map-labels"></script>
-  <script src="../../shared/sao-content-translations.js"></script>
-  <script src="../../shared/sao-datasets.js"></script>
-  <script src="../../shared/sao-walkthrough.js"></script>
-  <script src="../../shared/map-runtime.js"></script>
-  <script src="../../shared/sao-dropdown.js"></script>
-  <script src="adapter.js"></script>
-  <script src="maps.js"></script>
-</body>
+    <script src="mapData.js"></script>
+    <script src="maps_floor1.js"></script>
+    <script src="maps_floor2.js"></script>
+    <script src="maps_floor3.js"></script>
+    <script src="maps_mainquests.js"></script>
+    <script src="../../shared/sao-storage.js"></script>
+    <script src="../../shared/sao-page-utils.js"></script>
+    <script src="../../shared/sao-i18n.js?v=aincrad-map-labels"></script>
+    <script src="../../shared/sao-page-helpers.js"></script>
+    <script src="../../shared/sao-map-helpers.js"></script>
+    <script src="../../shared/sao-content-translations.js"></script>
+    <script src="../../shared/sao-datasets.js"></script>
+    <script src="../../shared/sao-walkthrough.js"></script>
+    <script src="../../shared/map-runtime.js"></script>
+    <script src="../../shared/sao-dropdown.js"></script>
+    <script src="adapter.js"></script>
+    <script src="maps.js"></script>
+    <script src="../../shared/sao-polish.js"></script>
+  </body>
 </html>

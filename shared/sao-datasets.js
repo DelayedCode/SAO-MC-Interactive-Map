@@ -14,14 +14,14 @@
   ]);
 
   const fallbackStorage = {
-    getItem() { return null; },
+    getItem() {
+      return null;
+    },
     setItem() {}
   };
 
   function getDataset(value) {
-    const candidate = value instanceof URLSearchParams
-      ? value.get(DATASET_PARAM)
-      : value;
+    const candidate = value instanceof URLSearchParams ? value.get(DATASET_PARAM) : value;
     return VALID_DATASETS.has(candidate) ? candidate : "beta";
   }
 
@@ -133,7 +133,7 @@
     closeButton.focus();
 
     backdrop.addEventListener("click", closeSelector);
-    dialog.addEventListener("keydown", event => {
+    dialog.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeSelector();
     });
   }

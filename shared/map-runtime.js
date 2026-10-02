@@ -47,7 +47,7 @@
     const cleanups = new Set();
     let disposed = false;
 
-    const runCleanup = cleanup => {
+    const runCleanup = (cleanup) => {
       try {
         cleanup();
       } catch (_error) {
@@ -76,6 +76,31 @@
       get disposed() {
         return disposed;
       }
+    };
+  }
+
+  // Generic, world-neutral context filtering shared by every map adapter.
+  // Adapters still own their datasets and expose getContextData(contextId);
+  // this only supplies the common "filter datasets by context id" primitive so
+  // the identical logic is not re-declared in each world's adapter.
+  function createContextDataResolver(datasets) {
+    const sources = datasets || {};
+    const markerDataset = sources.markerDataset;
+    const mobAreaDataset = sources.mobAreaDataset;
+    const mobAreaMobLookup = sources.mobAreaMobLookup;
+
+    return function getContextData(contextId) {
+      const markerEntries = Object.entries(markerDataset).filter(([, marker]) => marker && marker.floor === contextId);
+      const mobAreas = mobAreaDataset.filter((area) => area && area.floor === contextId);
+      const areaIds = new Set(mobAreas.map((area) => area.id));
+      const mobAreasMobs = Object.fromEntries(
+        Object.entries(mobAreaMobLookup).filter(([areaId]) => areaIds.has(areaId))
+      );
+      return Object.freeze({
+        markerDataset: Object.freeze(Object.fromEntries(markerEntries)),
+        mobAreaDataset: Object.freeze(mobAreas.slice()),
+        mobAreaMobLookup: Object.freeze(mobAreasMobs)
+      });
     };
   }
 
@@ -153,7 +178,7 @@
     }
 
     const names = Array.isArray(requiredElements) && requiredElements.length ? requiredElements : DEFAULT_REQUIRED_DOM;
-    const missing = names.filter(name => !dom[name]);
+    const missing = names.filter((name) => !dom[name]);
 
     if (missing.length) {
       throw new Error(`Map runtime is missing required DOM elements: ${missing.join(", ")}.`);
@@ -177,7 +202,9 @@
   function defaultSearch() {
     return {
       normalizeText(value) {
-        return String(value ?? "").trim().toLowerCase();
+        return String(value ?? "")
+          .trim()
+          .toLowerCase();
       },
       filterMarker(marker, query, activeCategories) {
         const normalizedQuery = this.normalizeText(query);
@@ -226,8 +253,7 @@
           }
         }
 
-        const hasParams = ["floor", "underground", "search", "q", "categories"]
-          .some(key => params.has(key));
+        const hasParams = ["floor", "underground", "search", "q", "categories"].some((key) => params.has(key));
 
         return {
           floor: params.get("floor") || null,
@@ -280,14 +306,17 @@
   }
 
   function createSidebarResizeController(runtime, config) {
-    const options = Object.assign({
-      min: 260,
-      max: 520,
-      defaultWidth: 320,
-      onWidthChange: null,
-      onResizeStart: null,
-      onResizeEnd: null
-    }, config || {});
+    const options = Object.assign(
+      {
+        min: 260,
+        max: 520,
+        defaultWidth: 320,
+        onWidthChange: null,
+        onResizeStart: null,
+        onResizeEnd: null
+      },
+      config || {}
+    );
     const dom = runtime.dom;
     const sidebar = options.sidebar;
     const handle = options.handle || {
@@ -298,11 +327,15 @@
     const documentObject = options.document || (dom && dom.ownerDocument) || null;
     const windowObject = options.window || (documentObject && documentObject.defaultView) || null;
 
-    if (!sidebar || !documentObject || !windowObject ||
+    if (
+      !sidebar ||
+      !documentObject ||
+      !windowObject ||
       typeof sidebar.getBoundingClientRect !== "function" ||
       typeof handle.addEventListener !== "function" ||
       typeof windowObject.addEventListener !== "function" ||
-      typeof documentObject.addEventListener !== "function") {
+      typeof documentObject.addEventListener !== "function"
+    ) {
       return null;
     }
 
@@ -317,13 +350,13 @@
       startWidth: 0
     };
 
-    const clampWidth = width => Math.min(options.max, Math.max(options.min, width));
-    const notifyWidthChange = width => {
+    const clampWidth = (width) => Math.min(options.max, Math.max(options.min, width));
+    const notifyWidthChange = (width) => {
       if (typeof options.onWidthChange === "function") {
         options.onWidthChange(width);
       }
     };
-    const applyWidth = width => {
+    const applyWidth = (width) => {
       const numericWidth = Number(width);
       const clampedWidth = clampWidth(Number.isFinite(numericWidth) ? numericWidth : options.defaultWidth);
       const root = documentObject?.documentElement || (dom && dom.documentElement) || null;
@@ -338,7 +371,7 @@
       notifyWidthChange(clampedWidth);
       return clampedWidth;
     };
-    const start = event => {
+    const start = (event) => {
       if (event.type === "mousedown" && event.button !== 0) return;
       if (event.type === "pointerdown" && event.pointerType === "mouse" && event.button !== 0) return;
       event.preventDefault?.();
@@ -349,7 +382,7 @@
         options.onResizeStart();
       }
     };
-    const move = event => {
+    const move = (event) => {
       if (!resizeState.active) return;
       const deltaX = event.clientX - resizeState.startX;
       applyWidth(resizeState.startWidth - deltaX);
@@ -362,7 +395,7 @@
         options.onResizeEnd(width);
       }
     };
-    const keydown = event => {
+    const keydown = (event) => {
       const currentWidth = sidebar.getBoundingClientRect().width || resizeState.width || options.defaultWidth;
       if (event.key === "ArrowLeft") {
         event.preventDefault?.();
@@ -427,34 +460,40 @@
   }
 
   function createMapRuntime(adapter, options) {
-    const runtimeOptions = Object.assign({
-      dom: typeof globalObject !== "undefined" && globalObject.document ? globalObject.document : null,
-      renderer: defaultRenderer(),
-      storage: typeof globalObject !== "undefined" ? globalObject.SAOStorage || null : null,
-      coordinateDependencies: null,
-      requiredElements: DEFAULT_REQUIRED_DOM,
-      search: defaultSearch(),
-      urlState: defaultUrlState(),
-      walkthrough: defaultWalkthrough(),
-      onError: null
-    }, options || {});
+    const runtimeOptions = Object.assign(
+      {
+        dom: typeof globalObject !== "undefined" && globalObject.document ? globalObject.document : null,
+        renderer: defaultRenderer(),
+        storage: typeof globalObject !== "undefined" ? globalObject.SAOStorage || null : null,
+        coordinateDependencies: null,
+        requiredElements: DEFAULT_REQUIRED_DOM,
+        search: defaultSearch(),
+        urlState: defaultUrlState(),
+        walkthrough: defaultWalkthrough(),
+        onError: null
+      },
+      options || {}
+    );
 
     validateAdapter(adapter);
     validateDom(runtimeOptions.dom, runtimeOptions.requiredElements);
 
     const coordinateDependencies = runtimeOptions.coordinateDependencies || adapter.coordinateDependencies || {};
     const normalizedCoordinateDependencies = {
-      mapWebsiteCoordinates: typeof coordinateDependencies.mapWebsiteCoordinates === "function"
-        ? coordinateDependencies.mapWebsiteCoordinates
-        : null,
-      invertMapCoordinates: typeof coordinateDependencies.invertMapCoordinates === "function"
-        ? coordinateDependencies.invertMapCoordinates
-        : null
+      mapWebsiteCoordinates:
+        typeof coordinateDependencies.mapWebsiteCoordinates === "function"
+          ? coordinateDependencies.mapWebsiteCoordinates
+          : null,
+      invertMapCoordinates:
+        typeof coordinateDependencies.invertMapCoordinates === "function"
+          ? coordinateDependencies.invertMapCoordinates
+          : null
     };
     const visitedMarkerStorageKey = "sao.visitedMarkers";
-    const storedVisitedMarkerIds = runtimeOptions.storage && typeof runtimeOptions.storage.getJSON === "function"
-      ? runtimeOptions.storage.getJSON(visitedMarkerStorageKey, [])
-      : [];
+    const storedVisitedMarkerIds =
+      runtimeOptions.storage && typeof runtimeOptions.storage.getJSON === "function"
+        ? runtimeOptions.storage.getJSON(visitedMarkerStorageKey, [])
+        : [];
 
     const state = {
       activeMapContextId: adapter.defaultFloor,
@@ -464,9 +503,9 @@
       selectedMarkerId: null,
       activeSearch: "",
       activeCategories: normalizeCategories(adapter.categories),
-      visitedMarkerIds: new Set(Array.isArray(storedVisitedMarkerIds)
-        ? storedVisitedMarkerIds.filter(id => typeof id === "string")
-        : []),
+      visitedMarkerIds: new Set(
+        Array.isArray(storedVisitedMarkerIds) ? storedVisitedMarkerIds.filter((id) => typeof id === "string") : []
+      ),
       sidebarWidth: null,
       initialized: false,
       destroyed: false,
@@ -598,7 +637,7 @@
           throw new Error("Map runtime has been destroyed.");
         }
         state.activeCategories = Object.fromEntries(
-          Object.keys(state.activeCategories).map(category => [category, false])
+          Object.keys(state.activeCategories).map((category) => [category, false])
         );
         return runtime.getCategoryStates();
       },
@@ -638,7 +677,7 @@
         }
         sidebarResizeController = createSidebarResizeController(runtime, {
           ...(config || {}),
-          onWidthChange: width => {
+          onWidthChange: (width) => {
             state.sidebarWidth = width;
             config?.onWidthChange?.(width);
           }
@@ -680,7 +719,7 @@
     return runtime;
   }
 
-  const api = { createDisposer, createMapRuntime };
+  const api = { createDisposer, createContextDataResolver, createMapRuntime };
 
   if (typeof module !== "undefined" && module.exports) {
     module.exports = api;

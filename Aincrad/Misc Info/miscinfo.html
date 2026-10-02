@@ -1,275 +1,398 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
-  <title data-i18n="page.miscinfo.title">Aincrad Misc Info | SAO MC Interactive Map</title>
-  <meta name="description" content="Reference miscellaneous SAO MC Aincrad data and quick info notes that support map navigation and progression planning.">
-  <meta name="keywords" content="SAO MC misc info, Aincrad progression notes, player levels">
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <meta name="author" content="DelayedCode">
-  <meta name="theme-color" content="#0b121a">
-  <link rel="canonical" href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Misc%20Info/miscinfo.html">
-  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png">
-  <link rel="apple-touch-icon" href="../../apple-touch-icon.png">
-  <link rel="manifest" href="../../site.webmanifest">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="SAO MC Interactive Map">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:title" content="Aincrad Misc Info | SAO MC Interactive Map">
-  <meta property="og:description" content="Reference miscellaneous SAO MC Aincrad data and quick info notes that support map navigation and progression planning.">
-  <meta property="og:url" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Misc%20Info/miscinfo.html">
-  <meta property="og:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
-  <meta property="og:image:alt" content="SAO MC misc info page preview">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Aincrad Misc Info | SAO MC Interactive Map">
-  <meta name="twitter:description" content="Reference miscellaneous SAO MC Aincrad data and quick info notes that support map navigation and progression planning.">
-  <meta name="twitter:image" content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png">
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Aincrad Misc Info",
-      "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Misc%20Info/miscinfo.html",
-      "description": "Miscellaneous SAO MC Aincrad information page.",
-      "isPartOf": {
-        "@type": "WebSite",
-        "name": "SAO MC Interactive Map",
-        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
-      },
-      "inLanguage": "en"
-    }
-  </script>
-  <style>
-    :root {
-      color-scheme: dark;
-      font-family: "Segoe UI", Arial, sans-serif;
-      --text: #eef4ff;
-      --muted: #b9cce3;
-      --line: #3a4a5e;
-      --panel: rgba(18, 27, 39, 0.94);
-      --panel-2: rgba(26, 38, 53, 0.95);
-      --accent: #73b9ff;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+    />
+    <title data-i18n="page.miscinfo.title">Aincrad Misc Info | SAO MC Interactive Map</title>
+    <meta
+      name="description"
+      content="Reference miscellaneous SAO MC Aincrad data and quick info notes that support map navigation and progression planning."
+    />
+    <meta name="keywords" content="SAO MC misc info, Aincrad progression notes, player levels" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="author" content="DelayedCode" />
+    <meta name="theme-color" content="#0b121a" />
+    <link
+      rel="canonical"
+      href="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Misc%20Info/miscinfo.html"
+    />
+    <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../../favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+    <link rel="manifest" href="../../site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SAO MC Interactive Map" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Aincrad Misc Info | SAO MC Interactive Map" />
+    <meta
+      property="og:description"
+      content="Reference miscellaneous SAO MC Aincrad data and quick info notes that support map navigation and progression planning."
+    />
+    <meta
+      property="og:url"
+      content="https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Misc%20Info/miscinfo.html"
+    />
+    <meta
+      property="og:image"
+      content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png"
+    />
+    <meta property="og:image:alt" content="SAO MC misc info page preview" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Aincrad Misc Info | SAO MC Interactive Map" />
+    <meta
+      name="twitter:description"
+      content="Reference miscellaneous SAO MC Aincrad data and quick info notes that support map navigation and progression planning."
+    />
+    <meta
+      name="twitter:image"
+      content="https://delayedcode.github.io/SAO-MC-Interactive-Map/assets/images/social-preview.png"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Aincrad Misc Info",
+        "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Misc%20Info/miscinfo.html",
+        "description": "Miscellaneous SAO MC Aincrad information page.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "SAO MC Interactive Map",
+          "url": "https://delayedcode.github.io/SAO-MC-Interactive-Map/"
+        },
+        "inLanguage": "en"
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Segoe UI", Arial, sans-serif;
+        --text: #eef4ff;
+        --muted: #b9cce3;
+        --line: #3a4a5e;
+        --panel: rgba(18, 27, 39, 0.94);
+        --panel-2: rgba(26, 38, 53, 0.95);
+        --accent: #73b9ff;
+      }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at 18% 12%, rgba(115, 185, 255, 0.12), transparent 24%),
-        linear-gradient(180deg, #0d141d 0%, #0b121a 100%);
-      color: var(--text);
-    }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 18% 12%, rgba(115, 185, 255, 0.12), transparent 24%),
+          linear-gradient(180deg, #0d141d 0%, #0b121a 100%);
+        color: var(--text);
+      }
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 18px;
-      background: rgba(15, 22, 32, 0.86);
-      border-bottom: 1px solid var(--line);
-      gap: 12px;
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-    }
-
-    .title {
-      font-size: clamp(1.25rem, 2.2vw, 1.6rem);
-      font-weight: 700;
-      line-height: 1.15;
-    }
-
-    .topbar button {
-      min-height: 38px;
-      padding: 8px 14px;
-      border: 1px solid rgba(130, 190, 255, 0.26);
-      border-radius: 10px;
-      background: rgba(23, 35, 50, 0.92);
-      color: var(--text);
-      cursor: pointer;
-      transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
-    }
-
-    .topbar button:hover {
-      background: rgba(30, 47, 68, 0.98);
-      border-color: var(--accent);
-      transform: translateY(-1px);
-    }
-
-    .topbar button:active {
-      transform: translateY(0) scale(0.98);
-    }
-
-    .topbar button:focus-visible,
-    .menu-button:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-
-    .content {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 22px 18px;
-    }
-
-    .button-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 980px;
-    }
-
-    .menu-button {
-      width: 100%;
-      text-align: left;
-      padding: 14px 16px;
-      border: 1px solid rgba(130, 190, 255, 0.24);
-      border-radius: 12px;
-      background: var(--panel-2);
-      color: var(--text);
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
-    }
-
-    .menu-button:hover {
-      background: rgba(38, 56, 78, 0.98);
-      border-color: var(--accent);
-      transform: translateY(-1px);
-    }
-
-    .menu-button:active {
-      transform: translateY(0) scale(0.98);
-    }
-
-    .details {
-      margin-top: 10px;
-      padding: 14px 16px;
-      border: 1px solid rgba(130, 190, 255, 0.2);
-      border-radius: 12px;
-      background: var(--panel);
-      color: var(--muted);
-      line-height: 1.7;
-      white-space: pre-line;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-
-    @media (max-width: 680px) {
       .topbar {
-        flex-direction: column;
-        align-items: stretch;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 18px;
+        background: rgba(15, 22, 32, 0.86);
+        border-bottom: 1px solid var(--line);
+        gap: 12px;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+      }
+
+      .title {
+        font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+        font-weight: 700;
+        line-height: 1.15;
       }
 
       .topbar button {
-        width: 100%;
+        min-height: 38px;
+        padding: 8px 14px;
+        border: 1px solid rgba(130, 190, 255, 0.26);
+        border-radius: 10px;
+        background: rgba(23, 35, 50, 0.92);
+        color: var(--text);
+        cursor: pointer;
+        transition:
+          border-color 0.16s ease,
+          background 0.16s ease,
+          transform 0.16s ease;
+      }
+
+      .topbar button:hover {
+        background: rgba(30, 47, 68, 0.98);
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .topbar button:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .topbar button:focus-visible,
+      .menu-button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
       }
 
       .content {
-        padding: 16px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 22px 18px;
       }
 
-      .topbar button:hover,
+      .button-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 980px;
+      }
+
+      .menu-button {
+        width: 100%;
+        text-align: left;
+        padding: 14px 16px;
+        border: 1px solid rgba(130, 190, 255, 0.24);
+        border-radius: 12px;
+        background: var(--panel-2);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition:
+          border-color 0.16s ease,
+          background 0.16s ease,
+          transform 0.16s ease;
+      }
+
       .menu-button:hover {
-        transform: none;
+        background: rgba(38, 56, 78, 0.98);
+        border-color: var(--accent);
+        transform: translateY(-1px);
       }
-    }
-  </style>
-  <link rel="stylesheet" href="miscinfo.css">
-  <link rel="stylesheet" href="../../shared/aincrad-ui.css">
-</head>
-<body>
-  <div class="page">
-    <nav class="nav" data-i18n-aria-label="ui.nav.sectionAria" aria-label="Section navigation">
-      <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Map</button>
-      <button type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
-      <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
-      <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
-      <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
-      <button type="button" data-nav-target="menu"><span class="nav-icon" aria-hidden="true"><svg class="nav-icon-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6H2M2 6l4-4M2 6l4 4"/></svg></span><span data-i18n="ui.nav.menu">Go back to Menu</span></button>
-    </nav>
 
-    <header class="page-header">
-      <div>
-        <p class="eyebrow" data-i18n="page.miscinfo.eyebrow">Aincrad reference</p>
-        <h1 data-i18n="page.miscinfo.heading">Misc. Info</h1>
-        <p class="subtitle" data-i18n="page.miscinfo.subtitle">Useful reference information about Aincrad, progression, systems, and the website.</p>
-      </div>
-      <span class="dataset-badge" data-i18n="page.miscinfo.referenceHub">Reference hub</span>
-    </header>
+      .menu-button:active {
+        transform: translateY(0) scale(0.98);
+      }
 
-    <main class="dashboard-grid">
-      <section class="section-panel" aria-labelledby="progressionHeading">
-        <div class="section-heading">
-          <div><p class="section-kicker" data-i18n="page.miscinfo.progression">Progression</p><h2 id="progressionHeading" data-i18n="page.miscinfo.playerProgression">Player Progression</h2></div>
-          <span class="section-count" data-i18n="page.miscinfo.xpThresholds">XP thresholds</span>
+      .details {
+        margin-top: 10px;
+        padding: 14px 16px;
+        border: 1px solid rgba(130, 190, 255, 0.2);
+        border-radius: 12px;
+        background: var(--panel);
+        color: var(--muted);
+        line-height: 1.7;
+        white-space: pre-line;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      }
+
+      @media (max-width: 680px) {
+        .topbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .topbar button {
+          width: 100%;
+        }
+
+        .content {
+          padding: 16px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        .topbar button:hover,
+        .menu-button:hover {
+          transform: none;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="miscinfo.css" />
+    <link rel="stylesheet" href="../../shared/aincrad-ui.css" />
+    <link rel="stylesheet" href="../../shared/sao-polish.css" />
+  </head>
+  <body>
+    <div class="page">
+      <nav class="nav" data-i18n-aria-label="ui.nav.sectionAria" aria-label="Section navigation">
+        <button type="button" data-nav-target="maps" data-i18n="ui.nav.maps">Map</button>
+        <button type="button" data-nav-target="bestiary" data-i18n="ui.nav.bestiary">Bestiary</button>
+        <button type="button" data-nav-target="equipment" data-i18n="ui.nav.equipment">Equipment</button>
+        <button type="button" data-nav-target="quests" data-i18n="ui.nav.quests">Quests</button>
+        <button type="button" data-nav-target="patchnotes" data-i18n="ui.nav.patchnotes">Patchnotes</button>
+        <button type="button" data-nav-target="menu">
+          <span class="nav-icon" aria-hidden="true"
+            ><svg
+              class="nav-icon-arrow"
+              viewBox="0 0 12 12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M10 6H2M2 6l4-4M2 6l4 4" /></svg></span
+          ><span data-i18n="ui.nav.menu">Go back to Menu</span>
+        </button>
+      </nav>
+
+      <header class="page-header">
+        <div>
+          <p class="eyebrow" data-i18n="page.miscinfo.eyebrow">AINCRAD / MISC. INFO</p>
+          <h1 data-i18n="page.miscinfo.heading">Misc. Info</h1>
+          <p class="subtitle" data-i18n="page.miscinfo.subtitle">
+            Useful reference information about Aincrad, progression, systems, and the website.
+          </p>
         </div>
-        <div id="progressionTableRoot"></div>
-      </section>
+        <span class="dataset-badge" data-i18n="page.miscinfo.referenceHub">Reference hub</span>
+      </header>
 
-      <section class="section-panel full-width" aria-labelledby="gameSystemsHeading">
-        <div class="section-heading"><div><p class="section-kicker" data-i18n="page.miscinfo.aincradSystems">Aincrad systems</p><h2 id="gameSystemsHeading" data-i18n="page.miscinfo.gameSystems">Game Systems</h2></div></div>
-        <div class="system-grid">
-          <a class="system-card" href="../Quests/quests.html"><strong data-i18n="ui.nav.quests">Quests</strong><p data-i18n="page.miscinfo.questsCardText">Search quests by NPC, location, requirements, rewards, and completion state.</p></a>
-          <a class="system-card" href="../eCompendium/ecompendium.html"><strong data-i18n="ui.nav.equipment">Equipment</strong><p data-i18n="page.miscinfo.equipmentCardText">Browse equipment categories, levels, rarity, descriptions, statistics, and crafting resources.</p></a>
-          <a class="system-card" href="../Bestiary/bestiary.html"><strong data-i18n="ui.nav.bestiary">Bestiary</strong><p data-i18n="page.miscinfo.bestiaryCardText">Review bosses, dungeon mobs, regular mobs, aggressiveness, XP, and drops.</p></a>
-          <a class="system-card" href="../Map/maps.html"><strong data-i18n="ui.nav.maps">Maps</strong><p data-i18n="page.miscinfo.mapsCardText">Explore floor maps with searchable markers, categories, coordinates, and underground layers.</p></a>
-        </div>
-      </section>
-
-      <section class="section-panel" aria-labelledby="skillsHeading">
-        <div class="section-heading"><div><p class="section-kicker" data-i18n="page.miscinfo.skillsHeading">Skills</p><h2 id="skillsHeading" data-i18n="page.miscinfo.skillsHeading">Skills</h2></div></div>
-        <div class="reference-grid">
-          <article class="reference-card wide">
-            <p data-i18n="page.miscinfo.skillsUnavailable">Skill information is not available yet.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section-panel" aria-labelledby="projectHeading">
-        <div class="section-heading"><div><p class="section-kicker" data-i18n="page.miscinfo.projectReference">Project reference</p><h2 id="projectHeading" data-i18n="page.miscinfo.projectInformation">Website / Project Information</h2></div></div>
-        <div class="project-grid">
-          <article class="project-card"><h3 data-i18n="page.miscinfo.projectHeading">Project</h3><p data-i18n="page.miscinfo.projectText">Static fan-made SAO MC reference website hosted on GitHub Pages.</p></article>
-          <article class="project-card"><h3 data-i18n="page.miscinfo.languagesHeading">Languages</h3><p data-i18n="page.miscinfo.languagesText">English, Español, and Français are available through the shared language system.</p></article>
-        </div>
-      </section>
-
-      <section class="section-panel full-width command-shell" aria-labelledby="commandsHeading" data-command-exclude-categories="media,useless">
-        <details class="reference-details" open>
-          <summary id="commandsHeading" data-i18n="page.miscinfo.commandReference">Command Reference</summary>
-          <div class="reference-details-content">
-            <p data-i18n="page.miscinfo.commandReferenceText">Search the existing command catalog by category, command, usage, or example.</p>
-            <div class="command-toolbar">
-              <div id="categoryFilters" class="list-tabs" role="tablist" data-i18n-aria-label="page.commands.tablistAria" aria-label="Command categories"></div>
-              <label class="command-search" for="commandSearch"><span data-i18n="page.commands.searchLabel">Search commands</span><input id="commandSearch" type="search" data-i18n-placeholder="page.commands.searchPlaceholder" placeholder="Search by command, usage, or example..." autocomplete="off"></label>
+      <main class="dashboard-grid">
+        <section class="section-panel" aria-labelledby="progressionHeading">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker" data-i18n="page.miscinfo.progression">Progression</p>
+              <h2 id="progressionHeading" data-i18n="page.miscinfo.playerProgression">Player Progression</h2>
             </div>
-            <p id="status" role="status" aria-live="polite" data-i18n="page.miscinfo.loadingCommands">Loading commands...</p>
-            <div id="commandTableRoot" aria-live="polite" aria-atomic="true"></div>
+            <span class="section-count" data-i18n="page.miscinfo.xpThresholds">XP thresholds</span>
           </div>
-        </details>
-      </section>
+          <div id="progressionTableRoot"></div>
+        </section>
 
-    </main>
-  </div>
+        <section class="section-panel full-width" aria-labelledby="gameSystemsHeading">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker" data-i18n="page.miscinfo.aincradSystems">Aincrad systems</p>
+              <h2 id="gameSystemsHeading" data-i18n="page.miscinfo.gameSystems">Game Systems</h2>
+            </div>
+          </div>
+          <div class="system-grid">
+            <a class="system-card" href="../Quests/quests.html"
+              ><strong data-i18n="ui.nav.quests">Quests</strong>
+              <p data-i18n="page.miscinfo.questsCardText">
+                Search quests by NPC, location, requirements, rewards, and completion state.
+              </p></a
+            >
+            <a class="system-card" href="../eCompendium/ecompendium.html"
+              ><strong data-i18n="ui.nav.equipment">Equipment</strong>
+              <p data-i18n="page.miscinfo.equipmentCardText">
+                Browse equipment categories, levels, rarity, descriptions, statistics, and crafting resources.
+              </p></a
+            >
+            <a class="system-card" href="../Bestiary/bestiary.html"
+              ><strong data-i18n="ui.nav.bestiary">Bestiary</strong>
+              <p data-i18n="page.miscinfo.bestiaryCardText">
+                Review bosses, dungeon mobs, regular mobs, aggressiveness, XP, and drops.
+              </p></a
+            >
+            <a class="system-card" href="../Map/maps.html"
+              ><strong data-i18n="ui.nav.maps">Maps</strong>
+              <p data-i18n="page.miscinfo.mapsCardText">
+                Explore floor maps with searchable markers, categories, coordinates, and underground layers.
+              </p></a
+            >
+          </div>
+        </section>
 
-  <script src="../../shared/sao-storage.js"></script>
-  <script src="../../shared/sao-i18n.js"></script>
-  <script src="../../shared/sao-content-translations.js"></script>
-  <script src="../../shared/sao-datasets.js"></script>
-  <script src="../Commands/commands_current.js"></script>
-  <script src="../Commands/commands.js"></script>
-  <script src="miscinfo.js"></script>
-</body>
+        <section class="section-panel" aria-labelledby="skillsHeading">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker" data-i18n="page.miscinfo.skillsHeading">Skills</p>
+              <h2 id="skillsHeading" data-i18n="page.miscinfo.skillsHeading">Skills</h2>
+            </div>
+          </div>
+          <div class="reference-grid">
+            <article class="reference-card wide">
+              <p data-i18n="page.miscinfo.skillsUnavailable">Skill information is not available yet.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-panel" aria-labelledby="projectHeading">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker" data-i18n="page.miscinfo.projectReference">Project reference</p>
+              <h2 id="projectHeading" data-i18n="page.miscinfo.projectInformation">Website / Project Information</h2>
+            </div>
+          </div>
+          <div class="project-grid">
+            <article class="project-card">
+              <h3 data-i18n="page.miscinfo.projectHeading">Project</h3>
+              <p data-i18n="page.miscinfo.projectText">
+                Static fan-made SAO MC reference website hosted on GitHub Pages.
+              </p>
+            </article>
+            <article class="project-card">
+              <h3 data-i18n="page.miscinfo.languagesHeading">Languages</h3>
+              <p data-i18n="page.miscinfo.languagesText">
+                English, Español, and Français are available through the shared language system.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section
+          class="section-panel full-width command-shell"
+          aria-labelledby="commandsHeading"
+          data-command-exclude-categories="media,useless"
+        >
+          <details class="reference-details" open>
+            <summary id="commandsHeading" data-i18n="page.miscinfo.commandReference">Command Reference</summary>
+            <div class="reference-details-content">
+              <p data-i18n="page.miscinfo.commandReferenceText">
+                Search the existing command catalog by category, command, usage, or example.
+              </p>
+              <div class="command-toolbar">
+                <div
+                  id="categoryFilters"
+                  class="list-tabs"
+                  role="tablist"
+                  data-i18n-aria-label="page.commands.tablistAria"
+                  aria-label="Command categories"
+                ></div>
+                <label class="command-search" for="commandSearch"
+                  ><span data-i18n="page.commands.searchLabel">Search commands</span
+                  ><input
+                    id="commandSearch"
+                    type="search"
+                    data-i18n-placeholder="page.commands.searchPlaceholder"
+                    placeholder="Search by command, usage, or example..."
+                    autocomplete="off"
+                /></label>
+              </div>
+              <p id="status" role="status" aria-live="polite" data-i18n="page.miscinfo.loadingCommands">
+                Loading commands...
+              </p>
+              <div id="commandTableRoot" aria-live="polite" aria-atomic="true"></div>
+            </div>
+          </details>
+        </section>
+      </main>
+    </div>
+
+    <script src="../../shared/sao-storage.js"></script>
+    <script src="../../shared/sao-page-utils.js"></script>
+    <script src="../../shared/sao-i18n.js"></script>
+    <script src="../../shared/sao-page-helpers.js"></script>
+    <script src="../../shared/sao-content-translations.js"></script>
+    <script src="../../shared/sao-datasets.js"></script>
+    <script src="../Commands/commands_current.js"></script>
+    <script src="../Commands/commands.js"></script>
+    <script src="miscinfo.js"></script>
+    <script src="../../shared/sao-polish.js"></script>
+  </body>
 </html>

@@ -1,30 +1,8 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const { createDom } = require("./harness-helpers");
 const root = path.resolve(__dirname, "..");
-
-function createDom(overrides = {}) {
-  const base = {
-    mapContainer: {},
-    sidebar: {},
-    mapLayer: {},
-    mapImage: {},
-    undergroundMapImage: {},
-    mobAreaLayer: {},
-    markerLayer: {},
-    title: {},
-    content: {},
-    overlayMappedCoords: {},
-    floorSelect: {},
-    undergroundToggle: {},
-    searchInput: {},
-    clearFiltersButton: {},
-    zoomLabel: {},
-    resetViewButton: {},
-    documentElement: { style: { setProperty() {} } }
-  };
-  return { ...base, ...overrides };
-}
 
 function createEventTarget() {
   const listeners = new Map();
@@ -100,12 +78,16 @@ const { createDisposer, createMapRuntime } = runtimeApi;
 const disposer = createDisposer();
 assert.equal(disposer.disposed, false, "new disposers are active");
 let cleanupCount = 0;
-disposer.add(() => { cleanupCount += 1; });
+disposer.add(() => {
+  cleanupCount += 1;
+});
 disposer.dispose();
 disposer.dispose();
 assert.equal(cleanupCount, 1, "cleanup callbacks run exactly once");
 assert.equal(disposer.disposed, true, "dispose marks the disposer as disposed");
-disposer.add(() => { cleanupCount += 1; });
+disposer.add(() => {
+  cleanupCount += 1;
+});
 assert.equal(cleanupCount, 2, "cleanup added after disposal runs immediately");
 
 const runtime = createMapRuntime(makeAdapter(), {
@@ -145,13 +127,16 @@ assert.equal(searchCategoryRuntime.getSearchQuery(), "mixed case query");
 assert.equal(searchCategoryRuntime.normalizeSearchQuery("  Another Query "), "another query");
 assert.equal(searchCategoryRuntime.clearSearchQuery(), "");
 assert.deepEqual(searchCategoryRuntime.getCategoryStates(), { general: true, hidden: false });
-assert.deepEqual(searchCategoryRuntime.replaceCategoryState({
-  "aincrad-floor-specific": true,
-  "underworld-island-specific": false
-}), {
-  "aincrad-floor-specific": true,
-  "underworld-island-specific": false
-});
+assert.deepEqual(
+  searchCategoryRuntime.replaceCategoryState({
+    "aincrad-floor-specific": true,
+    "underworld-island-specific": false
+  }),
+  {
+    "aincrad-floor-specific": true,
+    "underworld-island-specific": false
+  }
+);
 assert.equal(searchCategoryRuntime.toggleCategory("underworld-island-specific"), true);
 assert.equal(searchCategoryRuntime.getCategoryState("aincrad-floor-specific"), true);
 assert.equal(searchCategoryRuntime.setCategoryState("unknown-category", true), true);
@@ -159,7 +144,11 @@ const searchCategorySnapshot = searchCategoryRuntime.getState();
 searchCategorySnapshot.activeCategories["aincrad-floor-specific"] = false;
 assert.equal(searchCategoryRuntime.getCategoryState("aincrad-floor-specific"), true, "category snapshots are isolated");
 searchCategoryRuntime.setActiveMapContext("floor-2");
-assert.equal(searchCategoryRuntime.getCategoryState("aincrad-floor-specific"), true, "context changes do not reinterpret category IDs");
+assert.equal(
+  searchCategoryRuntime.getCategoryState("aincrad-floor-specific"),
+  true,
+  "context changes do not reinterpret category IDs"
+);
 assert.deepEqual(searchCategoryRuntime.clearCategoryState(), {
   "aincrad-floor-specific": false,
   "underworld-island-specific": false,
@@ -191,7 +180,10 @@ for (const id of ["aincrad-selection", "underworld-selection"]) {
 }
 
 assert.throws(() => createMapRuntime(null, { dom: createDom() }), /valid adapter/i);
-assert.throws(() => createMapRuntime(makeAdapter(), { dom: createDom({ mapContainer: null }) }), /missing required DOM/i);
+assert.throws(
+  () => createMapRuntime(makeAdapter(), { dom: createDom({ mapContainer: null }) }),
+  /missing required DOM/i
+);
 
 const secondRuntime = createMapRuntime(makeAdapter(), { dom: createDom() });
 assert.equal(secondRuntime.isInitialized(), false);
@@ -213,13 +205,16 @@ const coordinateRuntime = createMapRuntime(makeAdapter(), {
 const deps = coordinateRuntime.getCoordinateDependencies();
 assert.equal(typeof deps.mapWebsiteCoordinates, "function");
 assert.equal(typeof deps.invertMapCoordinates, "function");
-assert.deepEqual(coordinateRuntime.parseUrlState("?floor=floor2&underground=1&search=alpha&categories=general,hidden"), {
-  floor: "floor2",
-  underground: true,
-  search: "alpha",
-  activeCategories: { general: true, hidden: true },
-  hasParams: true
-});
+assert.deepEqual(
+  coordinateRuntime.parseUrlState("?floor=floor2&underground=1&search=alpha&categories=general,hidden"),
+  {
+    floor: "floor2",
+    underground: true,
+    search: "alpha",
+    activeCategories: { general: true, hidden: true },
+    hasParams: true
+  }
+);
 
 assert.deepEqual(coordinateRuntime.parseUrlState(""), {
   floor: null,
@@ -251,13 +246,19 @@ assert.equal(coordinateRuntime.serializeUrlState({ floor: "floor2" }), "floor=fl
 assert.equal(coordinateRuntime.serializeUrlState({ underground: true }), "underground=1");
 assert.equal(coordinateRuntime.serializeUrlState({ search: "alpha" }), "search=alpha");
 assert.equal(coordinateRuntime.serializeUrlState({ q: "beta" }), "search=beta");
-assert.equal(coordinateRuntime.serializeUrlState({ activeCategories: { hidden: true, general: true } }), "categories=hidden%2Cgeneral");
-assert.equal(coordinateRuntime.serializeUrlState({
-  floor: "floor2",
-  underground: true,
-  search: "alpha",
-  activeCategories: { general: true, hidden: false }
-}), "floor=floor2&underground=1&search=alpha&categories=general");
+assert.equal(
+  coordinateRuntime.serializeUrlState({ activeCategories: { hidden: true, general: true } }),
+  "categories=hidden%2Cgeneral"
+);
+assert.equal(
+  coordinateRuntime.serializeUrlState({
+    floor: "floor2",
+    underground: true,
+    search: "alpha",
+    activeCategories: { general: true, hidden: false }
+  }),
+  "floor=floor2&underground=1&search=alpha&categories=general"
+);
 const serializedState = coordinateRuntime.serializeUrlState({
   floor: "floor2",
   underground: true,
@@ -285,12 +286,24 @@ const visitedRuntime = createMapRuntime(makeAdapter({ id: "visited-test" }), {
   dom: createDom(),
   storage: visitedStorage
 });
-assert.equal(visitedRuntime.isMarkerVisited("floor1", "legacy-marker"), true, "legacy raw marker IDs remain compatible");
-assert.equal(visitedRuntime.isMarkerVisited("floor2", "already-visited"), true, "floor-aware marker IDs remain compatible");
+assert.equal(
+  visitedRuntime.isMarkerVisited("floor1", "legacy-marker"),
+  true,
+  "legacy raw marker IDs remain compatible"
+);
+assert.equal(
+  visitedRuntime.isMarkerVisited("floor2", "already-visited"),
+  true,
+  "floor-aware marker IDs remain compatible"
+);
 assert.equal(visitedRuntime.isMarkerVisited("floor1", "new-marker"), false);
 const visitedStateSnapshot = visitedRuntime.getState();
 visitedStateSnapshot.visitedMarkerIds.add("outside-mutation");
-assert.equal(visitedRuntime.isMarkerVisited("floor1", "outside-mutation"), false, "visited state snapshots are isolated");
+assert.equal(
+  visitedRuntime.isMarkerVisited("floor1", "outside-mutation"),
+  false,
+  "visited state snapshots are isolated"
+);
 assert.equal(visitedRuntime.setMarkerVisited("floor1", "new-marker", true), true);
 assert.equal(visitedRuntime.isMarkerVisited("floor1", "new-marker"), true);
 assert.deepEqual(visitedStorage.values["sao.visitedMarkers"], [
@@ -300,10 +313,7 @@ assert.deepEqual(visitedStorage.values["sao.visitedMarkers"], [
 ]);
 assert.equal(visitedRuntime.setMarkerVisited("floor1", "legacy-marker", false), false);
 assert.equal(visitedRuntime.isMarkerVisited("floor1", "legacy-marker"), false);
-assert.deepEqual(visitedStorage.values["sao.visitedMarkers"], [
-  "floor2:already-visited",
-  "floor1:new-marker"
-]);
+assert.deepEqual(visitedStorage.values["sao.visitedMarkers"], ["floor2:already-visited", "floor1:new-marker"]);
 visitedRuntime.destroy();
 
 const resizeEnvironment = createResizeEnvironment();
@@ -316,17 +326,23 @@ const resizeController = resizeRuntime.initializeSidebarResize({
   handle: resizeEnvironment.handle,
   document: resizeEnvironment.documentObject,
   window: resizeEnvironment.windowObject,
-  onWidthChange: width => resizeEvents.changed.push(width),
-  onResizeStart: () => { resizeEvents.started += 1; },
-  onResizeEnd: width => resizeEvents.ended.push(width)
+  onWidthChange: (width) => resizeEvents.changed.push(width),
+  onResizeStart: () => {
+    resizeEvents.started += 1;
+  },
+  onResizeEnd: (width) => resizeEvents.ended.push(width)
 });
 assert.ok(resizeController, "sidebar resize initializes with valid elements");
-assert.throws(() => resizeRuntime.initializeSidebarResize({
-  sidebar: resizeEnvironment.sidebar,
-  handle: resizeEnvironment.handle,
-  document: resizeEnvironment.documentObject,
-  window: resizeEnvironment.windowObject
-}), /already been initialized/i);
+assert.throws(
+  () =>
+    resizeRuntime.initializeSidebarResize({
+      sidebar: resizeEnvironment.sidebar,
+      handle: resizeEnvironment.handle,
+      document: resizeEnvironment.documentObject,
+      window: resizeEnvironment.windowObject
+    }),
+  /already been initialized/i
+);
 assert.equal(resizeRuntime.setSidebarWidth(100), 260, "sidebar width enforces minimum");
 assert.equal(resizeRuntime.setSidebarWidth(999), 520, "sidebar width enforces maximum");
 assert.equal(resizeEnvironment.handle.getAttribute("aria-valuemin"), "260");
@@ -352,7 +368,11 @@ assert.ok(resizeEvents.changed.length > 0, "width callback receives changes");
 resizeRuntime.destroy();
 resizeRuntime.destroy();
 assert.equal(resizeEnvironment.handle.listeners.get("mousedown")?.size || 0, 0, "destroy removes handle listeners");
-assert.equal(resizeEnvironment.windowObject.listeners.get("mousemove")?.size || 0, 0, "destroy removes window listeners");
+assert.equal(
+  resizeEnvironment.windowObject.listeners.get("mousemove")?.size || 0,
+  0,
+  "destroy removes window listeners"
+);
 
 const missingResizeRuntime = createMapRuntime(makeAdapter({ id: "missing-resize-test" }), { dom: createDom() });
 const missingResizeEnvironment = createResizeEnvironment();
@@ -369,26 +389,32 @@ missingResizeRuntime.destroy();
 for (const id of ["aincrad-sidebar-config", "underworld-sidebar-config"]) {
   const environment = createResizeEnvironment();
   const runtimeForPage = createMapRuntime(makeAdapter({ id }), { dom: environment.dom });
-  assert.ok(runtimeForPage.initializeSidebarResize({
-    sidebar: environment.sidebar,
-    handle: environment.handle,
-    document: environment.documentObject,
-    window: environment.windowObject
-  }), `${id} can use the shared sidebar mechanism`);
+  assert.ok(
+    runtimeForPage.initializeSidebarResize({
+      sidebar: environment.sidebar,
+      handle: environment.handle,
+      document: environment.documentObject,
+      window: environment.windowObject
+    }),
+    `${id} can use the shared sidebar mechanism`
+  );
   runtimeForPage.destroy();
 }
 
-const noWorldSpecificRuntime = createMapRuntime(makeAdapter({
-  id: "generic-adapter",
-  label: "Generic",
-  defaultFloor: "floor1",
-  categories: { alpha: true },
-  markerDataset: {},
-  mobAreaDataset: [],
-  navigationSections: {},
-  sectionPaths: {},
-  walkthroughSteps: []
-}), { dom: createDom() });
+const noWorldSpecificRuntime = createMapRuntime(
+  makeAdapter({
+    id: "generic-adapter",
+    label: "Generic",
+    defaultFloor: "floor1",
+    categories: { alpha: true },
+    markerDataset: {},
+    mobAreaDataset: [],
+    navigationSections: {},
+    sectionPaths: {},
+    walkthroughSteps: []
+  }),
+  { dom: createDom() }
+);
 assert.equal(noWorldSpecificRuntime.getAdapter().id, "generic-adapter");
 assert.equal(noWorldSpecificRuntime.getState().activeMapContextId, "floor1");
 
@@ -405,8 +431,16 @@ for (const controllerPath of [
   path.join(root, "Fractured Underworld", "Main UI", "mainui.js")
 ]) {
   const controllerSource = fs.readFileSync(controllerPath, "utf8");
-  assert.doesNotMatch(controllerSource, /function\s+parseUrlState\s*\(/, `${controllerPath} delegates URL parsing to the shared runtime`);
-  assert.doesNotMatch(controllerSource, /function\s+buildUrlFromState\s*\(/, `${controllerPath} does not wrap URL serialization`);
+  assert.doesNotMatch(
+    controllerSource,
+    /function\s+parseUrlState\s*\(/,
+    `${controllerPath} delegates URL parsing to the shared runtime`
+  );
+  assert.doesNotMatch(
+    controllerSource,
+    /function\s+buildUrlFromState\s*\(/,
+    `${controllerPath} does not wrap URL serialization`
+  );
   assert.match(controllerSource, /sharedMapRuntime\.parseUrlState\(window\.location\.search\)/);
   assert.match(controllerSource, /sharedMapRuntime\.serializeUrlState\(mapState\)/);
 }

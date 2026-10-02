@@ -15,7 +15,7 @@ Adapters may expose empty datasets and unavailable assets when repository data d
 
 ## Controller owns
 
-- Page-specific HTML behavior, marker DOM, icons, CSS classes, info panels, filtering details, and mob-area presentation.
+- Page-specific HTML behavior, marker DOM, CSS classes, info panels, filtering details, and mob-area presentation. Marker artwork is not duplicated: both controllers render the shared `MARKER_ICON_LIBRARY` icons from `shared/sao-map-helpers.js` and only decide which kind each marker gets.
 - Page-specific coordinate projection, inverse-coordinate use, image transforms, viewport culling, and rendering caches.
 - Page-specific navigation handling where route semantics differ.
 
@@ -26,6 +26,7 @@ The Aincrad and Underworld renderers therefore remain separate. Controllers cons
 - Generic map state and lifecycle disposal.
 - Category/search state, selection, persistence compatibility, URL-state serialization, and coordinate dependency plumbing.
 - Shared pan/zoom and sidebar infrastructure that does not require world knowledge.
+- `createContextDataResolver(datasets)`, the world-neutral "filter datasets by context id" primitive. Adapters call it and still own the datasets plus the resulting `getContextData(contextId)` contract.
 
 The shared runtime remains world-neutral and contains no floor, island, category, asset, or coordinate dataset names.
 

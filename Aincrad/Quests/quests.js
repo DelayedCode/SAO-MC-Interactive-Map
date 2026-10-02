@@ -1,14 +1,9 @@
 const DEFAULT_FLOOR = "floor1";
 const i18n = window.SAOI18n || null;
-const t = (key, params) => (i18n ? i18n.t(key, params) : key);
-const content = (key, fallback) => (i18n && typeof i18n.content === "function"
-  ? i18n.content(key, fallback)
-  : fallback);
+const { t, content } = window.SAOPageHelpers.createTranslators(i18n);
 const params = new URLSearchParams(window.location.search);
 const requestedFloor = params.get("floor");
-const activeFloor = requestedFloor && /^floor[123]$/.test(requestedFloor)
-  ? requestedFloor
-  : DEFAULT_FLOOR;
+const activeFloor = requestedFloor && /^floor[123]$/.test(requestedFloor) ? requestedFloor : DEFAULT_FLOOR;
 
 const columns = [
   { key: "npcName", labelKey: "page.quests.tableCols.npcName", label: "NPC Name" },
@@ -31,25 +26,19 @@ const completedStorageKey = "sao.completedQuests";
 const questsUiStateStorageKey = "sao.quests.uiState";
 
 function getFloorLabel(floor) {
-  return String(floor || DEFAULT_FLOOR).replace("floor", "Floor ");
+  /* Mirrors the map page: the word for "floor" comes from the localization layer so the label
+     reads "Floor 1" / "Piso 1" / "Étage 1" instead of a hard-coded English word. */
+  const floorWord = t("page.quests.floorText") || "Floor";
+  return String(floor || DEFAULT_FLOOR).replace("floor", `${floorWord} `);
 }
 
-function slugifyContentId(value) {
-  return String(value || "unknown")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "unknown";
-}
+const { slugifyContentId } = window.SAOPageHelpers;
+
+const { escapeHtml } = window.SAOPageHelpers;
 
 function getQuestId(entry) {
   if (entry.id) return String(entry.id);
-  return slugifyContentId([
-    entry.npcName,
-    entry.city,
-    entry.coordinates,
-    entry.questName
-  ].join("-"));
+  return slugifyContentId([entry.npcName, entry.city, entry.coordinates, entry.questName].join("-"));
 }
 
 function getQuestText(entry, field) {
@@ -63,7 +52,9 @@ function getQuestText(entry, field) {
 
 function getQuestType(entry) {
   const rawType = entry.questType ?? entry.type ?? entry.category;
-  const normalizedType = String(rawType || "").trim().toLowerCase();
+  const normalizedType = String(rawType || "")
+    .trim()
+    .toLowerCase();
   if (normalizedType.includes("main")) return QUEST_TYPES.main;
   if (normalizedType.includes("side")) return QUEST_TYPES.side;
   return QUEST_TYPES.side;
@@ -129,7 +120,7 @@ function loadCompletedQuests() {
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return new Set();
-    return new Set(parsed.filter(value => typeof value === "string"));
+    return new Set(parsed.filter((value) => typeof value === "string"));
   } catch {
     return new Set();
   }
@@ -153,8 +144,8 @@ function attachSectionNavButtons() {
 }
 
 function getQuestEntries() {
-  const registerEntries = entries => {
-    entries.forEach(entry => window.SAOContentTranslations?.registerQuestEntry?.(entry, slugifyContentId));
+  const registerEntries = (entries) => {
+    entries.forEach((entry) => window.SAOContentTranslations?.registerQuestEntry?.(entry, slugifyContentId));
     return entries;
   };
   if (window.SAODatasets?.getDatasetFromLocation() === "current") {
@@ -172,13 +163,27 @@ function getCompletedCountForEntries(entries) {
   }, 0);
 }
 
+/* Floor data scripts load through the shared tagged-script loader (the same path
+   the Bestiary and Compendium use) so a repeated call cannot double-inject the
+   same floor and the injected tag stays inspectable. The loader falls back to
+   onReady when the runtime helper is missing or the script fails, matching the
+   previous "always proceed" behaviour. */
+const loadedQuestFloors = new Set();
+
 function loadFloorDataScript(floorKey, onReady) {
-  const floorScript = document.createElement("script");
-  floorScript.src = `quests_${floorKey}.js`;
-  floorScript.async = false;
-  floorScript.addEventListener("load", onReady, { once: true });
-  floorScript.addEventListener("error", onReady, { once: true });
-  document.head.appendChild(floorScript);
+  const runtimeUtils = window.SAORuntimeUtils;
+  if (!runtimeUtils || typeof runtimeUtils.loadTaggedScriptOnce !== "function") {
+    onReady();
+    return;
+  }
+
+  runtimeUtils.loadTaggedScriptOnce({
+    cache: loadedQuestFloors,
+    cacheKey: floorKey,
+    tagAttribute: "data-quests-floor",
+    src: `quests_${floorKey}.js`,
+    onReady
+  });
 }
 
 function renderQuestTable(entries) {
@@ -214,18 +219,28 @@ function renderQuestTable(entries) {
     const isCompleted = isQuestCompleted(entry);
     row.classList.toggle("is-completed", isCompleted);
 
-    columns.forEach(({ key }) => {
+    columns.forEach(({ key, label, labelKey }) => {
       const cell = document.createElement("td");
       cell.classList.add(key);
+      /* The mobile layout renders the table as labelled cards, so each cell carries its own
+         localized column name instead of relying on the (hidden) table header. */
+      cell.dataset.label = t(labelKey, null) || label;
       if (key === "completed") {
         const button = document.createElement("button");
         button.type = "button";
         button.className = `completion-button${isCompleted ? " is-completed" : ""}`;
         button.dataset.questKey = questKey;
-        button.textContent = isCompleted
-          ? t("page.quests.completed")
-          : t("page.quests.markCompleted");
+        button.textContent = isCompleted ? t("page.quests.completed") : t("page.quests.markCompleted");
         cell.appendChild(button);
+        row.appendChild(cell);
+        return;
+      }
+      if (key === "questName" && entry.questNumber) {
+        const numberBadge = document.createElement("span");
+        numberBadge.className = "quest-number";
+        numberBadge.textContent = String(entry.questNumber);
+        numberBadge.setAttribute("aria-label", t("page.quests.questNumber", { number: entry.questNumber }));
+        cell.append(numberBadge, document.createTextNode(getQuestText(entry, key)));
         row.appendChild(cell);
         return;
       }
@@ -243,16 +258,32 @@ function initQuestsRuntime() {
   const status = document.getElementById("status");
   const questSearch = document.getElementById("questSearch");
   const questTableRoot = document.getElementById("questTableRoot");
+  const cityFilter = document.getElementById("questCityFilter");
+  const completionFilter = document.getElementById("questCompletionFilter");
   const titleSpan = document.querySelector(".quests-title span");
   const questUiState = loadQuestUiState();
   const savedSearchByFloor = questUiState.searchByFloor || {};
   const savedQuestTypeByFloor = questUiState.questTypeByFloor || {};
-  const initialSearch = params.get("search") || params.get("npc") || params.get("q") || savedSearchByFloor[activeFloor] || "";
+  const savedCityByFloor = questUiState.cityByFloor || {};
+  const savedCompletionByFloor = questUiState.completionByFloor || {};
+  const initialSearch =
+    params.get("search") || params.get("npc") || params.get("q") || savedSearchByFloor[activeFloor] || "";
   const questEntries = getQuestEntries();
-  let activeQuestType = savedQuestTypeByFloor[activeFloor] === QUEST_TYPES.main
-    ? QUEST_TYPES.main
-    : QUEST_TYPES.side;
+  let activeQuestType = savedQuestTypeByFloor[activeFloor] === QUEST_TYPES.main ? QUEST_TYPES.main : QUEST_TYPES.side;
+  let activeCity = savedCityByFloor[activeFloor] || "";
+  let activeCompletion = savedCompletionByFloor[activeFloor] || "";
   let renderRafId = null;
+
+  /* Current Data carries the Main Questline, Beta-Test Data carries side quests only.
+     If the remembered quest type has no entries but the other type does, follow the data
+     so the table never opens on an empty tab. */
+  const hasMainEntries = questEntries.some((entry) => getQuestType(entry) === QUEST_TYPES.main);
+  const hasSideEntries = questEntries.some((entry) => getQuestType(entry) === QUEST_TYPES.side);
+  if (activeQuestType === QUEST_TYPES.main && !hasMainEntries && hasSideEntries) {
+    activeQuestType = QUEST_TYPES.side;
+  } else if (activeQuestType === QUEST_TYPES.side && !hasSideEntries && hasMainEntries) {
+    activeQuestType = QUEST_TYPES.main;
+  }
 
   attachSectionNavButtons();
 
@@ -269,7 +300,7 @@ function initQuestsRuntime() {
   }
 
   function updateQuestTypeButtons() {
-    document.querySelectorAll(".quest-type-button[data-quest-type]").forEach(button => {
+    document.querySelectorAll(".quest-type-button[data-quest-type]").forEach((button) => {
       const isActive = button.dataset.questType === activeQuestType;
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", String(isActive));
@@ -278,21 +309,31 @@ function initQuestsRuntime() {
 
   function renderFilteredQuests() {
     const query = questSearch ? questSearch.value.trim().toLowerCase() : "";
-    const typeEntries = questEntries.filter(entry => getQuestType(entry) === activeQuestType);
-    const visibleEntries = query
-      ? typeEntries.filter(entry =>
-          columns.some(({ key }) => key !== "completed" && (
-            String(entry[key]).toLowerCase().includes(query) ||
-            String(getQuestText(entry, key)).toLowerCase().includes(query)
-          ))
+    const typeEntries = questEntries.filter((entry) => getQuestType(entry) === activeQuestType);
+    const cityEntries = activeCity
+      ? typeEntries.filter((entry) => String(getQuestText(entry, "city")) === activeCity)
+      : typeEntries;
+    const completionEntries = activeCompletion
+      ? cityEntries.filter((entry) =>
+          activeCompletion === "completed" ? isQuestCompleted(entry) : !isQuestCompleted(entry)
         )
-        : typeEntries;
-      const completedCount = getCompletedCountForEntries(typeEntries);
+      : cityEntries;
+    const visibleEntries = query
+      ? completionEntries.filter((entry) =>
+          columns.some(
+            ({ key }) =>
+              key !== "completed" &&
+              (String(entry[key]).toLowerCase().includes(query) ||
+                String(getQuestText(entry, key)).toLowerCase().includes(query))
+          )
+        )
+      : completionEntries;
+    const completedCount = getCompletedCountForEntries(typeEntries);
 
     if (status) {
       if (questEntries.length === 0) {
         status.textContent = t("page.quests.noQuestData", { floor: getFloorLabel(activeFloor) });
-      } else if (visibleEntries.length === 0 && query) {
+      } else if (visibleEntries.length === 0 && (query || activeCity || activeCompletion)) {
         status.textContent = t("page.quests.noQuestMatchFloor", {
           floor: getFloorLabel(activeFloor),
           completed: completedCount
@@ -323,13 +364,42 @@ function initQuestsRuntime() {
       if (root) {
         const emptyState = document.createElement("p");
         emptyState.className = "empty-state";
-        emptyState.textContent = t("page.quests.noQuestMatch");
+        emptyState.textContent = t("page.quests.noFilterMatch");
         root.replaceChildren(emptyState);
       }
       return;
     }
 
     renderQuestTable(visibleEntries);
+  }
+
+  /* City options come straight from the loaded quest data. Placeholder values such as "N/A"
+     are kept out so they never appear as a selectable city. */
+  function populateCityFilter() {
+    if (!cityFilter) return;
+    const cities = [
+      ...new Set(
+        questEntries
+          .map((entry) => String(getQuestText(entry, "city")).trim())
+          .filter((city) => city && !/^n\/?a$/i.test(city))
+      )
+    ].sort((a, b) => a.localeCompare(b));
+    const previousValue = activeCity;
+    const options = [`<option value="">${escapeHtml(t("page.quests.allCities"))}</option>`].concat(
+      cities.map((city) => `<option value="${escapeHtml(city)}">${escapeHtml(city)}</option>`)
+    );
+    cityFilter.innerHTML = options.join("");
+    activeCity = cities.includes(previousValue) ? previousValue : "";
+    cityFilter.value = activeCity;
+  }
+
+  function saveFilterState() {
+    const nextUiState = loadQuestUiState();
+    saveQuestUiState({
+      ...nextUiState,
+      cityByFloor: { ...(nextUiState.cityByFloor || {}), [activeFloor]: activeCity },
+      completionByFloor: { ...(nextUiState.completionByFloor || {}), [activeFloor]: activeCompletion }
+    });
   }
 
   if (status) {
@@ -354,7 +424,7 @@ function initQuestsRuntime() {
     });
   }
 
-  document.querySelectorAll(".quest-type-button[data-quest-type]").forEach(button => {
+  document.querySelectorAll(".quest-type-button[data-quest-type]").forEach((button) => {
     button.addEventListener("click", () => {
       const nextType = button.dataset.questType;
       if (!Object.values(QUEST_TYPES).includes(nextType)) return;
@@ -372,15 +442,32 @@ function initQuestsRuntime() {
 
   updateQuestTypeButtons();
 
+  populateCityFilter();
+  if (completionFilter) {
+    completionFilter.value = activeCompletion;
+    completionFilter.addEventListener("change", () => {
+      activeCompletion = completionFilter.value;
+      saveFilterState();
+      renderFilteredQuests();
+    });
+  }
+  if (cityFilter) {
+    cityFilter.addEventListener("change", () => {
+      activeCity = cityFilter.value;
+      saveFilterState();
+      renderFilteredQuests();
+    });
+  }
+
   if (questTableRoot) {
-    questTableRoot.addEventListener("click", event => {
+    questTableRoot.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-quest-key]");
       if (!button) return;
 
       const questKey = button.dataset.questKey;
       if (!questKey) return;
 
-      const entry = questEntries.find(candidate => getQuestKey(candidate) === questKey);
+      const entry = questEntries.find((candidate) => getQuestKey(candidate) === questKey);
       const nextState = entry ? !isQuestCompleted(entry) : !completedQuests.has(questKey);
       setQuestCompleted(completedQuests, questKey, nextState);
       if (!nextState) {
@@ -393,7 +480,10 @@ function initQuestsRuntime() {
 
   renderFilteredQuests();
 
-  document.addEventListener("sao:languagechange", renderFilteredQuests);
+  document.addEventListener("sao:languagechange", () => {
+    populateCityFilter();
+    renderFilteredQuests();
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -1,0 +1,268 @@
+﻿/* SAO MC UI polish layer: small consistency pass, no redesign. */
+:root {
+  --sao-polish-focus: #8bb7ff;
+  --sao-polish-active-glow: rgba(115, 185, 255, 0.16);
+}
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--sao-polish-focus);
+  outline-offset: 2px;
+}
+button,
+select,
+summary,
+a {
+  cursor: pointer;
+}
+button:disabled,
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.nav button[aria-current="page"],
+.nav button.is-active,
+.top-nav .top-button[aria-current="page"],
+.top-nav button[aria-current="page"] {
+  border-color: rgba(130, 190, 255, 0.55);
+  background: rgba(24, 42, 62, 0.95);
+  color: #fff;
+  box-shadow:
+    0 0 14px var(--sao-polish-active-glow),
+    inset 0 -2px 0 rgba(115, 185, 255, 0.65);
+}
+.marker.active-marker {
+  z-index: 60;
+  filter: drop-shadow(0 0 8px rgba(115, 185, 255, 0.85));
+}
+.marker.active-marker::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #9fd3ff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 14px rgba(115, 185, 255, 0.55),
+    inset 0 0 8px rgba(115, 185, 255, 0.3);
+  pointer-events: none;
+}
+#zoomControls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+#zoomControls button {
+  min-height: 32px;
+  min-width: 34px;
+  font-weight: 700;
+}
+#zoomLabel {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: #cfe6ff;
+}
+.sidebar-list-button {
+  text-align: left;
+}
+.sidebar-list-button.active {
+  font-weight: 700;
+}
+.mode-button .tag.sao-release-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.mode-button .tag.sao-release-badge.is-live {
+  border: 1px solid rgba(131, 214, 160, 0.55);
+  background: rgba(39, 91, 62, 0.4);
+  color: #c9f3d9;
+}
+.mode-button .tag.sao-release-badge.is-soon {
+  border: 1px dashed rgba(164, 198, 230, 0.45);
+  background: rgba(10, 18, 30, 0.6);
+  color: #9fb4c9;
+}
+.mode-button.is-unreleased-world {
+  cursor: not-allowed;
+}
+.mode-button.is-unreleased-world:hover {
+  transform: none;
+}
+#discord-button[aria-expanded="true"] {
+  border-color: #73b9ff;
+  background: rgba(24, 42, 62, 0.96);
+  box-shadow: 0 0 14px rgba(115, 185, 255, 0.2);
+}
+.slot-button.is-filled {
+  outline: 2px solid rgba(231, 189, 112, 0.45);
+  outline-offset: 1px;
+}
+.slot-button.is-unavailable {
+  opacity: 0.6;
+}
+.slot-button.is-unavailable:hover {
+  transform: none;
+  border-style: dashed;
+}
+.base-value {
+  font-size: 0.72rem;
+  color: #bcd2e5;
+  text-align: right;
+  line-height: 1.5;
+}
+.quest-table tbody tr.is-completed td:first-child {
+  box-shadow: inset 3px 0 0 rgba(133, 209, 163, 0.8);
+}
+@media (max-width: 760px) {
+  .nav button,
+  .top-nav .top-button,
+  .list-tab {
+    min-height: 40px;
+  }
+}
+@media (min-width: 1900px) {
+  .page {
+    max-width: 1440px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Equipment rarity readability (uses the rarity wording already in the data). */
+.rarity-common {
+  color: #c3ccd5;
+}
+.rarity-uncommon {
+  color: #82d69b;
+  font-weight: 700;
+}
+.rarity-rare {
+  color: #71c9ff;
+  font-weight: 700;
+}
+.rarity-epic {
+  color: #c6a2ff;
+  font-weight: 700;
+}
+.rarity-legendary {
+  color: #f5b66d;
+  font-weight: 700;
+}
+.rarity-mythic {
+  color: #ff819e;
+  font-weight: 700;
+}
+.rarity-godlike {
+  color: #ffe08a;
+  font-weight: 700;
+}
+.rarity-event {
+  color: #ffb0d4;
+  font-weight: 700;
+}
+
+/* Long descriptions stay readable instead of overflowing their card. */
+.ecompendium-card .equipment-section p {
+  margin: 0;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Quest filters (city / completion) reuse the shared Aincrad accent palette so the controls
+   match every other Aincrad page instead of keeping the old page-local green theme. */
+.quest-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 14px;
+}
+.quest-filter-field {
+  display: grid;
+  gap: 4px;
+}
+.quest-filter-field > span {
+  color: #9cc7e7;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.quest-filter-field select {
+  min-height: 34px;
+  min-width: 150px;
+  padding: 6px 10px;
+  border: 1px solid rgba(164, 198, 230, 0.2);
+  border-radius: 8px;
+  background: rgba(6, 14, 22, 0.72);
+  color: var(--aincrad-text, #edf4ff);
+  outline: none;
+}
+.quest-filter-field select:focus {
+  border-color: #73c9ff;
+  box-shadow: 0 0 0 3px rgba(115, 201, 255, 0.12);
+}
+@media (max-width: 720px) {
+  .quest-filter-field {
+    width: 100%;
+  }
+  .quest-filter-field select {
+    width: 100%;
+  }
+}
+
+/* Questline number shown before Main Quest titles in the quest table. */
+.quest-number {
+  display: inline-grid;
+  min-width: 22px;
+  height: 20px;
+  place-items: center;
+  margin-right: 7px;
+  padding: 0 5px;
+  border: 1px solid rgba(115, 201, 255, 0.45);
+  border-radius: 6px;
+  background: rgba(115, 201, 255, 0.12);
+  color: #d6ecff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+}
+
+/* Bestiary cards reuse the Equipment Compendium hover interaction. */
+.mob-card {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+.mob-card:hover {
+  border-color: #49b7ff;
+  box-shadow: 0 0 16px rgba(73, 183, 255, 0.2);
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mob-card:hover {
+    transform: none;
+  }
+}

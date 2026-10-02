@@ -9,7 +9,7 @@ function createVirtualControl(initialValue, propertyName) {
       if (type === "change") listeners.delete(listener);
     },
     dispatchEvent(event) {
-      listeners.forEach(listener => listener(event));
+      listeners.forEach((listener) => listener(event));
     }
   };
 }
@@ -38,82 +38,112 @@ const elements = {
 
 let categoryToggleButtons = [];
 
-const { mapContainer, sidebar, sidebarResizeHandle, mapLayer, mapImage, undergroundMapImage, mobAreaLayer, markerLayer, title, content, overlayMappedCoords, floorSelect, undergroundToggle, searchInput, clearFiltersButton, zoomLabel, resetViewButton, globalToast } = elements;
+const {
+  mapContainer,
+  sidebar,
+  sidebarResizeHandle,
+  mapLayer,
+  mapImage,
+  undergroundMapImage,
+  mobAreaLayer,
+  markerLayer,
+  title,
+  content,
+  overlayMappedCoords,
+  floorSelect,
+  undergroundToggle,
+  searchInput,
+  clearFiltersButton,
+  zoomLabel,
+  resetViewButton,
+  globalToast
+} = elements;
+
+/* HTML escaping comes from shared/sao-page-helpers.js. */
+const { escapeHtml } = window.SAOPageHelpers;
+
+/* Cache, colour, mob-area, pointer and marker-icon helpers come from shared/sao-map-helpers.js. */
+const {
+  getCachedValue,
+  setCachedValue,
+  normalizeHexColor,
+  getOppositeHexColor,
+  getMobAreaCenter,
+  formatZoomLabel,
+  getGridSquareSize,
+  clearTextSelection,
+  shouldIgnoreMapDrag,
+  getImageLocalCoords,
+  CLUSTER_RADIUS_PX,
+  CLUSTER_ID_PREFIX,
+  isClusteringEnabled,
+  buildScreenClusters,
+  MARKET_CATEGORIES,
+  CRAFTSMAN_CATEGORIES,
+  MOB_AREA_LABEL_VERTICAL_OFFSET,
+  buildMarketMarkerIcon,
+  buildCraftsmanMarkerIcon,
+  buildMarkerIcon,
+  renderMapRuntimeError
+} = window.SAOMapHelpers;
 
 function showMainUiRuntimeError(message) {
-  const fallbackMessage = message || t("page.mainui.runtimeError");
-  if (title) {
-    title.textContent = t("page.mainui.runtimeTitle");
-  }
-  if (content) {
-    const paragraph = document.createElement("p");
-    paragraph.textContent = fallbackMessage;
-    content.replaceChildren(paragraph);
-  }
+  renderMapRuntimeError(title, content, t("page.mainui.runtimeTitle"), message || t("page.mainui.runtimeError"));
 }
 
 function hasRequiredMainUiElements() {
   return Boolean(
-    mapContainer && sidebar && mapLayer && mapImage && undergroundMapImage &&
-    mobAreaLayer && markerLayer && title && content && overlayMappedCoords &&
-    floorSelect && undergroundToggle && searchInput && zoomLabel && resetViewButton
+    mapContainer &&
+    sidebar &&
+    mapLayer &&
+    mapImage &&
+    undergroundMapImage &&
+    mobAreaLayer &&
+    markerLayer &&
+    title &&
+    content &&
+    overlayMappedCoords &&
+    floorSelect &&
+    undergroundToggle &&
+    searchInput &&
+    zoomLabel &&
+    resetViewButton
   );
 }
 
-const MARKET_CATEGORIES = new Set([
-  "lootBuyers",
-  "weaponSellers",
-  "travelingMerchants",
-  "equipmentMerchants",
-  "toolMerchants",
-  "accessoriesMerchants",
-  "occultMerchants",
-  "consumablesMerchants"
-]);
-const CRAFTSMAN_CATEGORIES = new Set([
-  "weaponsmith",
-  "armorBlacksmith",
-  "ingotBlacksmith",
-  "keyBlacksmith",
-  "accessoriesBlacksmith",
-  "runeCraftsmen",
-  "refaire"
-]);
 const mapAdapter = window.UnderworldMapAdapter || null;
-let contextData = null;
-let contextDataId = null;
-let contextMobAreaLookup = new Map();
+/* Per-context dataset caching, the mob-area lookup and the marker search-cache
+   invalidation are owned by the shared accessor factory (shared/sao-map-helpers.js)
+   so the Aincrad and Underworld maps cannot drift apart on them. */
+const mapContextAccessors = window.SAOMapHelpers.createMapContextAccessors({
+  getAdapter: () => mapAdapter,
+  getContextId: () => floorSelect?.value || mapAdapter?.defaultFloor || "",
+  onContextChange: () => {
+    markerSearchCache = null;
+  }
+});
+
 function getContextData() {
-  const contextId = floorSelect?.value || mapAdapter?.defaultFloor || "";
-  if (contextData && contextDataId === contextId) return contextData;
-  contextDataId = contextId;
-  contextData = mapAdapter?.getContextData?.(contextId) || {
-    markerDataset: {},
-    mobAreaDataset: [],
-    mobAreaMobLookup: {}
-  };
-  contextMobAreaLookup = new Map(contextData.mobAreaDataset.map(area => [area.id, area]));
-  markerSearchCache = null;
-  return contextData;
+  return mapContextAccessors.getContextData();
 }
-function getDataEntries() { return Object.entries(getContextData().markerDataset); }
-function getMobAreas() { return getContextData().mobAreaDataset; }
-function getMobAreaMobLookup() { return getContextData().mobAreaMobLookup; }
-function getMobAreaLookup() { getContextData(); return contextMobAreaLookup; }
+function getDataEntries() {
+  return mapContextAccessors.getDataEntries();
+}
+function getMobAreas() {
+  return mapContextAccessors.getMobAreas();
+}
+function getMobAreaMobLookup() {
+  return mapContextAccessors.getMobAreaMobLookup();
+}
+function getMobAreaLookup() {
+  return mapContextAccessors.getMobAreaLookup();
+}
 
 const mapUiStateStorageKey = "sao.map.uiState";
 const mapWalkthroughStorageKey = "sao.walkthrough.mainui.completed";
 const i18n = window.SAOI18n || null;
-const t = (key, params) => (i18n ? i18n.t(key, params) : key);
-const contentLookup = (key, fallback) => (i18n && typeof i18n.content === "function"
-  ? i18n.content(key, fallback)
-  : fallback);
-const storage = window.SAOStorage || {
-  getItem() { return null; },
-  setItem() {},
-  getJSON(_key, fallbackValue) { return fallbackValue; },
-  setJSON() {}
-};
+const { t, content: contentLookup } = window.SAOPageHelpers.createTranslators(i18n);
+const storage = window.SAOPageHelpers.getStorage();
 
 const initialCategoryState = Object.freeze({
   npc: false,
@@ -126,27 +156,27 @@ const initialCategoryState = Object.freeze({
 });
 
 function createSharedMapRuntime() {
-  return (typeof window.createMapRuntime === "function" && window.UnderworldMapAdapter)
+  return typeof window.createMapRuntime === "function" && window.UnderworldMapAdapter
     ? window.createMapRuntime(window.UnderworldMapAdapter, {
-      dom: elements,
-      storage,
-      coordinateDependencies: window.UnderworldMapAdapter.coordinateDependencies,
-      requiredElements: [
-        "mapContainer",
-        "sidebar",
-        "mapLayer",
-        "mapImage",
-        "undergroundMapImage",
-        "mobAreaLayer",
-        "markerLayer",
-        "title",
-        "content",
-        "overlayMappedCoords",
-        "searchInput",
-        "clearFiltersButton",
-        "zoomLabel",
-        "resetViewButton"
-      ]
+        dom: elements,
+        storage,
+        coordinateDependencies: window.UnderworldMapAdapter.coordinateDependencies,
+        requiredElements: [
+          "mapContainer",
+          "sidebar",
+          "mapLayer",
+          "mapImage",
+          "undergroundMapImage",
+          "mobAreaLayer",
+          "markerLayer",
+          "title",
+          "content",
+          "overlayMappedCoords",
+          "searchInput",
+          "clearFiltersButton",
+          "zoomLabel",
+          "resetViewButton"
+        ]
       })
     : null;
 }
@@ -159,43 +189,27 @@ let pageDisposer = null;
 let pageInitialized = false;
 let walkthroughController = null;
 
+/* Disposer plus tracked listener / animation-frame / timeout registration live in
+   shared/sao-map-helpers.js (createPageLifecycle) so the Aincrad and Underworld
+   maps cannot drift apart. These wrappers keep the page-local call sites and the
+   `pageDisposer` guard readable; `state` carries the pending-handle keys. */
+const pageLifecycle = window.SAOMapHelpers.createPageLifecycle();
+
 function getPageDisposer() {
-  if (!pageDisposer || pageDisposer.disposed) {
-    pageDisposer = window.createDisposer();
-  }
+  pageDisposer = pageLifecycle.getDisposer();
   return pageDisposer;
 }
 
 function addPageEventListener(target, type, listener, options) {
-  target.addEventListener(type, listener, options);
-  getPageDisposer().add(() => target.removeEventListener(type, listener, options));
+  pageLifecycle.addListener(target, type, listener, options);
 }
 
 function schedulePageAnimationFrame(stateKey, callback) {
-  const disposer = getPageDisposer();
-  if (disposer.disposed) return null;
-  const handle = window.requestAnimationFrame(() => {
-    if (state[stateKey] === handle) state[stateKey] = null;
-    if (disposer.disposed) return;
-    callback();
-  });
-  state[stateKey] = handle;
-  disposer.add(() => {
-    if (state[stateKey] === handle) state[stateKey] = null;
-    window.cancelAnimationFrame(handle);
-  });
-  return handle;
+  return pageLifecycle.scheduleAnimationFrame(state, stateKey, callback);
 }
 
 function schedulePageTimeout(callback, delay) {
-  const disposer = getPageDisposer();
-  if (disposer.disposed) return null;
-  const handle = window.setTimeout(() => {
-    if (disposer.disposed) return;
-    callback();
-  }, delay);
-  disposer.add(() => window.clearTimeout(handle));
-  return handle;
+  return pageLifecycle.scheduleTimeout(callback, delay);
 }
 
 function getMarkerText(marker, field, markerId) {
@@ -211,37 +225,37 @@ function getAreaText(area) {
   return contentLookup(`underworld-map.mob-area.${area?.id || "unknown"}.title`, area?.title || "");
 }
 
-const state = {
-  zoom: 1,
-  translateX: 0,
-  translateY: 0,
-  isDragging: false,
-  dragStartX: 0,
-  dragStartY: 0,
-  pendingDragClientX: 0,
-  pendingDragClientY: 0,
-  dragRafId: null,
-  initialZoom: 1,
-  initialTranslateX: 0,
-  initialTranslateY: 0,
-  pendingPointerEvent: null,
-  coordinateRafId: null,
-  renderMarkersRafId: null,
-  markerRenderSignature: "",
-  markerCache: new Map(),
-};
+/* Namespace this world's map content is registered under in the shared content registry
+   (shared/sao-content-translations.js). Aincrad owns `map.*`; the Underworld owns
+   `underworld-map.*`, so the two datasets can never share or overwrite each other's keys
+   while both resolve through the same SAOI18n.content() lookup path. */
+const UNDERWORLD_MAP_CONTENT_NAMESPACE = "underworld-map";
 
-function isMainCategoryAvailableForFloor(category, floor) {
-  const allowedFloors = mapAdapter?.categoryFloorRules?.[category];
-  if (!allowedFloors) return true;
-  return allowedFloors.includes(floor);
+/* Registers every Underworld marker and mob area with the shared content registry so
+   getMarkerText()/getAreaText() resolve through it instead of falling back to raw English.
+   The Aincrad controller registers per active floor because its dataset is huge; the
+   Underworld adapter exposes its whole dataset up front (a handful of waypoints across five
+   islands), so one pass covers every island the user can switch to. */
+function registerUnderworldMapTranslations() {
+  const registry = window.SAOContentTranslations;
+  if (!registry) return;
+
+  const markers = mapAdapter?.markerDataset || {};
+  Object.entries(markers).forEach(([id, marker]) => {
+    registry.registerMapMarker?.(id, marker, UNDERWORLD_MAP_CONTENT_NAMESPACE);
+  });
+
+  const mobAreas = Array.isArray(mapAdapter?.mobAreaDataset) ? mapAdapter.mobAreaDataset : [];
+  mobAreas.forEach((area) => registry.registerMapMobArea?.(area, UNDERWORLD_MAP_CONTENT_NAMESPACE));
 }
+
+const state = window.SAOMapHelpers.createInitialMapState();
 
 function syncMainCategoryButtonVisibility() {
   const selectedFloor = floorSelect ? floorSelect.value : "";
   const visibleCategories = new Set(getIslandCategoriesForFloor(selectedFloor));
 
-  categoryToggleButtons.forEach(button => {
+  categoryToggleButtons.forEach((button) => {
     const category = button.dataset.category;
     const isVisible = visibleCategories.has(category);
     const listItem = button.closest("li");
@@ -257,7 +271,7 @@ function syncMainCategoryButtonVisibility() {
   });
 
   const categoryStates = sharedMapRuntime?.getCategoryStates?.() || {};
-  Object.keys(categoryStates).forEach(category => {
+  Object.keys(categoryStates).forEach((category) => {
     if (!visibleCategories.has(category)) {
       sharedMapRuntime.setCategoryState(category, false);
     }
@@ -281,7 +295,7 @@ function getIslandCategoriesForFloor(floorKey) {
 function syncIslandNavigation() {
   const islandButtons = document.querySelectorAll(".island-nav-button");
   const selectedFloor = floorSelect?.value || mapAdapter?.defaultFloor || "";
-  islandButtons.forEach(button => {
+  islandButtons.forEach((button) => {
     const isActive = button.dataset.island === selectedFloor;
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
@@ -301,18 +315,20 @@ function renderCategorySidebar() {
 
   if (!categoryList) return;
 
-  categoryList.innerHTML = categories.map(category => {
-    const label = t(`page.mainui.categories.${category}`) || category;
-    const active = !!(sharedMapRuntime && sharedMapRuntime.getCategoryState(category));
-    return `
+  categoryList.innerHTML = categories
+    .map((category) => {
+      const label = t(`page.mainui.categories.${category}`) || category;
+      const active = !!(sharedMapRuntime && sharedMapRuntime.getCategoryState(category));
+      return `
       <li>
         <button class="sidebar-list-button${active ? " active" : ""}" type="button" data-category="${category}" aria-pressed="${active ? "true" : "false"}">${label}</button>
       </li>
     `;
-  }).join("");
+    })
+    .join("");
 
   categoryToggleButtons = categoryList.querySelectorAll(".sidebar-list-button[data-category]");
-  categoryToggleButtons.forEach(button => {
+  categoryToggleButtons.forEach((button) => {
     const category = button.dataset.category;
     const isActive = !!(sharedMapRuntime && sharedMapRuntime.getCategoryState(category));
     button.classList.toggle("active", isActive);
@@ -320,7 +336,7 @@ function renderCategorySidebar() {
   });
 
   const categoryStates = sharedMapRuntime?.getCategoryStates?.() || {};
-  Object.keys(categoryStates).forEach(category => {
+  Object.keys(categoryStates).forEach((category) => {
     if (!categories.includes(category)) {
       sharedMapRuntime.setCategoryState(category, false);
     }
@@ -383,87 +399,11 @@ function supportsVisitedCategory(category) {
   return mapAdapter?.supportsVisitedCategory?.(category) === true;
 }
 
-function normalizeHexColor(value) {
-  const color = String(value || "").trim();
-  const hex = color.startsWith("#") ? color.slice(1) : color;
-  if (!/^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(hex)) return null;
-  if (hex.length === 3) {
-    return `#${hex.split("").map(char => char + char).join("").toLowerCase()}`;
-  }
-  return `#${hex.toLowerCase()}`;
-}
-
-function getOppositeHexColor(value) {
-  const normalized = normalizeHexColor(value);
-  if (!normalized) return "#ffffff";
-  const r = 255 - parseInt(normalized.slice(1, 3), 16);
-  const g = 255 - parseInt(normalized.slice(3, 5), 16);
-  const b = 255 - parseInt(normalized.slice(5, 7), 16);
-  const toHex = channel => channel.toString(16).padStart(2, "0");
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
-
-function getMobAreaCenter(area) {
-  const cachedCenter = getCachedValue(mobAreaCenterCache, area.id);
-  if (cachedCenter !== undefined) {
-    return cachedCenter;
-  }
-
-  if (!Array.isArray(area.corners) || area.corners.length === 0) return null;
-  const totals = area.corners.reduce((acc, point) => {
-    acc.x += point.x;
-    acc.z += point.z;
-    return acc;
-  }, { x: 0, z: 0 });
-  const center = {
-    x: Math.round(totals.x / area.corners.length),
-    z: Math.round(totals.z / area.corners.length)
-  };
-  setCachedValue(mobAreaCenterCache, area.id, center);
-  return center;
-}
-
-const CACHE_LIMIT = 1024;
-const mobAreaCenterCache = new Map();
 const mobAreaSearchCache = new Map();
-const MOB_AREA_LABEL_VERTICAL_OFFSET = 16;
 
 // MOB_AREA_MOBS is defined per-floor in the floor data files (e.g. maps_floor1.js)
 // so that each floor can ship its own mob lists. Access via typeof checks
 // in the code to avoid undefined errors when a floor doesn't provide data.
-
-function escapeHtml(value) {
-  const escapeMap = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  };
-  return String(value).replace(/[&<>"']/g, char => escapeMap[char]);
-}
-
-function getCachedValue(cache, key) {
-  if (!cache.has(key)) {
-    return undefined;
-  }
-
-  const value = cache.get(key);
-  cache.delete(key);
-  cache.set(key, value);
-  return value;
-}
-
-function setCachedValue(cache, key, value) {
-  if (cache.has(key)) {
-    cache.delete(key);
-  } else if (cache.size >= CACHE_LIMIT) {
-    const oldestKey = cache.keys().next().value;
-    cache.delete(oldestKey);
-  }
-
-  cache.set(key, value);
-}
 
 function getMobAreaSearchHaystack(area) {
   const cachedValue = getCachedValue(mobAreaSearchCache, area.id);
@@ -477,18 +417,11 @@ function getMobAreaSearchHaystack(area) {
 }
 
 function getFloorSpecificBestiaryUrl(floor, category, search) {
-  const params = new URLSearchParams();
-  if (floor) params.set("floor", floor);
-  if (category) params.set("category", category);
-  if (search) params.set("search", search);
-  return `../Bestiary/bestiary.html${params.toString() ? `?${params.toString()}` : ""}`;
+  return window.SAOPageUtils.buildQueryUrl("../../Aincrad/Bestiary/bestiary.html", { floor, category, search });
 }
 
 function getFloorSpecificQuestsUrl(floor, search) {
-  const params = new URLSearchParams();
-  if (floor) params.set("floor", floor);
-  if (search) params.set("search", search);
-  return `../Quests/quests.html${params.toString() ? `?${params.toString()}` : ""}`;
+  return window.SAOPageUtils.buildQueryUrl("../../Aincrad/Quests/quests.html", { floor, search });
 }
 
 let toastTimeoutId = null;
@@ -508,36 +441,11 @@ function showToast(message) {
   }, 2600);
 }
 
-const SECTION_PATHS = {
-  maps: "../Map/maps.html",
-  bestiary: "../Bestiary/bestiary.html",
-  equipment: "../eCompendium/ecompendium.html",
-  quests: "../Quests/quests.html",
-  patchnotes: "../Patchnotes/patchnotes.html",
-  towerDefense: "../Tower Defense/towerdefense.html",
-  compendium: "../Compendium/compendium.html"
-};
-
-const FLOOR_AWARE_SECTIONS = new Set(["maps", "bestiary", "equipment", "quests"]);
-
-function buildSectionUrl(section, floor) {
-  const path = SECTION_PATHS[section] || "#";
-  if (path === "#") return path;
-  if (!floor) return path;
-  if (FLOOR_AWARE_SECTIONS.has(section)) {
-    return `${path}?${new URLSearchParams({ floor }).toString()}`;
-  }
-  if (section === "towerDefense" || section === "compendium") {
-    return `${path}?${new URLSearchParams({ floor }).toString()}`;
-  }
-  return path;
-}
-
 function attachSectionNavButtons() {
   const nav = document.querySelector(".top-nav");
   if (!nav) return;
 
-  addPageEventListener(nav, "click", event => {
+  addPageEventListener(nav, "click", (event) => {
     const messageButton = event.target.closest("button[data-message]");
     if (messageButton) {
       showToast(messageButton.dataset.message);
@@ -547,55 +455,33 @@ function attachSectionNavButtons() {
     const button = event.target.closest("button[data-nav-target]");
     if (!button) return;
 
-    const nextHref = window.SAOPageUtils.resolveSafeInternalHref(buildSectionUrl(button.dataset.navTarget, floorSelect.value));
-    if (!nextHref) return;
-
-    const datasets = window.SAODatasets;
-    if (datasets && datasets.affectedSections.has(button.dataset.navTarget)) {
-      event.preventDefault();
-      datasets.installStyles();
-      datasets.navigate({
-        section: button.dataset.navTarget,
-        url: nextHref,
-        title: button.textContent.trim()
-      });
-      return;
-    }
-
-    window.location.href = nextHref;
+    const outcome = window.SAOPageUtils.navigateToSection(button, {
+      sectionPaths: window.SAOPageUtils.UNDERWORLD_SECTION_PATHS,
+      floorAwareSections: window.SAOPageUtils.UNDERWORLD_FLOOR_AWARE_SECTIONS,
+      floorProvider: () => floorSelect.value
+    });
+    if (outcome === "dataset") event.preventDefault();
   });
 }
 
+/* The entry markup (and the mob id slug) live in shared/sao-map-helpers.js; this wrapper supplies
+   the page's own data lookup, localisation and bestiary link. */
 function buildMobAreaMobListMarkup(areaId, areaFloor) {
-  const mobLookup = getMobAreaMobLookup();
-  const mobs = mobLookup[areaId] || [];
-  if (mobs.length === 0) {
-    return `<p>${t("page.mainui.noMobEntries")}</p>`;
-  }
-
-  return `
-    <ul class="mob-area-entry-list">
-      ${mobs.map(mob => {
-        const search = mob.search ? mob.search : mob.name;
-        const mobId = String(mob.id || mob.name || "unknown")
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "") || "unknown";
-        const mobName = contentLookup(`bestiary.mob.${mobId}`, mob.name);
-        const areaObj = getMobAreaLookup().get(areaId);
-        const category = areaObj && areaObj.underground === true ? "dungeonMobs" : "regular";
-        let href = getFloorSpecificBestiaryUrl(areaFloor, category, search);
-        if (category === "dungeonMobs") href += "#dungeonMobs";
-        return `
-          <li class="mob-area-entry-item">
-            <span class="mob-area-entry-name">${escapeHtml(mobName)}</span>
-            <button type="button" class="mob-area-info-button" data-waypoint-info-href="${escapeHtml(href)}">${t("page.maps.viewWaypointInfo")}</button>
-          </li>
-        `;
-      }).join("")}
-    </ul>
-  `;
+  const mobs = getMobAreaMobLookup()[areaId] || [];
+  const areaObj = getMobAreaLookup().get(areaId);
+  const category = areaObj && areaObj.underground === true ? "dungeonMobs" : "regular";
+  return window.SAOMapHelpers.buildMobAreaMobListMarkup({
+    mobs,
+    content: contentLookup,
+    escapeHtml,
+    emptyText: t("page.mainui.noMobEntries"),
+    selectLabel: t("page.maps.viewWaypointInfo"),
+    getHref: (mob) => {
+      const search = mob.search ? mob.search : mob.name;
+      const href = getFloorSpecificBestiaryUrl(areaFloor, category, search);
+      return category === "dungeonMobs" ? `${href}#dungeonMobs` : href;
+    }
+  });
 }
 
 function openMobAreaInfo(area) {
@@ -630,7 +516,9 @@ function handleInfoOverlayClick(event) {
   const href = window.SAOPageUtils.resolveSafeInternalHref(actionButton.dataset.waypointInfoHref);
   if (!href) return;
 
-  try { persistStateToHistory(); } catch (e) {}
+  try {
+    persistStateToHistory();
+  } catch (e) {}
   window.location.href = href;
 }
 
@@ -689,7 +577,7 @@ function clearMapFilters() {
   sharedMapRuntime.clearCategoryState();
   sharedMapRuntime.clearSearchQuery();
 
-  categoryToggleButtons.forEach(button => {
+  categoryToggleButtons.forEach((button) => {
     button.classList.remove("active");
   });
 
@@ -717,7 +605,7 @@ function buildWalkthroughSteps() {
       body: t("page.mainui.walkthrough.step3Body")
     },
     {
-      selector: "#mapLayer",
+      selector: "#mapContainer",
       title: t("page.mainui.walkthrough.step4Title"),
       body: t("page.mainui.walkthrough.step4Body")
     }
@@ -768,9 +656,7 @@ function getInvertedMobAreaCorners(area, floor, dimensions) {
     return cached;
   }
 
-  const corners = area.corners
-    .map(point => getInverseCoords(point.x, point.z, floor, dimensions))
-    .filter(Boolean);
+  const corners = area.corners.map((point) => getInverseCoords(point.x, point.z, floor, dimensions)).filter(Boolean);
   setCachedValue(mobAreaCornersCache, key, corners);
   return corners;
 }
@@ -780,34 +666,163 @@ function getInverseMarkerCoords(marker, floor, dimensions) {
   return getInverseCoords(marker.coords.x, marker.coords.z, floor, dimensions);
 }
 
-const zoomConfig = { factor: 1.14, min: 0.5, max: 30.0 };
+/* ---------------------------------------------------------------------------
+   Progressive waypoint clustering
 
-const formatZoomLabel = zoom => `${zoom.toFixed(1).replace(/\.0$/, "")}x`;
+   Waypoints that land close together on screen collapse into one compact cluster
+   marker; zooming in progressively releases them back to their real positions, and
+   clustering switches off entirely at the shared 7x cutoff. The grouping maths are
+   shared with the Aincrad map via shared/sao-map-helpers.js (buildScreenClusters) -
+   this page only decides which waypoints are cluster candidates. Stored coordinates
+   are never touched, so a released waypoint returns to its own coordinate.
+   --------------------------------------------------------------------------- */
 
-function getImageLocalCoords(event) {
-  const imgRect = mapImage.getBoundingClientRect();
-  const naturalWidth = mapImage.naturalWidth || imgRect.width;
-  const naturalHeight = mapImage.naturalHeight || imgRect.height;
-  const scale = Math.min(imgRect.width / naturalWidth, imgRect.height / naturalHeight);
-  const contentWidth = naturalWidth * scale;
-  const contentHeight = naturalHeight * scale;
-  const offsetX = (imgRect.width - contentWidth) / 2;
-  const offsetY = (imgRect.height - contentHeight) / 2;
-  const localX = event.clientX - imgRect.left - offsetX;
-  const localY = event.clientY - imgRect.top - offsetY;
+/* Clusters rebuilt on every render; the info panel reads them when a cluster is clicked. */
+let activeClusters = new Map();
 
+/* Groups the waypoints that are actually renderable right now by on-screen distance.
+   Floor, enabled categories, the active search, the underground toggle and the
+   viewport are all honoured, so a cluster always represents exactly the waypoints the
+   user can currently see, across any mix of categories. */
+function buildMarkerClusters(options) {
+  const { selectedFloor, filterText, imgScale, offsetX, offsetY, naturalWidth, naturalHeight, viewportBounds } =
+    options;
+  const empty = { clusters: [], byMember: new Map(), byId: new Map() };
+  if (!imgScale || !isClusteringEnabled(state.zoom)) return empty;
+
+  const points = [];
+  const addPoint = (id, coords) => {
+    if (!coords) return;
+    const inv = getInverseCoords(coords.x, coords.z, selectedFloor, { width: naturalWidth, height: naturalHeight });
+    if (!inv) return;
+    const leftPx = offsetX + inv.rawX * imgScale;
+    const topPx = offsetY + inv.rawY * imgScale;
+    const screenX = leftPx * state.zoom + state.translateX;
+    const screenY = topPx * state.zoom + state.translateY;
+    if (
+      screenX < viewportBounds.left ||
+      screenX > viewportBounds.right ||
+      screenY < viewportBounds.top ||
+      screenY > viewportBounds.bottom
+    )
+      return;
+    points.push({ id, x: leftPx, y: topPx });
+  };
+
+  getDataEntries().forEach(([id, marker]) => {
+    if (!marker) return;
+    if (marker.floor !== selectedFloor) return;
+    if (!sharedMapRuntime.getCategoryState(marker.category)) return;
+    if (filterText && !(markerSearchCache.get(id) || "").includes(filterText)) return;
+    addPoint(id, marker.coords);
+  });
+
+  if (sharedMapRuntime.getCategoryState("mobAreas")) {
+    getMobAreas().forEach((area) => {
+      if (!area || area.floor !== selectedFloor) return;
+      if ((area.underground === true) !== undergroundToggle.checked) return;
+      if (filterText && !getMobAreaSearchHaystack(area).includes(filterText)) return;
+      addPoint(`mob-area:${area.id}`, getMobAreaCenter(area));
+    });
+  }
+
+  return buildScreenClusters(points, { radiusPx: CLUSTER_RADIUS_PX, zoom: state.zoom });
+}
+
+/* Waypoint Info routing: the same categories and routes the single-marker panel uses.
+   Categories without a destination simply get no button, so no destination is invented. */
+function supportsWaypointInfo(marker) {
+  return Boolean(marker) && (marker.category === "bossSpawns" || marker.category === "sideQuests");
+}
+
+function getWaypointInfoHref(marker, markerId) {
+  if (!marker) return "";
+  const query = marker.title;
+  if (marker.category === "bossSpawns") {
+    const bossCategory = marker.underground === true ? "dungeonBoss" : "boss";
+    return getFloorSpecificBestiaryUrl(marker.floor, bossCategory, query);
+  }
+  return getFloorSpecificQuestsUrl(marker.floor, query);
+}
+
+/* Normalises a waypoint (marker entry or mob area) into one shape for the cluster panel. */
+function resolveWaypointEntry(id) {
+  if (id.startsWith("mob-area:")) {
+    const area = getMobAreaLookup().get(id.slice("mob-area:".length));
+    if (!area) return null;
+    return {
+      id,
+      marker: null,
+      title: `${getAreaText(area)} ${t("page.maps.mobs")}`,
+      description: "",
+      floor: area.floor || "",
+      coords: getMobAreaCenter(area),
+      category: "mobAreas"
+    };
+  }
+  const marker = getContextData().markerDataset[id];
+  if (!marker) return null;
   return {
-    localX,
-    localY,
-    naturalWidth,
-    naturalHeight,
-    contentWidth,
-    contentHeight,
-    offsetX,
-    offsetY,
-    scale
+    id,
+    marker,
+    title: getMarkerText(marker, "title", id),
+    description: getMarkerText(marker, "description", id),
+    floor: marker.floor || "",
+    coords: marker.coords || null,
+    category: marker.category
   };
 }
+
+/* Combined panel for a cluster: every contained waypoint stays individually reachable,
+   with its own details and the same Waypoint Info routing the single-marker panel uses. */
+function openClusterInfo(clusterId) {
+  const cluster = activeClusters.get(clusterId);
+  if (!cluster) return;
+  const entries = cluster.memberIds
+    .map((memberId) => resolveWaypointEntry(memberId))
+    .filter(Boolean)
+    .sort((a, b) => a.title.localeCompare(b.title));
+  if (!entries.length) return;
+
+  sharedMapRuntime.setSelectedMarker(clusterId);
+  title.textContent = t("page.maps.clusterTitle", { count: entries.length });
+
+  const listItems = entries
+    .map((entry) => {
+      const floorText = escapeHtml(String(entry.floor).replace("floor", `${t("page.maps.floorText")} `));
+      const coordsX = entry.coords && entry.coords.x !== undefined ? escapeHtml(entry.coords.x) : "--";
+      const coordsZ = entry.coords && entry.coords.z !== undefined ? escapeHtml(entry.coords.z) : "--";
+      const href = supportsWaypointInfo(entry.marker) ? getWaypointInfoHref(entry.marker, entry.id) : "";
+      return `
+      <li class="cluster-entry">
+        <details>
+          <summary>${escapeHtml(entry.title)}</summary>
+          <div class="cluster-entry-body">
+            ${entry.description ? `<p>${escapeHtml(entry.description)}</p>` : ""}
+            <p><strong>${t("page.maps.floorText")}:</strong> ${floorText}</p>
+            <p><strong>${t("page.maps.coordinates")}:</strong> X: ${coordsX} Z: ${coordsZ}</p>
+            ${href ? `<div class="waypoint-info-row"><button type="button" class="waypoint-info-button" data-waypoint-info-href="${escapeHtml(href)}">${t("page.maps.viewWaypointInfo")}</button></div>` : ""}
+          </div>
+        </details>
+      </li>
+    `;
+    })
+    .join("");
+
+  content.innerHTML = `
+    <p>${t("page.maps.clusterBody", { count: entries.length })}</p>
+    <ul class="cluster-list">${listItems}</ul>
+  `;
+
+  const previousActive = markerLayer.querySelector(".active-marker");
+  if (previousActive) previousActive.classList.remove("active-marker");
+  const activeMarker = markerLayer.querySelector(`[data-marker-id="${clusterId}"]`);
+  if (activeMarker) activeMarker.classList.add("active-marker");
+}
+
+/* Wheel/keyboard zoom step and the clamp range used by setZoom(). Defined once in
+   shared/sao-map-helpers.js so both interactive maps cannot drift apart on the zoom domain. */
+const zoomConfig = window.SAOMapHelpers.MAP_ZOOM_CONFIG;
 
 function mapCoordinates(rawX, rawY, dimensions) {
   if (typeof mapWebsiteCoordinates !== "function") return null;
@@ -815,12 +830,11 @@ function mapCoordinates(rawX, rawY, dimensions) {
 }
 
 function updateCoordinatePanelFromEvent(event) {
-  const info = getImageLocalCoords(event);
-  if (info.localX < 0 || info.localY < 0 || info.localX > info.contentWidth || info.localY > info.contentHeight) {
-    overlayMappedCoords.textContent = t("page.mainui.coordinatesPlaceholder");
-    return;
-  }
-
+  const info = getImageLocalCoords(mapImage, event);
+  /* The whole viewport is valid coordinate space (same treatment as the Aincrad map): the cursor is
+     projected through the existing linear map math, so the readout is not limited to the artwork
+     rectangle. mapCoordinates() still returns null when this map has no calibration configured, and
+     the viewport edge - the container's pointerleave - is the only boundary. */
   const rawX = info.localX * (info.naturalWidth / info.contentWidth);
   const rawY = info.localY * (info.naturalHeight / info.contentHeight);
   const mapped = mapCoordinates(rawX, rawY, {
@@ -852,6 +866,13 @@ function updateTransform() {
   mapLayer.style.transform = mapTransform;
   markerLayer.style.transform = `scale(${(1 / state.zoom).toFixed(6)})`;
   markerLayer.style.transformOrigin = "top left";
+  /* The viewport checker/grid squares scale with zoom but stay anchored to the viewport, so panning
+     never moves them. Only written when the value changes, to avoid repainting the grid while
+     dragging. */
+  const gridSize = `${getGridSquareSize(state.zoom)}px`;
+  if (mapContainer.style.getPropertyValue("--map-grid-size") !== gridSize) {
+    mapContainer.style.setProperty("--map-grid-size", gridSize);
+  }
   zoomLabel.textContent = formatZoomLabel(state.zoom);
 }
 
@@ -875,7 +896,7 @@ function resetView() {
 }
 
 function setUndergroundMode(enabled) {
-  mapImage.style.opacity = enabled ? 0.10 : 1;
+  mapImage.style.opacity = enabled ? 0.1 : 1;
   undergroundMapImage.style.display = enabled ? "block" : "none";
 }
 
@@ -921,7 +942,7 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
   const svgNS = "http://www.w3.org/2000/svg";
   const fragment = document.createDocumentFragment();
 
-  mobAreas.forEach(area => {
+  mobAreas.forEach((area) => {
     if (area.floor !== selectedFloor) return;
     const isAreaUnderground = area.underground === true;
     if (isAreaUnderground !== undergroundToggle.checked) return;
@@ -929,15 +950,14 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
     const projectedPoints = getInvertedMobAreaCorners(area, selectedFloor, {
       width: mapImage.naturalWidth,
       height: mapImage.naturalHeight
-    })
-      .map(inv => ({
-        x: offsetX + inv.rawX * imgScale,
-        y: offsetY + inv.rawY * imgScale
-      }));
+    }).map((inv) => ({
+      x: offsetX + inv.rawX * imgScale,
+      y: offsetY + inv.rawY * imgScale
+    }));
 
     if (projectedPoints.length < 3) return;
 
-    const points = projectedPoints.map(point => `${point.x},${point.y}`);
+    const points = projectedPoints.map((point) => `${point.x},${point.y}`);
 
     const polygon = document.createElementNS(svgNS, "polygon");
     polygon.setAttribute("class", "mob-area-polygon");
@@ -953,10 +973,10 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
 
     const centerX = projectedPoints.reduce((sum, point) => sum + point.x, 0) / projectedPoints.length;
     const centerY = projectedPoints.reduce((sum, point) => sum + point.y, 0) / projectedPoints.length;
-    const minX = Math.min(...projectedPoints.map(point => point.x));
-    const maxX = Math.max(...projectedPoints.map(point => point.x));
-    const minY = Math.min(...projectedPoints.map(point => point.y));
-    const maxY = Math.max(...projectedPoints.map(point => point.y));
+    const minX = Math.min(...projectedPoints.map((point) => point.x));
+    const maxX = Math.max(...projectedPoints.map((point) => point.x));
+    const minY = Math.min(...projectedPoints.map((point) => point.y));
+    const maxY = Math.max(...projectedPoints.map((point) => point.y));
     const zoneWidth = Math.max(1, maxX - minX);
     const zoneHeight = Math.max(1, maxY - minY);
     const sizeByWidth = zoneWidth / Math.max(areaTitle.length * 0.62, 1);
@@ -976,124 +996,6 @@ function renderMobAreas(selectedFloor, imgScale, offsetX, offsetY) {
   mobAreaLayer.replaceChildren(fragment);
 }
 
-const MARKET_ICON_LIBRARY = Object.freeze({
-  lootBuyers: `
-    <svg class="market-icon loot-buyer-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M4.5 7.5h15l-1.3 9.2a2 2 0 0 1-2 1.7H7.8a2 2 0 0 1-2-1.7Z" fill="#f6e7ac" stroke="#7c6422" stroke-width="1.1"/>
-      <path d="M8 7.5a4 4 0 0 1 8 0" fill="none" stroke="#fff7d0" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M8.5 11.2h7" stroke="#7c6422" stroke-width="1.2" stroke-linecap="round"/>
-      <circle cx="12" cy="14.6" r="1.7" fill="#7c6422"/>
-    </svg>
-  `,
-  weaponSellers: `
-    <svg class="market-icon weapon-seller-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M6.2 17.8 15.8 8.2l2 2-9.6 9.6-3 1Z" fill="#d7e3f3" stroke="#52657d" stroke-width="1"/>
-      <path d="M14.6 5.9 18 2.5l3.5 3.5-3.4 3.4Z" fill="#f5c65b" stroke="#8a6120" stroke-width="1"/>
-      <path d="M5 18.8l1.3-3.3 2 2Z" fill="#8a5a34"/>
-    </svg>
-  `,
-  travelingMerchants: `
-    <svg class="market-icon traveling-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M5 10h12.6a2 2 0 0 1 1.8 1.1l1.6 3.2v2.8H19a2.5 2.5 0 0 1-5 0H10a2.5 2.5 0 0 1-5 0H3.5v-5.4Z" fill="#efe6d0" stroke="#7b6543" stroke-width="1.1"/>
-      <path d="M15.6 10V7.4h2.5l1.7 2.6Z" fill="#9ed0ff" stroke="#4d7092" stroke-width="1"/>
-      <circle cx="7.5" cy="17.1" r="1.6" fill="#7b6543"/>
-      <circle cx="16.5" cy="17.1" r="1.6" fill="#7b6543"/>
-    </svg>
-  `,
-  equipmentMerchants: `
-    <svg class="market-icon equipment-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M12 3.2 18.5 6v5.2c0 4.4-2.7 7.2-6.5 9.6-3.8-2.4-6.5-5.2-6.5-9.6V6Z" fill="#dfe8f6" stroke="#51637d" stroke-width="1.1"/>
-      <path d="M12 6.6 9 8v3.2c0 2.6 1.4 4.5 3 5.8 1.6-1.3 3-3.2 3-5.8V8Z" fill="#7fa4d9"/>
-    </svg>
-  `,
-  toolMerchants: `
-    <svg class="market-icon tool-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M14.5 4.2a4.3 4.3 0 0 0-2.8 6.9L5.1 17.7a1.5 1.5 0 1 0 2.1 2.1l6.6-6.6a4.3 4.3 0 0 0 6.9-2.8l-2.9 1.1-2.3-2.3Z" fill="#cfe9ee" stroke="#456972" stroke-width="1.1"/>
-      <circle cx="6.2" cy="18.7" r="0.9" fill="#456972"/>
-    </svg>
-  `,
-  accessoriesMerchants: `
-    <svg class="market-icon accessories-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="12" cy="12.4" r="5.8" fill="#ffe2b8" stroke="#91612a" stroke-width="1.1"/>
-      <circle cx="12" cy="12.4" r="2.4" fill="#1f2d46"/>
-      <path d="M12 4.8v2M12 18v1.6M4.4 12.4H6.4M17.6 12.4H19.6" stroke="#fff5df" stroke-width="1.2" stroke-linecap="round"/>
-    </svg>
-  `,
-  occultMerchants: `
-    <svg class="market-icon occult-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M12 3.8 13.9 9.5H20l-4.9 3.6 1.9 5.7L12 15.2 7 18.8l1.9-5.7L4 9.5h6.1Z" fill="#e0d0ff" stroke="#5c3e88" stroke-width="1.1"/>
-      <circle cx="12" cy="12" r="1.6" fill="#5c3e88"/>
-    </svg>
-  `,
-  consumablesMerchants: `
-    <svg class="market-icon consumables-merchant-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M9 3.5h6v2l-1.6 2.4v8.4a3.4 3.4 0 1 1-6.8 0V7.9L9 5.5Z" fill="#ffd8c0" stroke="#93553c" stroke-width="1.1"/>
-      <path d="M8.4 11.4h7.2" stroke="#93553c" stroke-width="1"/>
-      <path d="M9.2 14.2c1-.7 1.9-.3 2.8.1.9.4 1.8.8 2.6.2" stroke="#fff2eb" stroke-width="1.1" fill="none"/>
-    </svg>
-  `
-});
-
-function buildMarketMarkerIcon(category) {
-  return MARKET_ICON_LIBRARY[category] || "";
-}
-
-const CRAFTSMAN_ICON_LIBRARY = Object.freeze({
-  weaponsmith: `
-    <svg class="craftsman-icon weaponsmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M6.2 17.9 15.7 8.4l2 2-9.5 9.5-3 1Z" fill="#dce7f5" stroke="#53657d" stroke-width="1"/>
-      <path d="M14.5 6l3.3-3.3 3.2 3.2-3.3 3.3Z" fill="#f5c45c" stroke="#8d6120" stroke-width="1"/>
-      <path d="M4.9 19l1.3-3.2 1.9 1.9Z" fill="#8d5e35"/>
-    </svg>
-  `,
-  armorBlacksmith: `
-    <svg class="craftsman-icon armor-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M12 3.4 18.5 6v5.4c0 4.2-2.4 6.9-6.5 9.1-4.1-2.2-6.5-4.9-6.5-9.1V6Z" fill="#d9e6f8" stroke="#4e637f" stroke-width="1.1"/>
-      <path d="M12 6.6 9.1 7.8v3.5c0 2.1 1.1 3.8 2.9 5 1.8-1.2 2.9-2.9 2.9-5V7.8Z" fill="#7ea1d8"/>
-    </svg>
-  `,
-  ingotBlacksmith: `
-    <svg class="craftsman-icon ingot-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <rect x="4.4" y="11.3" width="15.2" height="5.2" rx="1.1" fill="#f0d2a2" stroke="#8b6335" stroke-width="1.1"/>
-      <path d="M7.2 11.3 10 7.2h4l2.8 4.1" fill="#f7e1bd" stroke="#8b6335" stroke-width="1"/>
-      <path d="M8.1 14h7.8" stroke="#8b6335" stroke-width="1.1" stroke-linecap="round"/>
-    </svg>
-  `,
-  keyBlacksmith: `
-    <svg class="craftsman-icon key-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="8.2" cy="10.5" r="3" fill="#ffeb9d" stroke="#8b6925" stroke-width="1.1"/>
-      <path d="M11 10.5h8v1.8h-1.8v1.8h-2v-1.8h-1.8v1.8h-2V12.3H11Z" fill="#ffeb9d" stroke="#8b6925" stroke-width="1.1" stroke-linejoin="round"/>
-    </svg>
-  `,
-  accessoriesBlacksmith: `
-    <svg class="craftsman-icon accessories-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="12" cy="12.2" r="5.7" fill="#ffe1b9" stroke="#8f622a" stroke-width="1.1"/>
-      <circle cx="12" cy="12.2" r="2.5" fill="#26324e"/>
-      <path d="M12 4.8v1.8M12 17.8v1.4M4.6 12.2h1.8M17.6 12.2h1.8" stroke="#fff6de" stroke-width="1.2" stroke-linecap="round"/>
-    </svg>
-  `,
-  runeCraftsmen: `
-    <svg class="craftsman-icon rune-craftsmen-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M6.7 18.1 13.4 11.4l2.2 2.2-6.7 6.7-2.9.8Z" fill="#dce8f7" stroke="#4d6078" stroke-width="1"/>
-      <path d="M16.1 4.8 18.4 2.5l3.1 3.1-2.3 2.3Z" fill="#f1ca7e" stroke="#8d6424" stroke-width="1"/>
-      <path d="M5.7 19.3 7 16.3l1.7 1.7Z" fill="#7f5a34"/>
-    </svg>
-  `,
-  refaire: `
-    <svg class="craftsman-icon refaire-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M5.5 16.6c.7 1.2 2.3 1.8 3.7 1.3l7.1-2.7c1.4-.5 2.1-2 1.6-3.4l-1.2-3.4a2.9 2.9 0 0 0-3.6-1.8l-7.1 2.7a2.9 2.9 0 0 0-1.8 3.6l1.3 3.4Z" fill="#f7e2c1" stroke="#7a4b28" stroke-width="1.1"/>
-      <path d="M9.1 9.7 14.2 8.5" stroke="#7a4b28" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M9.7 11.4 15 10.1" stroke="#8a5b33" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M10.4 13.1 15.7 11.9" stroke="#6b3f20" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M8.7 15.1c1.4.2 2.7-.9 3-2.3.3-1.4-.6-2.8-2-3l-2.4-.3c-.9-.1-1.8.5-2.1 1.4l-.7 2.5c-.3.9.1 1.8.9 2.3.6.3 1.3.4 2 .4Z" fill="#edd1a3" stroke="#7a4b28" stroke-width="1"/>
-    </svg>
-  `
-});
-
-function buildCraftsmanMarkerIcon(category) {
-  return CRAFTSMAN_ICON_LIBRARY[category] || "";
-}
-
 function scheduleRenderMarkers() {
   if (!pageDisposer || pageDisposer.disposed) return;
   if (state.renderMarkersRafId !== null) return;
@@ -1109,7 +1011,14 @@ function getMarkerRenderSignature(selectedFloor, filterText) {
     .sort();
   const viewportKey = `${Math.round(markerLayer.clientWidth)}x${Math.round(markerLayer.clientHeight)}`;
   const viewKey = `${Math.round(state.zoom * 1000)}:${Math.round(state.translateX)}:${Math.round(state.translateY)}`;
-  return [selectedFloor, filterText, undergroundToggle.checked ? "underground" : "surface", enabledCategories.join(","), viewportKey, viewKey].join("|");
+  return [
+    selectedFloor,
+    filterText,
+    undergroundToggle.checked ? "underground" : "surface",
+    enabledCategories.join(","),
+    viewportKey,
+    viewKey
+  ].join("|");
 }
 
 function getMarkerViewportBounds() {
@@ -1161,6 +1070,17 @@ function renderMarkers() {
 
   ensureMarkerSearchCache();
   const viewportBounds = getMarkerViewportBounds();
+  const clustering = buildMarkerClusters({
+    selectedFloor,
+    filterText,
+    imgScale,
+    offsetX,
+    offsetY,
+    naturalWidth,
+    naturalHeight,
+    viewportBounds
+  });
+  activeClusters = clustering.byId;
   let renderedCount = 0;
   let activeMarkerRendered = false;
 
@@ -1181,8 +1101,14 @@ function renderMarkers() {
     const topPx = offsetY + inv.rawY * imgScale;
     const screenX = leftPx * state.zoom + state.translateX;
     const screenY = topPx * state.zoom + state.translateY;
-    const isVisibleWithinViewport = screenX >= viewportBounds.left && screenX <= viewportBounds.right && screenY >= viewportBounds.top && screenY <= viewportBounds.bottom;
+    const isVisibleWithinViewport =
+      screenX >= viewportBounds.left &&
+      screenX <= viewportBounds.right &&
+      screenY >= viewportBounds.top &&
+      screenY <= viewportBounds.bottom;
     if (!isVisibleWithinViewport) return;
+    /* Clustered waypoints are represented by their cluster marker instead. */
+    if (clustering.byMember.has(id)) return;
 
     desiredIds.add(id);
     let markerEl = state.markerCache.get(id);
@@ -1199,9 +1125,7 @@ function renderMarkers() {
     markerEl.style.top = `${topPx}px`;
     markerEl.style.opacity = (() => {
       const isUnderground = marker.underground === true;
-      return isUnderground
-        ? (undergroundToggle.checked ? 1 : 0.10)
-        : (undergroundToggle.checked ? 0.10 : 1);
+      return isUnderground ? (undergroundToggle.checked ? 1 : 0.1) : undergroundToggle.checked ? 0.1 : 1;
     })();
     markerEl.style.setProperty("--marker-anchor-y", markerType === "biome" ? "-100%" : "-50%");
     const markerTitle = getMarkerText(marker, "title", id);
@@ -1217,62 +1141,17 @@ function renderMarkers() {
     const isCraftsmenCategory = CRAFTSMAN_CATEGORIES.has(marker.category);
     const isMarketCategory = MARKET_CATEGORIES.has(marker.category);
 
-    if (markerType === "biome") {
-      markerEl.innerHTML = `
-        <svg class="biome-pin-icon" viewBox="0 0 24 34" aria-hidden="true" focusable="false">
-          <path d="M12 33 C12 33, 3 19.5, 3 12 C3 7.03, 7.03 3, 12 3 C16.97 3, 21 7.03, 21 12 C21 19.5, 12 33, 12 33 Z" fill="#d72638" stroke="#ffffff" stroke-width="2"/>
-          <circle cx="12" cy="12" r="4" fill="#ffffff"/>
-        </svg>
-      `;
-    } else if (markerType === "dungeon") {
-      markerEl.innerHTML = `
-        <svg class="dungeon-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M7.5 2.5 10 5l-1.2 1.2 3.2 3.2-1.8 1.8-3.2-3.2L5.8 9 3.3 6.5 7.5 2.5Z" fill="#ffffff"/>
-          <path d="M16.5 2.5 20.7 6.5 18.2 9l-1.2-1.2-3.2 3.2-1.8-1.8 3.2-3.2L14 5l2.5-2.5Z" fill="#ffffff"/>
-          <path d="M11.1 11.1 12.9 11.1 12.9 21.5 11.1 21.5Z" fill="#ffffff"/>
-          <path d="M9.6 19.2 14.4 19.2 14.4 20.9 9.6 20.9Z" fill="#ffffff"/>
-        </svg>
-      `;
-    } else if (markerType === "boss") {
-      markerEl.innerHTML = `
-        <svg class="boss-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M4 8 2.5 4.5 6.2 6 8 5l2 2.3H14L16 5l1.8 1 3.7-1.5L20 8l-2 1.4V13c0 3.1-2.7 5.6-6 5.6S6 16.1 6 13V9.4L4 8Z" fill="#ffffff"/>
-          <circle cx="9.3" cy="12.2" r="1.2" fill="#d72638"/>
-          <circle cx="14.7" cy="12.2" r="1.2" fill="#d72638"/>
-          <path d="M9.4 15.6c1.7 1.2 3.5 1.2 5.2 0" stroke="#d72638" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-        </svg>
-      `;
+    if (markerType === "biome" || markerType === "dungeon" || markerType === "boss") {
+      markerEl.innerHTML = buildMarkerIcon(markerType);
     } else if (isSideQuest) {
       markerEl.classList.add("side-quest-marker");
-      markerEl.innerHTML = `
-        <svg class="quest-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <rect x="4" y="3.5" width="13" height="17" rx="2" fill="#f4ecd1" stroke="#9d8d62" stroke-width="1.2"/>
-          <path d="M7 8.1h7M7 11h7M7 13.9h5" stroke="#8b7c53" stroke-width="1.35" stroke-linecap="round"/>
-          <circle cx="17.2" cy="16.6" r="4.3" fill="#2e8f5c" stroke="#d9ffe9" stroke-width="1.2"/>
-          <path d="M15.1 16.6l1.4 1.5 2.5-2.8" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      `;
+      markerEl.innerHTML = buildMarkerIcon("sideQuest");
     } else if (isAlchemist) {
       markerEl.classList.add("alchemist-marker");
-      markerEl.innerHTML = `
-        <svg class="alchemist-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M9 3h6v2l-1.6 2.7v2.2l4.8 7.2c.9 1.4-.1 3.2-1.8 3.2H7.6c-1.7 0-2.7-1.8-1.8-3.2l4.8-7.2V7.7L9 5V3Z" fill="#e9f9ff" stroke="#2f6c84" stroke-width="1.1"/>
-          <path d="M7.2 16.1h9.6" stroke="#2f6c84" stroke-width="1"/>
-          <path d="M8.4 13.9c1.2-.8 2.2-.2 3.1.3.9.5 1.8 1.1 3 .4" stroke="#4fb2cf" stroke-width="1.1" fill="none"/>
-          <circle cx="9.4" cy="12.3" r="0.9" fill="#4fb2cf"/>
-          <circle cx="14.6" cy="11.4" r="0.8" fill="#4fb2cf"/>
-        </svg>
-      `;
+      markerEl.innerHTML = buildMarkerIcon("alchemist");
     } else if (isLumberjack) {
       markerEl.classList.add("lumberjack-marker");
-      markerEl.innerHTML = `
-        <svg class="lumberjack-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <rect x="4" y="12" width="11" height="5" rx="1.5" fill="#eed5a8" stroke="#8d6130" stroke-width="1.1"/>
-          <path d="M15 12.5c2.2 0 3.7 1.4 3.7 2.9s-1.5 2.9-3.7 2.9" fill="#c98f4f" stroke="#8d6130" stroke-width="1.1"/>
-          <path d="M6.5 10.5 16.8 4.5l1.2 2.1L7.7 12.6Z" fill="#d8e4eb" stroke="#5b6d78" stroke-width="1"/>
-          <path d="M16.3 4.8 19.8 6.9 21.1 5 17.4 2.9Z" fill="#6a3f24"/>
-        </svg>
-      `;
+      markerEl.innerHTML = buildMarkerIcon("lumberjack");
     } else if (isCraftsmenCategory) {
       markerEl.classList.add("craftsman-marker", `${marker.category}-marker`);
       markerEl.innerHTML = buildCraftsmanMarkerIcon(marker.category);
@@ -1283,7 +1162,10 @@ function renderMarkers() {
       markerEl.textContent = markerType.charAt(0);
     }
 
-    markerEl.classList.toggle("visited", supportsVisitedCategory(marker.category) && sharedMapRuntime.isMarkerVisited(marker.floor, id));
+    markerEl.classList.toggle(
+      "visited",
+      supportsVisitedCategory(marker.category) && sharedMapRuntime.isMarkerVisited(marker.floor, id)
+    );
     if (sharedMapRuntime.getSelectedMarker() === id) {
       markerEl.classList.add("active-marker");
       activeMarkerRendered = true;
@@ -1296,7 +1178,7 @@ function renderMarkers() {
 
   if (sharedMapRuntime.getCategoryState("mobAreas") && imgScale) {
     const mobAreasList = getMobAreas();
-    mobAreasList.forEach(area => {
+    mobAreasList.forEach((area) => {
       if (area.floor !== selectedFloor) return;
       const isAreaUnderground = area.underground === true;
       if (isAreaUnderground !== undergroundToggle.checked) return;
@@ -1318,10 +1200,16 @@ function renderMarkers() {
       const topPx = offsetY + inv.rawY * imgScale;
       const screenX = leftPx * state.zoom + state.translateX;
       const screenY = topPx * state.zoom + state.translateY;
-      const isVisibleWithinViewport = screenX >= viewportBounds.left && screenX <= viewportBounds.right && screenY >= viewportBounds.top && screenY <= viewportBounds.bottom;
+      const isVisibleWithinViewport =
+        screenX >= viewportBounds.left &&
+        screenX <= viewportBounds.right &&
+        screenY >= viewportBounds.top &&
+        screenY <= viewportBounds.bottom;
       if (!isVisibleWithinViewport) return;
 
       const mobAreaId = `mob-area:${area.id}`;
+      /* Clustered mob areas are represented by their cluster marker instead. */
+      if (clustering.byMember.has(mobAreaId)) return;
       desiredIds.add(mobAreaId);
       let markerEl = state.markerCache.get(mobAreaId);
       if (!markerEl) {
@@ -1342,13 +1230,7 @@ function renderMarkers() {
       const contrastColor = getOppositeHexColor(zoneColor);
       markerEl.style.setProperty("--mob-marker-bg", zoneColor);
       markerEl.style.setProperty("--mob-marker-contrast", contrastColor);
-      markerEl.innerHTML = `
-        <svg class="mob-area-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path class="mob-area-icon-hex" d="M12 2.2 19.3 6.3 19.3 14.7 12 18.8 4.7 14.7 4.7 6.3Z"/>
-          <path class="mob-area-icon-ring" d="M12 7.2a4.8 4.8 0 1 1 0 9.6 4.8 4.8 0 0 1 0-9.6Z"/>
-          <path class="mob-area-icon-dot" d="M12 10.2a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z"/>
-        </svg>
-      `;
+      markerEl.innerHTML = buildMarkerIcon("mobArea");
       if (sharedMapRuntime.getSelectedMarker() === mobAreaId) {
         markerEl.classList.add("active-marker");
         activeMarkerRendered = true;
@@ -1359,6 +1241,34 @@ function renderMarkers() {
       renderedCount += 1;
     });
   }
+
+  /* Compact cluster markers for the waypoints that are grouped at this zoom level. */
+  clustering.clusters.forEach((cluster) => {
+    desiredIds.add(cluster.id);
+    let markerEl = state.markerCache.get(cluster.id);
+    if (!markerEl) {
+      markerEl = document.createElement("div");
+      markerEl.dataset.markerId = cluster.id;
+      state.markerCache.set(cluster.id, markerEl);
+      markerLayer.appendChild(markerEl);
+    }
+    const size = cluster.memberIds.length;
+    const label = t("page.maps.clusterTitle", { count: size });
+    markerEl.className = "marker cluster-marker";
+    markerEl.style.left = `${cluster.x}px`;
+    markerEl.style.top = `${cluster.y}px`;
+    markerEl.style.opacity = 1;
+    markerEl.innerHTML = `<span class="cluster-count">${size}</span>`;
+    markerEl.title = label;
+    markerEl.tabIndex = 0;
+    markerEl.setAttribute("role", "button");
+    markerEl.setAttribute("aria-label", label);
+    const selectedId = sharedMapRuntime.getSelectedMarker();
+    const isActive = selectedId === cluster.id || cluster.memberIds.includes(selectedId);
+    markerEl.classList.toggle("active-marker", isActive);
+    if (isActive) activeMarkerRendered = true;
+    renderedCount += 1;
+  });
 
   for (const existingMarker of Array.from(markerLayer.children)) {
     const markerId = existingMarker.dataset.markerId;
@@ -1382,22 +1292,23 @@ function renderMarkers() {
 }
 
 function openInfo(id) {
+  if (id.startsWith(CLUSTER_ID_PREFIX)) {
+    openClusterInfo(id);
+    return;
+  }
   const marker = getContextData().markerDataset[id];
   if (!marker) return;
   const canBeVisited = supportsVisitedCategory(marker.category);
   const markerFloor = marker.floor || "";
   const isVisited = sharedMapRuntime.isMarkerVisited(markerFloor, id);
-  const waypointQuery = marker.title;
-  const visitedLabel = marker.category === "bossSpawns"
-    ? t("page.maps.visitedDefeated")
-    : marker.category === "dungeons"
-      ? t("page.maps.visitedCompleted")
-      : t("page.maps.visitedVisited");
-  const showInfoButton = marker.category === "bossSpawns" || marker.category === "sideQuests";
-  const bossCategory = marker.underground === true ? "dungeonBoss" : "boss";
-  const bestiaryHref = getFloorSpecificBestiaryUrl(marker.floor, bossCategory, waypointQuery);
-  const questsHref = getFloorSpecificQuestsUrl(marker.floor, waypointQuery);
-  const waypointInfoHref = marker.category === "bossSpawns" ? bestiaryHref : questsHref;
+  const visitedLabel =
+    marker.category === "bossSpawns"
+      ? t("page.maps.visitedDefeated")
+      : marker.category === "dungeons"
+        ? t("page.maps.visitedCompleted")
+        : t("page.maps.visitedVisited");
+  const showInfoButton = supportsWaypointInfo(marker);
+  const waypointInfoHref = getWaypointInfoHref(marker, id);
   sharedMapRuntime.setSelectedMarker(id);
   title.textContent = getMarkerText(marker, "title", id);
   const markerType = escapeHtml(getMarkerText(marker, "type", id));
@@ -1418,16 +1329,6 @@ function openInfo(id) {
   if (previousActive) previousActive.classList.remove("active-marker");
   const activeMarker = markerLayer.querySelector(`[data-marker-id="${id}"]`);
   if (activeMarker) activeMarker.classList.add("active-marker");
-
-}
-
-function clearTextSelection() {
-  if (window.getSelection) {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      selection.removeAllRanges();
-    }
-  }
 }
 
 function handleWheel(event) {
@@ -1439,20 +1340,6 @@ function handleWheel(event) {
   const direction = event.deltaY < 0 ? 1 : -1;
   const nextZoom = state.zoom * (direction > 0 ? zoomConfig.factor : 1 / zoomConfig.factor);
   setZoom(nextZoom, offsetX, offsetY);
-}
-
-function shouldIgnoreMapDrag(target) {
-  return Boolean(
-    target.closest(".marker") ||
-    target.closest("#zoomControls") ||
-    target.closest("#sidebar") ||
-    target.closest("#infoOverlay") ||
-    target.closest("#title") ||
-    target.closest("#content") ||
-    target.closest("button") ||
-    target.closest("input") ||
-    target.closest("label")
-  );
 }
 
 function startDrag(event) {
@@ -1522,17 +1409,18 @@ function init() {
 
   const urlState = sharedMapRuntime.parseUrlState(window.location.search);
   const savedState = loadMapUiState();
-  const initialState = urlState.hasParams ? urlState : (savedState || {});
+  const initialState = urlState.hasParams ? urlState : savedState || {};
   sharedMapRuntime.replaceCategoryState(initialCategoryState);
   const requestedFloor = initialState.floor || floorSelect.value;
   if (requestedFloor && ["gigasCedar", "iceCave", "rulid", "fishingIsland", "playerIsland"].includes(requestedFloor)) {
     floorSelect.value = requestedFloor;
   }
+  registerUnderworldMapTranslations();
   if (undergroundToggle) {
     undergroundToggle.checked = Boolean(initialState.underground);
   }
   if (initialState.activeCategories) {
-    Object.keys(initialCategoryState).forEach(key => {
+    Object.keys(initialCategoryState).forEach((key) => {
       sharedMapRuntime.setCategoryState(key, !!initialState.activeCategories[key]);
     });
   }
@@ -1553,7 +1441,7 @@ function init() {
       window,
       onWidthChange: () => scheduleRenderMarkers(),
       onResizeStart: () => document.body.classList.add("resizing-sidebar"),
-      onResizeEnd: width => {
+      onResizeEnd: (width) => {
         document.body.classList.remove("resizing-sidebar");
         storage.setItem("sao.sidebar.width", String(Math.round(width)));
       }
@@ -1586,13 +1474,18 @@ function init() {
   addPageEventListener(content, "change", handleInfoOverlayChange);
   addPageEventListener(markerLayer, "click", handleMarkerLayerClick);
   addPageEventListener(markerLayer, "keydown", handleMarkerLayerKeydown);
-  addPageEventListener(window, "mousemove", event => {
+  addPageEventListener(window, "mousemove", (event) => {
     drag(event);
   });
 
-  addPageEventListener(window, "pointermove", event => {
-    drag(event);
-  }, { passive: false });
+  addPageEventListener(
+    window,
+    "pointermove",
+    (event) => {
+      drag(event);
+    },
+    { passive: false }
+  );
 
   addPageEventListener(document, "mouseup", () => {
     stopDrag();
@@ -1606,7 +1499,17 @@ function init() {
   addPageEventListener(window, "blur", stopDrag);
 
   addPageEventListener(resetViewButton, "click", resetView);
-  document.querySelectorAll(".island-nav-button").forEach(button => {
+  addPageEventListener(document.getElementById("zoomIn"), "click", (event) => {
+    event.stopPropagation();
+    const rect = mapContainer.getBoundingClientRect();
+    setZoom(state.zoom * zoomConfig.factor, rect.width / 2, rect.height / 2);
+  });
+  addPageEventListener(document.getElementById("zoomOut"), "click", (event) => {
+    event.stopPropagation();
+    const rect = mapContainer.getBoundingClientRect();
+    setZoom(state.zoom / zoomConfig.factor, rect.width / 2, rect.height / 2);
+  });
+  document.querySelectorAll(".island-nav-button").forEach((button) => {
     addPageEventListener(button, "click", () => {
       if (!floorSelect) return;
       floorSelect.value = button.dataset.island || floorSelect.value;
@@ -1648,7 +1551,7 @@ function init() {
 
   const categoryList = document.getElementById("categoryList");
   if (categoryList) {
-    addPageEventListener(categoryList, "click", event => {
+    addPageEventListener(categoryList, "click", (event) => {
       const button = event.target.closest(".sidebar-list-button[data-category]");
       if (!button || button.disabled) return;
       const category = button.dataset.category;
@@ -1660,7 +1563,7 @@ function init() {
     });
   }
 
-  categoryToggleButtons.forEach(button => {
+  categoryToggleButtons.forEach((button) => {
     const category = button.dataset.category;
     button.classList.toggle("active", sharedMapRuntime.getCategoryState(category));
     button.setAttribute("aria-pressed", String(sharedMapRuntime.getCategoryState(category)));
@@ -1701,7 +1604,7 @@ function init() {
     }
     applyMapSources(floorSelect.value);
 
-    const compendiumButton = document.querySelector('button[data-message]');
+    const compendiumButton = document.querySelector("button[data-message]");
     if (compendiumButton) {
       compendiumButton.dataset.message = t("page.mainui.compendiumToast");
     }
@@ -1781,13 +1684,13 @@ function syncStateFromDom() {
 
     // Restore category active flags and update DOM classes
     if (mapState.activeCategories) {
-      Object.keys(initialCategoryState).forEach(key => {
+      Object.keys(initialCategoryState).forEach((key) => {
         sharedMapRuntime.setCategoryState(key, !!mapState.activeCategories[key]);
       });
-      categoryToggleButtons.forEach(button => {
+      categoryToggleButtons.forEach((button) => {
         const cat = button.dataset.category;
         const active = sharedMapRuntime.getCategoryState(cat);
-        button.classList.toggle('active', active);
+        button.classList.toggle("active", active);
       });
     }
 
@@ -1806,7 +1709,7 @@ function syncStateFromDom() {
     setUndergroundMode(undergroundToggle.checked);
 
     // Sync category buttons into runtime state so render uses the restored UI classes
-    categoryToggleButtons.forEach(button => {
+    categoryToggleButtons.forEach((button) => {
       const cat = button.dataset.category;
       sharedMapRuntime.setCategoryState(cat, button.classList.contains("active"));
     });

@@ -8,7 +8,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -568, z: -293 },
     drops: ["N/A"],
-    description: "Alchemist",
+    description: "Alchemist"
   },
   "assistant-alchimiste-kaelor": {
     title: "Assistant to the Alchemist",
@@ -17,7 +17,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -574, z: -299 },
     drops: ["N/A"],
-    description: "Assistant to the Alchemist",
+    description: "Assistant to the Alchemist"
   },
   "cabinetmaker-kaelor": {
     title: "Cabinetmaker",
@@ -26,7 +26,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -575, z: -293 },
     drops: ["N/A"],
-    description: "Makes Wooden Boards and Acacia Wood Powder.",
+    description: "Makes Wooden Boards and Acacia Wood Powder."
   },
   "crushed-harpy-ring": {
     title: "Manufacturer of the Crushed Harpy Ring",
@@ -35,7 +35,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -618, z: 529 },
     drops: ["N/A"],
-    description: "Crushed Harpy Ring Blacksmith.",
+    description: "Crushed Harpy Ring Blacksmith."
   },
   "flaming-harpy-ring": {
     title: "Manufacturer of the Ring of the Flaming Harpy",
@@ -45,7 +45,7 @@ Object.assign(DATA, {
     coords: { x: -694, z: 205 },
     underground: true,
     drops: ["N/A"],
-    description: "Flaming Harpy Ring Blacksmith.",
+    description: "Flaming Harpy Ring Blacksmith."
   },
   "drowned-harpy-ring": {
     title: "Manufacturer of the Ring of the Drowned Harpy",
@@ -54,7 +54,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -818, z: 98 },
     drops: ["N/A"],
-    description: "Drowned Harpy Ring Blacksmith.",
+    description: "Drowned Harpy Ring Blacksmith."
   },
   "wild-gloves-manufacturer": {
     title: "Manufacturer of Wild Gloves",
@@ -63,7 +63,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -498, z: -746 },
     drops: ["N/A"],
-    description: "Wild Gloves Blacksmith.",
+    description: "Wild Gloves Blacksmith."
   },
   "runic-necklace-manufacturer": {
     title: "Manufacturer of the Runic Necklace",
@@ -72,7 +72,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -38, z: 199 },
     drops: ["N/A"],
-    description: "Runic Necklace Blacksmith.",
+    description: "Runic Necklace Blacksmith."
   },
   "corrupt-mask-manufacturer": {
     title: "Manufacturer of Corrupt Mask",
@@ -81,7 +81,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -713, z: -109 },
     drops: ["N/A"],
-    description: "Corrupt Mask Blacksmith.",
+    description: "Corrupt Mask Blacksmith."
   },
   "fierce-talisman-manufacturer": {
     title: "Manufacturer of the Fierce Talisman",
@@ -90,7 +90,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: 78, z: -71 },
     drops: ["N/A"],
-    description: "Fierce Talisman Blacksmith.",
+    description: "Fierce Talisman Blacksmith."
   },
   "local-farmer-kaelor": {
     title: "Local Farmer",
@@ -99,7 +99,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -581, z: -273 },
     drops: ["N/A"],
-    description: "Local Farmer - Buys Loot.",
+    description: "Local Farmer - Buys Loot."
   },
   "refaire-refaiter": {
     title: "Refaiter",
@@ -108,7 +108,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: 0, z: -355 },
     drops: ["N/A"],
-    description: "Transforms Resources and Spider Threads to make useful strings in making Accessories.",
+    description: "Transforms Resources and Spider Threads to make useful strings in making Accessories."
   },
   "impure-onyx-accessories-blacksmith": {
     title: "Impure Onyx Accessories Blacksmith",
@@ -117,7 +117,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -502, z: 334 },
     drops: ["N/A"],
-    description: "Impure Onyx Accessories Blacksmith.",
+    description: "Impure Onyx Accessories Blacksmith."
   },
   "pure-onyx-accessories-blacksmith": {
     title: "Pure Onyx Accessories Blacksmith",
@@ -127,7 +127,7 @@ Object.assign(DATA, {
     coords: { x: 339, z: 505 },
     underground: true,
     drops: ["N/A"],
-    description: "Pure Onyx Accessories Blacksmith.",
+    description: "Pure Onyx Accessories Blacksmith."
   },
   "bauxite-accessories-blacksmith": {
     title: "Bauxite Accessories Blacksmith",
@@ -136,7 +136,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -194, z: 20 },
     drops: ["N/A"],
-    description: "Bauxite Accessories Blacksmith.",
+    description: "Bauxite Accessories Blacksmith."
   },
   "scrap-accessories-blacksmith": {
     title: "Scrap Accessories Blacksmith",
@@ -145,7 +145,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -777, z: 17 },
     drops: ["N/A"],
-    description: "Scrap Accessories Blacksmith.",
+    description: "Scrap Accessories Blacksmith."
   },
   "bull-and-bear-accessories-blacksmith": {
     title: "Bull & Bear Accessories Blacksmith",
@@ -154,7 +154,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -602, z: -285 },
     drops: ["N/A"],
-    description: "Bull & Bear Accessories Blacksmith",
+    description: "Bull & Bear Accessories Blacksmith"
   },
   "accessories-blacksmith-p2": {
     title: "Accessories Blacksmith",
@@ -163,7 +163,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: 111, z: -408 },
     drops: ["N/A"],
-    description: "Accessories Blacksmith",
+    description: "Accessories Blacksmith"
   },
   "bee-weapon-blacksmith": {
     title: "Bees Weapon Blacksmith",
@@ -173,7 +173,7 @@ Object.assign(DATA, {
     coords: { x: 591, z: -700 },
     underground: true,
     drops: ["N/A"],
-    description: "Bees Weapon Blacksmith",
+    description: "Bees Weapon Blacksmith"
   },
   "necrotic-weaponsmith": {
     title: "Necrotic Weaponsmith",
@@ -183,7 +183,7 @@ Object.assign(DATA, {
     coords: { x: 727, z: 265 },
     underground: true,
     drops: ["N/A"],
-    description: "Necrotic Weaponsmith",
+    description: "Necrotic Weaponsmith"
   },
   "bee-armor-blacksmith": {
     title: "Bee Armor Blacksmith",
@@ -193,7 +193,7 @@ Object.assign(DATA, {
     coords: { x: 591, z: -675 },
     underground: true,
     drops: ["N/A"],
-    description: "Bee Armor Blacksmith",
+    description: "Bee Armor Blacksmith"
   },
   "necromancer-armor-blacksmith": {
     title: "Blacksmith of Necromancer Armor",
@@ -203,7 +203,7 @@ Object.assign(DATA, {
     coords: { x: 722, z: 264 },
     underground: true,
     drops: ["N/A"],
-    description: "Necromancer Armor Blacksmith",
+    description: "Necromancer Armor Blacksmith"
   },
   "necrotic-tool-blacksmith": {
     title: "Necrotic Tool Blacksmith",
@@ -213,7 +213,7 @@ Object.assign(DATA, {
     coords: { x: 722, z: 268 },
     underground: true,
     drops: ["N/A"],
-    description: "Necrotic Tool Blacksmith",
+    description: "Necrotic Tool Blacksmith"
   },
   "pure-onyx-ingot-blacksmith": {
     title: "Pure Onyx Ingot Blacksmith",
@@ -222,7 +222,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: 868, z: -295 },
     drops: ["N/A"],
-    description: "Pure Onyx Ingot Blacksmith",
+    description: "Pure Onyx Ingot Blacksmith"
   },
   "bauxite-ingot-impure-onyx-blacksmith": {
     title: "Blacksmith of Bauxite Ingots & Impure Onyx",
@@ -231,7 +231,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: 124, z: -385 },
     drops: ["N/A"],
-    description: "Bauxite Ingots & Impure Onyx Blacksmith",
+    description: "Bauxite Ingots & Impure Onyx Blacksmith"
   },
   "accessories-merchant-kaelor": {
     title: "Accessories Merchant",
@@ -240,7 +240,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -568, z: -287 },
     drops: ["N/A"],
-    description: "Accessories Merchant",
+    description: "Accessories Merchant"
   },
   "occult-amulet-merchant-taurus": {
     title: "Occult Amulet Merchant",
@@ -250,7 +250,7 @@ Object.assign(DATA, {
     coords: { x: -351, z: 877 },
     underground: true,
     drops: ["N/A"],
-    description: "Occult Amulet Merchant",
+    description: "Occult Amulet Merchant"
   },
   "occult-ringman-taurus": {
     title: "Occult Ringman",
@@ -260,7 +260,7 @@ Object.assign(DATA, {
     coords: { x: -354, z: 882 },
     underground: true,
     drops: ["N/A"],
-    description: "Occult Ringman",
+    description: "Occult Ringman"
   },
   "occult-artifact-merchant-brasier": {
     title: "Occult Artifact Merchant",
@@ -270,7 +270,7 @@ Object.assign(DATA, {
     coords: { x: -321, z: 115 },
     underground: true,
     drops: ["N/A"],
-    description: "Occult Artifact Merchant",
+    description: "Occult Artifact Merchant"
   },
   "equipment-merchant-kaelor": {
     title: "Equipment Merchant",
@@ -279,7 +279,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -576, z: -288 },
     drops: ["N/A"],
-    description: "Sell Weapons and Consumables for newcomers.",
+    description: "Sell Weapons and Consumables for newcomers."
   },
   "savanna-tool-merchant": {
     title: "Savanna Tool Merchant",
@@ -288,7 +288,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -583, z: -286 },
     drops: ["N/A"],
-    description: "Sell Tier 2 Tools; Savanna tools.",
+    description: "Sell Tier 2 Tools; Savanna tools."
   },
   "occult-bracelet-merchant-taurus": {
     title: "Occult Bracelet Merchant",
@@ -298,7 +298,7 @@ Object.assign(DATA, {
     coords: { x: -343, z: 879 },
     underground: true,
     drops: ["N/A"],
-    description: "Occult Bracelet Merchant",
+    description: "Occult Bracelet Merchant"
   },
   "occult-gloves-merchant-taurus": {
     title: "Occult Gloves Merchant",
@@ -308,7 +308,7 @@ Object.assign(DATA, {
     coords: { x: -345, z: 887 },
     underground: true,
     drops: ["N/A"],
-    description: "Occult Gloves Merchant",
+    description: "Occult Gloves Merchant"
   },
   "miner-of-the-corner-urbus": {
     title: "Miner of the Corner",
@@ -317,7 +317,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: 129, z: -380 },
     drops: ["N/A"],
-    description: "Miner of the Corner",
+    description: "Miner of the Corner"
   },
   "Refauncher-urbus": {
     title: "Refauncher",
@@ -326,7 +326,7 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: 2, z: -356 },
     drops: ["N/A"],
-    description: "Transforms Resources and Spider Threads to make useful strings in making Accessories.",
+    description: "Transforms Resources and Spider Threads to make useful strings in making Accessories."
   },
   "honeyed-loot-buyer": {
     title: "Honeyed Loot Buyer",
@@ -336,7 +336,7 @@ Object.assign(DATA, {
     coords: { x: 591, z: -690 },
     underground: true,
     drops: ["N/A"],
-    description: "Honeyed Loot Buyer",
+    description: "Honeyed Loot Buyer"
   },
   "harpies-loot-buyer": {
     title: "Harpies Loot Buyer",
@@ -345,16 +345,16 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: -568, z: -255 },
     drops: ["N/A"],
-    description: "Harpies Loot Buyer",
+    description: "Harpies Loot Buyer"
   },
-  "repreneur_de_butin_p2_marome": {
+  repreneur_de_butin_p2_marome: {
     title: "Sanctuary Loot Repreneur",
     type: "NPC",
     category: "lootBuyers",
     floor: "floor2",
     coords: { x: 710, z: -277 },
     drops: ["N/A"],
-    description: "Sells objects from the Sanctuary of Khesûn.",
+    description: "Sells objects from the Sanctuary of Khesûn."
   },
   "necrotic-loot-repreneur": {
     title: "Necrotic Loot Repreneur",
@@ -364,7 +364,7 @@ Object.assign(DATA, {
     coords: { x: 728, z: 268 },
     underground: true,
     drops: ["N/A"],
-    description: "Sells Necrotic Loot.",
+    description: "Sells Necrotic Loot."
   },
   "bull-and-bear-loot-buyer": {
     title: "Bull & Bear Loot Buyer",
@@ -373,63 +373,63 @@ Object.assign(DATA, {
     floor: "floor2",
     coords: { x: 68, z: -343 },
     drops: ["N/A"],
-    description: "Take back items from Bulls and Bears.",
+    description: "Take back items from Bulls and Bears."
   },
-  "autel_des_deux_lunes": {
+  autel_des_deux_lunes: {
     title: "Altar of Two Moons",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: 570, z: -470 },
     drops: ["N/A"],
-    description: "A mysterious moonlit altar located at the heart of Map 2.",
+    description: "A mysterious moonlit altar located at the heart of Map 2."
   },
-  "baie_des_monstres_ondoyante": {
+  baie_des_monstres_ondoyante: {
     title: "Wavy Monster Bay",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -780, z: 171 },
     drops: ["N/A"],
-    description: "A shoreline biome where monsters gather along restless waves.",
+    description: "A shoreline biome where monsters gather along restless waves."
   },
-  "baobab_millenaire": {
+  baobab_millenaire: {
     title: "Millennial Baobab",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -88, z: -92 },
     drops: ["N/A"],
-    description: "A giant ancient baobab tree standing watch over the area.",
+    description: "A giant ancient baobab tree standing watch over the area."
   },
-  "desert_des_crocs_argentes": {
+  desert_des_crocs_argentes: {
     title: "Silver Fang Desert",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -372, z: -556 },
     drops: ["N/A"],
-    description: "A harsh desert known for its silver sands and dangerous predators.",
+    description: "A harsh desert known for its silver sands and dangerous predators."
   },
-  "foret_des_ailes_d_emeraude": {
+  foret_des_ailes_d_emeraude: {
     title: "Emerald Wings Forest",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -550, z: 476 },
     drops: ["N/A"],
-    description: "A vibrant forest filled with lush foliage and winged creatures.",
+    description: "A vibrant forest filled with lush foliage and winged creatures."
   },
-  "foret_sucree": {
+  foret_sucree: {
     title: "Sweet Forest",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: 484, z: -665 },
     drops: ["N/A"],
-    description: "A fragrant woodland alive with sweet flora and hidden paths.",
+    description: "A fragrant woodland alive with sweet flora and hidden paths."
   },
-  "grotte_de_taran": {
+  grotte_de_taran: {
     title: "Taran Cave",
     type: "Biome",
     category: "biomes",
@@ -437,27 +437,27 @@ Object.assign(DATA, {
     coords: { x: -316, z: -94 },
     underground: true,
     drops: ["N/A"],
-    description: "A dark underground cave beneath Taran, home to hidden dangers.",
+    description: "A dark underground cave beneath Taran, home to hidden dangers."
   },
-  "kaelor": {
+  kaelor: {
     title: "Kaelor",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -583, z: -264 },
     drops: ["N/A"],
-    description: "A remote biome named Kaelor, known for its unusual terrain.",
+    description: "A remote biome named Kaelor, known for its unusual terrain."
   },
-  "lac_des_taureaux": {
+  lac_des_taureaux: {
     title: "Lake of the Bulls",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: 118, z: -68 },
     drops: ["N/A"],
-    description: "A quiet lake surrounded by rugged scenery and wild beasts.",
+    description: "A quiet lake surrounded by rugged scenery and wild beasts."
   },
-  "les_veines_de_sablemor": {
+  les_veines_de_sablemor: {
     title: "Sablemor Veins",
     type: "Biome",
     category: "biomes",
@@ -465,27 +465,27 @@ Object.assign(DATA, {
     coords: { x: 225, z: 295 },
     underground: true,
     drops: ["N/A"],
-    description: "Underground mineral veins near Sablemor, rich with rare ore.",
+    description: "Underground mineral veins near Sablemor, rich with rare ore."
   },
-  "maisons_des_ngangas": {
+  maisons_des_ngangas: {
     title: "Nganga Houses",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -430, z: -428 },
     drops: ["N/A"],
-    description: "A small settlement of Ngangas houses with mystic inhabitants.",
+    description: "A small settlement of Ngangas houses with mystic inhabitants."
   },
-  "marome": {
+  marome: {
     title: "Marome",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: 721, z: -281 },
     drops: ["N/A"],
-    description: "A coastal enclave with tropical life and hidden secrets.",
+    description: "A coastal enclave with tropical life and hidden secrets."
   },
-  "nid_de_brasier": {
+  nid_de_brasier: {
     title: "Brazier Nest",
     type: "Biome",
     category: "biomes",
@@ -493,45 +493,45 @@ Object.assign(DATA, {
     coords: { x: -581, z: 234 },
     underground: true,
     drops: ["N/A"],
-    description: "A fiery underground nest where blazing creatures gather.",
+    description: "A fiery underground nest where blazing creatures gather."
   },
-  "oasis_secret": {
+  oasis_secret: {
     title: "Secret Oasis",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: 798, z: 253 },
     drops: ["N/A"],
-    description: "A hidden oasis tucked away in Map 2's desert regions.",
+    description: "A hidden oasis tucked away in Map 2's desert regions."
   },
-  "ruche_de_melliona": {
+  ruche_de_melliona: {
     title: "Melliona's Hive",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: 506, z: -724 },
     drops: ["N/A"],
-    description: "The buzzing hive where Melliona's creatures gather.",
+    description: "The buzzing hive where Melliona's creatures gather."
   },
-  "sanctuaire_de_khesun": {
+  sanctuaire_de_khesun: {
     title: "Sanctuary of Khesun",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -6, z: 181 },
     drops: ["N/A"],
-    description: "A sacred sanctuary dedicated to the guardian Khesun.",
+    description: "A sacred sanctuary dedicated to the guardian Khesun."
   },
-  "taran": {
+  taran: {
     title: "Taran",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -427, z: 272 },
     drops: ["N/A"],
-    description: "A rugged region known for strong winds and sparse vegetation.",
+    description: "A rugged region known for strong winds and sparse vegetation."
   },
-  "tombeau_du_necromancien": {
+  tombeau_du_necromancien: {
     title: "Necromancer's Tomb",
     type: "Biome",
     category: "biomes",
@@ -539,27 +539,27 @@ Object.assign(DATA, {
     coords: { x: 721, z: 244 },
     underground: true,
     drops: ["N/A"],
-    description: "An ancient tomb filled with necromantic energies.",
+    description: "An ancient tomb filled with necromantic energies."
   },
-  "tour_de_taurus": {
+  tour_de_taurus: {
     title: "Taurus Tower",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: -160, z: 795 },
     drops: ["N/A"],
-    description: "A towering spire watched over by Taurus.",
+    description: "A towering spire watched over by Taurus."
   },
-  "urbus": {
+  urbus: {
     title: "Urbus",
     type: "Biome",
     category: "biomes",
     floor: "floor2",
     coords: { x: 64, z: -348 },
     drops: ["N/A"],
-    description: "The town of Urbus, a key waypoint in the Map 2 region.",
+    description: "The town of Urbus, a key waypoint in the Map 2 region."
   },
-  "gardien_sanctuaire": {
+  gardien_sanctuaire: {
     title: "Sanctuary Guardian",
     type: "Boss",
     category: "bossSpawns",
@@ -567,9 +567,9 @@ Object.assign(DATA, {
     coords: { x: 0, z: 190 },
     underground: true,
     drops: ["N/A"],
-    description: "A powerful boss guarding the sacred sanctuary.",
+    description: "A powerful boss guarding the sacred sanctuary."
   },
-  "magnus": {
+  magnus: {
     title: "Magnus",
     type: "Boss",
     category: "bossSpawns",
@@ -577,9 +577,9 @@ Object.assign(DATA, {
     coords: { x: 228, z: 316 },
     underground: true,
     drops: ["N/A"],
-    description: "A fearsome boss encountered underground in Map 2.",
+    description: "A fearsome boss encountered underground in Map 2."
   },
-  "melisara": {
+  melisara: {
     title: "Melisara",
     type: "Boss",
     category: "bossSpawns",
@@ -587,9 +587,9 @@ Object.assign(DATA, {
     coords: { x: 175, z: -409 },
     underground: true,
     drops: ["N/A"],
-    description: "A dangerous boss lurking in the depths of Map 2.",
+    description: "A dangerous boss lurking in the depths of Map 2."
   },
-  "morveth": {
+  morveth: {
     title: "Morveth",
     type: "Boss",
     category: "bossSpawns",
@@ -597,18 +597,18 @@ Object.assign(DATA, {
     coords: { x: 583, z: -187 },
     underground: true,
     drops: ["N/A"],
-    description: "A subterranean boss found deep below Map 2.",
+    description: "A subterranean boss found deep below Map 2."
   },
-  "rugiboeuf": {
+  rugiboeuf: {
     title: "Rugiboeuf",
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
     coords: { x: -155, z: 571 },
     drops: ["N/A"],
-    description: "A colossal boss roaming the northern reaches of Map 2.",
+    description: "A colossal boss roaming the northern reaches of Map 2."
   },
-  "velindra": {
+  velindra: {
     title: "Velindra",
     type: "Boss",
     category: "bossSpawns",
@@ -616,323 +616,323 @@ Object.assign(DATA, {
     coords: { x: 800, z: 300 },
     underground: true,
     drops: ["N/A"],
-    description: "A shadowy boss hidden beneath the surface.",
+    description: "A shadowy boss hidden beneath the surface."
   },
-  "winnie": {
+  winnie: {
     title: "Winnie",
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
     coords: { x: 578, z: -774 },
     drops: ["N/A"],
-    description: "A rare boss found in the western areas of Map 2.",
+    description: "A rare boss found in the western areas of Map 2."
   },
-  "donjon_ruche_de_melliona": {
+  donjon_ruche_de_melliona: {
     title: "Melliona's Hive Dungeon",
     type: "Dungeon",
     category: "dungeons",
     floor: "floor2",
     coords: { x: 506, z: -724 },
     drops: ["N/A"],
-    description: "A dungeon formed inside Melliona's Hive.",
+    description: "A dungeon formed inside Melliona's Hive."
   },
-  "donjon_tombeau_du_necromancien": {
+  donjon_tombeau_du_necromancien: {
     title: "Necromancer's Tomb Dungeon",
     type: "Dungeon",
     category: "dungeons",
     floor: "floor2",
     coords: { x: 721, z: 244 },
     drops: ["N/A"],
-    description: "A dungeon built within the Necromancer's Tomb.",
+    description: "A dungeon built within the Necromancer's Tomb."
   },
-  "fs_q_p1_la_facette_de_la_realite": {
+  fs_q_p1_la_facette_de_la_realite: {
     title: "The Facet of Reality",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 62, z: -428 },
     drops: ["N/A"],
-    description: "A side quest about uncovering a hidden facet of reality.",
+    description: "A side quest about uncovering a hidden facet of reality."
   },
-  "fs_q_p2_a_la_recherche_des_ngangas": {
+  fs_q_p2_a_la_recherche_des_ngangas: {
     title: "In Search of the Ngangas",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -585, z: -255 },
     drops: ["N/A"],
-    description: "A side quest to locate the Ngangas people.",
+    description: "A side quest to locate the Ngangas people."
   },
-  "fs_q_p2_aide_a_la_cuisine": {
+  fs_q_p2_aide_a_la_cuisine: {
     title: "Kitchen Help",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -563, z: -255 },
     drops: ["N/A"],
-    description: "A quest to assist with cooking and preparation tasks.",
+    description: "A quest to assist with cooking and preparation tasks."
   },
-  "fs_q_p2_aider_yuko": {
+  fs_q_p2_aider_yuko: {
     title: "Help Yuko",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -610, z: -245 },
     drops: ["N/A"],
-    description: "A quest to help Yuko with an important task.",
+    description: "A quest to help Yuko with an important task."
   },
-  "fs_q_p2_ca_pique_mais_ca_fait_du_bien": {
+  fs_q_p2_ca_pique_mais_ca_fait_du_bien: {
     title: "It Stings but Feels Good",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -577, z: -256 },
     drops: ["N/A"],
-    description: "A quest that tests resilience through painful trials.",
+    description: "A quest that tests resilience through painful trials."
   },
-  "fs_q_p2_chemin_vers_urbus": {
+  fs_q_p2_chemin_vers_urbus: {
     title: "Road to Urbus",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 135, z: -374 },
     drops: ["N/A"],
-    description: "A quest guiding the player toward Urbus.",
+    description: "A quest guiding the player toward Urbus."
   },
-  "fs_q_p2_communication_avec_yaa": {
+  fs_q_p2_communication_avec_yaa: {
     title: "Talking With Yaa",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 743, z: -257 },
     drops: ["N/A"],
-    description: "A quest focused on communicating with Yaa.",
+    description: "A quest focused on communicating with Yaa."
   },
-  "fs_q_p2_donjon_le_tombeau_oublie": {
+  fs_q_p2_donjon_le_tombeau_oublie: {
     title: "Dungeon: The Forgotten Tomb",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 160, z: -312 },
     drops: ["N/A"],
-    description: "A quest involving the forgotten tomb dungeon.",
+    description: "A quest involving the forgotten tomb dungeon."
   },
-  "fs_q_p2_faconneur_de_cle_i": {
+  fs_q_p2_faconneur_de_cle_i: {
     title: "Key Smith I",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 160, z: -312 },
     drops: ["N/A"],
-    description: "A quest about creating a key with a master smith.",
+    description: "A quest about creating a key with a master smith."
   },
-  "fs_q_p2_hater_du_vert": {
+  fs_q_p2_hater_du_vert: {
     title: "Hating the Green",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -431, z: 279 },
     drops: ["N/A"],
-    description: "A quest centered around a rivalry with the color green.",
+    description: "A quest centered around a rivalry with the color green."
   },
-  "fs_q_p2_l_art_des_peaux": {
+  fs_q_p2_l_art_des_peaux: {
     title: "The Art of Hides",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 105, z: -392 },
     drops: ["N/A"],
-    description: "A quest exploring how to work with animal hides.",
+    description: "A quest exploring how to work with animal hides."
   },
-  "fs_q_p2_l_art_des_plumes": {
+  fs_q_p2_l_art_des_plumes: {
     title: "The Art of Feathers",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 112, z: -391 },
     drops: ["N/A"],
-    description: "A quest focused on collecting or crafting with feathers.",
+    description: "A quest focused on collecting or crafting with feathers."
   },
-  "fs_q_p2_l_empreinte_des_seas": {
+  fs_q_p2_l_empreinte_des_seas: {
     title: "The Imprint of the Seas",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 620, z: -567 },
     drops: ["N/A"],
-    description: "A quest tied to the legacy left by the seas.",
+    description: "A quest tied to the legacy left by the seas."
   },
-  "fs_q_p2_l_epreuve_du_chasseur": {
+  fs_q_p2_l_epreuve_du_chasseur: {
     title: "The Hunter's Trial",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -202, z: -688 },
     drops: ["N/A"],
-    description: "A hunting trial to prove your skills.",
+    description: "A hunting trial to prove your skills."
   },
-  "fs_q_p2_l_onyx_du_savoir": {
+  fs_q_p2_l_onyx_du_savoir: {
     title: "The Onyx of Knowledge",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 724, z: -301 },
     drops: ["N/A"],
-    description: "A quest about recovering an onyx of knowledge.",
+    description: "A quest about recovering an onyx of knowledge."
   },
-  "fs_q_p2_la_philosophie_de_bushi": {
+  fs_q_p2_la_philosophie_de_bushi: {
     title: "Bushi's Philosophy",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -41, z: 205 },
     drops: ["N/A"],
-    description: "A philosophical quest inspired by Bushi teachings.",
+    description: "A philosophical quest inspired by Bushi teachings."
   },
-  "fs_q_p2_le_chat_relax": {
+  fs_q_p2_le_chat_relax: {
     title: "The Relaxed Cat",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -553, z: -264 },
     drops: ["N/A"],
-    description: "A relaxed quest involving a calm cat companion.",
+    description: "A relaxed quest involving a calm cat companion."
   },
-  "fs_q_p2_le_clocher_de_la_sombre_messagere": {
+  fs_q_p2_le_clocher_de_la_sombre_messagere: {
     title: "The Dark Messenger's Bell Tower",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -585, z: -245 },
     drops: ["N/A"],
-    description: "A quest centered around a haunted bell tower.",
+    description: "A quest centered around a haunted bell tower."
   },
-  "fs_q_p2_le_palier_2": {
+  fs_q_p2_le_palier_2: {
     title: "Step 2",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -16, z: -823 },
     drops: ["N/A"],
-    description: "A second step in an ongoing side quest series.",
+    description: "A second step in an ongoing side quest series."
   },
-  "fs_q_p2_le_rituel_de_purification": {
+  fs_q_p2_le_rituel_de_purification: {
     title: "The Purification Ritual",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -507, z: -60 },
     drops: ["N/A"],
-    description: "A quest to complete a cleansing ritual.",
+    description: "A quest to complete a cleansing ritual."
   },
-  "fs_q_p2_le_toit_d_une_cabane": {
+  fs_q_p2_le_toit_d_une_cabane: {
     title: "The Roof of a Cabin",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 639, z: -263 },
     drops: ["N/A"],
-    description: "A quest involving the roof of a cabin shelter.",
+    description: "A quest involving the roof of a cabin shelter."
   },
-  "fs_q_p2_le_tribut_avant_le_verdict": {
+  fs_q_p2_le_tribut_avant_le_verdict: {
     title: "The Tribute Before the Verdict",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -629, z: -296 },
     drops: ["N/A"],
-    description: "A quest about offering tribute before judgment.",
+    description: "A quest about offering tribute before judgment."
   },
-  "fs_q_p2_les_bases_d_une_cabane": {
+  fs_q_p2_les_bases_d_une_cabane: {
     title: "The Cabin Base",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 639, z: -263 },
     drops: ["N/A"],
-    description: "A quest focused on building a cabin foundation.",
+    description: "A quest focused on building a cabin foundation."
   },
-  "fs_q_p2_les_murs_d_une_cabane": {
+  fs_q_p2_les_murs_d_une_cabane: {
     title: "The Cabin Walls",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 639, z: -263 },
     drops: ["N/A"],
-    description: "A quest about putting up the walls of a cabin.",
+    description: "A quest about putting up the walls of a cabin."
   },
-  "fs_q_p2_ma_premiere_arme": {
+  fs_q_p2_ma_premiere_arme: {
     title: "My First Weapon",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 16, z: -305 },
     drops: ["N/A"],
-    description: "A quest where you obtain your first weapon.",
+    description: "A quest where you obtain your first weapon."
   },
-  "fs_q_p2_nettoyer_les_cieux_de_taran": {
+  fs_q_p2_nettoyer_les_cieux_de_taran: {
     title: "Cleaning Taran's Skies",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -432, z: 272 },
     drops: ["N/A"],
-    description: "A quest to clear the skies above Taran.",
+    description: "A quest to clear the skies above Taran."
   },
-  "fs_q_p2_non_c_est_de_la_sape": {
+  fs_q_p2_non_c_est_de_la_sape: {
     title: "No, It's Fashion",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 696, z: -277 },
     drops: ["N/A"],
-    description: "A quest about defending your choice of style.",
+    description: "A quest about defending your choice of style."
   },
-  "fs_q_p2_parler_a_la_femme_etrange": {
+  fs_q_p2_parler_a_la_femme_etrange: {
     title: "Talk to the Strange Woman",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 13, z: -665 },
     drops: ["N/A"],
-    description: "A quest to speak with an enigmatic woman.",
+    description: "A quest to speak with an enigmatic woman."
   },
-  "fs_q_p2_retour_a_urbus": {
+  fs_q_p2_retour_a_urbus: {
     title: "Return to Urbus",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: 62, z: -428 },
     drops: ["N/A"],
-    description: "A quest to return back to the town of Urbus.",
+    description: "A quest to return back to the town of Urbus."
   },
-  "fs_q_p2_un_bon_petit_repas": {
+  fs_q_p2_un_bon_petit_repas: {
     title: "A Good Little Meal",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -159, z: 10 },
     drops: ["N/A"],
-    description: "A side quest centered around preparing a meal.",
+    description: "A side quest centered around preparing a meal."
   },
-  "fs_q_p2_un_joueur_doit_faire_ses_preuves": {
+  fs_q_p2_un_joueur_doit_faire_ses_preuves: {
     title: "A Player Must Prove Himself",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -436, z: -442 },
     drops: ["N/A"],
-    description: "A quest in which the player must prove their worth.",
+    description: "A quest in which the player must prove their worth."
   },
-  "fs_q_p2_un_peu_de_chaque": {
+  fs_q_p2_un_peu_de_chaque: {
     title: "A Bit of Everything",
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
     coords: { x: -448, z: 267 },
     drops: ["N/A"],
-    description: "A side quest that covers a bit of everything.",
-  },
+    description: "A side quest that covers a bit of everything."
+  }
 });
 
 const RAW_MAP2_WAYPOINT_LINES = [
@@ -1024,48 +1024,26 @@ const RAW_MAP2_WAYPOINT_LINES = [
   "non_c_est_de_la_sape - side quest - surface - 696 - -277",
   "un_bon_petit_repas - side quest - surface - -159 - 10",
   "un_peu_de_chaque - side quest - surface - -448 - 267"
-]
+];
 
 Object.assign(DATA, createMap2WaypointEntries(RAW_MAP2_WAYPOINT_LINES));
 
-if (typeof MOB_AREA_MOBS === 'undefined') MOB_AREA_MOBS = {};
+if (typeof MOB_AREA_MOBS === "undefined") MOB_AREA_MOBS = {};
 Object.assign(MOB_AREA_MOBS, {
-  "silver-fang-desert-mobs": [
-    { name: "Savanes Wolf" },
-    { name: "Mountain Wolf" }
-  ],
-  "sweet-forest-mobs": [
-    { name: "Forest Bear" }
-  ],
-  "wavy-monster-bay-mobs": [
-    { name: "Lightning Harpy" },
-    { name: "Dazzling Fish" }
-  ],
-  "emerald-wings-forest-mobs": [
-    { name: "Earth Harpy" }
-  ],
+  "silver-fang-desert-mobs": [{ name: "Savanes Wolf" }, { name: "Mountain Wolf" }],
+  "sweet-forest-mobs": [{ name: "Forest Bear" }],
+  "wavy-monster-bay-mobs": [{ name: "Lightning Harpy" }, { name: "Dazzling Fish" }],
+  "emerald-wings-forest-mobs": [{ name: "Earth Harpy" }],
   "sanctuary-of-khesun-mobs": [
     { name: "Sanctuary Skeleton Shaman" },
     { name: "Sanctuary Skeleton Warrior" },
     { name: "Sanctuary Skeleton Archer" }
   ],
-  "lake-of-bulls-mobs": [
-    { name: "Monstrous Bull" },
-    { name: "Taurus" }
-  ],
-  "melliona-hive-dungeon-mobs": [
-    { name: "Dardroyal" },
-    { name: "Worker" }
-  ],
-  "inferno-nest-mobs": [
-    { name: "Fire Harpy" }
-  ],
-  "veins-of-sablemor-mobs": [
-    { name: "Golem of Peter" }
-  ],
-  "sanctuary-of-khesun-interior-mobs": [
-    { name: "Guardian Minion" }
-  ],
+  "lake-of-bulls-mobs": [{ name: "Monstrous Bull" }, { name: "Taurus" }],
+  "melliona-hive-dungeon-mobs": [{ name: "Dardroyal" }, { name: "Worker" }],
+  "inferno-nest-mobs": [{ name: "Fire Harpy" }],
+  "veins-of-sablemor-mobs": [{ name: "Golem of Peter" }],
+  "sanctuary-of-khesun-interior-mobs": [{ name: "Guardian Minion" }],
   "forgotten-tomb-of-the-necromancer-mobs": [
     { name: "Fire Skeleton" },
     { name: "Fire Swordsman Skeleton" },
@@ -1080,7 +1058,6 @@ Object.assign(MOB_AREA_MOBS, {
 });
 
 // (Intentionally left unexposed to avoid altering globals)
-
 
 MOB_AREAS.push(
   {
@@ -1242,6 +1219,5 @@ MOB_AREAS.push(
       { x: 733, z: -150 },
       { x: 524, z: 144 }
     ]
-  },
+  }
 );
-

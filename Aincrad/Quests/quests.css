@@ -30,7 +30,9 @@ body {
   border-radius: 8px;
   padding: 8px 12px;
   cursor: pointer;
-  transition: background-color 0.14s ease, transform 0.14s ease;
+  transition:
+    background-color 0.14s ease,
+    transform 0.14s ease;
 }
 
 .nav button:hover {
@@ -116,6 +118,15 @@ body {
   box-shadow: 0 0 0 3px rgba(133, 209, 163, 0.14);
 }
 
+.eyebrow {
+  margin: 0 0 6px;
+  color: #9cd7b8;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
 .quests-title {
   display: inline-flex;
   align-items: center;
@@ -173,6 +184,16 @@ body {
 .quest-table td.city {
   white-space: normal;
   word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.quest-table td.city {
+  min-width: 140px;
+  max-width: 200px;
+}
+
+.quest-table td.requirements {
+  max-width: 180px;
 }
 
 .quest-table td.coordinates,
@@ -205,19 +226,28 @@ body {
   border-radius: 999px;
   background: #101915;
   color: #eaf6ef;
-  padding: 6px 10px;
+  padding: 7px 12px;
   cursor: pointer;
   white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition:
+    border-color 0.14s ease,
+    background 0.14s ease,
+    transform 0.14s ease;
 }
 
 .completion-button.is-completed {
   border-color: #85d1a3;
   background: #173124;
   color: #c9f3d9;
+  box-shadow: 0 0 8px rgba(133, 209, 163, 0.15);
 }
 
 .completion-button:hover {
-  filter: brightness(1.08);
+  border-color: #85d1a3;
+  background: #1b3425;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 720px) {
@@ -233,5 +263,143 @@ body {
   .search-label {
     min-width: 0;
     margin-left: 0;
+  }
+}
+
+/* Mobile / narrow layouts: the nine-column table becomes a stack of labelled cards.
+   Every column stays readable instead of hiding behind a horizontal scrollbar, and the
+   labels come from the data-label attribute quests.js renders on each cell. Short fields
+   (city / coords / XP / Col) share a line so the page does not become needlessly tall.
+   The table needs ~1091px of content width, so this applies until the panel can actually
+   hold it (1140px viewport), which keeps the "Mark Completed" action from being clipped. */
+@media (max-width: 1140px) {
+  #questTableRoot {
+    overflow-x: visible;
+  }
+
+  #questTableRoot .quest-table {
+    display: block;
+    min-width: 0;
+    border-collapse: separate;
+  }
+
+  /* The table header is not rendered in card mode (each cell shows its own visible label
+     through td::before). A visually-hidden 1px/overflow-hidden header is deliberately avoided:
+     that idiom presents as genuinely clipped content to the overflow guard in
+     scripts/verify-ui-polish.js, and display:block/grid/flex on table elements already drops
+     the native table semantics in Chromium, so the hidden header would not restore them. */
+  #questTableRoot .quest-table thead {
+    display: none;
+  }
+
+  #questTableRoot .quest-table tbody {
+    display: grid;
+    gap: 8px;
+  }
+
+  #questTableRoot .quest-table tr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+    padding: 11px 13px 12px;
+    border: 1px solid rgba(164, 198, 230, 0.14);
+    border-radius: 12px;
+    background: rgba(13, 22, 32, 0.86);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  #questTableRoot .quest-table tr.is-completed {
+    border-color: rgba(131, 214, 160, 0.5);
+    background: rgba(13, 26, 20, 0.86);
+  }
+
+  /* Flex rows keep a cell's inline content (including the questline number badge) in one item. */
+  #questTableRoot .quest-table td {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+    max-width: none;
+    padding: 1px 0;
+    border: 0;
+    background: none;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    white-space: normal;
+  }
+
+  #questTableRoot .quest-table td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    color: #9cc7e7;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Identity / long-text fields take a full line... */
+  #questTableRoot .quest-table td.npcName,
+  #questTableRoot .quest-table td.requirements,
+  #questTableRoot .quest-table td.questName,
+  #questTableRoot .quest-table td.completed {
+    flex: 1 1 100%;
+  }
+
+  /* ...while the short ones pack together. */
+  #questTableRoot .quest-table td.city,
+  #questTableRoot .quest-table td.coordinates,
+  #questTableRoot .quest-table td.xpReward,
+  #questTableRoot .quest-table td.colReward,
+  #questTableRoot .quest-table td.bonusItems {
+    flex: 0 1 auto;
+  }
+
+  #questTableRoot .quest-table td.npcName::before {
+    color: #bcd2e5;
+  }
+
+  #questTableRoot .quest-table td.npcName {
+    font-weight: 700;
+  }
+
+  #questTableRoot .quest-table td.requirements,
+  #questTableRoot .quest-table td.questName,
+  #questTableRoot .quest-table td.bonusItems {
+    margin-top: 5px;
+  }
+
+  #questTableRoot .quest-table td.completed {
+    display: block;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(164, 198, 230, 0.14);
+  }
+
+  #questTableRoot .quest-table td.completed::before {
+    display: block;
+    width: auto;
+    margin-bottom: 5px;
+  }
+
+  #questTableRoot .completion-button {
+    width: 100%;
+    min-height: 38px;
+    font-size: 0.82rem;
+  }
+}
+
+/* Tablet / small-laptop widths have room for several quest cards side by side. */
+@media (min-width: 620px) and (max-width: 1140px) {
+  #questTableRoot .quest-table tbody {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 980px) and (max-width: 1140px) {
+  #questTableRoot .quest-table tbody {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

@@ -17,6 +17,7 @@
     farmingSpots: true,
     mobAreas: true,
     sideQuests: true,
+    mainQuests: true,
     alchemist: true,
     lumberjack: true,
     lootBuyers: true,
@@ -37,39 +38,40 @@
   });
 
   const mapImageSources = Object.freeze({
-    floor1: { surface: "floor1.png", underground: "floor1underground.png" },
-    floor2: { surface: "floor2.png", underground: "floor2underground.png" },
-    floor3: { surface: "floor3.png", underground: "floor3underground.png" }
+    floor1: {
+      surface: "floor1.png",
+      underground: "floor1underground.png",
+      surfaceWebp: "floor1.webp",
+      undergroundWebp: "floor1underground.webp"
+    },
+    floor2: {
+      surface: "floor2.png",
+      underground: "floor2underground.png",
+      surfaceWebp: "floor2.webp",
+      undergroundWebp: "floor2underground.webp"
+    },
+    floor3: {
+      surface: "floor3.png",
+      underground: "floor3underground.png",
+      surfaceWebp: "floor3.webp",
+      undergroundWebp: "floor3underground.webp"
+    }
   });
 
-  const markerDataset = typeof DATA !== "undefined" ? DATA : (globalObject.DATA || {});
-  const mobAreaDataset = typeof MOB_AREAS !== "undefined"
-    ? MOB_AREAS
-    : (Array.isArray(globalObject.MOB_AREAS) ? globalObject.MOB_AREAS : []);
-  const mobAreaMobLookup = typeof MOB_AREA_MOBS !== "undefined"
-    ? MOB_AREA_MOBS
-    : (globalObject.MOB_AREA_MOBS || {});
-  function getContextData(contextId) {
-    const markerEntries = Object.entries(markerDataset)
-      .filter(([, marker]) => marker && marker.floor === contextId);
-    const mobAreas = mobAreaDataset.filter(area => area && area.floor === contextId);
-    const areaIds = new Set(mobAreas.map(area => area.id));
-    const mobAreasMobs = Object.fromEntries(
-      Object.entries(mobAreaMobLookup).filter(([areaId]) => areaIds.has(areaId))
-    );
-    return Object.freeze({
-      markerDataset: Object.freeze(Object.fromEntries(markerEntries)),
-      mobAreaDataset: Object.freeze(mobAreas.slice()),
-      mobAreaMobLookup: Object.freeze(mobAreasMobs)
-    });
-  }
+  const markerDataset = typeof DATA !== "undefined" ? DATA : globalObject.DATA || {};
+  const mobAreaDataset =
+    typeof MOB_AREAS !== "undefined" ? MOB_AREAS : Array.isArray(globalObject.MOB_AREAS) ? globalObject.MOB_AREAS : [];
+  const mobAreaMobLookup = typeof MOB_AREA_MOBS !== "undefined" ? MOB_AREA_MOBS : globalObject.MOB_AREA_MOBS || {};
+  const getContextData = globalObject.SAOMapRuntime.createContextDataResolver({
+    markerDataset,
+    mobAreaDataset,
+    mobAreaMobLookup
+  });
   const coordinateDependencies = {
-    mapWebsiteCoordinates: typeof globalObject.mapWebsiteCoordinates === "function"
-      ? globalObject.mapWebsiteCoordinates
-      : null,
-    invertMapCoordinates: typeof globalObject.invertMapCoordinates === "function"
-      ? globalObject.invertMapCoordinates
-      : null
+    mapWebsiteCoordinates:
+      typeof globalObject.mapWebsiteCoordinates === "function" ? globalObject.mapWebsiteCoordinates : null,
+    invertMapCoordinates:
+      typeof globalObject.invertMapCoordinates === "function" ? globalObject.invertMapCoordinates : null
   };
   function supportsVisitedCategory(category) {
     return category === "biomes" || category === "dungeons" || category === "bossSpawns";
@@ -102,16 +104,9 @@
       miscinfo: true,
       menu: true
     }),
-    sectionPaths: Object.freeze({
-      menu: "../../index.html",
-      maps: "../Map/maps.html",
-      bestiary: "../Bestiary/bestiary.html",
-      equipment: "../eCompendium/ecompendium.html",
-      quests: "../Quests/quests.html",
-      patchnotes: "../Patchnotes/patchnotes.html",
-      commands: "../Commands/commands.html",
-      miscinfo: "../Misc Info/miscinfo.html"
-    }),
+    /* Reuses the canonical Aincrad route table from shared/sao-page-utils.js rather than
+       re-declaring the same paths; the map runtime only validates that this is an object map. */
+    sectionPaths: (globalObject.SAOPageUtils && globalObject.SAOPageUtils.SECTION_PATHS) || {},
     walkthroughSteps: Object.freeze([
       { title: "Navigation" },
       { title: "Map Controls" },

@@ -7,14 +7,17 @@ const root = path.resolve(__dirname, "..");
 
 function createCookieDocument(initialCookie = "") {
   const cookieMap = new Map();
-  const applyCookieString = value => {
+  const applyCookieString = (value) => {
     const entryString = String(value || "");
     if (!entryString) {
       cookieMap.clear();
       return;
     }
 
-    const [firstToken, ...rawAttributes] = entryString.split(";").map(part => part.trim()).filter(Boolean);
+    const [firstToken, ...rawAttributes] = entryString
+      .split(";")
+      .map((part) => part.trim())
+      .filter(Boolean);
     const equalsIndex = firstToken.indexOf("=");
     const name = equalsIndex >= 0 ? firstToken.slice(0, equalsIndex) : firstToken;
     const cookieValue = equalsIndex >= 0 ? firstToken.slice(equalsIndex + 1) : "";
@@ -35,7 +38,10 @@ function createCookieDocument(initialCookie = "") {
   };
 
   if (initialCookie) {
-    for (const cookie of String(initialCookie).split(";").map(part => part.trim()).filter(Boolean)) {
+    for (const cookie of String(initialCookie)
+      .split(";")
+      .map((part) => part.trim())
+      .filter(Boolean)) {
       applyCookieString(cookie);
     }
   }
@@ -70,9 +76,15 @@ function createBrowser({ storageMap = new Map(), cookieValue = "" } = {}) {
   const document = createCookieDocument(cookieValue);
   Object.assign(document, {
     addEventListener() {},
-    getElementById() { return null; },
-    querySelector() { return null; },
-    querySelectorAll() { return []; },
+    getElementById() {
+      return null;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll() {
+      return [];
+    },
     createElement() {
       return {
         appendChild() {},
@@ -82,7 +94,9 @@ function createBrowser({ storageMap = new Map(), cookieValue = "" } = {}) {
         classList: { add() {}, remove() {}, toggle() {} },
         style: {},
         dataset: {},
-        closest() { return null; }
+        closest() {
+          return null;
+        }
       };
     },
     head: { appendChild() {} }
@@ -113,12 +127,18 @@ function createBrowser({ storageMap = new Map(), cookieValue = "" } = {}) {
     matchMedia() {
       return { matches: false, addListener() {}, removeListener() {} };
     },
-    SAODatasets: { getDatasetFromLocation() { return "beta"; } },
+    SAODatasets: {
+      getDatasetFromLocation() {
+        return "beta";
+      }
+    },
     SAOContentTranslations: {
       registerQuestEntry() {},
       registerMapMarker() {},
       register() {},
-      translateKnownTerms(value) { return value; },
+      translateKnownTerms(value) {
+        return value;
+      },
       es: {},
       fr: {}
     },
@@ -156,7 +176,9 @@ function loadStorageModule(windowObject) {
   });
   context.window = windowObject;
   context.globalThis = windowObject;
-  vm.runInContext(fs.readFileSync(path.join(root, "shared", "sao-storage.js"), "utf8"), context, { filename: "shared/sao-storage.js" });
+  vm.runInContext(fs.readFileSync(path.join(root, "shared", "sao-storage.js"), "utf8"), context, {
+    filename: "shared/sao-storage.js"
+  });
   return windowObject.SAOStorage;
 }
 
@@ -187,9 +209,15 @@ function assertStorageFallbackOrder() {
   assert.equal(storage.getItem("gamma"), null);
 
   const brokenStorage = {
-    getItem() { throw new Error("localStorage unavailable"); },
-    setItem() { throw new Error("localStorage unavailable"); },
-    removeItem() { throw new Error("localStorage unavailable"); }
+    getItem() {
+      throw new Error("localStorage unavailable");
+    },
+    setItem() {
+      throw new Error("localStorage unavailable");
+    },
+    removeItem() {
+      throw new Error("localStorage unavailable");
+    }
   };
 
   const cookieBrowser = createBrowser({ cookieValue: "cookieKey=cookieValue" });
@@ -202,8 +230,12 @@ function assertStorageFallbackOrder() {
   memoryBrowser.windowObject.localStorage = brokenStorage;
   memoryBrowser.document.cookie = "";
   const getterThatThrows = {
-    get cookie() { throw new Error("cookie unavailable"); },
-    set cookie(_nextValue) { throw new Error("cookie unavailable"); }
+    get cookie() {
+      throw new Error("cookie unavailable");
+    },
+    set cookie(_nextValue) {
+      throw new Error("cookie unavailable");
+    }
   };
   memoryBrowser.document = getterThatThrows;
   memoryBrowser.windowObject.document = getterThatThrows;
@@ -213,9 +245,15 @@ function assertStorageFallbackOrder() {
 
   const missingValueBrowser = createBrowser();
   missingValueBrowser.windowObject.localStorage = {
-    getItem() { return null; },
-    setItem() { throw new Error("blocked"); },
-    removeItem() { throw new Error("blocked"); }
+    getItem() {
+      return null;
+    },
+    setItem() {
+      throw new Error("blocked");
+    },
+    removeItem() {
+      throw new Error("blocked");
+    }
   };
   const missingValueStorage = loadStorageModule(missingValueBrowser.windowObject);
   missingValueStorage.setItem("jsonValue", JSON.stringify({ ok: true }));
@@ -275,14 +313,24 @@ function assertQuestCompatibility() {
 
   const storage = {
     _values: new Map(),
-    getItem(key) { return this._values.has(String(key)) ? this._values.get(String(key)) : null; },
-    setItem(key, value) { this._values.set(String(key), String(value)); },
+    getItem(key) {
+      return this._values.has(String(key)) ? this._values.get(String(key)) : null;
+    },
+    setItem(key, value) {
+      this._values.set(String(key), String(value));
+    },
     getJSON(key, fallbackValue) {
       const raw = this.getItem(key);
       if (raw === null) return fallbackValue;
-      try { return JSON.parse(raw); } catch { return fallbackValue; }
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return fallbackValue;
+      }
     },
-    setJSON(key, value) { this.setItem(key, JSON.stringify(value)); }
+    setJSON(key, value) {
+      this.setItem(key, JSON.stringify(value));
+    }
   };
   browser.windowObject.SAOStorage = storage;
 
@@ -311,6 +359,7 @@ function assertQuestCompatibility() {
   seedContext.globalThis = seedBrowser.windowObject;
   seedBrowser.windowObject.SAOStorage = storage;
 
+  loadScript(path.join(root, "shared", "sao-page-helpers.js"), seedContext);
   loadScript(path.join(root, "Aincrad", "Quests", "quests_floor1.js"), seedContext);
   loadScript(path.join(root, "Aincrad", "Quests", "quests_current.js"), seedContext);
   loadScript(path.join(root, "Aincrad", "Quests", "quests.js"), seedContext);
@@ -348,6 +397,7 @@ function assertQuestCompatibility() {
   runtimeContext.globalThis = runtimeBrowser.windowObject;
   runtimeBrowser.windowObject.SAOStorage = storage;
 
+  loadScript(path.join(root, "shared", "sao-page-helpers.js"), runtimeContext);
   loadScript(path.join(root, "Aincrad", "Quests", "quests_floor1.js"), runtimeContext);
   loadScript(path.join(root, "Aincrad", "Quests", "quests_current.js"), runtimeContext);
   loadScript(path.join(root, "Aincrad", "Quests", "quests.js"), runtimeContext);
@@ -383,15 +433,29 @@ function assertVisitedMarkerCompatibility() {
     getJSON(key, fallbackValue) {
       return Object.prototype.hasOwnProperty.call(this._values, key) ? this._values[key] : fallbackValue;
     },
-    setJSON(key, value) { this._values[key] = value; }
+    setJSON(key, value) {
+      this._values[key] = value;
+    }
   };
 
   const runtimeApi = require(path.join(root, "shared", "map-runtime.js"));
   const dom = {
-    mapContainer: {}, sidebar: {}, mapLayer: {}, mapImage: {}, undergroundMapImage: {},
-    mobAreaLayer: {}, markerLayer: {}, title: {}, content: {}, overlayMappedCoords: {},
-    floorSelect: {}, undergroundToggle: {}, searchInput: {}, clearFiltersButton: {},
-    zoomLabel: {}, resetViewButton: {}
+    mapContainer: {},
+    sidebar: {},
+    mapLayer: {},
+    mapImage: {},
+    undergroundMapImage: {},
+    mobAreaLayer: {},
+    markerLayer: {},
+    title: {},
+    content: {},
+    overlayMappedCoords: {},
+    floorSelect: {},
+    undergroundToggle: {},
+    searchInput: {},
+    clearFiltersButton: {},
+    zoomLabel: {},
+    resetViewButton: {}
   };
   const adapter = {
     id: "persistence-test",
@@ -435,8 +499,12 @@ function assertWalkthroughResetUsesStorageAbstraction() {
   const removed = [];
   const storage = {
     _values: new Map(),
-    getItem(key) { return this._values.has(String(key)) ? this._values.get(String(key)) : null; },
-    setItem(key, value) { this._values.set(String(key), String(value)); },
+    getItem(key) {
+      return this._values.has(String(key)) ? this._values.get(String(key)) : null;
+    },
+    setItem(key, value) {
+      this._values.set(String(key), String(value));
+    },
     removeItem(key) {
       const normalized = String(key);
       removed.push(normalized);
@@ -445,16 +513,26 @@ function assertWalkthroughResetUsesStorageAbstraction() {
     getJSON(key, fallbackValue) {
       const raw = this.getItem(key);
       if (raw === null) return fallbackValue;
-      try { return JSON.parse(raw); } catch { return fallbackValue; }
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return fallbackValue;
+      }
     },
-    setJSON(key, value) { this.setItem(key, JSON.stringify(value)); }
+    setJSON(key, value) {
+      this.setItem(key, JSON.stringify(value));
+    }
   };
 
   browser.windowObject.SAOStorage = storage;
   browser.windowObject.localStorage = {
-    getItem() { return null; },
+    getItem() {
+      return null;
+    },
     setItem() {},
-    removeItem() { throw new Error("resetWalkthroughProgress should use SAOStorage.removeItem when available"); }
+    removeItem() {
+      throw new Error("resetWalkthroughProgress should use SAOStorage.removeItem when available");
+    }
   };
 
   const context = vm.createContext({
@@ -489,15 +567,20 @@ function assertWalkthroughResetUsesStorageAbstraction() {
     storage.setItem(key, "1");
   }
 
-  vm.runInContext(fs.readFileSync(path.join(root, "shared", "sao-i18n.js"), "utf8"), context, { filename: "shared/sao-i18n.js" });
+  vm.runInContext(fs.readFileSync(path.join(root, "shared", "sao-i18n.js"), "utf8"), context, {
+    filename: "shared/sao-i18n.js"
+  });
   vm.runInContext("window.SAOI18n.resetWalkthroughProgress();", context);
 
-  assert.deepEqual(removed.sort(), [
-    "sao.walkthrough.index.completed",
-    "sao.walkthrough.maps.completed",
-    "sao.walkthrough.mainui.completed",
-    "sao.walkthrough.characterBuild.completed"
-  ].sort());
+  assert.deepEqual(
+    removed.sort(),
+    [
+      "sao.walkthrough.index.completed",
+      "sao.walkthrough.maps.completed",
+      "sao.walkthrough.mainui.completed",
+      "sao.walkthrough.characterBuild.completed"
+    ].sort()
+  );
 }
 
 function main() {

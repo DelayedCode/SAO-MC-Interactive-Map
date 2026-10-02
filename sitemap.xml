@@ -2,61 +2,73 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Bestiary/bestiary.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Character%20Build/character-build.html</loc>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Commands/commands.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/eCompendium/ecompendium.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Map/maps.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Misc%20Info/miscinfo.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Patchnotes/patchnotes.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Aincrad/Quests/quests.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Fractured%20Underworld/Compendium/compendium.html</loc>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Fractured%20Underworld/Main%20UI/mainui.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://delayedcode.github.io/SAO-MC-Interactive-Map/Fractured%20Underworld/Tower%20Defense/towerdefense.html</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
