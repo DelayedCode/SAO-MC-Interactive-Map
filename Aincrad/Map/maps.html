@@ -201,6 +201,79 @@
         </div>
       </section>
 
+      <div id="mapContextMenu" class="map-context-menu" role="menu" aria-hidden="true" hidden>
+        <div class="map-context-menu-header" data-i18n="page.maps.mapContextMenu.title">MAP ACTIONS</div>
+        <button
+          class="map-context-menu-item"
+          type="button"
+          data-map-action="create-custom-marker"
+          data-i18n="page.maps.mapContextMenu.createCustomMarker"
+        >
+          Create Custom Marker
+        </button>
+        <button
+          class="map-context-menu-item"
+          type="button"
+          data-map-action="distance-point-1"
+          data-i18n="page.maps.mapContextMenu.distancePoint1"
+        >
+          Distance Calculator Point 1
+        </button>
+        <button
+          class="map-context-menu-item"
+          type="button"
+          data-map-action="distance-point-2"
+          data-i18n="page.maps.mapContextMenu.distancePoint2"
+        >
+          Distance Calculator Point 2
+        </button>
+        <button
+          class="map-context-menu-item"
+          type="button"
+          data-map-action="reset-distance"
+          data-i18n="page.maps.mapContextMenu.resetDistance"
+        >
+          Reset Distance Calculator
+        </button>
+        <div class="map-context-menu-divider"></div>
+        <button
+          class="map-context-menu-item"
+          type="button"
+          data-map-action="journey-export"
+          data-i18n="page.maps.mapContextMenu.exportJourneyMap"
+        >
+          Export JourneyMap Waypoints
+        </button>
+        <button
+          class="map-context-menu-item"
+          type="button"
+          data-map-action="journey-import"
+          data-i18n="page.maps.mapContextMenu.importJourneyMap"
+        >
+          Import JourneyMap Waypoints
+        </button>
+        <div class="map-context-menu-divider"></div>
+        <a
+          class="map-context-menu-item"
+          href="https://www.youtube.com/watch?v=W9nZ6u15yis"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-i18n="page.maps.mapContextMenu.waypointTutorial"
+        >
+          How to Import/Export Waypoints Tutorial
+        </a>
+      </div>
+
+      <input id="journeyMapImportFile" type="file" accept=".dat,application/octet-stream" hidden />
+      <div
+        id="globalToast"
+        class="global-toast"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-hidden="true"
+      ></div>
+
       <div
         id="sidebarResizeHandle"
         role="separator"
@@ -211,6 +284,10 @@
       ></div>
 
       <aside id="sidebar">
+        <div id="customCategoryItem" class="sidebar-section" hidden>
+          <div class="sidebar-section-title" data-i18n="page.maps.customWaypoint.category">Custom Markers</div>
+          <ul id="customWaypointSidebarList" class="sidebar-list"></ul>
+        </div>
         <div class="sidebar-section">
           <div class="sidebar-section-title" data-i18n="page.maps.categoryMainTitle">Main</div>
           <ul class="sidebar-list">
@@ -479,6 +556,166 @@
       </aside>
     </main>
 
+    <dialog id="customWaypointDialog" class="custom-waypoint-dialog" aria-labelledby="customWaypointDialogTitle">
+      <form id="customWaypointForm" class="custom-waypoint-form">
+        <div class="custom-waypoint-header">
+          <h2 id="customWaypointDialogTitle" data-i18n="page.maps.customWaypoint.createTitle">
+            Create Custom Waypoint
+          </h2>
+          <button
+            id="customWaypointCancel"
+            class="control-action"
+            type="button"
+            data-i18n="page.maps.customWaypoint.cancel"
+          >
+            Cancel Creation
+          </button>
+        </div>
+        <label for="customWaypointName" data-i18n="page.maps.customWaypoint.nameLabel">Waypoint Name</label>
+        <input id="customWaypointName" name="name" type="text" maxlength="80" aria-required="true" />
+        <label for="customWaypointDescription" data-i18n="page.maps.customWaypoint.descriptionLabel"
+          >Waypoint Description</label
+        >
+        <textarea id="customWaypointDescription" name="description" rows="3" maxlength="1000"></textarea>
+        <label for="customWaypointButtonSelect" data-i18n="page.maps.customWaypoint.buttonLabel">Button</label>
+        <select id="customWaypointButtonSelect" name="button"></select>
+        <div id="customWaypointButtonNameRow" hidden>
+          <label for="customWaypointButtonName" data-i18n="page.maps.customWaypoint.buttonNameLabel">Button Name</label>
+          <input id="customWaypointButtonName" name="buttonName" type="text" maxlength="40" />
+        </div>
+        <div id="customWaypointCategoryColorRow" hidden>
+          <label for="customWaypointCategoryColor">Color Selector for "JourneyMap" Export</label>
+          <div class="custom-waypoint-color-row">
+            <div class="custom-waypoint-color-picker">
+              <span id="customWaypointCategorySwatch" class="custom-waypoint-color-swatch" aria-hidden="true"></span>
+              <span id="customWaypointCategoryColorHint" class="custom-waypoint-color-hint">Click to choose a color</span>
+              <input
+                id="customWaypointCategoryColor"
+                name="categoryColor"
+                type="color"
+                value="#000000"
+                aria-label="Choose JourneyMap category color"
+                title="Click to choose a color"
+              />
+            </div>
+            <input
+              id="customWaypointCategoryHex"
+              name="categoryHex"
+              type="text"
+              inputmode="text"
+              spellcheck="false"
+              maxlength="7"
+              aria-label="JourneyMap category HEX color"
+              placeholder="#RRGGBB"
+            />
+          </div>
+        </div>
+        <div class="custom-waypoint-coordinates">
+          <span class="custom-waypoint-field-label" data-i18n="page.maps.customWaypoint.coordinatesLabel"
+            >Coordinates</span
+          >
+          <label for="customWaypointX" data-i18n="page.maps.customWaypoint.xLabel">X</label>
+          <input id="customWaypointX" name="x" type="number" step="any" aria-required="true" />
+          <label for="customWaypointZ" data-i18n="page.maps.customWaypoint.zLabel">Z</label>
+          <input id="customWaypointZ" name="z" type="number" step="any" aria-required="true" />
+        </div>
+        <label for="customWaypointLogo" data-i18n="page.maps.customWaypoint.logoLabel">Custom Logo</label>
+        <select id="customWaypointLogo" name="logo">
+          <option value="pin" data-i18n="page.maps.customWaypoint.logoPin">Pin</option>
+          <option value="star" data-i18n="page.maps.customWaypoint.logoStar">Star</option>
+          <option value="flag" data-i18n="page.maps.customWaypoint.logoFlag">Flag</option>
+          <option value="home" data-i18n="page.maps.customWaypoint.logoHome">Home</option>
+          <option value="chest" data-i18n="page.maps.customWaypoint.logoChest">Chest</option>
+          <option value="sword" data-i18n="page.maps.customWaypoint.logoSword">Sword</option>
+          <option value="shield" data-i18n="page.maps.customWaypoint.logoShield">Shield</option>
+          <option value="skull" data-i18n="page.maps.customWaypoint.logoSkull">Skull</option>
+          <option value="diamond" data-i18n="page.maps.customWaypoint.logoDiamond">Diamond</option>
+          <option value="target" data-i18n="page.maps.customWaypoint.logoTarget">Target</option>
+        </select>
+        <p id="customWaypointStatus" class="custom-waypoint-status" role="status" aria-live="polite">
+          <span
+            id="customWaypointPerformanceWarning"
+            class="custom-waypoint-performance-warning"
+            data-i18n="page.maps.customWaypoint.performanceWarning"
+            >More custom waypoints may reduce map performance. Large numbers of waypoints can make the map slower,
+            especially while zooming or moving around.</span
+          >
+          <span id="customWaypointStatusMessage"></span>
+        </p>
+        <div class="custom-waypoint-actions">
+          <button
+            id="customWaypointCopy"
+            class="control-action"
+            type="button"
+            data-i18n="page.maps.customWaypoint.copy"
+          >
+            Copy Coordinates
+          </button>
+          <button
+            class="control-action custom-waypoint-confirm"
+            type="submit"
+            data-i18n="page.maps.customWaypoint.confirm"
+          >
+            Confirm Creation
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="customWaypointDeleteDialog" class="custom-waypoint-dialog" aria-labelledby="customWaypointDeleteTitle">
+      <form method="dialog" class="custom-waypoint-form">
+        <div class="custom-waypoint-header">
+          <h2 id="customWaypointDeleteTitle" data-i18n="page.maps.customWaypoint.delete">Delete Custom Waypoint</h2>
+        </div>
+        <p id="customWaypointDeleteMessage" class="custom-waypoint-status" role="status"></p>
+        <div class="custom-waypoint-actions">
+          <button
+            id="customWaypointDeleteCancel"
+            class="control-action"
+            type="button"
+            data-i18n="page.maps.customWaypoint.cancelAction"
+          >
+            Cancel
+          </button>
+          <button
+            id="customWaypointDeleteConfirm"
+            class="control-action custom-waypoint-confirm"
+            type="button"
+            data-i18n="page.maps.customWaypoint.confirmAction"
+          >
+            Confirm
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="customButtonDeleteDialog" class="custom-waypoint-dialog" aria-labelledby="customButtonDeleteTitle">
+      <form method="dialog" class="custom-waypoint-form">
+        <div class="custom-waypoint-header">
+          <h2 id="customButtonDeleteTitle" data-i18n="page.maps.customWaypoint.deleteButton">Delete Button</h2>
+        </div>
+        <p id="customButtonDeleteDescription" class="custom-waypoint-status"></p>
+        <div class="custom-waypoint-actions">
+          <button
+            id="customButtonDeleteCancel"
+            class="control-action"
+            type="button"
+            data-i18n="page.maps.customWaypoint.cancelAction"
+          >
+            Cancel
+          </button>
+          <button
+            id="customButtonDeleteConfirm"
+            class="control-action custom-waypoint-confirm"
+            type="button"
+            data-i18n="page.maps.customWaypoint.deleteButton"
+          >
+            Delete Button
+          </button>
+        </div>
+      </form>
+    </dialog>
+
     <script src="mapData.js"></script>
     <script src="maps_floor1.js"></script>
     <script src="maps_floor2.js"></script>
@@ -489,11 +726,16 @@
     <script src="../../shared/sao-i18n.js?v=aincrad-map-labels"></script>
     <script src="../../shared/sao-page-helpers.js"></script>
     <script src="../../shared/sao-map-helpers.js"></script>
+    <script src="../../shared/sao-color-utils.js"></script>
+    <script src="../../shared/sao-custom-waypoints.js"></script>
+    <script src="../../shared/sao-journeymap-export.js"></script>
+    <script src="../../shared/sao-journeymap-import.js"></script>
     <script src="../../shared/sao-content-translations.js"></script>
     <script src="../../shared/sao-datasets.js"></script>
     <script src="../../shared/sao-walkthrough.js"></script>
     <script src="../../shared/map-runtime.js"></script>
     <script src="../../shared/sao-dropdown.js"></script>
+    <script src="../../Fractured%20Underworld/Main%20UI/adapter.js"></script>
     <script src="adapter.js"></script>
     <script src="maps.js"></script>
     <script src="../../shared/sao-polish.js"></script>

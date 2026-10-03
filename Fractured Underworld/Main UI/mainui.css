@@ -61,32 +61,6 @@ header {
   --accent: #73b9ff;
 }
 
-.global-toast {
-  position: fixed;
-  left: 50%;
-  bottom: 18px;
-  transform: translate(-50%, 8px);
-  max-width: min(420px, calc(100vw - 32px));
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(130, 190, 255, 0.42);
-  background: rgba(10, 18, 32, 0.96);
-  color: var(--text);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-  z-index: 40;
-  text-align: center;
-}
-
-.global-toast.show {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-
 .top-nav {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

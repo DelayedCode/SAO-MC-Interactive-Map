@@ -18,18 +18,28 @@ const ALL_STORAGE_KEYS = [...Object.values(WALKTHROUGH_KEYS), WARNING_ENCOUNTER_
 /* Feature pages start their first-visit tour on their own; only the Welcome Mat puts the
    mandatory Aincrad/beta warning in front of the tour. */
 const pageTours = [
-  { name: "aincrad-map", path: "/Aincrad/Map/maps.html", key: WALKTHROUGH_KEYS.maps, steps: 4 },
+  { name: "aincrad-map", path: "/Aincrad/Map/maps.html", key: WALKTHROUGH_KEYS.maps, steps: 5 },
   {
     name: "underworld-map",
     path: "/Fractured%20Underworld/Main%20UI/mainui.html",
     key: WALKTHROUGH_KEYS.mainui,
-    steps: 4
+    steps: 5
   }
 ];
 
 const welcomeTour = { name: "welcome", path: "/index.html", key: WALKTHROUGH_KEYS.index, steps: 5 };
 
 const languages = ["en", "es", "fr"];
+const mapMenuWalkthroughTitles = {
+  en: "Right-Click Map Menu",
+  es: "Menú del mapa con clic derecho",
+  fr: "Menu contextuel du clic droit"
+};
+const mapMenuWalkthroughBodies = {
+  en: "Right-click the map to open the map action menu. This menu contains the available map actions and tools.",
+  es: "Haz clic derecho en el mapa para abrir el menú de acciones. Este menú contiene las acciones y herramientas disponibles para el mapa.",
+  fr: "Fais un clic droit sur la carte pour ouvrir le menu d'actions. Ce menu contient les actions et outils disponibles pour la carte."
+};
 const warningLanguageOrder = ["en", "fr", "es"];
 const viewports = [
   { name: "desktop", width: 1440, height: 1000 },
@@ -82,8 +92,9 @@ async function waitForOkayEnabled(page, timeout = 30000) {
 /* The tour scrolls its target into view with `behavior: "smooth"`, so the focus rect keeps
    moving for a few frames. Poll until it has been stable for a few consecutive samples
    instead of guessing a fixed delay. */
-async function waitForTourSettled(page, timeout = 5000) {
-  await page.waitForFunction(
+async function waitForTourSettled(page, timeout = 5000, context = "walkthrough") {
+  try {
+    await page.waitForFunction(
     () => {
       const target = document.querySelector(".sao-tour-focus-target");
       if (!target) return false;
@@ -99,8 +110,16 @@ async function waitForTourSettled(page, timeout = 5000) {
       return state.hits >= 3 && Date.now() - state.startedAt > 400;
     },
     null,
-    { timeout, polling: 100 }
-  );
+      { timeout, polling: 100 }
+    );
+  } catch (error) {
+    const state = await page.evaluate(() => ({
+      title: document.querySelector(".sao-tour-title")?.textContent || "",
+      target: document.querySelector(".sao-tour-focus-target")?.id || null,
+      menuHidden: document.getElementById("mapContextMenu")?.hidden ?? null
+    }));
+    throw new Error(`${context}: walkthrough target did not settle (${JSON.stringify(state)})`, { cause: error });
+  }
 }
 
 /* Reads the warning's live state without reimplementing any of its logic. */
@@ -714,6 +733,9 @@ async function verifyWarningEncounterThreshold(browser) {
  * ------------------------------------------------------------------ */
 async function verifyPageTours(browser) {
   const results = [];
+  for (const tour of pageTours) {
+    assert.equal(tour.steps, 5, `${tour.name}: walkthrough configuration has five steps`);
+  }
   for (const viewport of viewports) {
     for (const language of languages) {
       for (const tour of pageTours) {
@@ -737,10 +759,11 @@ async function verifyPageTours(browser) {
         });
 
         for (let stepIndex = 0; stepIndex < tour.steps; stepIndex += 1) {
-          await waitForTourSettled(page);
+          await waitForTourSettled(page, 5000, `${label}, step ${stepIndex + 1}`);
           const state = await page.evaluate(() => {
             const target = document.querySelector(".sao-tour-focus-target");
             const card = document.querySelector(".sao-tour-card");
+            const menu = document.getElementById("mapContextMenu");
             const cardRect = card && card.getBoundingClientRect();
             const targetRect = target && target.getBoundingClientRect();
             const text = [
@@ -751,12 +774,19 @@ async function verifyPageTours(browser) {
             return {
               open: document.querySelector(".sao-tour-overlay.open") !== null,
               target: Boolean(target),
+              targetId: target && target.id,
               targetRect: targetRect && {
                 left: targetRect.left,
                 top: targetRect.top,
                 right: targetRect.right,
                 bottom: targetRect.bottom
               },
+              menuVisible: Boolean(menu && !menu.hidden && menu.getAttribute("aria-hidden") !== "true"),
+              menuRect: menu && menu.getBoundingClientRect().toJSON(),
+              title: (document.querySelector(".sao-tour-title") || {}).textContent || "",
+              body: (document.querySelector(".sao-tour-body") || {}).textContent || "",
+              stepNumber: document.getElementById("sao-tour-overlay")?.currentStepIndex + 1,
+              totalSteps: document.getElementById("sao-tour-overlay")?.steps?.length || 0,
               cardRect: cardRect && {
                 left: cardRect.left,
                 top: cardRect.top,
@@ -768,6 +798,7 @@ async function verifyPageTours(browser) {
             };
           });
           assert.equal(state.open, true, `${label}: tour is open at step ${stepIndex + 1}`);
+          assert.equal(state.totalSteps, tour.steps, `${label}: active walkthrough has five steps`);
           assert.equal(state.target, true, `${label}: target missing at step ${stepIndex + 1}`);
           assert.equal(
             inViewport(state.targetRect, viewport.width, viewport.height),
@@ -781,7 +812,41 @@ async function verifyPageTours(browser) {
           );
           assert.equal(state.overflow, false, `${label}: horizontal overflow at step ${stepIndex + 1}`);
           assert.equal(state.text.includes("page."), false, `${label}: raw localization key at step ${stepIndex + 1}`);
+          if (stepIndex === tour.steps - 1) {
+            assert.equal(state.stepNumber, 5, `${label}: walkthrough is at step 5 of 5`);
+            assert.equal(state.targetId, "mapContextMenu", `${label}: the map menu is the walkthrough target`);
+            assert.equal(state.menuVisible, true, `${label}: entering the final step opens the actual map menu`);
+            assert.equal(state.title, mapMenuWalkthroughTitles[language], `${label}: the menu walkthrough step is localized`);
+            assert.equal(state.body, mapMenuWalkthroughBodies[language], `${label}: the menu walkthrough body is localized`);
+            assert.equal(
+              await page.evaluate(() => window.__walkthroughContextMenuEventCount),
+              1,
+              `${label}: Step 5 opens the real menu through the map contextmenu event`
+            );
+            assert.ok(
+              Math.abs((state.menuRect.left + state.menuRect.right) / 2 - viewport.width / 2) <= 2,
+              `${label}: demonstrated menu is horizontally centered`
+            );
+            assert.ok(
+              Math.abs((state.menuRect.top + state.menuRect.bottom) / 2 - viewport.height / 2) <= 2,
+              `${label}: demonstrated menu is vertically centered`
+            );
+          }
           if (stepIndex < tour.steps - 1) {
+            if (stepIndex === tour.steps - 2) {
+              await page.evaluate(() => {
+                const mapImage = document.getElementById("mapImage");
+                if (!mapImage) throw new Error("Map image is required for the context-menu walkthrough.");
+                window.__walkthroughContextMenuEventCount = 0;
+                mapImage.addEventListener(
+                  "contextmenu",
+                  () => {
+                    window.__walkthroughContextMenuEventCount += 1;
+                  },
+                  { once: true }
+                );
+              });
+            }
             await page.locator(".sao-tour-actions button").nth(2).click({ force: true });
             await page.evaluate(() => {
               window.__tourSettleState = null;
@@ -792,18 +857,130 @@ async function verifyPageTours(browser) {
         await page.locator(".sao-tour-actions button").nth(2).click({ force: true });
         await page.waitForTimeout(250);
         assert.equal(
+          await page.evaluate(() => document.getElementById("mapContextMenu")?.hidden),
+          true,
+          `${label}: finishing the tour closes the demonstrated map menu`
+        );
+        assert.equal(
           await page.evaluate((key) => window.SAOStorage.getItem(key), tour.key),
           "1",
           `${label}: finishing the tour persists`
         );
         assert.deepEqual(errors, [], `${label}: browser errors`);
         assert.deepEqual(failedRequests, [], `${label}: failed requests`);
+        if (language === "en" && viewport.name === "desktop") {
+          await verifyMapMenuWalkthroughLifecycle(page, tour, label);
+          assert.deepEqual(errors, [], `${label}: browser errors after menu walkthrough lifecycle checks`);
+          assert.deepEqual(failedRequests, [], `${label}: failed requests after menu walkthrough lifecycle checks`);
+        }
         results.push({ scope: "page-tour", tour: tour.name, language, viewport: viewport.name, status: "passed" });
         await session.context.close();
       }
     }
   }
   return results;
+}
+
+async function verifyMapMenuWalkthroughLifecycle(page, tour, label) {
+  const next = page.locator(".sao-tour-actions button").nth(2);
+  const back = page.locator(".sao-tour-actions button").nth(1);
+  const skip = page.locator(".sao-tour-actions button").nth(0);
+  const readMenuPosition = () =>
+    page.evaluate(() => {
+      const menu = document.getElementById("mapContextMenu");
+      return { left: menu.style.left, top: menu.style.top, zIndex: menu.style.zIndex };
+    });
+  const assertMenuPositionRestored = async (expected, action) => {
+    assert.deepEqual(await readMenuPosition(), expected, `${label}: ${action} restores the menu's inline position`);
+  };
+  const waitForMenu = () =>
+    page.waitForFunction(() => {
+      const menu = document.getElementById("mapContextMenu");
+      return menu && !menu.hidden && menu.getAttribute("aria-hidden") !== "true";
+    });
+  const advanceToMenuStep = async () => {
+    const originalPosition = await readMenuPosition();
+    await page.evaluate(() => document.dispatchEvent(new Event("sao:walkthroughrestart")));
+    await page.waitForFunction(() => Boolean(document.querySelector(".sao-tour-overlay.open")));
+    for (let index = 0; index < tour.steps - 1; index += 1) {
+      await next.click({ force: true });
+    }
+    await waitForMenu();
+    return originalPosition;
+  };
+
+  const positionBeforeBack = await advanceToMenuStep();
+  await back.click({ force: true });
+  await page.waitForFunction(() => document.getElementById("mapContextMenu")?.hidden === true);
+  await assertMenuPositionRestored(positionBeforeBack, "going Back");
+  assert.match(
+    await page.locator(".sao-tour-step").textContent(),
+    /4\s+of\s+5/,
+    `${label}: going back leaves and closes the menu step`
+  );
+
+  const positionBeforeEscape = await readMenuPosition();
+  await next.click({ force: true });
+  await waitForMenu();
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector(".sao-tour-overlay.open"));
+  assert.equal(
+    await page.evaluate(() => document.getElementById("mapContextMenu")?.hidden),
+    true,
+    `${label}: closing the walkthrough closes the demonstrated menu`
+  );
+
+  await assertMenuPositionRestored(positionBeforeEscape, "Escape");
+
+  const positionBeforeSkip = await advanceToMenuStep();
+  await skip.click({ force: true });
+  await page.waitForFunction(() => !document.querySelector(".sao-tour-overlay.open"));
+  assert.equal(
+    await page.evaluate(() => document.getElementById("mapContextMenu")?.hidden),
+    true,
+    `${label}: Skip closes the demonstrated menu`
+  );
+  await assertMenuPositionRestored(positionBeforeSkip, "closing the walkthrough");
+
+  const positionBeforeFinish = await advanceToMenuStep();
+  await next.click({ force: true });
+  await page.waitForFunction(() => document.getElementById("mapContextMenu")?.hidden === true);
+  await assertMenuPositionRestored(positionBeforeFinish, "finishing the walkthrough");
+  const point = await page.evaluate(() => {
+    const container = document.getElementById("mapContainer");
+    const layer = document.getElementById("mapLayer");
+    const rect = container.getBoundingClientRect();
+    for (let yFraction = 0.1; yFraction < 1; yFraction += 0.1) {
+      for (let xFraction = 0.1; xFraction < 1; xFraction += 0.1) {
+        const x = rect.left + rect.width * xFraction;
+        const y = rect.top + rect.height * yFraction;
+        const target = document.elementFromPoint(x, y);
+        if (
+          target &&
+          layer.contains(target) &&
+          !target.closest(".marker, button, input, select, textarea, label, dialog, #measurementLayer, #mapContextMenu")
+        ) {
+          return { x, y };
+        }
+      }
+    }
+    throw new Error("Could not find a clear map surface for the post-walkthrough right-click.");
+  });
+  await page.mouse.click(point.x, point.y, { button: "right" });
+  await waitForMenu();
+  const normalMenu = await page.evaluate(() => {
+    const menu = document.getElementById("mapContextMenu");
+    const rect = menu.getBoundingClientRect();
+    return {
+      zIndex: getComputedStyle(menu).zIndex,
+      left: rect.left,
+      width: rect.width,
+      viewportWidth: window.innerWidth
+    };
+  });
+  assert.equal(normalMenu.zIndex, "1200", `${label}: normal context-menu stacking is restored`);
+  const expectedLeft = Math.min(Math.max(12, point.x + 12), normalMenu.viewportWidth - normalMenu.width - 12);
+  assert.ok(Math.abs(normalMenu.left - expectedLeft) <= 2, `${label}: right-click uses normal pointer positioning again`);
 }
 
 module.exports = {

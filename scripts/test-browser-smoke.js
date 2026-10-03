@@ -179,6 +179,13 @@ async function main() {
               issues.push(`html[lang] is "${actual}" instead of "${language}"`);
             }
 
+            if (pageInfo.id === "hub") {
+              const hasStandaloneTilde = await page.locator("body").evaluate((body) =>
+                body.innerText.split(/\n/).some((line) => line.trim() === "~")
+              );
+              if (hasStandaloneTilde) issues.push("Welcome Mat contains a stray standalone tilde");
+            }
+
             const title = await page.title();
             if (!title) issues.push("page title is empty");
 

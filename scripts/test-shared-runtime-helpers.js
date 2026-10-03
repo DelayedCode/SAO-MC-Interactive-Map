@@ -156,4 +156,31 @@ assert.equal(typeof context.window.createDisposer, "function", "map runtime supp
   assert.equal(invalidations, 2, "a context change signals the invalidation hook");
 }
 
+/* --- createMapContextAccessors: custom marker overlays avoid dataset copies -- */
+{
+  const builtInMarker = { id: "built-in", floor: "floor1" };
+  const customMarker = { id: "custom:one", floor: "floor1" };
+  const markerDataset = Object.freeze({ "built-in": builtInMarker });
+  const adapter = {
+    getContextData() {
+      return { markerDataset, mobAreaDataset: [], mobAreaMobLookup: {} };
+    }
+  };
+  const accessors = createMapContextAccessors({
+    getAdapter: () => adapter,
+    getContextId: () => "floor1",
+    getAdditionalMarkers: () => ({ "custom:one": customMarker })
+  });
+  const contextData = accessors.getContextData();
+  assert.equal(contextData.markerDataset["built-in"], builtInMarker, "built-in marker references are not copied");
+  assert.equal(contextData.markerDataset["custom:one"], customMarker, "custom markers are readable by id");
+  assert.deepEqual(
+    accessors.getDataEntries().map(([id]) => id),
+    ["built-in", "custom:one"],
+    "Object.entries includes built-in and additional markers"
+  );
+  assert.equal(Object.isFrozen(markerDataset), true, "the built-in dataset remains untouched");
+  assert.equal(Reflect.ownKeys(markerDataset).length, 1, "no custom keys were added to built-in data");
+}
+
 console.log("Shared runtime helper regression tests passed.");

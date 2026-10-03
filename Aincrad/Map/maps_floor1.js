@@ -299,6 +299,7 @@ Object.assign(DATA, {
     category: "dungeons",
     floor: "floor1",
     coords: { x: 1032, z: 1172 },
+    tutorial: "",
     drops: ["N/A"],
     description:
       "A fractured ruin wrapped in red mist where sword skills desync in narrow halls. Parties that clear its upper chambers often hear one extra set of footsteps behind them."
@@ -309,6 +310,7 @@ Object.assign(DATA, {
     category: "dungeons",
     floor: "floor1",
     coords: { x: 3407, z: 960 },
+    tutorial: "",
     drops: ["N/A"],
     description:
       "The old boss tower from early Aincrad records, layered with trap stairs and ambush rooms. Every floor feels like a raid rehearsal built to punish hesitation."
@@ -319,6 +321,7 @@ Object.assign(DATA, {
     category: "dungeons",
     floor: "floor1",
     coords: { x: 2381, z: 2403 },
+    tutorial: "",
     drops: ["N/A"],
     description:
       "A maze that rewrites its routes after each elite pull, like the system is learning your pathing. Scouts call it the place where map memory goes to die."
@@ -329,6 +332,7 @@ Object.assign(DATA, {
     category: "dungeons",
     floor: "floor1",
     coords: { x: 2780, z: 4410 },
+    tutorial: "",
     drops: ["N/A"],
     description:
       "Hidden beneath broken stone circles, this sub-dungeon is tuned for tight duels and poison attrition. The deeper vaults feel like a side route meant for front-liners only."
@@ -339,6 +343,7 @@ Object.assign(DATA, {
     category: "dungeons",
     floor: "floor1",
     coords: { x: 4268, z: 3876 },
+    tutorial: "",
     drops: ["N/A"],
     description:
       "Collapsed ore tunnels now host armored mobs that patrol like a disciplined guild squad. Miners left warning runes at each fork, but most parties still pick the wrong descent."

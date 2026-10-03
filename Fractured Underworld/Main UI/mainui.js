@@ -32,6 +32,10 @@ const elements = {
   clearFiltersButton: document.getElementById("clearFilters"),
   zoomLabel: document.getElementById("zoomLabel"),
   resetViewButton: document.getElementById("resetView"),
+  customWaypointDialog: document.getElementById("customWaypointDialog"),
+  customWaypointForm: document.getElementById("customWaypointForm"),
+  mapContextMenu: document.getElementById("mapContextMenu"),
+  journeyMapImportFile: document.getElementById("journeyMapImportFile"),
   categoryToggleButtons: document.querySelectorAll(".sidebar-list-button[data-category]"),
   globalToast: document.getElementById("globalToast")
 };
@@ -56,6 +60,10 @@ const {
   clearFiltersButton,
   zoomLabel,
   resetViewButton,
+  customWaypointDialog,
+  customWaypointForm,
+  mapContextMenu,
+  journeyMapImportFile,
   globalToast
 } = elements;
 
@@ -74,6 +82,7 @@ const {
   clearTextSelection,
   shouldIgnoreMapDrag,
   getImageLocalCoords,
+  copyTextToClipboard,
   CLUSTER_RADIUS_PX,
   CLUSTER_ID_PREFIX,
   isClusteringEnabled,
@@ -84,6 +93,7 @@ const {
   buildMarketMarkerIcon,
   buildCraftsmanMarkerIcon,
   buildMarkerIcon,
+  buildCustomWaypointIcon,
   renderMapRuntimeError
 } = window.SAOMapHelpers;
 
@@ -107,17 +117,25 @@ function hasRequiredMainUiElements() {
     undergroundToggle &&
     searchInput &&
     zoomLabel &&
-    resetViewButton
+    resetViewButton &&
+    customWaypointDialog &&
+    customWaypointForm
   );
 }
 
 const mapAdapter = window.UnderworldMapAdapter || null;
+let customWaypointStore = null;
+let mapContextMenuState = { event: null, x: null, z: null };
+let walkthroughContextMenuDemoState = null;
+let pendingCustomWaypointFloor = "";
+let customWaypointStatusKey = "";
 /* Per-context dataset caching, the mob-area lookup and the marker search-cache
    invalidation are owned by the shared accessor factory (shared/sao-map-helpers.js)
    so the Aincrad and Underworld maps cannot drift apart on them. */
 const mapContextAccessors = window.SAOMapHelpers.createMapContextAccessors({
   getAdapter: () => mapAdapter,
   getContextId: () => floorSelect?.value || mapAdapter?.defaultFloor || "",
+  getAdditionalMarkers: (floor) => customWaypointStore?.getMarkerDataset(floor) || {},
   onContextChange: () => {
     markerSearchCache = null;
   }
@@ -146,6 +164,7 @@ const { t, content: contentLookup } = window.SAOPageHelpers.createTranslators(i1
 const storage = window.SAOPageHelpers.getStorage();
 
 const initialCategoryState = Object.freeze({
+  custom: false,
   npc: false,
   rulid: false,
   fishingSpot: false,
@@ -287,9 +306,11 @@ function getMapLabel(mapKey) {
 function getIslandCategoriesForFloor(floorKey) {
   const entries = Object.entries(mapAdapter?.categoryFloorRules || {});
   const selectedFloor = floorKey || mapAdapter?.defaultFloor || "";
-  return entries
+  const categories = entries
     .filter(([, allowedFloors]) => !allowedFloors || allowedFloors.includes(selectedFloor))
     .map(([category]) => category);
+  if (customWaypointStore?.hasAny()) categories.unshift("custom");
+  return categories;
 }
 
 function syncIslandNavigation() {
@@ -305,17 +326,45 @@ function syncIslandNavigation() {
 function renderCategorySidebar() {
   const categoryList = document.getElementById("categoryList");
   const sectionHeader = document.getElementById("categorySectionHeader");
+  const customSidebarSection =
+    document.getElementById("customMarkerSidebarSection") || document.getElementById("customCategoryItem");
+  const customSidebarList = document.getElementById("customWaypointSidebarList");
   const selectedFloor = floorSelect?.value || mapAdapter?.defaultFloor || "";
   const categories = getIslandCategoriesForFloor(selectedFloor);
+  customWaypointStore?.initializeButtonEnabledState(sharedMapRuntime.getCategoryState("custom"));
+  sharedMapRuntime.setCategoryState("custom", Boolean(customWaypointStore?.hasEnabledButtons(selectedFloor)));
 
   if (sectionHeader) {
     const labelText = mapAdapter?.floors?.[selectedFloor]?.label || getMapLabel(selectedFloor);
     sectionHeader.textContent = labelText.toUpperCase();
   }
 
+  if (customSidebarSection) customSidebarSection.hidden = !customWaypointStore?.hasAny();
+  if (customSidebarList && customWaypointStore) {
+    const buttonCounts = customWaypointStore.getButtonCountsForFloor(selectedFloor);
+    const buttons = customWaypointStore.getCustomButtonsForFloor(selectedFloor);
+    const buttonMarkup = buttons
+      .map((buttonName) => {
+        const count = buttonCounts[buttonName] || 0;
+        const isActive = customWaypointStore.getButtonEnabled(buttonName, selectedFloor);
+        return `
+          <li class="custom-waypoint-sidebar-row">
+            <button class="sidebar-list-button${isActive ? " active" : ""}" type="button" data-custom-button="${escapeHtml(buttonName)}" aria-pressed="${isActive ? "true" : "false"}">
+              <span>${escapeHtml(formatCustomButtonName(buttonName))}</span>
+              ${count > 0 ? `<span class="marker-count">${count}</span>` : ""}
+            </button>
+            <button type="button" class="sidebar-list-button custom-button-delete" data-custom-button-delete="${escapeHtml(buttonName)}">${t("page.maps.customWaypoint.deleteButton")}</button>
+          </li>
+        `;
+      })
+      .join("");
+    customSidebarList.innerHTML = buttonMarkup;
+  }
+
   if (!categoryList) return;
 
   categoryList.innerHTML = categories
+    .filter((category) => category !== "custom")
     .map((category) => {
       const label = t(`page.mainui.categories.${category}`) || category;
       const active = !!(sharedMapRuntime && sharedMapRuntime.getCategoryState(category));
@@ -337,7 +386,7 @@ function renderCategorySidebar() {
 
   const categoryStates = sharedMapRuntime?.getCategoryStates?.() || {};
   Object.keys(categoryStates).forEach((category) => {
-    if (!categories.includes(category)) {
+    if (!categories.includes(category) && category !== "custom") {
       sharedMapRuntime.setCategoryState(category, false);
     }
   });
@@ -510,6 +559,16 @@ function openMobAreaInfo(area) {
 }
 
 function handleInfoOverlayClick(event) {
+  const deleteButton = event.target.closest("[data-custom-waypoint-delete]");
+  if (deleteButton && content.contains(deleteButton)) {
+    deleteCustomWaypoint(deleteButton.dataset.customWaypointDelete || "");
+    return;
+  }
+  const customWaypointButton = event.target.closest("[data-custom-waypoint-open]");
+  if (customWaypointButton && content.contains(customWaypointButton)) {
+    openInfo(`custom:${customWaypointButton.dataset.customWaypointOpen || ""}`);
+    return;
+  }
   const actionButton = event.target.closest("[data-waypoint-info-href]");
   if (!actionButton || !content.contains(actionButton)) return;
 
@@ -608,6 +667,13 @@ function buildWalkthroughSteps() {
       selector: "#mapContainer",
       title: t("page.mainui.walkthrough.step4Title"),
       body: t("page.mainui.walkthrough.step4Body")
+    },
+    {
+      selector: "#mapContextMenu",
+      title: t("page.mainui.walkthrough.step5Title"),
+      body: t("page.mainui.walkthrough.step5Body"),
+      onEnter: enterWalkthroughContextMenuDemo,
+      onExit: exitWalkthroughContextMenuDemo
     }
   ];
 }
@@ -802,6 +868,7 @@ function openClusterInfo(clusterId) {
             <p><strong>${t("page.maps.floorText")}:</strong> ${floorText}</p>
             <p><strong>${t("page.maps.coordinates")}:</strong> X: ${coordsX} Z: ${coordsZ}</p>
             ${href ? `<div class="waypoint-info-row"><button type="button" class="waypoint-info-button" data-waypoint-info-href="${escapeHtml(href)}">${t("page.maps.viewWaypointInfo")}</button></div>` : ""}
+            ${entry.marker?.customWaypointId ? `<button type="button" class="waypoint-info-button" data-custom-waypoint-delete="${escapeHtml(entry.marker.customWaypointId)}">${t("page.maps.customWaypoint.delete")}</button>` : ""}
           </div>
         </details>
       </li>
@@ -827,6 +894,805 @@ const zoomConfig = window.SAOMapHelpers.MAP_ZOOM_CONFIG;
 function mapCoordinates(rawX, rawY, dimensions) {
   if (typeof mapWebsiteCoordinates !== "function") return null;
   return mapWebsiteCoordinates(rawX, rawY, floorSelect.value, dimensions);
+}
+
+function getMapCoordinatesFromEvent(event) {
+  const info = getImageLocalCoords(mapImage, event);
+  if (!info.naturalWidth || !info.naturalHeight || !info.contentWidth || !info.contentHeight) return null;
+  const rawX = info.localX * (info.naturalWidth / info.contentWidth);
+  const rawY = info.localY * (info.naturalHeight / info.contentHeight);
+  return mapCoordinates(rawX, rawY, { width: info.naturalWidth, height: info.naturalHeight });
+}
+
+function closeMapContextMenu() {
+  const menu = document.getElementById("mapContextMenu");
+  if (!menu) return;
+  menu.hidden = true;
+  menu.setAttribute("aria-hidden", "true");
+  mapContextMenuState = { event: null, x: null, z: null };
+}
+
+function updateMapContextMenuPosition(clientX, clientY) {
+  const menu = document.getElementById("mapContextMenu");
+  if (!menu || menu.hidden) return;
+
+  const menuWidth = menu.offsetWidth || 220;
+  const menuHeight = menu.offsetHeight || 200;
+  const left = Math.min(Math.max(12, clientX + 12), window.innerWidth - menuWidth - 12);
+  const top = Math.min(Math.max(12, clientY + 12), window.innerHeight - menuHeight - 12);
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+}
+
+function openMapContextMenu(event) {
+  const isUnavailableMapSurface = Boolean(
+    mapAdapter?.assetAvailability?.[floorSelect?.value] !== true &&
+      event.target &&
+      typeof event.target.closest === "function" &&
+      mapContainer.contains(event.target) &&
+      !shouldIgnoreMapDrag(event.target) &&
+      !event.target.closest("dialog, a, [role='button'], [role='dialog']")
+  );
+  if (!isMapSurfaceTarget(event.target) && !isUnavailableMapSurface) {
+    closeMapContextMenu();
+    return;
+  }
+  const mapped = getMapCoordinatesFromEvent(event);
+  if (!mapped && !isUnavailableMapSurface) {
+    closeMapContextMenu();
+    return;
+  }
+
+  event.preventDefault();
+  const menu = document.getElementById("mapContextMenu");
+  if (!menu) return;
+
+  mapContextMenuState = { event, x: mapped?.x ?? null, z: mapped?.z ?? null };
+  menu.hidden = false;
+  menu.setAttribute("aria-hidden", "false");
+  updateMapContextMenuPosition(event.clientX, event.clientY);
+}
+
+function enterWalkthroughContextMenuDemo() {
+  const menu = document.getElementById("mapContextMenu");
+  if (!menu) return;
+
+  if (!walkthroughContextMenuDemoState) {
+    walkthroughContextMenuDemoState = {
+      left: menu.style.left,
+      top: menu.style.top,
+      zIndex: menu.style.zIndex
+    };
+  }
+
+  if (menu.hidden) {
+    const mapRect = mapImage?.getBoundingClientRect?.();
+    if (!mapRect) return;
+    mapImage.dispatchEvent(
+      new MouseEvent("contextmenu", {
+        bubbles: true,
+        cancelable: true,
+        clientX: mapRect.left + mapRect.width / 2,
+        clientY: mapRect.top + mapRect.height / 2
+      })
+    );
+  }
+  if (menu.hidden) return;
+
+  const rect = menu.getBoundingClientRect();
+  menu.style.left = `${Math.max(0, (window.innerWidth - rect.width) / 2)}px`;
+  menu.style.top = `${Math.max(0, (window.innerHeight - rect.height) / 2)}px`;
+  menu.style.zIndex = "119";
+}
+
+function exitWalkthroughContextMenuDemo() {
+  if (!walkthroughContextMenuDemoState) return;
+  const menu = document.getElementById("mapContextMenu");
+  closeMapContextMenu();
+  if (menu) {
+    menu.style.left = walkthroughContextMenuDemoState.left;
+    menu.style.top = walkthroughContextMenuDemoState.top;
+    menu.style.zIndex = walkthroughContextMenuDemoState.zIndex;
+  }
+  walkthroughContextMenuDemoState = null;
+}
+
+function getJourneyMapExportCategories() {
+  const runtime = sharedMapRuntime || window.__underworldMapRuntime || null;
+  const activeCategories = runtime && typeof runtime.getCategoryStates === "function" ? runtime.getCategoryStates() : {};
+  const floor = floorSelect ? floorSelect.value : mapAdapter?.defaultFloor || "";
+  const contextData = getContextData ? getContextData() : { markerDataset: {} };
+  const result = {};
+
+  Object.entries(activeCategories).forEach(([category, isEnabled]) => {
+    if (!isEnabled) return;
+
+    Object.values(contextData.markerDataset || {}).forEach((marker) => {
+      if (!marker || marker.floor !== floor || marker.category !== category) return;
+
+      const x = Number(marker.coords && marker.coords.x !== undefined ? marker.coords.x : marker.x ?? 0);
+      const y = Number(marker.coords && marker.coords.y !== undefined ? marker.coords.y : marker.y ?? -30);
+      const z = Number(marker.coords && marker.coords.z !== undefined ? marker.coords.z : marker.z ?? 0);
+      const exportCategory =
+        marker.category === "custom"
+          ? String(marker.customWaypointButton || "Custom").trim() || "Custom"
+          : category;
+      const world = mapAdapter?.mapId || mapAdapter?.id || "underworld";
+      const colorUtils = window.SAOColorUtils || window.SAOJourneyMapColors;
+      const categoryColor =
+        marker.category === "custom"
+          ? customWaypointStore?.getButtonColor(exportCategory, floor) ||
+            ensurePersistedCustomWaypointCategoryColor(exportCategory, floor)
+          : colorUtils?.getHardcodedCategoryColor?.(exportCategory) ||
+            colorUtils?.getJourneyMapColorValue?.(exportCategory, { world });
+      const waypointColor = marker.category === "custom" ? marker.color ?? categoryColor : categoryColor;
+
+      const entry = {
+        name: String(marker.title || marker.id || category).trim() || category,
+        x: Number.isFinite(x) ? x : 0,
+        y: Number.isFinite(y) ? y : -30,
+        z: Number.isFinite(z) ? z : 0,
+        dim: String(mapAdapter?.id || "overworld"),
+        icon: marker.icon || marker.customLogo || marker.logo || "pin",
+        color: waypointColor,
+        categoryColor,
+        enabled: 1,
+        visible: 1,
+        group: exportCategory,
+        uuid: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`),
+        id: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`)
+      };
+      if (!result[exportCategory]) result[exportCategory] = [];
+      result[exportCategory].push(entry);
+    });
+  });
+
+  return result;
+}
+
+function exportCurrentJourneyMapWaypoints() {
+  const exporter = window.SAOJourneyMapExport;
+  const runtime = sharedMapRuntime || window.__underworldMapRuntime || null;
+
+  if (!exporter || typeof exporter.buildJourneyMapExport !== "function") {
+    showToast(getJourneyMapImportMessage("exportFailure"));
+    return;
+  }
+
+  let objectUrl = "";
+  let anchor = null;
+  try {
+    const categories = getJourneyMapExportCategories();
+    const enabledCategoryCount = Object.values(runtime?.getCategoryStates?.() || {}).filter(Boolean).length;
+    const waypointCount = Object.values(categories).reduce((count, entries) => count + entries.length, 0);
+    if (!runtime || enabledCategoryCount === 0) {
+      showToast(getJourneyMapImportMessage("exportNoWaypoints"));
+      return;
+    }
+    if (waypointCount === 0) {
+      showToast(getJourneyMapImportMessage("exportEmptyCategories"));
+      return;
+    }
+
+    const worldName = mapAdapter?.mapId || mapAdapter?.id || "underworld";
+    const config = {
+      world: worldName,
+      dimensionId: exporter.normalizeDimensionId(worldName, mapAdapter?.id || worldName),
+      categories,
+      settings: { enable: true, hideEmpty: false, sortType: "asc" }
+    };
+
+    const exportPayload = exporter.buildJourneyMapExport(config);
+    const blob = exportPayload.toBlob();
+    objectUrl = URL.createObjectURL(blob);
+    anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = "WaypointData.dat";
+    document.body.appendChild(anchor);
+    anchor.click();
+
+    const countLabel = getJourneyMapImportMessage(
+      waypointCount === 1 ? "exportWaypointOne" : "exportWaypointMany",
+      { count: waypointCount }
+    );
+    showToast(getJourneyMapImportMessage("exportSuccess", { countLabel }));
+  } catch {
+    showToast(getJourneyMapImportMessage("exportFailure"));
+  } finally {
+    anchor?.remove();
+    if (objectUrl) schedulePageTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  }
+}
+
+function getJourneyMapImportTargets() {
+  const logoIds = window.SAOCustomWaypoints?.LOGO_IDS || [];
+  return [window.AincradMapAdapter, window.UnderworldMapAdapter]
+    .filter(Boolean)
+    .map((adapter) => ({
+      id: adapter.id,
+      defaultFloor: adapter.defaultFloor,
+      floors: adapter.floors,
+      journeymapDimensionId: window.SAOJourneyMapExport?.normalizeDimensionId(adapter.mapId || adapter.id, adapter.id),
+      logoIds
+    }));
+}
+
+function getJourneyMapImportMessage(key, params) {
+  return t(`${mapAdapter?.translationNamespace || "page.mainui"}.mapContextMenu.${key}`, params);
+}
+
+async function importJourneyMapFile(file) {
+  try {
+    const importer = window.SAOJourneyMapImport;
+    if (!importer || !file || typeof file.arrayBuffer !== "function") throw new Error("unavailable");
+    const plan = importer.prepareJourneyMapImport(await file.arrayBuffer(), getJourneyMapImportTargets(), mapAdapter?.id);
+    if (plan.records.length === 0) {
+      showToast(getJourneyMapImportMessage("importNoWaypoints"));
+      return;
+    }
+
+    const batches = new Map();
+    plan.records.forEach((entry) => {
+      if (!batches.has(entry.world)) batches.set(entry.world, []);
+      batches.get(entry.world).push(entry.record);
+    });
+    const targets = new Map(getJourneyMapImportTargets().map((target) => [target.id, target]));
+    const stores = new Map();
+    for (const [world, records] of batches) {
+      const store = world === customWaypointStore?.world
+        ? customWaypointStore
+        : window.SAOCustomWaypoints.createCustomWaypointStore({
+            storage,
+            world,
+            floorIds: Object.keys(targets.get(world)?.floors || {})
+          });
+      if (!store || !store.canAddMany(records)) throw new Error("store-validation");
+      stores.set(world, store);
+    }
+
+    let importedCount = 0;
+    let duplicateCount = 0;
+    const importedCategories = new Set();
+    let currentWorldChanged = false;
+    for (const [world, records] of batches) {
+      const result = stores.get(world).addMany(records);
+      if (!result) throw new Error("store-write");
+      importedCount += result.records.length;
+      duplicateCount += result.duplicateCount;
+      result.records.forEach((record) => importedCategories.add(`${world}\u0000${record.button}`));
+      records.forEach((record) => stores.get(world).setButtonEnabled(record.button, record.floor, true));
+      if (world === customWaypointStore?.world && records.length > 0) currentWorldChanged = true;
+    }
+
+    if (currentWorldChanged) {
+      sharedMapRuntime.setCategoryState("custom", customWaypointStore.hasEnabledButtons(floorSelect.value));
+      refreshCustomWaypointData(true);
+    }
+    if (importedCount === 0) {
+      const key = duplicateCount === 1 ? "importDuplicatesOne" : "importDuplicatesMany";
+      showToast(getJourneyMapImportMessage(key, { count: duplicateCount }));
+      return;
+    }
+    if (duplicateCount > 0) {
+      const newLabel = getJourneyMapImportMessage(importedCount === 1 ? "importNewOne" : "importNewMany", {
+        count: importedCount
+      });
+      const duplicateLabel = getJourneyMapImportMessage(
+        duplicateCount === 1 ? "importDuplicateOne" : "importDuplicateMany",
+        { count: duplicateCount }
+      );
+      showToast(getJourneyMapImportMessage("importPartial", { newLabel, duplicateLabel }));
+      return;
+    }
+    showToast(
+      getJourneyMapImportMessage("importSuccess", {
+        waypoints: importedCount,
+        categories: importedCategories.size,
+        waypointLabel: getJourneyMapImportMessage(
+          importedCount === 1 ? "importWaypointOne" : "importWaypointMany"
+        ),
+        categoryLabel: getJourneyMapImportMessage(
+          importedCategories.size === 1 ? "importCategoryOne" : "importCategoryMany"
+        )
+      })
+    );
+  } catch (error) {
+    const outcome =
+      error?.code === "unsupported" ? "importUnsupported" : error?.code === "invalid" ? "importInvalid" : "importFailure";
+    showToast(getJourneyMapImportMessage(outcome));
+  } finally {
+    if (journeyMapImportFile) journeyMapImportFile.value = "";
+  }
+}
+
+function handleMapContextMenuAction(event) {
+  const actionButton = event.target.closest("[data-map-action]");
+  if (!actionButton) return;
+  event.preventDefault();
+  event.stopPropagation();
+
+  const action = actionButton.dataset.mapAction;
+  const sourceEvent = mapContextMenuState.event;
+
+  if (action === "create-custom-marker" && sourceEvent) {
+    openCustomWaypointDialog(sourceEvent);
+  } else if (action === "journey-export") {
+    exportCurrentJourneyMapWaypoints();
+  } else if (action === "journey-import") {
+    journeyMapImportFile?.click();
+  }
+
+  closeMapContextMenu();
+}
+
+function isMapSurfaceTarget(target) {
+  return Boolean(
+    target &&
+    typeof target.closest === "function" &&
+    mapLayer.contains(target) &&
+    !target.closest("#mapEmptyState") &&
+    !shouldIgnoreMapDrag(target) &&
+    !target.closest("dialog, a, [role='button'], [role='dialog']")
+  );
+}
+
+let customWaypointDeleteTargetId = "";
+let customButtonDeleteState = null;
+
+function getCustomButtonDefaultLabel() {
+  return t("page.maps.customWaypoint.buttonDefault") || "Default";
+}
+
+function formatCustomButtonName(buttonName) {
+  const trimmed = String(buttonName || "").trim();
+  if (!trimmed) return getCustomButtonDefaultLabel();
+  return trimmed === "Default" ? getCustomButtonDefaultLabel() : trimmed;
+}
+
+function setCustomWaypointStatus(key) {
+  customWaypointStatusKey = key || "";
+  const statusMessage = document.getElementById("customWaypointStatusMessage");
+  if (statusMessage) {
+    statusMessage.textContent = key ? t(`page.maps.customWaypoint.${key}`) : "";
+    return;
+  }
+  document.getElementById("customWaypointStatus").textContent = key ? t(`page.maps.customWaypoint.${key}`) : "";
+}
+
+function openCustomWaypointDeleteDialog(recordId) {
+  const dialog = document.getElementById("customWaypointDeleteDialog");
+  const message = document.getElementById("customWaypointDeleteMessage");
+  if (!dialog || !message || !recordId) return;
+  customWaypointDeleteTargetId = recordId;
+  message.textContent = t("page.maps.customWaypoint.deleteConfirm");
+  dialog.showModal();
+}
+
+function closeCustomWaypointDeleteDialog() {
+  const dialog = document.getElementById("customWaypointDeleteDialog");
+  if (dialog && dialog.open) dialog.close();
+  customWaypointDeleteTargetId = "";
+}
+
+function confirmCustomWaypointDelete() {
+  const recordId = customWaypointDeleteTargetId;
+  const record = recordId ? customWaypointStore.getRecord(recordId) : null;
+  if (!record) {
+    closeCustomWaypointDeleteDialog();
+    return;
+  }
+  const markerId = `custom:${recordId}`;
+  const shouldRender = sharedMapRuntime.getCategoryState("custom");
+  customWaypointStore.remove(recordId);
+  const markerElement = state.markerCache.get(markerId);
+  markerElement?.remove();
+  state.markerCache.delete(markerId);
+  if (sharedMapRuntime.getSelectedMarker() === markerId) {
+    sharedMapRuntime.clearSelectedMarker();
+    setDefaultSidebarMessage();
+  }
+  closeCustomWaypointDeleteDialog();
+  refreshCustomWaypointData(shouldRender);
+}
+
+function updateCustomButtonDeleteCountdown() {
+  const state = customButtonDeleteState;
+  const confirmButton = document.getElementById("customButtonDeleteConfirm");
+  if (!state || !confirmButton) return;
+
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - state.startedAt) / 1000));
+  const remainingSeconds = Math.max(0, 5 - elapsedSeconds);
+
+  if (state.phase === "countdown") {
+    if (remainingSeconds <= 0) {
+      state.phase = "delete";
+      if (state.timerId) {
+        window.clearInterval(state.timerId);
+        state.timerId = null;
+      }
+      confirmButton.textContent = t("page.maps.customWaypoint.confirmDelete");
+      confirmButton.disabled = false;
+      return;
+    }
+    confirmButton.textContent = `${t("page.maps.customWaypoint.areYouSure")} (${remainingSeconds})`;
+    confirmButton.disabled = true;
+    return;
+  }
+
+  if (state.phase === "delete") {
+    confirmButton.textContent = t("page.maps.customWaypoint.confirmDelete");
+    confirmButton.disabled = false;
+    return;
+  }
+
+  confirmButton.textContent = t("page.maps.customWaypoint.confirmAction");
+  confirmButton.disabled = false;
+}
+
+function closeCustomButtonDeleteDialog() {
+  const dialog = document.getElementById("customButtonDeleteDialog");
+  const confirmButton = document.getElementById("customButtonDeleteConfirm");
+  if (customButtonDeleteState?.timerId) {
+    window.clearInterval(customButtonDeleteState.timerId);
+  }
+  customButtonDeleteState = null;
+  if (confirmButton) {
+    confirmButton.textContent = t("page.maps.customWaypoint.deleteAction");
+    confirmButton.disabled = false;
+  }
+  if (dialog && dialog.open) dialog.close();
+}
+
+function openCustomButtonDeleteDialog(buttonName, floor) {
+  const dialog = document.getElementById("customButtonDeleteDialog");
+  const confirmButton = document.getElementById("customButtonDeleteConfirm");
+  const description = document.getElementById("customButtonDeleteDescription");
+  if (!dialog || !buttonName || !description) return;
+
+  closeCustomButtonDeleteDialog();
+  customButtonDeleteState = {
+    buttonName,
+    floor,
+    startedAt: 0,
+    timerId: null,
+    phase: "ready"
+  };
+  if (confirmButton) {
+    confirmButton.textContent = t("page.maps.customWaypoint.deleteAction");
+    confirmButton.disabled = false;
+  }
+  description.textContent = t("page.maps.customWaypoint.deleteButtonWarning");
+  dialog.showModal();
+}
+
+function confirmCustomButtonDelete() {
+  const state = customButtonDeleteState;
+  const confirmButton = document.getElementById("customButtonDeleteConfirm");
+  if (!state || !customWaypointStore || !confirmButton) return;
+
+  if (state.phase === "countdown") {
+    return;
+  }
+
+  if (state.phase === "confirm") {
+    state.phase = "countdown";
+    state.startedAt = Date.now();
+    confirmButton.disabled = true;
+    confirmButton.textContent = `${t("page.maps.customWaypoint.areYouSure")} (5)`;
+    state.timerId = window.setInterval(() => {
+      updateCustomButtonDeleteCountdown();
+    }, 1000);
+    return;
+  }
+
+  if (state.phase === "delete") {
+    const removed = customWaypointStore.removeButton(state.buttonName, state.floor);
+    closeCustomButtonDeleteDialog();
+    if (removed > 0) {
+      refreshCustomWaypointData(true);
+    }
+    return;
+  }
+
+  state.phase = "confirm";
+  confirmButton.textContent = t("page.maps.customWaypoint.confirmAction");
+  confirmButton.disabled = false;
+}
+
+function handleCustomSidebarClick(event) {
+  const deleteButton = event.target.closest("[data-custom-button-delete]");
+  if (deleteButton) {
+    const buttonName = deleteButton.dataset.customButtonDelete || "";
+    if (buttonName) openCustomButtonDeleteDialog(buttonName, floorSelect.value);
+    return;
+  }
+
+  const selectorButton = event.target.closest("[data-custom-button]");
+  if (selectorButton && customWaypointStore) {
+    const buttonName = selectorButton.dataset.customButton || "";
+    if (!buttonName) return;
+    customWaypointStore.setButtonEnabled(
+      buttonName,
+      floorSelect.value,
+      !customWaypointStore.getButtonEnabled(buttonName, floorSelect.value)
+    );
+    sharedMapRuntime.setCategoryState("custom", customWaypointStore.hasEnabledButtons(floorSelect.value));
+    refreshCustomWaypointData(true);
+  }
+}
+
+function getCustomWaypointButtonOptions() {
+  const buttons = customWaypointStore
+    ? customWaypointStore.getCustomButtonsForFloor(pendingCustomWaypointFloor || floorSelect.value)
+    : [];
+  const normalized = [];
+  const seen = new Set();
+  buttons.forEach((buttonName) => {
+    const normalizedName = String(buttonName || "").trim() || "Default";
+    const key = normalizedName.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    normalized.push(normalizedName);
+  });
+  return ["__create__", ...normalized];
+}
+
+function normalizeCustomWaypointCategoryColor(value) {
+  const colorUtils = window.SAOColorUtils || window.SAOJourneyMapColors;
+  if (colorUtils && typeof colorUtils.normalizeHexColor === "function") {
+    return colorUtils.normalizeHexColor(value);
+  }
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const raw = String(value).trim();
+  const normalized = raw.startsWith("#") ? raw.slice(1) : raw;
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null;
+  return `#${normalized.toUpperCase()}`;
+}
+
+function generateRandomCustomWaypointCategoryColor() {
+  const colorUtils = window.SAOColorUtils || window.SAOJourneyMapColors;
+  if (colorUtils && typeof colorUtils.randomHexColor === "function") {
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      const candidate = normalizeCustomWaypointCategoryColor(colorUtils.randomHexColor());
+      if (candidate && candidate.toUpperCase() !== "#FFFFFF") {
+        return candidate;
+      }
+    }
+  }
+  let candidate = "#";
+  do {
+    candidate = "#";
+    for (let index = 0; index < 3; index += 1) {
+      candidate += Math.floor(Math.random() * 256)
+        .toString(16)
+        .padStart(2, "0");
+    }
+  } while (candidate.toUpperCase() === "#FFFFFF");
+  return candidate.toUpperCase();
+}
+
+function applyCustomWaypointCategoryColor(value) {
+  const colorInput = document.getElementById("customWaypointCategoryColor");
+  const hexInput = document.getElementById("customWaypointCategoryHex");
+  const swatch = document.getElementById("customWaypointCategorySwatch");
+  const normalized = normalizeCustomWaypointCategoryColor(value) || generateRandomCustomWaypointCategoryColor();
+  if (colorInput) colorInput.value = normalized;
+  if (hexInput) hexInput.value = normalized;
+  if (swatch) {
+    swatch.style.background = normalized;
+    swatch.style.borderColor = normalized;
+  }
+  return normalized;
+}
+
+function updateCustomWaypointCategoryColorState() {
+  const select = document.getElementById("customWaypointButtonSelect");
+  const row = document.getElementById("customWaypointCategoryColorRow");
+  const isCreating = select && select.value === "__create__";
+  if (row) row.hidden = !isCreating;
+  if (!isCreating) return;
+  const colorInput = document.getElementById("customWaypointCategoryColor");
+  const hexInput = document.getElementById("customWaypointCategoryHex");
+  const buttonName = document.getElementById("customWaypointButtonName")?.value.trim().toLowerCase();
+  const isBiomes = buttonName === "biomes";
+  const picker = colorInput?.closest(".custom-waypoint-color-picker");
+  const hint = document.getElementById("customWaypointCategoryColorHint");
+  if (picker) picker.dataset.locked = String(isBiomes);
+  if (colorInput) colorInput.disabled = isBiomes;
+  if (hexInput) hexInput.readOnly = isBiomes;
+  if (hint) hint.textContent = isBiomes ? "Biomes color is locked to white" : "Click to choose a color";
+  const enteredHex = hexInput?.value || "";
+  const pickerValue = colorInput?.value || "";
+  const currentValue = normalizeCustomWaypointCategoryColor(enteredHex)
+    ? enteredHex
+    : normalizeCustomWaypointCategoryColor(pickerValue) && pickerValue.toUpperCase() !== "#000000"
+      ? pickerValue
+      : "";
+  applyCustomWaypointCategoryColor(isBiomes ? "#FFFFFF" : currentValue || generateRandomCustomWaypointCategoryColor());
+}
+
+function getCustomWaypointCategoryColorValue() {
+  const hexInput = document.getElementById("customWaypointCategoryHex");
+  const colorInput = document.getElementById("customWaypointCategoryColor");
+  const value = normalizeCustomWaypointCategoryColor((hexInput && hexInput.value) || (colorInput && colorInput.value) || "");
+  if (hexInput && !value) {
+    hexInput.setCustomValidity("Invalid HEX color");
+    hexInput.reportValidity();
+    return null;
+  }
+  if (hexInput) hexInput.setCustomValidity("");
+  return value;
+}
+
+function ensurePersistedCustomWaypointCategoryColor(buttonName, floor) {
+  if (!customWaypointStore) return null;
+  const savedColor = customWaypointStore.getButtonColor(buttonName, floor);
+  if (savedColor) return savedColor;
+  const generatedColor = generateRandomCustomWaypointCategoryColor();
+  customWaypointStore.setButtonColor(buttonName, floor, generatedColor);
+  return generatedColor;
+}
+
+function syncCustomWaypointButtonOptions() {
+  const select = document.getElementById("customWaypointButtonSelect");
+  const row = document.getElementById("customWaypointButtonNameRow");
+  const input = document.getElementById("customWaypointButtonName");
+  if (!select) return;
+  const previousValue = select.value;
+  const options = getCustomWaypointButtonOptions();
+  select.innerHTML = "";
+  options.forEach((buttonName) => {
+    const option = document.createElement("option");
+    option.value = buttonName;
+    option.textContent =
+      buttonName === "__create__" ? t("page.maps.customWaypoint.createButton") : formatCustomButtonName(buttonName);
+    select.appendChild(option);
+  });
+  const nextValue = options.includes(previousValue) ? previousValue : options[0] || "";
+  select.value = nextValue;
+  const isCreating = select.value === "__create__";
+  if (row) row.hidden = !isCreating;
+  if (input) input.value = "";
+  updateCustomWaypointCategoryColorState();
+}
+
+function getSelectedCustomWaypointButtonName() {
+  const select = document.getElementById("customWaypointButtonSelect");
+  const input = document.getElementById("customWaypointButtonName");
+  if (!select) return "Default";
+  if (select.value === "__create__") {
+    const entered = (input?.value || "").trim();
+    return entered || "Default";
+  }
+  return String(select.value || "Default").trim() || "Default";
+}
+
+function resetCustomWaypointForm() {
+  customWaypointForm.reset();
+  ["customWaypointName", "customWaypointX", "customWaypointZ", "customWaypointButtonName"].forEach((id) => {
+    const field = document.getElementById(id);
+    if (field) field.setCustomValidity("");
+  });
+  const buttonNameRow = document.getElementById("customWaypointButtonNameRow");
+  if (buttonNameRow) buttonNameRow.hidden = true;
+  syncCustomWaypointButtonOptions();
+  setCustomWaypointStatus("");
+}
+
+function maybeOpenCustomWaypointDialogFromMapClick(event) {
+  if (!event || event.defaultPrevented || event.button !== 0 || event.detail < 3) return;
+  if (event.target.closest(".marker, button, input, select, textarea, label, dialog, #infoOverlay, #zoomControls, #mapEmptyState")) {
+    return;
+  }
+  if (customWaypointDialog.open || !customWaypointStore) return;
+  openCustomWaypointDialog(event);
+}
+
+function openCustomWaypointDialog(event) {
+  if (!customWaypointStore || customWaypointDialog.open) return;
+  pendingCustomWaypointFloor = floorSelect.value;
+  resetCustomWaypointForm();
+  const mapped = getMapCoordinatesFromEvent(event);
+  if (mapped) {
+    document.getElementById("customWaypointX").value = String(Math.round(mapped.x));
+    document.getElementById("customWaypointZ").value = String(Math.round(mapped.z));
+  }
+  customWaypointDialog.showModal();
+  if (!mapped) {
+    setCustomWaypointStatus("manualCoordinates");
+  }
+  document.getElementById("customWaypointName").focus();
+}
+
+function closeCustomWaypointDialog() {
+  if (customWaypointDialog.open) customWaypointDialog.close();
+}
+
+async function copyCustomWaypointCoordinates() {
+  const x = document.getElementById("customWaypointX").value;
+  const z = document.getElementById("customWaypointZ").value;
+  const text = `X: ${x} Z: ${z}`;
+  const copied = await copyTextToClipboard(text);
+  setCustomWaypointStatus(copied ? "copySuccess" : "copyError");
+}
+
+function refreshCustomWaypointData(renderVisibleMarkers) {
+  mapContextAccessors.invalidate();
+  markerSearchCache = null;
+  state.markerRenderSignature = "";
+  if (!customWaypointStore.hasAny()) sharedMapRuntime.setCategoryState("custom", false);
+  state.customWaypointListSignature = "";
+  renderCategorySidebar();
+  syncMainCategoryButtonVisibility();
+  const canProjectCustomWaypoints = typeof mapAdapter?.coordinateDependencies?.invertMapCoordinates === "function";
+  if (renderVisibleMarkers && canProjectCustomWaypoints) scheduleRenderMarkers();
+  else if (!canProjectCustomWaypoints && sharedMapRuntime.getCategoryState("custom")) {
+    setMarkerEmptyState(sharedMapRuntime.getSearchQuery());
+  }
+}
+
+function createCustomWaypoint(event) {
+  event.preventDefault();
+  const nameInput = document.getElementById("customWaypointName");
+  const xInput = document.getElementById("customWaypointX");
+  const zInput = document.getElementById("customWaypointZ");
+  const name = nameInput.value.trim();
+  const xText = xInput.value.trim();
+  const zText = zInput.value.trim();
+  const validCoordinates = xText && zText && Number.isFinite(Number(xText)) && Number.isFinite(Number(zText));
+  if (!name) {
+    nameInput.setCustomValidity(t("page.maps.customWaypoint.nameRequired"));
+    nameInput.reportValidity();
+    setCustomWaypointStatus("nameRequired");
+    return;
+  }
+  nameInput.setCustomValidity("");
+  if (!validCoordinates) {
+    const message = t("page.maps.customWaypoint.coordinatesRequired");
+    xInput.setCustomValidity(message);
+    zInput.setCustomValidity(message);
+    (xText ? zInput : xInput).reportValidity();
+    setCustomWaypointStatus("coordinatesRequired");
+    return;
+  }
+  xInput.setCustomValidity("");
+  zInput.setCustomValidity("");
+
+  const buttonName = getSelectedCustomWaypointButtonName();
+  const categoryColor =
+    document.getElementById("customWaypointButtonSelect")?.value === "__create__"
+      ? getCustomWaypointCategoryColorValue()
+      : undefined;
+  if (
+    document.getElementById("customWaypointButtonSelect")?.value === "__create__" &&
+    !categoryColor
+  ) {
+    document.getElementById("customWaypointCategoryHex")?.setCustomValidity("Invalid HEX color");
+    document.getElementById("customWaypointCategoryHex")?.reportValidity();
+    return;
+  }
+
+  const record = customWaypointStore.add({
+    name,
+    description: document.getElementById("customWaypointDescription").value,
+    x: xText,
+    z: zText,
+    floor: pendingCustomWaypointFloor,
+    button: buttonName,
+    color: categoryColor,
+    logo: document.getElementById("customWaypointLogo").value
+  });
+  if (!record) return;
+  customWaypointStore.setButtonEnabled(buttonName, pendingCustomWaypointFloor, true);
+  sharedMapRuntime.setCategoryState("custom", customWaypointStore.hasEnabledButtons(pendingCustomWaypointFloor));
+  refreshCustomWaypointData(sharedMapRuntime.getCategoryState("custom"));
+  closeCustomWaypointDialog();
+  openInfo(`custom:${record.id}`);
+}
+
+function deleteCustomWaypoint(recordId) {
+  if (!customWaypointStore.getRecord(recordId)) return;
+  openCustomWaypointDeleteDialog(recordId);
 }
 
 function updateCoordinatePanelFromEvent(event) {
@@ -910,6 +1776,43 @@ function hasActiveMarkerCategories() {
 }
 
 function setMarkerEmptyState(filterText) {
+  const canProjectCustomWaypoints = typeof mapAdapter?.coordinateDependencies?.invertMapCoordinates === "function";
+  if (!canProjectCustomWaypoints && sharedMapRuntime.getCategoryState("custom")) {
+    const normalizedFilter = sharedMapRuntime.normalizeSearchQuery(filterText || "");
+    const listSignature = [
+      floorSelect.value,
+      normalizedFilter,
+      customWaypointStore.getRevision(),
+      i18n?.getLanguage?.() || "en"
+    ].join("|");
+    if (state.customWaypointListSignature === listSignature) return;
+    const customRecords = customWaypointStore
+      .getRecordsForFloor(floorSelect.value)
+      .filter(
+        (record) => !normalizedFilter || `${record.name} ${record.description}`.toLowerCase().includes(normalizedFilter)
+      );
+    if (customRecords.length > 0) {
+      title.textContent = t("page.maps.customWaypoint.category");
+      const entries = customRecords
+        .map(
+          (record) => `
+            <li class="custom-waypoint-list-item">
+              <button type="button" class="custom-waypoint-open" data-custom-waypoint-open="${escapeHtml(record.id)}" aria-label="${escapeHtml(t("page.maps.viewWaypointInfo"))}: ${escapeHtml(record.name)}">${escapeHtml(record.name)}</button>
+              ${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}
+              <p><strong>${t("page.maps.customWaypoint.coordinatesLabel")}:</strong> X: ${escapeHtml(record.x)} Z: ${escapeHtml(record.z)}</p>
+              <button type="button" class="waypoint-info-button" data-custom-waypoint-delete="${escapeHtml(record.id)}">${t("page.maps.customWaypoint.delete")}</button>
+            </li>
+          `
+        )
+        .join("");
+      content.innerHTML = `<p>${t("page.maps.customWaypoint.manualCoordinates")}</p><ul id="customWaypointFallbackList" class="custom-waypoint-list">${entries}</ul>`;
+      state.customWaypointListSignature = listSignature;
+      return;
+    }
+    state.customWaypointListSignature = listSignature;
+  } else {
+    state.customWaypointListSignature = "";
+  }
   const hasActiveCategories = hasActiveMarkerCategories();
 
   if (!hasActiveCategories && !filterText) {
@@ -1141,7 +2044,14 @@ function renderMarkers() {
     const isCraftsmenCategory = CRAFTSMAN_CATEGORIES.has(marker.category);
     const isMarketCategory = MARKET_CATEGORIES.has(marker.category);
 
-    if (markerType === "biome" || markerType === "dungeon" || markerType === "boss") {
+    markerEl.style.removeProperty("--custom-waypoint-color");
+    if (marker.customWaypointId) {
+      markerEl.classList.add("custom-marker");
+      const customWaypointColor = marker.color || marker.customWaypointButtonColor;
+      if (customWaypointColor) markerEl.style.setProperty("--custom-waypoint-color", customWaypointColor);
+      else markerEl.style.removeProperty("--custom-waypoint-color");
+      markerEl.innerHTML = buildCustomWaypointIcon(marker.customLogo);
+    } else if (markerType === "biome" || markerType === "dungeon" || markerType === "boss") {
       markerEl.innerHTML = buildMarkerIcon(markerType);
     } else if (isSideQuest) {
       markerEl.classList.add("side-quest-marker");
@@ -1311,8 +2221,11 @@ function openInfo(id) {
   const waypointInfoHref = getWaypointInfoHref(marker, id);
   sharedMapRuntime.setSelectedMarker(id);
   title.textContent = getMarkerText(marker, "title", id);
-  const markerType = escapeHtml(getMarkerText(marker, "type", id));
+  const markerType = escapeHtml(
+    marker.customWaypointId ? t("page.maps.customWaypoint.category") : getMarkerText(marker, "type", id)
+  );
   const markerDescription = escapeHtml(getMarkerText(marker, "description", id));
+  const customRecord = marker.customWaypointId ? customWaypointStore.getRecord(marker.customWaypointId) : null;
   const floorText = escapeHtml(String(marker.floor || "").replace("floor", `${t("page.maps.floorText")} `));
   const coordsX = marker.coords && marker.coords.x !== undefined ? escapeHtml(marker.coords.x) : "--";
   const coordsZ = marker.coords && marker.coords.z !== undefined ? escapeHtml(marker.coords.z) : "--";
@@ -1322,6 +2235,7 @@ function openInfo(id) {
     <p><strong>${t("page.maps.floorText")}:</strong> ${floorText}</p>
     <p><strong>${t("page.maps.coordinates")}:</strong> X: ${coordsX} Z: ${coordsZ}</p>
     ${showInfoButton ? `<div class="waypoint-info-row"><button type="button" id="waypointInfoButton" class="waypoint-info-button" data-waypoint-info-href="${escapeHtml(waypointInfoHref)}">${t("page.maps.viewWaypointInfo")}</button></div>` : ""}
+    ${customRecord ? `<div class="waypoint-info-row"><button type="button" class="waypoint-info-button" data-custom-waypoint-delete="${escapeHtml(customRecord.id)}">${t("page.maps.customWaypoint.delete")}</button></div>` : ""}
     ${canBeVisited ? `<div class="visited-toggle-row"><label class="visited-toggle-label">${visitedLabel}: <input type="checkbox" id="visitedToggle" data-marker-id="${escapeHtml(id)}" data-marker-floor="${escapeHtml(markerFloor)}" ${isVisited ? "checked" : ""}></label></div>` : ""}
   `;
 
@@ -1384,6 +2298,14 @@ function init() {
   }
 
   getPageDisposer();
+  if (!customWaypointStore) {
+    customWaypointStore = window.SAOCustomWaypoints.createCustomWaypointStore({
+      storage,
+      world: "underworld",
+      floorIds: Object.keys(mapAdapter.floors)
+    });
+    mapContextAccessors.invalidate();
+  }
   walkthroughController = window.createWalkthroughController({
     document,
     window,
@@ -1404,7 +2326,6 @@ function init() {
     sharedMapRuntime.init();
   }
 
-  renderCategorySidebar();
   syncIslandNavigation();
 
   const urlState = sharedMapRuntime.parseUrlState(window.location.search);
@@ -1470,6 +2391,61 @@ function init() {
   addPageEventListener(mapContainer, "wheel", handleWheel, { passive: false });
   addPageEventListener(mapContainer, "mousedown", startDrag);
   addPageEventListener(mapContainer, "pointerdown", startDrag);
+  addPageEventListener(mapContainer, "contextmenu", openMapContextMenu);
+  addPageEventListener(mapContainer, "click", maybeOpenCustomWaypointDialogFromMapClick);
+  addPageEventListener(document, "click", (event) => {
+    if (!mapContextMenu || mapContextMenu.hidden) return;
+    if (walkthroughContextMenuDemoState) return;
+    if (!mapContextMenu.contains(event.target)) closeMapContextMenu();
+  });
+  addPageEventListener(document, "keydown", (event) => {
+    if (event.key === "Escape") closeMapContextMenu();
+  });
+  addPageEventListener(mapContextMenu, "click", handleMapContextMenuAction);
+  addPageEventListener(journeyMapImportFile, "change", (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (file) importJourneyMapFile(file);
+  });
+  addPageEventListener(document.getElementById("customWaypointForm"), "submit", createCustomWaypoint);
+  addPageEventListener(document.getElementById("customWaypointCancel"), "click", closeCustomWaypointDialog);
+  addPageEventListener(document.getElementById("customWaypointCopy"), "click", copyCustomWaypointCoordinates);
+  addPageEventListener(document.getElementById("customWaypointDeleteConfirm"), "click", confirmCustomWaypointDelete);
+  addPageEventListener(document.getElementById("customWaypointDeleteCancel"), "click", closeCustomWaypointDeleteDialog);
+  addPageEventListener(document.getElementById("customButtonDeleteConfirm"), "click", confirmCustomButtonDelete);
+  addPageEventListener(document.getElementById("customButtonDeleteCancel"), "click", closeCustomButtonDeleteDialog);
+  addPageEventListener(document.getElementById("customWaypointSidebarList"), "click", handleCustomSidebarClick);
+  addPageEventListener(customWaypointDialog, "close", () => {
+    resetCustomWaypointForm();
+    pendingCustomWaypointFloor = "";
+  });
+  addPageEventListener(document.getElementById("customWaypointDeleteDialog"), "close", closeCustomWaypointDeleteDialog);
+  addPageEventListener(document.getElementById("customButtonDeleteDialog"), "close", closeCustomButtonDeleteDialog);
+  ["customWaypointName", "customWaypointX", "customWaypointZ"].forEach((id) => {
+    addPageEventListener(document.getElementById(id), "input", (event) => event.target.setCustomValidity(""));
+  });
+  const customWaypointColorHexInput = document.getElementById("customWaypointCategoryHex");
+  const customWaypointColorInput = document.getElementById("customWaypointCategoryColor");
+  addPageEventListener(document.getElementById("customWaypointButtonName"), "input", updateCustomWaypointCategoryColorState);
+  if (customWaypointColorHexInput) {
+    addPageEventListener(customWaypointColorHexInput, "input", () => {
+      const normalized = normalizeCustomWaypointCategoryColor(customWaypointColorHexInput.value);
+      if (normalized) {
+        customWaypointColorHexInput.setCustomValidity("");
+        applyCustomWaypointCategoryColor(normalized);
+      } else {
+        customWaypointColorHexInput.setCustomValidity("Invalid HEX color");
+      }
+    });
+  }
+  if (customWaypointColorInput) {
+    addPageEventListener(customWaypointColorInput, "input", () => {
+      const normalized = normalizeCustomWaypointCategoryColor(customWaypointColorInput.value);
+      if (normalized) {
+        applyCustomWaypointCategoryColor(normalized);
+      }
+    });
+  }
+  addPageEventListener(document.getElementById("customWaypointButtonSelect"), "change", updateCustomWaypointCategoryColorState);
   addPageEventListener(content, "click", handleInfoOverlayClick);
   addPageEventListener(content, "change", handleInfoOverlayChange);
   addPageEventListener(markerLayer, "click", handleMarkerLayerClick);
@@ -1593,6 +2569,8 @@ function init() {
   });
 
   addPageEventListener(document, "sao:languagechange", () => {
+    renderCategorySidebar();
+    syncMainCategoryButtonVisibility();
     markerSearchCache = null;
     state.markerRenderSignature = "";
     scheduleRenderMarkers();
@@ -1601,6 +2579,9 @@ function init() {
     }
     if (searchInput) {
       searchInput.setAttribute("aria-label", t("page.mainui.searchPlaceholder"));
+    }
+    if (customWaypointDialog.open && customWaypointStatusKey) {
+      setCustomWaypointStatus(customWaypointStatusKey);
     }
     applyMapSources(floorSelect.value);
 
@@ -1620,6 +2601,12 @@ function init() {
     }
     if (selectedMarkerId && getContextData().markerDataset[selectedMarkerId]) {
       openInfo(selectedMarkerId);
+      return;
+    }
+    const canProjectCustomWaypoints = typeof mapAdapter?.coordinateDependencies?.invertMapCoordinates === "function";
+    if (!canProjectCustomWaypoints && sharedMapRuntime.getCategoryState("custom")) {
+      state.customWaypointListSignature = "";
+      setMarkerEmptyState(sharedMapRuntime.getSearchQuery());
       return;
     }
     setDefaultSidebarMessage();

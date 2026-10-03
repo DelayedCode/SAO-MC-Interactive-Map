@@ -16,6 +16,11 @@ const elements = {
   clearFiltersButton: document.getElementById("clearFilters"),
   zoomLabel: document.getElementById("zoomLabel"),
   resetViewButton: document.getElementById("resetView"),
+  customWaypointDialog: document.getElementById("customWaypointDialog"),
+  customWaypointForm: document.getElementById("customWaypointForm"),
+  mapContextMenu: document.getElementById("mapContextMenu"),
+  journeyMapImportFile: document.getElementById("journeyMapImportFile"),
+  globalToast: document.getElementById("globalToast"),
   categoryToggleButtons: document.querySelectorAll(".sidebar-list-button[data-category]")
 };
 
@@ -37,6 +42,11 @@ const {
   clearFiltersButton,
   zoomLabel,
   resetViewButton,
+  customWaypointDialog,
+  customWaypointForm,
+  mapContextMenu,
+  journeyMapImportFile,
+  globalToast,
   categoryToggleButtons
 } = elements;
 
@@ -55,6 +65,7 @@ const {
   clearTextSelection,
   shouldIgnoreMapDrag,
   getImageLocalCoords,
+  copyTextToClipboard,
   CLUSTER_RADIUS_PX,
   isClusteringEnabled,
   buildScreenClusters,
@@ -64,6 +75,7 @@ const {
   buildMarketMarkerIcon,
   buildCraftsmanMarkerIcon,
   buildMarkerIcon,
+  buildCustomWaypointIcon,
   applyImageSourceWithFallback,
   renderMapRuntimeError
 } = window.SAOMapHelpers;
@@ -88,17 +100,26 @@ function hasRequiredMapElements() {
     undergroundToggle &&
     searchInput &&
     zoomLabel &&
-    resetViewButton
+    resetViewButton &&
+    customWaypointDialog &&
+    customWaypointForm
   );
 }
 
 const mapAdapter = window.AincradMapAdapter || null;
+let customWaypointStore = null;
+let mapContextMenuState = { event: null, x: null, z: null };
+let walkthroughContextMenuDemoState = null;
+let pendingCustomWaypointFloor = "";
+let customWaypointStatusKey = "";
+let journeyMapImportToastTimeoutId = null;
 /* Per-context dataset caching, the mob-area lookup and the marker search-cache
    invalidation are owned by the shared accessor factory (shared/sao-map-helpers.js)
    so the Aincrad and Underworld maps cannot drift apart on them. */
 const mapContextAccessors = window.SAOMapHelpers.createMapContextAccessors({
   getAdapter: () => mapAdapter,
   getContextId: () => floorSelect?.value || mapAdapter?.defaultFloor || "",
+  getAdditionalMarkers: (floor) => customWaypointStore?.getMarkerDataset(floor) || {},
   onContextChange: () => {
     markerSearchCache = null;
   }
@@ -279,6 +300,7 @@ const { t, content: contentLookup } = window.SAOPageHelpers.createTranslators(i1
 const storage = window.SAOPageHelpers.getStorage();
 
 const initialCategoryState = Object.freeze({
+  custom: false,
   biomes: false,
   dungeons: false,
   mobAreas: false,
@@ -375,11 +397,586 @@ function getMarkerText(marker, field, markerId) {
   return translated;
 }
 
+function getSafeDungeonTutorialUrl(value) {
+  if (typeof value !== "string" || !value.trim()) return "";
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:" || !url.hostname || url.username || url.password) return "";
+    return url.href;
+  } catch (_error) {
+    return "";
+  }
+}
+
 function getAreaText(area) {
   return contentLookup(`map.mob-area.${area?.id || "unknown"}.title`, area?.title || "");
 }
 
 const state = window.SAOMapHelpers.createInitialMapState();
+
+let distanceMeasurementState = null;
+let distanceMeasurementLayer = null;
+let distanceMeasurementNodes = null;
+
+function clearDistanceMeasurement() {
+  distanceMeasurementState = {
+    floor: floorSelect.value,
+    point1: null,
+    point2: null,
+    distance: 0
+  };
+  renderDistanceMeasurement();
+}
+
+function getDistanceMeasurementDistance(point1, point2) {
+  if (!point1 || !point2) return 0;
+  return Math.hypot(point2.x - point1.x, point2.z - point1.z);
+}
+
+function ensureDistanceMeasurementLayer() {
+  if (distanceMeasurementLayer?.isConnected) return distanceMeasurementLayer;
+
+  distanceMeasurementLayer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  distanceMeasurementLayer.setAttribute("id", "measurementLayer");
+  distanceMeasurementLayer.setAttribute("aria-hidden", "true");
+  distanceMeasurementLayer.setAttribute("preserveAspectRatio", "none");
+  distanceMeasurementLayer.setAttribute("pointer-events", "none");
+  distanceMeasurementLayer.style.position = "absolute";
+  distanceMeasurementLayer.style.inset = "0";
+  distanceMeasurementLayer.style.width = "100%";
+  distanceMeasurementLayer.style.height = "100%";
+  distanceMeasurementLayer.style.pointerEvents = "none";
+  distanceMeasurementLayer.style.overflow = "visible";
+  distanceMeasurementLayer.style.zIndex = "3";
+
+  const createSvgElement = (name) => document.createElementNS("http://www.w3.org/2000/svg", name);
+  const line = createSvgElement("line");
+  line.setAttribute("pointer-events", "none");
+  line.setAttribute("stroke", "#ffd166");
+  line.setAttribute("stroke-dasharray", "6 6");
+  line.setAttribute("stroke-linecap", "round");
+  line.setAttribute("vector-effect", "non-scaling-stroke");
+
+  const firstPoint = createSvgElement("circle");
+  const secondPoint = createSvgElement("circle");
+  [firstPoint, secondPoint].forEach((point) => {
+    point.setAttribute("pointer-events", "none");
+    point.setAttribute("fill", "#ffd166");
+    point.setAttribute("stroke", "#111827");
+    point.setAttribute("vector-effect", "non-scaling-stroke");
+  });
+
+  const label = createSvgElement("text");
+  label.setAttribute("pointer-events", "none");
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-weight", "700");
+  label.setAttribute("fill", "#f8fafc");
+  label.setAttribute("stroke", "#111827");
+  label.setAttribute("paint-order", "stroke");
+  label.setAttribute("vector-effect", "non-scaling-stroke");
+
+  distanceMeasurementLayer.append(line, firstPoint, secondPoint, label);
+  mapContainer.appendChild(distanceMeasurementLayer);
+  distanceMeasurementNodes = { line, firstPoint, secondPoint, label };
+  return distanceMeasurementLayer;
+}
+
+function getDistanceMeasurementPointFromEvent(event) {
+  const naturalWidth = mapImage.naturalWidth || mapImage.width || 0;
+  const naturalHeight = mapImage.naturalHeight || mapImage.height || 0;
+  if (!naturalWidth || !naturalHeight) return null;
+
+  const info = getImageLocalCoords(mapImage, event);
+  if (!info.contentWidth || !info.contentHeight) return null;
+  const rawX = info.localX * (info.naturalWidth / info.contentWidth);
+  const rawY = info.localY * (info.naturalHeight / info.contentHeight);
+  const coords = mapCoordinates(rawX, rawY, { width: naturalWidth, height: naturalHeight });
+  if (!coords) return null;
+
+  return {
+    x: coords.x,
+    z: coords.z,
+    floor: floorSelect.value,
+    rawX,
+    rawY
+  };
+}
+
+function renderDistanceMeasurement() {
+  const measurementState = distanceMeasurementState;
+  const hasPoint1 = Boolean(measurementState?.point1);
+  const hasPoint2 = Boolean(measurementState?.point2);
+
+  if (!measurementState || (!hasPoint1 && !hasPoint2)) {
+    if (distanceMeasurementNodes) {
+      Object.values(distanceMeasurementNodes).forEach((node) => (node.style.display = "none"));
+    }
+    return;
+  }
+
+  ensureDistanceMeasurementLayer();
+  const naturalWidth = mapImage.naturalWidth || mapImage.width || 0;
+  const naturalHeight = mapImage.naturalHeight || mapImage.height || 0;
+  const imageWidth = mapImage.offsetWidth || mapImage.getBoundingClientRect().width / state.zoom;
+  const imageHeight = mapImage.offsetHeight || mapImage.getBoundingClientRect().height / state.zoom;
+  if (!naturalWidth || !naturalHeight || !imageWidth || !imageHeight) return;
+
+  const scale = Math.min(imageWidth / naturalWidth, imageHeight / naturalHeight);
+  const offsetX = (imageWidth - naturalWidth * scale) / 2;
+  const offsetY = (imageHeight - naturalHeight * scale) / 2;
+  const zoom = state.zoom;
+  const toViewport = (point) => ({
+    x: state.translateX + (offsetX + point.rawX * scale) * zoom,
+    y: state.translateY + (offsetY + point.rawY * scale) * zoom
+  });
+
+  const first = hasPoint1 ? measurementState.point1 : measurementState.point2;
+  const second = hasPoint1 && hasPoint2 ? measurementState.point2 : null;
+  const { line, firstPoint, secondPoint, label } = distanceMeasurementNodes;
+
+  [line, firstPoint, secondPoint, label].forEach((node) => (node.style.display = "none"));
+  const firstViewport = toViewport(first);
+  firstPoint.setAttribute("cx", String(firstViewport.x));
+  firstPoint.setAttribute("cy", String(firstViewport.y));
+  firstPoint.setAttribute("r", "6");
+  firstPoint.setAttribute("stroke-width", "2");
+  firstPoint.style.display = "";
+
+  if (!second) return;
+
+  const secondViewport = toViewport(second);
+  secondPoint.setAttribute("cx", String(secondViewport.x));
+  secondPoint.setAttribute("cy", String(secondViewport.y));
+  secondPoint.setAttribute("r", "6");
+  secondPoint.setAttribute("stroke-width", "2");
+  secondPoint.style.display = "";
+
+  line.setAttribute("x1", String(firstViewport.x));
+  line.setAttribute("y1", String(firstViewport.y));
+  line.setAttribute("x2", String(secondViewport.x));
+  line.setAttribute("y2", String(secondViewport.y));
+  line.setAttribute("stroke-width", "3");
+  line.setAttribute("stroke-dasharray", "6 6");
+  line.style.display = "";
+
+  label.setAttribute("x", String((firstViewport.x + secondViewport.x) / 2));
+  label.setAttribute("y", String((firstViewport.y + secondViewport.y) / 2 - 12));
+  label.setAttribute("font-size", "12");
+  label.setAttribute("stroke-width", "1.2");
+  label.textContent = t("page.maps.distanceCalculator.distance").replace(
+    "{value}",
+    (measurementState.distance ?? getDistanceMeasurementDistance(measurementState.point1, measurementState.point2)).toFixed(1)
+  );
+  label.style.display = "";
+}
+
+function setDistanceMeasurementFromEvent(event) {
+  const nextPoint = getDistanceMeasurementPointFromEvent(event);
+  if (!nextPoint) return false;
+
+  const point1 = distanceMeasurementState?.point1 ?? null;
+  const point2 = distanceMeasurementState?.point2 ?? null;
+
+  if (!point1 && !point2) {
+    distanceMeasurementState = { floor: floorSelect.value, point1: nextPoint, point2: null, distance: 0 };
+    renderDistanceMeasurement();
+    return true;
+  }
+
+  if (point1 && !point2) {
+    distanceMeasurementState = {
+      floor: floorSelect.value,
+      point1,
+      point2: nextPoint,
+      distance: getDistanceMeasurementDistance(point1, nextPoint)
+    };
+    renderDistanceMeasurement();
+    return true;
+  }
+
+  if (!point1 && point2) {
+    distanceMeasurementState = {
+      floor: floorSelect.value,
+      point1: nextPoint,
+      point2,
+      distance: getDistanceMeasurementDistance(nextPoint, point2)
+    };
+    renderDistanceMeasurement();
+    return true;
+  }
+
+  distanceMeasurementState = {
+    floor: floorSelect.value,
+    point1,
+    point2: nextPoint,
+    distance: getDistanceMeasurementDistance(point1, nextPoint)
+  };
+  renderDistanceMeasurement();
+  return true;
+}
+
+function setDistanceMeasurementPointFromContext(event, pointIndex) {
+  const point = getDistanceMeasurementPointFromEvent(event);
+  if (!point) return false;
+
+  const currentPoint1 = distanceMeasurementState?.point1 ?? null;
+  const currentPoint2 = distanceMeasurementState?.point2 ?? null;
+
+  if (pointIndex === 1) {
+    distanceMeasurementState = {
+      floor: floorSelect.value,
+      point1: point,
+      point2: currentPoint2,
+      distance: getDistanceMeasurementDistance(point, currentPoint2)
+    };
+    renderDistanceMeasurement();
+    return true;
+  }
+
+  if (pointIndex === 2) {
+    distanceMeasurementState = {
+      floor: floorSelect.value,
+      point1: currentPoint1,
+      point2: point,
+      distance: getDistanceMeasurementDistance(currentPoint1, point)
+    };
+    renderDistanceMeasurement();
+    return true;
+  }
+
+  return false;
+}
+
+function closeMapContextMenu() {
+  const menu = document.getElementById("mapContextMenu");
+  if (!menu) return;
+  menu.hidden = true;
+  menu.setAttribute("aria-hidden", "true");
+  mapContextMenuState = { event: null, x: null, z: null };
+}
+
+function updateMapContextMenuPosition(clientX, clientY) {
+  const menu = document.getElementById("mapContextMenu");
+  if (!menu || menu.hidden) return;
+
+  const menuWidth = menu.offsetWidth || 220;
+  const menuHeight = menu.offsetHeight || 200;
+  const left = Math.min(Math.max(12, clientX + 12), window.innerWidth - menuWidth - 12);
+  const top = Math.min(Math.max(12, clientY + 12), window.innerHeight - menuHeight - 12);
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+}
+
+function openMapContextMenu(event) {
+  if (!isMapSurfaceTarget(event.target)) {
+    closeMapContextMenu();
+    return;
+  }
+  const mapped = getMapCoordinatesFromEvent(event);
+  if (!mapped) {
+    closeMapContextMenu();
+    return;
+  }
+
+  event.preventDefault();
+  const menu = document.getElementById("mapContextMenu");
+  if (!menu) return;
+
+  mapContextMenuState = { event, x: mapped.x, z: mapped.z };
+  menu.hidden = false;
+  menu.setAttribute("aria-hidden", "false");
+  updateMapContextMenuPosition(event.clientX, event.clientY);
+}
+
+function enterWalkthroughContextMenuDemo() {
+  const menu = document.getElementById("mapContextMenu");
+  if (!menu) return;
+
+  if (!walkthroughContextMenuDemoState) {
+    walkthroughContextMenuDemoState = {
+      left: menu.style.left,
+      top: menu.style.top,
+      zIndex: menu.style.zIndex
+    };
+  }
+
+  if (menu.hidden) {
+    const mapRect = mapImage?.getBoundingClientRect?.();
+    if (!mapRect) return;
+    mapImage.dispatchEvent(
+      new MouseEvent("contextmenu", {
+        bubbles: true,
+        cancelable: true,
+        clientX: mapRect.left + mapRect.width / 2,
+        clientY: mapRect.top + mapRect.height / 2
+      })
+    );
+  }
+  if (menu.hidden) return;
+
+  const rect = menu.getBoundingClientRect();
+  menu.style.left = `${Math.max(0, (window.innerWidth - rect.width) / 2)}px`;
+  menu.style.top = `${Math.max(0, (window.innerHeight - rect.height) / 2)}px`;
+  menu.style.zIndex = "119";
+}
+
+function exitWalkthroughContextMenuDemo() {
+  if (!walkthroughContextMenuDemoState) return;
+  const menu = document.getElementById("mapContextMenu");
+  closeMapContextMenu();
+  if (menu) {
+    menu.style.left = walkthroughContextMenuDemoState.left;
+    menu.style.top = walkthroughContextMenuDemoState.top;
+    menu.style.zIndex = walkthroughContextMenuDemoState.zIndex;
+  }
+  walkthroughContextMenuDemoState = null;
+}
+
+function getJourneyMapExportCategories() {
+  const runtime = sharedMapRuntime || window.__aincradMapRuntime || null;
+  const activeCategories = runtime && typeof runtime.getCategoryStates === "function" ? runtime.getCategoryStates() : {};
+  const floor = floorSelect ? floorSelect.value : mapAdapter?.defaultFloor || "";
+  const contextData = getContextData ? getContextData() : { markerDataset: {} };
+  const result = {};
+
+  Object.entries(activeCategories).forEach(([category, isEnabled]) => {
+    if (!isEnabled) return;
+
+    Object.values(contextData.markerDataset || {}).forEach((marker) => {
+      if (!marker || marker.floor !== floor || marker.category !== category) return;
+
+      const x = Number(marker.coords && marker.coords.x !== undefined ? marker.coords.x : marker.x ?? 0);
+      const y = Number(marker.coords && marker.coords.y !== undefined ? marker.coords.y : marker.y ?? -30);
+      const z = Number(marker.coords && marker.coords.z !== undefined ? marker.coords.z : marker.z ?? 0);
+      const exportCategory =
+        marker.category === "custom"
+          ? String(marker.customWaypointButton || "Custom").trim() || "Custom"
+          : category;
+      const world = mapAdapter?.mapId || mapAdapter?.id || "aincrad";
+      const colorUtils = window.SAOColorUtils || window.SAOJourneyMapColors;
+      const categoryColor =
+        marker.category === "custom"
+          ? customWaypointStore?.getButtonColor(exportCategory, floor) ||
+            ensurePersistedCustomWaypointCategoryColor(exportCategory, floor)
+          : colorUtils?.getHardcodedCategoryColor?.(exportCategory) ||
+            colorUtils?.getJourneyMapColorValue?.(exportCategory, { world });
+      const waypointColor = marker.category === "custom" ? marker.color ?? categoryColor : categoryColor;
+
+      const entry = {
+        name: String(marker.title || marker.id || category).trim() || category,
+        x: Number.isFinite(x) ? x : 0,
+        y: Number.isFinite(y) ? y : -30,
+        z: Number.isFinite(z) ? z : 0,
+        dim: String(mapAdapter?.id || "overworld"),
+        icon: marker.icon || marker.customLogo || marker.logo || "pin",
+        color: waypointColor,
+        categoryColor,
+        enabled: 1,
+        visible: 1,
+        group: exportCategory,
+        uuid: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`),
+        id: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`)
+      };
+      if (!result[exportCategory]) result[exportCategory] = [];
+      result[exportCategory].push(entry);
+    });
+  });
+
+  return result;
+}
+
+function exportCurrentJourneyMapWaypoints() {
+  const exporter = window.SAOJourneyMapExport;
+  const runtime = sharedMapRuntime || window.__aincradMapRuntime || null;
+
+  if (!exporter || typeof exporter.buildJourneyMapExport !== "function") {
+    showJourneyMapImportToast(getJourneyMapImportMessage("exportFailure"));
+    return;
+  }
+
+  let objectUrl = "";
+  let anchor = null;
+  try {
+    const categories = getJourneyMapExportCategories();
+    const enabledCategoryCount = Object.values(runtime?.getCategoryStates?.() || {}).filter(Boolean).length;
+    const waypointCount = Object.values(categories).reduce((count, entries) => count + entries.length, 0);
+    if (!runtime || enabledCategoryCount === 0) {
+      showJourneyMapImportToast(getJourneyMapImportMessage("exportNoWaypoints"));
+      return;
+    }
+    if (waypointCount === 0) {
+      showJourneyMapImportToast(getJourneyMapImportMessage("exportEmptyCategories"));
+      return;
+    }
+
+    const worldName = mapAdapter?.mapId || mapAdapter?.id || "aincrad";
+    const config = {
+      world: worldName,
+      dimensionId: exporter.normalizeDimensionId(worldName, mapAdapter?.id || worldName),
+      categories,
+      settings: { enable: true, hideEmpty: false, sortType: "asc" }
+    };
+
+    const exportPayload = exporter.buildJourneyMapExport(config);
+    const blob = exportPayload.toBlob();
+    objectUrl = URL.createObjectURL(blob);
+    anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = "WaypointData.dat";
+    document.body.appendChild(anchor);
+    anchor.click();
+
+    const countLabel = getJourneyMapImportMessage(
+      waypointCount === 1 ? "exportWaypointOne" : "exportWaypointMany",
+      { count: waypointCount }
+    );
+    showJourneyMapImportToast(getJourneyMapImportMessage("exportSuccess", { countLabel }));
+  } catch {
+    showJourneyMapImportToast(getJourneyMapImportMessage("exportFailure"));
+  } finally {
+    anchor?.remove();
+    if (objectUrl) schedulePageTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  }
+}
+
+function showJourneyMapImportToast(message) {
+  if (!globalToast || !message) return;
+  globalToast.textContent = message;
+  globalToast.classList.add("show");
+  globalToast.setAttribute("aria-hidden", "false");
+  if (journeyMapImportToastTimeoutId !== null) window.clearTimeout(journeyMapImportToastTimeoutId);
+  journeyMapImportToastTimeoutId = schedulePageTimeout(() => {
+    globalToast.classList.remove("show");
+    globalToast.setAttribute("aria-hidden", "true");
+    journeyMapImportToastTimeoutId = null;
+  }, 3000);
+}
+
+function getJourneyMapImportTargets() {
+  const logoIds = window.SAOCustomWaypoints?.LOGO_IDS || [];
+  return [window.AincradMapAdapter, window.UnderworldMapAdapter]
+    .filter(Boolean)
+    .map((adapter) => ({
+      id: adapter.id,
+      defaultFloor: adapter.defaultFloor,
+      floors: adapter.floors,
+      journeymapDimensionId: window.SAOJourneyMapExport?.normalizeDimensionId(adapter.mapId || adapter.id, adapter.id),
+      logoIds
+    }));
+}
+
+function getJourneyMapImportMessage(key, params) {
+  return t(`${mapAdapter?.translationNamespace || "page.maps"}.mapContextMenu.${key}`, params);
+}
+
+async function importJourneyMapFile(file) {
+  try {
+    const importer = window.SAOJourneyMapImport;
+    if (!importer || !file || typeof file.arrayBuffer !== "function") throw new Error("unavailable");
+    const plan = importer.prepareJourneyMapImport(await file.arrayBuffer(), getJourneyMapImportTargets(), mapAdapter?.id);
+    if (plan.records.length === 0) {
+      showJourneyMapImportToast(getJourneyMapImportMessage("importNoWaypoints"));
+      return;
+    }
+
+    const batches = new Map();
+    plan.records.forEach((entry) => {
+      if (!batches.has(entry.world)) batches.set(entry.world, []);
+      batches.get(entry.world).push(entry.record);
+    });
+    const targets = new Map(getJourneyMapImportTargets().map((target) => [target.id, target]));
+    const stores = new Map();
+    for (const [world, records] of batches) {
+      const store = world === customWaypointStore?.world
+        ? customWaypointStore
+        : window.SAOCustomWaypoints.createCustomWaypointStore({
+            storage,
+            world,
+            floorIds: Object.keys(targets.get(world)?.floors || {})
+          });
+      if (!store || !store.canAddMany(records)) throw new Error("store-validation");
+      stores.set(world, store);
+    }
+
+    let importedCount = 0;
+    let duplicateCount = 0;
+    const importedCategories = new Set();
+    let currentWorldChanged = false;
+    for (const [world, records] of batches) {
+      const result = stores.get(world).addMany(records);
+      if (!result) throw new Error("store-write");
+      importedCount += result.records.length;
+      duplicateCount += result.duplicateCount;
+      result.records.forEach((record) => importedCategories.add(`${world}\u0000${record.button}`));
+      records.forEach((record) => stores.get(world).setButtonEnabled(record.button, record.floor, true));
+      if (world === customWaypointStore?.world && records.length > 0) currentWorldChanged = true;
+    }
+
+    if (currentWorldChanged) {
+      sharedMapRuntime.setCategoryState("custom", customWaypointStore.hasEnabledButtons(floorSelect.value));
+      refreshCustomWaypointData(true);
+    }
+    if (importedCount === 0) {
+      const key = duplicateCount === 1 ? "importDuplicatesOne" : "importDuplicatesMany";
+      showJourneyMapImportToast(getJourneyMapImportMessage(key, { count: duplicateCount }));
+      return;
+    }
+    if (duplicateCount > 0) {
+      const newLabel = getJourneyMapImportMessage(importedCount === 1 ? "importNewOne" : "importNewMany", {
+        count: importedCount
+      });
+      const duplicateLabel = getJourneyMapImportMessage(
+        duplicateCount === 1 ? "importDuplicateOne" : "importDuplicateMany",
+        { count: duplicateCount }
+      );
+      showJourneyMapImportToast(getJourneyMapImportMessage("importPartial", { newLabel, duplicateLabel }));
+      return;
+    }
+    showJourneyMapImportToast(
+      getJourneyMapImportMessage("importSuccess", {
+        waypoints: importedCount,
+        categories: importedCategories.size,
+        waypointLabel: getJourneyMapImportMessage(
+          importedCount === 1 ? "importWaypointOne" : "importWaypointMany"
+        ),
+        categoryLabel: getJourneyMapImportMessage(
+          importedCategories.size === 1 ? "importCategoryOne" : "importCategoryMany"
+        )
+      })
+    );
+  } catch (error) {
+    const outcome =
+      error?.code === "unsupported" ? "importUnsupported" : error?.code === "invalid" ? "importInvalid" : "importFailure";
+    showJourneyMapImportToast(getJourneyMapImportMessage(outcome));
+  } finally {
+    if (journeyMapImportFile) journeyMapImportFile.value = "";
+  }
+}
+
+function handleMapContextMenuAction(event) {
+  const actionButton = event.target.closest("[data-map-action]");
+  if (!actionButton) return;
+  event.preventDefault();
+  event.stopPropagation();
+
+  const action = actionButton.dataset.mapAction;
+  const sourceEvent = mapContextMenuState.event;
+  if (action === "create-custom-marker" && sourceEvent) {
+    openCustomWaypointDialog(sourceEvent);
+  } else if (action === "journey-export") {
+    exportCurrentJourneyMapWaypoints();
+  } else if (action === "journey-import") {
+    journeyMapImportFile?.click();
+  } else if (action === "distance-point-1" && sourceEvent && typeof getDistanceMeasurementPointFromEvent === "function") {
+    setDistanceMeasurementPointFromContext(sourceEvent, 1);
+  } else if (action === "distance-point-2" && sourceEvent && typeof getDistanceMeasurementPointFromEvent === "function") {
+    setDistanceMeasurementPointFromContext(sourceEvent, 2);
+  } else if (action === "reset-distance" && typeof clearDistanceMeasurement === "function") {
+    clearDistanceMeasurement();
+  }
+
+  closeMapContextMenu();
+}
 
 function loadMapUiState() {
   const parsed = storage.getJSON(mapUiStateStorageKey, null);
@@ -486,6 +1083,11 @@ function openMobAreaInfo(area) {
 }
 
 function handleInfoOverlayClick(event) {
+  const deleteButton = event.target.closest("[data-custom-waypoint-delete]");
+  if (deleteButton && content.contains(deleteButton)) {
+    deleteCustomWaypoint(deleteButton.dataset.customWaypointDelete || "");
+    return;
+  }
   const actionButton = event.target.closest("[data-waypoint-info-href]");
   if (!actionButton || !content.contains(actionButton)) return;
 
@@ -584,6 +1186,13 @@ function buildWalkthroughSteps() {
       selector: "#mapContainer",
       title: t("page.maps.walkthrough.step4Title"),
       body: t("page.maps.walkthrough.step4Body")
+    },
+    {
+      selector: "#mapContextMenu",
+      title: t("page.maps.walkthrough.step5Title"),
+      body: t("page.maps.walkthrough.step5Body"),
+      onEnter: enterWalkthroughContextMenuDemo,
+      onExit: exitWalkthroughContextMenuDemo
     }
   ];
 }
@@ -645,6 +1254,535 @@ function mapCoordinates(rawX, rawY, dimensions) {
   return mapWebsiteCoordinates(rawX, rawY, floorSelect.value, dimensions);
 }
 
+function getMapCoordinatesFromEvent(event) {
+  const info = getImageLocalCoords(mapImage, event);
+  if (!info.naturalWidth || !info.naturalHeight || !info.contentWidth || !info.contentHeight) return null;
+  const rawX = info.localX * (info.naturalWidth / info.contentWidth);
+  const rawY = info.localY * (info.naturalHeight / info.contentHeight);
+  return mapCoordinates(rawX, rawY, { width: info.naturalWidth, height: info.naturalHeight });
+}
+
+function isMapSurfaceTarget(target) {
+  return Boolean(
+    target &&
+    typeof target.closest === "function" &&
+    mapLayer.contains(target) &&
+    !shouldIgnoreMapDrag(target) &&
+    !target.closest("dialog, a, [role='button'], [role='dialog']")
+  );
+}
+
+let customWaypointDeleteTargetId = "";
+let customButtonDeleteState = null;
+
+function getCustomButtonDefaultLabel() {
+  return t("page.maps.customWaypoint.buttonDefault") || "Default";
+}
+
+function formatCustomButtonName(buttonName) {
+  const trimmed = String(buttonName || "").trim();
+  if (!trimmed) return getCustomButtonDefaultLabel();
+  return trimmed === "Default" ? getCustomButtonDefaultLabel() : trimmed;
+}
+
+function setCustomWaypointStatus(key) {
+  customWaypointStatusKey = key || "";
+  const statusMessage = document.getElementById("customWaypointStatusMessage");
+  if (statusMessage) {
+    statusMessage.textContent = key ? t(`page.maps.customWaypoint.${key}`) : "";
+    return;
+  }
+  document.getElementById("customWaypointStatus").textContent = key ? t(`page.maps.customWaypoint.${key}`) : "";
+}
+
+function openCustomWaypointDeleteDialog(recordId) {
+  const dialog = document.getElementById("customWaypointDeleteDialog");
+  const message = document.getElementById("customWaypointDeleteMessage");
+  if (!dialog || !message || !recordId) return;
+  customWaypointDeleteTargetId = recordId;
+  message.textContent = t("page.maps.customWaypoint.deleteConfirm");
+  dialog.showModal();
+}
+
+function closeCustomWaypointDeleteDialog() {
+  const dialog = document.getElementById("customWaypointDeleteDialog");
+  if (dialog && dialog.open) dialog.close();
+  customWaypointDeleteTargetId = "";
+}
+
+function confirmCustomWaypointDelete() {
+  const recordId = customWaypointDeleteTargetId;
+  const record = recordId ? customWaypointStore.getRecord(recordId) : null;
+  if (!record) {
+    closeCustomWaypointDeleteDialog();
+    return;
+  }
+  const markerId = `custom:${recordId}`;
+  const shouldRender = sharedMapRuntime.getCategoryState("custom");
+  customWaypointStore.remove(recordId);
+  const markerElement = state.markerCache.get(markerId);
+  markerElement?.remove();
+  state.markerCache.delete(markerId);
+  if (sharedMapRuntime.getSelectedMarker() === markerId) {
+    sharedMapRuntime.clearSelectedMarker();
+    setDefaultSidebarMessage();
+  }
+  closeCustomWaypointDeleteDialog();
+  refreshCustomWaypointData(shouldRender);
+}
+
+function updateCustomButtonDeleteCountdown() {
+  const state = customButtonDeleteState;
+  const confirmButton = document.getElementById("customButtonDeleteConfirm");
+  if (!state || !confirmButton) return;
+
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - state.startedAt) / 1000));
+  const remainingSeconds = Math.max(0, 5 - elapsedSeconds);
+
+  if (state.phase === "countdown") {
+    if (remainingSeconds <= 0) {
+      state.phase = "delete";
+      if (state.timerId) {
+        window.clearInterval(state.timerId);
+        state.timerId = null;
+      }
+      confirmButton.textContent = t("page.maps.customWaypoint.confirmDelete");
+      confirmButton.disabled = false;
+      return;
+    }
+    confirmButton.textContent = `${t("page.maps.customWaypoint.areYouSure")} (${remainingSeconds})`;
+    confirmButton.disabled = true;
+    return;
+  }
+
+  if (state.phase === "delete") {
+    confirmButton.textContent = t("page.maps.customWaypoint.confirmDelete");
+    confirmButton.disabled = false;
+    return;
+  }
+
+  confirmButton.textContent = t("page.maps.customWaypoint.confirmAction");
+  confirmButton.disabled = false;
+}
+
+function closeCustomButtonDeleteDialog() {
+  const dialog = document.getElementById("customButtonDeleteDialog");
+  const confirmButton = document.getElementById("customButtonDeleteConfirm");
+  if (customButtonDeleteState?.timerId) {
+    window.clearInterval(customButtonDeleteState.timerId);
+  }
+  customButtonDeleteState = null;
+  if (confirmButton) {
+    confirmButton.textContent = t("page.maps.customWaypoint.deleteAction");
+    confirmButton.disabled = false;
+  }
+  if (dialog && dialog.open) dialog.close();
+}
+
+function openCustomButtonDeleteDialog(buttonName, floor) {
+  const dialog = document.getElementById("customButtonDeleteDialog");
+  const confirmButton = document.getElementById("customButtonDeleteConfirm");
+  const description = document.getElementById("customButtonDeleteDescription");
+  if (!dialog || !buttonName || !description) return;
+
+  closeCustomButtonDeleteDialog();
+  customButtonDeleteState = {
+    buttonName,
+    floor,
+    startedAt: 0,
+    timerId: null,
+    phase: "ready"
+  };
+  if (confirmButton) {
+    confirmButton.textContent = t("page.maps.customWaypoint.deleteAction");
+    confirmButton.disabled = false;
+  }
+  description.textContent = t("page.maps.customWaypoint.deleteButtonWarning");
+  dialog.showModal();
+}
+
+function confirmCustomButtonDelete() {
+  const state = customButtonDeleteState;
+  const confirmButton = document.getElementById("customButtonDeleteConfirm");
+  if (!state || !customWaypointStore || !confirmButton) return;
+
+  if (state.phase === "countdown") {
+    return;
+  }
+
+  if (state.phase === "confirm") {
+    state.phase = "countdown";
+    state.startedAt = Date.now();
+    confirmButton.disabled = true;
+    confirmButton.textContent = `${t("page.maps.customWaypoint.areYouSure")} (5)`;
+    state.timerId = window.setInterval(() => {
+      updateCustomButtonDeleteCountdown();
+    }, 1000);
+    return;
+  }
+
+  if (state.phase === "delete") {
+    const removed = customWaypointStore.removeButton(state.buttonName, state.floor);
+    closeCustomButtonDeleteDialog();
+    if (removed > 0) {
+      refreshCustomWaypointData(true);
+    }
+    return;
+  }
+
+  state.phase = "confirm";
+  confirmButton.textContent = t("page.maps.customWaypoint.confirmAction");
+  confirmButton.disabled = false;
+}
+
+function handleCustomSidebarClick(event) {
+  const deleteButton = event.target.closest("[data-custom-button-delete]");
+  if (deleteButton) {
+    const buttonName = deleteButton.dataset.customButtonDelete || "";
+    if (buttonName) openCustomButtonDeleteDialog(buttonName, floorSelect.value);
+    return;
+  }
+
+  const selectorButton = event.target.closest("[data-custom-button]");
+  if (selectorButton && customWaypointStore) {
+    const buttonName = selectorButton.dataset.customButton || "";
+    if (!buttonName) return;
+    customWaypointStore.setButtonEnabled(
+      buttonName,
+      floorSelect.value,
+      !customWaypointStore.getButtonEnabled(buttonName, floorSelect.value)
+    );
+    sharedMapRuntime.setCategoryState("custom", customWaypointStore.hasEnabledButtons(floorSelect.value));
+    refreshCustomWaypointData(true);
+  }
+}
+
+function getCustomWaypointButtonOptions() {
+  const buttons = customWaypointStore
+    ? customWaypointStore.getCustomButtonsForFloor(pendingCustomWaypointFloor || floorSelect.value)
+    : [];
+  const normalized = [];
+  const seen = new Set();
+  buttons.forEach((buttonName) => {
+    const normalizedName = String(buttonName || "").trim() || "Default";
+    const key = normalizedName.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    normalized.push(normalizedName);
+  });
+  return ["__create__", ...normalized];
+}
+
+function normalizeCustomWaypointCategoryColor(value) {
+  const colorUtils = window.SAOColorUtils || window.SAOJourneyMapColors;
+  if (colorUtils && typeof colorUtils.normalizeHexColor === "function") {
+    return colorUtils.normalizeHexColor(value);
+  }
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const raw = String(value).trim();
+  const normalized = raw.startsWith("#") ? raw.slice(1) : raw;
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null;
+  return `#${normalized.toUpperCase()}`;
+}
+
+function generateRandomCustomWaypointCategoryColor() {
+  const colorUtils = window.SAOColorUtils || window.SAOJourneyMapColors;
+  if (colorUtils && typeof colorUtils.randomHexColor === "function") {
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      const candidate = normalizeCustomWaypointCategoryColor(colorUtils.randomHexColor());
+      if (candidate && candidate.toUpperCase() !== "#FFFFFF") {
+        return candidate;
+      }
+    }
+  }
+  let candidate = "#";
+  do {
+    candidate = "#";
+    for (let index = 0; index < 3; index += 1) {
+      candidate += Math.floor(Math.random() * 256)
+        .toString(16)
+        .padStart(2, "0");
+    }
+  } while (candidate.toUpperCase() === "#FFFFFF");
+  return candidate.toUpperCase();
+}
+
+function applyCustomWaypointCategoryColor(value) {
+  const colorInput = document.getElementById("customWaypointCategoryColor");
+  const hexInput = document.getElementById("customWaypointCategoryHex");
+  const swatch = document.getElementById("customWaypointCategorySwatch");
+  const normalized = normalizeCustomWaypointCategoryColor(value) || generateRandomCustomWaypointCategoryColor();
+  if (colorInput) colorInput.value = normalized;
+  if (hexInput) hexInput.value = normalized;
+  if (swatch) {
+    swatch.style.background = normalized;
+    swatch.style.borderColor = normalized;
+  }
+  return normalized;
+}
+
+function updateCustomWaypointCategoryColorState() {
+  const select = document.getElementById("customWaypointButtonSelect");
+  const row = document.getElementById("customWaypointCategoryColorRow");
+  const isCreating = select && select.value === "__create__";
+  if (row) row.hidden = !isCreating;
+  if (!isCreating) return;
+  const colorInput = document.getElementById("customWaypointCategoryColor");
+  const hexInput = document.getElementById("customWaypointCategoryHex");
+  const buttonName = document.getElementById("customWaypointButtonName")?.value.trim().toLowerCase();
+  const isBiomes = buttonName === "biomes";
+  const picker = colorInput?.closest(".custom-waypoint-color-picker");
+  const hint = document.getElementById("customWaypointCategoryColorHint");
+  if (picker) picker.dataset.locked = String(isBiomes);
+  if (colorInput) colorInput.disabled = isBiomes;
+  if (hexInput) hexInput.readOnly = isBiomes;
+  if (hint) hint.textContent = isBiomes ? "Biomes color is locked to white" : "Click to choose a color";
+  const enteredHex = hexInput?.value || "";
+  const pickerValue = colorInput?.value || "";
+  const currentValue = normalizeCustomWaypointCategoryColor(enteredHex)
+    ? enteredHex
+    : normalizeCustomWaypointCategoryColor(pickerValue) && pickerValue.toUpperCase() !== "#000000"
+      ? pickerValue
+      : "";
+  applyCustomWaypointCategoryColor(isBiomes ? "#FFFFFF" : currentValue || generateRandomCustomWaypointCategoryColor());
+}
+
+function getCustomWaypointCategoryColorValue() {
+  const hexInput = document.getElementById("customWaypointCategoryHex");
+  const colorInput = document.getElementById("customWaypointCategoryColor");
+  const value = normalizeCustomWaypointCategoryColor((hexInput && hexInput.value) || (colorInput && colorInput.value) || "");
+  if (hexInput && !value) {
+    hexInput.setCustomValidity("Invalid HEX color");
+    hexInput.reportValidity();
+    return null;
+  }
+  if (hexInput) hexInput.setCustomValidity("");
+  return value;
+}
+
+function ensurePersistedCustomWaypointCategoryColor(buttonName, floor) {
+  if (!customWaypointStore) return null;
+  const savedColor = customWaypointStore.getButtonColor(buttonName, floor);
+  if (savedColor) return savedColor;
+  const generatedColor = generateRandomCustomWaypointCategoryColor();
+  customWaypointStore.setButtonColor(buttonName, floor, generatedColor);
+  return generatedColor;
+}
+
+function syncCustomWaypointButtonOptions() {
+  const select = document.getElementById("customWaypointButtonSelect");
+  const row = document.getElementById("customWaypointButtonNameRow");
+  const input = document.getElementById("customWaypointButtonName");
+  if (!select) return;
+  const previousValue = select.value;
+  const options = getCustomWaypointButtonOptions();
+  select.innerHTML = "";
+  options.forEach((buttonName) => {
+    const option = document.createElement("option");
+    option.value = buttonName;
+    option.textContent =
+      buttonName === "__create__" ? t("page.maps.customWaypoint.createButton") : formatCustomButtonName(buttonName);
+    select.appendChild(option);
+  });
+  const nextValue = options.includes(previousValue) ? previousValue : options[0] || "";
+  select.value = nextValue;
+  const isCreating = select.value === "__create__";
+  if (row) row.hidden = !isCreating;
+  if (input) input.value = "";
+  updateCustomWaypointCategoryColorState();
+}
+
+function getSelectedCustomWaypointButtonName() {
+  const select = document.getElementById("customWaypointButtonSelect");
+  const input = document.getElementById("customWaypointButtonName");
+  if (!select) return "Default";
+  if (select.value === "__create__") {
+    const entered = (input?.value || "").trim();
+    return entered || "Default";
+  }
+  return String(select.value || "Default").trim() || "Default";
+}
+
+function resetCustomWaypointForm() {
+  customWaypointForm.reset();
+  ["customWaypointName", "customWaypointX", "customWaypointZ", "customWaypointButtonName"].forEach((id) => {
+    const field = document.getElementById(id);
+    if (field) field.setCustomValidity("");
+  });
+  const buttonNameRow = document.getElementById("customWaypointButtonNameRow");
+  if (buttonNameRow) buttonNameRow.hidden = true;
+  syncCustomWaypointButtonOptions();
+  setCustomWaypointStatus("");
+}
+
+function maybeOpenCustomWaypointDialogFromMapClick(event) {
+  if (!event || event.defaultPrevented || event.button !== 0 || event.detail < 3) return;
+  if (event.target.closest(".marker, button, input, select, textarea, label, dialog, #infoOverlay, #zoomControls, #mapEmptyState")) {
+    return;
+  }
+  if (customWaypointDialog.open || !customWaypointStore) return;
+  openCustomWaypointDialog(event);
+}
+
+function openCustomWaypointDialog(event) {
+  if (!customWaypointStore || customWaypointDialog.open) return;
+  pendingCustomWaypointFloor = floorSelect.value;
+  resetCustomWaypointForm();
+  const mapped = getMapCoordinatesFromEvent(event);
+  if (mapped) {
+    document.getElementById("customWaypointX").value = String(Math.round(mapped.x));
+    document.getElementById("customWaypointZ").value = String(Math.round(mapped.z));
+  }
+  customWaypointDialog.showModal();
+  if (!mapped) {
+    setCustomWaypointStatus("manualCoordinates");
+  }
+  document.getElementById("customWaypointName").focus();
+}
+
+function closeCustomWaypointDialog() {
+  if (customWaypointDialog.open) customWaypointDialog.close();
+}
+
+async function copyCustomWaypointCoordinates() {
+  const x = document.getElementById("customWaypointX").value;
+  const z = document.getElementById("customWaypointZ").value;
+  const text = `X: ${x} Z: ${z}`;
+  const copied = await copyTextToClipboard(text);
+  setCustomWaypointStatus(copied ? "copySuccess" : "copyError");
+}
+
+function syncCustomWaypointCategory() {
+  const categoryItem =
+    document.getElementById("customCategoryItem") || document.getElementById("customMarkerSidebarSection");
+  const categoryButton = categoryItem?.querySelector("[data-category='custom']");
+  const customSidebarSection =
+    document.getElementById("customMarkerSidebarSection") || document.getElementById("customCategoryItem");
+  const customSidebarList = document.getElementById("customWaypointSidebarList");
+  customWaypointStore?.initializeButtonEnabledState(sharedMapRuntime.getCategoryState("custom"));
+  const hasEnabledButtons = Boolean(customWaypointStore?.hasEnabledButtons(floorSelect.value));
+  sharedMapRuntime.setCategoryState("custom", hasEnabledButtons);
+  const hasCustomWaypoints = Boolean(customWaypointStore?.hasAny());
+  if (categoryItem) categoryItem.hidden = !hasCustomWaypoints;
+  if (customSidebarSection) customSidebarSection.hidden = !hasCustomWaypoints;
+  if (customSidebarList && customWaypointStore) {
+    const buttonCounts = customWaypointStore.getButtonCountsForFloor(floorSelect.value);
+    const buttons = customWaypointStore.getCustomButtonsForFloor(floorSelect.value);
+    customSidebarList.innerHTML = buttons
+      .map((buttonName) => {
+        const count = buttonCounts[buttonName] || 0;
+        const color = ensurePersistedCustomWaypointCategoryColor(buttonName, floorSelect.value);
+        const isActive = customWaypointStore.getButtonEnabled(buttonName, floorSelect.value);
+        return `
+          <li class="custom-waypoint-sidebar-row">
+            <button
+              type="button"
+              class="sidebar-list-button ${isActive ? "active" : ""}"
+              data-custom-button="${escapeHtml(buttonName)}"
+              aria-pressed="${isActive ? "true" : "false"}"
+            >
+              <span class="custom-waypoint-color-swatch" style="background:${color || "#000000"}; border-color:${color || "#000000"};"></span>
+              <span>${escapeHtml(formatCustomButtonName(buttonName))}</span>
+              ${count > 0 ? `<span class="marker-count">${count}</span>` : ""}
+            </button>
+            <button
+              type="button"
+              class="sidebar-list-button custom-button-delete"
+              data-custom-button-delete="${escapeHtml(buttonName)}"
+            >
+              ${t("page.maps.customWaypoint.deleteButton")}
+            </button>
+          </li>
+        `;
+      })
+      .join("");
+  }
+  if (!hasCustomWaypoints && sharedMapRuntime) {
+    categoryButton?.classList.remove("active");
+    categoryButton?.setAttribute("aria-pressed", "false");
+  }
+  return hasCustomWaypoints;
+}
+
+function refreshCustomWaypointData(renderVisibleMarkers) {
+  mapContextAccessors.invalidate();
+  markerSearchCache = null;
+  state.markerRenderSignature = "";
+  syncCustomWaypointCategory();
+  refreshCategoryCounts();
+  if (renderVisibleMarkers) {
+    state.customWaypointOnlyRender = state.renderMarkersRafId === null;
+    scheduleRenderMarkers();
+  }
+}
+
+function createCustomWaypoint(event) {
+  event.preventDefault();
+  const nameInput = document.getElementById("customWaypointName");
+  const xInput = document.getElementById("customWaypointX");
+  const zInput = document.getElementById("customWaypointZ");
+  const name = nameInput.value.trim();
+  const xText = xInput.value.trim();
+  const zText = zInput.value.trim();
+  const validCoordinates = xText && zText && Number.isFinite(Number(xText)) && Number.isFinite(Number(zText));
+  if (!name) {
+    nameInput.setCustomValidity(t("page.maps.customWaypoint.nameRequired"));
+    nameInput.reportValidity();
+    setCustomWaypointStatus("nameRequired");
+    return;
+  }
+  nameInput.setCustomValidity("");
+  if (!validCoordinates) {
+    const message = t("page.maps.customWaypoint.coordinatesRequired");
+    xInput.setCustomValidity(message);
+    zInput.setCustomValidity(message);
+    (xText ? zInput : xInput).reportValidity();
+    setCustomWaypointStatus("coordinatesRequired");
+    return;
+  }
+  xInput.setCustomValidity("");
+  zInput.setCustomValidity("");
+
+  const buttonName = getSelectedCustomWaypointButtonName();
+  const categoryColor =
+    document.getElementById("customWaypointButtonSelect")?.value === "__create__"
+      ? getCustomWaypointCategoryColorValue()
+      : undefined;
+  if (
+    document.getElementById("customWaypointButtonSelect")?.value === "__create__" &&
+    !categoryColor
+  ) {
+    document.getElementById("customWaypointCategoryHex")?.setCustomValidity("Invalid HEX color");
+    document.getElementById("customWaypointCategoryHex")?.reportValidity();
+    return;
+  }
+
+  const record = customWaypointStore.add({
+    name,
+    description: document.getElementById("customWaypointDescription").value,
+    x: xText,
+    z: zText,
+    floor: pendingCustomWaypointFloor,
+    button: buttonName,
+    color: categoryColor,
+    logo: document.getElementById("customWaypointLogo").value
+  });
+  if (!record) return;
+  customWaypointStore.setButtonEnabled(buttonName, pendingCustomWaypointFloor, true);
+  sharedMapRuntime.setCategoryState("custom", customWaypointStore.hasEnabledButtons(pendingCustomWaypointFloor));
+  const customCategoryButton = document.querySelector("[data-category='custom']");
+  customCategoryButton?.classList.toggle("active", sharedMapRuntime.getCategoryState("custom"));
+  customCategoryButton?.setAttribute("aria-pressed", String(sharedMapRuntime.getCategoryState("custom")));
+  refreshCustomWaypointData(sharedMapRuntime.getCategoryState("custom"));
+  closeCustomWaypointDialog();
+  openInfo(`custom:${record.id}`);
+}
+
+function deleteCustomWaypoint(recordId) {
+  if (!customWaypointStore.getRecord(recordId)) return;
+  openCustomWaypointDeleteDialog(recordId);
+}
+
 function updateCoordinatePanelFromEvent(event) {
   const info = getImageLocalCoords(mapImage, event);
   /* The whole viewport is valid coordinate space. The cursor is projected through the same linear
@@ -681,6 +1819,7 @@ function updateTransform() {
   const mapTransform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.zoom})`;
   mapLayer.style.transform = mapTransform;
   markerLayer.style.setProperty("--marker-zoom-compensation", (1 / state.zoom).toFixed(6));
+  renderDistanceMeasurement();
   /* The viewport checker/grid squares scale with zoom but stay anchored to the viewport, so panning
      never moves them. Only written when the value changes, to avoid repainting the grid while
      dragging. */
@@ -880,6 +2019,9 @@ function getMarkerViewportBounds() {
 }
 
 function renderMarkers() {
+  const customOnlyRender = state.customWaypointOnlyRender === true;
+  const previouslyClustered = state.clusteredMarkerIds || new Set();
+  state.customWaypointOnlyRender = false;
   const selectedFloor = floorSelect.value;
   const filterText = sharedMapRuntime.getSearchQuery();
   const signature = getMarkerRenderSignature(selectedFloor, filterText);
@@ -902,7 +2044,7 @@ function renderMarkers() {
     offsetY = (containerH - naturalHeight * imgScale) / 2;
   }
 
-  renderMobAreas(selectedFloor, imgScale, offsetX, offsetY);
+  if (!customOnlyRender) renderMobAreas(selectedFloor, imgScale, offsetX, offsetY);
 
   ensureMarkerSearchCache();
   const clustering = buildMarkerClusters({
@@ -915,12 +2057,25 @@ function renderMarkers() {
     viewportBounds
   });
   activeClusters = clustering.byId;
+  state.clusteredMarkerIds = new Set(clustering.byMember.keys());
   getDataEntries().forEach(([id, marker]) => {
     const matchesFloor = marker.floor === selectedFloor;
     const matchesSearch = (markerSearchCache.get(id) || "").includes(filterText);
 
     const categoryEnabled = sharedMapRuntime.getCategoryState(marker.category);
     if (!matchesFloor || !categoryEnabled || (filterText && !matchesSearch)) return;
+
+    if (customOnlyRender && !marker.customWaypointId) {
+      if (clustering.byMember.has(id)) return;
+      const existingMarker = state.markerCache.get(id);
+      if (existingMarker && markerLayer.contains(existingMarker)) {
+        desiredIds.add(id);
+        renderedCount += 1;
+        if (sharedMapRuntime.getSelectedMarker() === id) activeMarkerRendered = true;
+        return;
+      }
+      if (!previouslyClustered.has(id)) return;
+    }
 
     // Derive pixel position from game coordinates
     if (!imgScale || !marker.coords) return;
@@ -961,7 +2116,14 @@ function renderMarkers() {
     markerEl.style.top = `${topPx}px`;
     const markerAnchorY = markerType === "biome" ? "-100%" : "-50%";
     markerEl.style.setProperty("--marker-anchor-y", markerAnchorY);
-    if (markerType === "biome" || markerType === "dungeon" || markerType === "boss") {
+    markerEl.style.removeProperty("--custom-waypoint-color");
+    if (marker.customWaypointId) {
+      markerEl.classList.add("custom-marker");
+      const customWaypointColor = marker.color || marker.customWaypointButtonColor;
+      if (customWaypointColor) markerEl.style.setProperty("--custom-waypoint-color", customWaypointColor);
+      else markerEl.style.removeProperty("--custom-waypoint-color");
+      markerEl.innerHTML = buildCustomWaypointIcon(marker.customLogo);
+    } else if (markerType === "biome" || markerType === "dungeon" || markerType === "boss") {
       markerEl.innerHTML = buildMarkerIcon(markerType);
     } else if (marker.category === MAIN_QUESTS_CATEGORY) {
       markerEl.classList.add("main-quest-marker");
@@ -1020,6 +2182,16 @@ function renderMarkers() {
       state.markerCache.set(cluster.id, markerEl);
       markerLayer.appendChild(markerEl);
     }
+    const clusterMembersSignature = JSON.stringify(cluster.memberIds);
+    if (customOnlyRender && markerEl.dataset.clusterMembers === clusterMembersSignature) {
+      const selectedId = sharedMapRuntime.getSelectedMarker();
+      const isActive = selectedId === cluster.id || cluster.memberIds.includes(selectedId);
+      markerEl.classList.toggle("active-marker", isActive);
+      if (isActive) activeMarkerRendered = true;
+      renderedCount += 1;
+      return;
+    }
+    markerEl.dataset.clusterMembers = clusterMembersSignature;
     const size = cluster.memberIds.length;
     const label = t("page.maps.clusterTitle", { count: size });
     markerEl.className = "marker cluster-marker";
@@ -1048,6 +2220,18 @@ function renderMarkers() {
       const waypointTitle = `${getAreaText(area)} ${t("page.maps.mobs")}`;
       const searchHaystack = getMobAreaSearchHaystack(area);
       if (filterText && !searchHaystack.includes(filterText)) return;
+      const mobAreaId = `mob-area:${area.id}`;
+      if (customOnlyRender) {
+        if (clustering.byMember.has(mobAreaId)) return;
+        const existingMarker = state.markerCache.get(mobAreaId);
+        if (existingMarker && markerLayer.contains(existingMarker)) {
+          desiredIds.add(mobAreaId);
+          renderedCount += 1;
+          if (sharedMapRuntime.getSelectedMarker() === mobAreaId) activeMarkerRendered = true;
+          return;
+        }
+        if (!previouslyClustered.has(mobAreaId)) return;
+      }
 
       const center = getMobAreaCenter(area);
       if (!center) return;
@@ -1068,7 +2252,6 @@ function renderMarkers() {
         topPx > viewportBounds.bottom
       )
         return;
-      const mobAreaId = `mob-area:${area.id}`;
       /* Clustered mob areas are represented by their cluster marker instead. */
       if (clustering.byMember.has(mobAreaId)) return;
       desiredIds.add(mobAreaId);
@@ -1109,14 +2292,23 @@ function renderMarkers() {
     }
   }
 
-  if (renderedCount === 0) {
-    sharedMapRuntime.clearSelectedMarker();
-    setMarkerEmptyState(filterText);
-    return;
-  }
-
   if (!activeMarkerRendered) {
+    const selectedMarkerId = sharedMapRuntime.getSelectedMarker();
+    const selectedMarker = selectedMarkerId && getContextData().markerDataset[selectedMarkerId];
+    if (
+      selectedMarker?.customWaypointId &&
+      selectedMarker.floor === selectedFloor &&
+      sharedMapRuntime.getCategoryState("custom") &&
+      !filterText
+    ) {
+      openInfo(selectedMarkerId);
+      return;
+    }
     sharedMapRuntime.clearSelectedMarker();
+    if (renderedCount === 0) {
+      setMarkerEmptyState(filterText);
+      return;
+    }
     setDefaultSidebarMessage();
   }
 }
@@ -1153,6 +2345,7 @@ function openClusterInfo(clusterId) {
             <p><strong>${t("page.maps.floorText")}:</strong> ${floorText}</p>
             <p><strong>${t("page.maps.coordinates")}:</strong> X: ${coordsX} Z: ${coordsZ}</p>
             ${href ? `<div class="waypoint-info-row"><button type="button" class="waypoint-info-button" data-waypoint-info-href="${escapeHtml(href)}">${t("page.maps.viewWaypointInfo")}</button></div>` : ""}
+            ${entry.marker?.customWaypointId ? `<button type="button" class="waypoint-info-button" data-custom-waypoint-delete="${escapeHtml(entry.marker.customWaypointId)}">${t("page.maps.customWaypoint.delete")}</button>` : ""}
           </div>
         </details>
       </li>
@@ -1191,11 +2384,18 @@ function openInfo(id) {
   const waypointInfoHref = getWaypointInfoHref(marker, id);
   sharedMapRuntime.setSelectedMarker(id);
   title.textContent = getMarkerText(marker, "title", id);
-  const markerType = escapeHtml(getMarkerText(marker, "type", id));
+  const markerType = escapeHtml(
+    marker.customWaypointId ? t("page.maps.customWaypoint.category") : getMarkerText(marker, "type", id)
+  );
   const markerDescription = escapeHtml(getMarkerText(marker, "description", id));
+  const customRecord = marker.customWaypointId ? customWaypointStore.getRecord(marker.customWaypointId) : null;
   const floorText = escapeHtml(String(marker.floor || "").replace("floor", `${t("page.maps.floorText")} `));
   const coordsX = marker.coords && marker.coords.x !== undefined ? escapeHtml(marker.coords.x) : "--";
   const coordsZ = marker.coords && marker.coords.z !== undefined ? escapeHtml(marker.coords.z) : "--";
+  const tutorialUrl = marker.category === "dungeons" ? getSafeDungeonTutorialUrl(marker.tutorial) : "";
+  const tutorialLine = tutorialUrl
+    ? `<p class="dungeon-tutorial-row"><strong>${t("page.maps.tutorial")}:</strong><br><a class="waypoint-info-button dungeon-tutorial-link" href="${escapeHtml(tutorialUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(tutorialUrl)}</a></p>`
+    : "";
   /* Main Quest markers show their questline number, and when several quests share a
      location the panel lists every quest number sitting at that spot. */
   const mainQuestLine =
@@ -1212,9 +2412,11 @@ function openInfo(id) {
     ${mainQuestLine}
     <p>${markerDescription}</p>
     <p><strong>${t("page.maps.floorText")}:</strong> ${floorText}</p>
+    ${tutorialLine}
     <p><strong>${t("page.maps.coordinates")}:</strong> X: ${coordsX} Z: ${coordsZ}</p>
     ${sharedLocationLine}
     ${showInfoButton ? `<div class="waypoint-info-row"><button type="button" id="waypointInfoButton" class="waypoint-info-button" data-waypoint-info-href="${escapeHtml(waypointInfoHref)}">${t("page.maps.viewWaypointInfo")}</button></div>` : ""}
+    ${customRecord ? `<div class="waypoint-info-row"><button type="button" class="waypoint-info-button" data-custom-waypoint-delete="${escapeHtml(customRecord.id)}">${t("page.maps.customWaypoint.delete")}</button></div>` : ""}
     ${canBeVisited ? `<div class="visited-toggle-row"><label class="visited-toggle-label">${visitedLabel}: <input type="checkbox" id="visitedToggle" data-marker-id="${escapeHtml(id)}" data-marker-floor="${escapeHtml(markerFloor)}" ${isVisited ? "checked" : ""}></label></div>` : ""}
   `;
 
@@ -1288,6 +2490,14 @@ function init() {
   }
 
   getPageDisposer();
+  if (!customWaypointStore) {
+    customWaypointStore = window.SAOCustomWaypoints.createCustomWaypointStore({
+      storage,
+      world: "aincrad",
+      floorIds: Object.keys(mapAdapter.floors)
+    });
+    mapContextAccessors.invalidate();
+  }
   walkthroughController = window.createWalkthroughController({
     document,
     window,
@@ -1318,7 +2528,10 @@ function init() {
       handle: sidebarResizeHandle,
       document,
       window,
-      onWidthChange: () => scheduleRenderMarkers(),
+      onWidthChange: () => {
+        renderDistanceMeasurement();
+        scheduleRenderMarkers();
+      },
       onResizeStart: () => document.body.classList.add("resizing-sidebar"),
       onResizeEnd: (width) => {
         document.body.classList.remove("resizing-sidebar");
@@ -1344,6 +2557,7 @@ function init() {
       sharedMapRuntime.setCategoryState(key, !!initialState.activeCategories[key]);
     });
   }
+  syncCustomWaypointCategory();
   if (searchInput && typeof initialState.search === "string") {
     searchInput.value = initialState.search;
   }
@@ -1375,6 +2589,61 @@ function init() {
   addPageEventListener(mapContainer, "wheel", handleWheel, { passive: false });
   addPageEventListener(mapContainer, "mousedown", startDrag);
   addPageEventListener(mapContainer, "pointerdown", startDrag);
+  addPageEventListener(mapContainer, "contextmenu", openMapContextMenu);
+  addPageEventListener(mapContainer, "click", maybeOpenCustomWaypointDialogFromMapClick);
+  addPageEventListener(document, "click", (event) => {
+    if (!mapContextMenu || mapContextMenu.hidden) return;
+    if (walkthroughContextMenuDemoState) return;
+    if (!mapContextMenu.contains(event.target)) closeMapContextMenu();
+  });
+  addPageEventListener(document, "keydown", (event) => {
+    if (event.key === "Escape") closeMapContextMenu();
+  });
+  addPageEventListener(mapContextMenu, "click", handleMapContextMenuAction);
+  addPageEventListener(journeyMapImportFile, "change", (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (file) importJourneyMapFile(file);
+  });
+  addPageEventListener(document.getElementById("customWaypointForm"), "submit", createCustomWaypoint);
+  addPageEventListener(document.getElementById("customWaypointCancel"), "click", closeCustomWaypointDialog);
+  addPageEventListener(document.getElementById("customWaypointCopy"), "click", copyCustomWaypointCoordinates);
+  addPageEventListener(document.getElementById("customWaypointDeleteConfirm"), "click", confirmCustomWaypointDelete);
+  addPageEventListener(document.getElementById("customWaypointDeleteCancel"), "click", closeCustomWaypointDeleteDialog);
+  addPageEventListener(document.getElementById("customButtonDeleteConfirm"), "click", confirmCustomButtonDelete);
+  addPageEventListener(document.getElementById("customButtonDeleteCancel"), "click", closeCustomButtonDeleteDialog);
+  addPageEventListener(document.getElementById("customWaypointSidebarList"), "click", handleCustomSidebarClick);
+  addPageEventListener(customWaypointDialog, "close", () => {
+    resetCustomWaypointForm();
+    pendingCustomWaypointFloor = "";
+  });
+  addPageEventListener(document.getElementById("customWaypointDeleteDialog"), "close", closeCustomWaypointDeleteDialog);
+  addPageEventListener(document.getElementById("customButtonDeleteDialog"), "close", closeCustomButtonDeleteDialog);
+  ["customWaypointName", "customWaypointX", "customWaypointZ"].forEach((id) => {
+    addPageEventListener(document.getElementById(id), "input", (event) => event.target.setCustomValidity(""));
+  });
+  const customWaypointColorHexInput = document.getElementById("customWaypointCategoryHex");
+  const customWaypointColorInput = document.getElementById("customWaypointCategoryColor");
+  addPageEventListener(document.getElementById("customWaypointButtonName"), "input", updateCustomWaypointCategoryColorState);
+  if (customWaypointColorHexInput) {
+    addPageEventListener(customWaypointColorHexInput, "input", () => {
+      const normalized = normalizeCustomWaypointCategoryColor(customWaypointColorHexInput.value);
+      if (normalized) {
+        customWaypointColorHexInput.setCustomValidity("");
+        applyCustomWaypointCategoryColor(normalized);
+      } else {
+        customWaypointColorHexInput.setCustomValidity("Invalid HEX color");
+      }
+    });
+  }
+  if (customWaypointColorInput) {
+    addPageEventListener(customWaypointColorInput, "input", () => {
+      const normalized = normalizeCustomWaypointCategoryColor(customWaypointColorInput.value);
+      if (normalized) {
+        applyCustomWaypointCategoryColor(normalized);
+      }
+    });
+  }
+  addPageEventListener(document.getElementById("customWaypointButtonSelect"), "change", updateCustomWaypointCategoryColorState);
   addPageEventListener(content, "click", handleInfoOverlayClick);
   addPageEventListener(content, "change", handleInfoOverlayChange);
   addPageEventListener(markerLayer, "click", handleMarkerLayerClick);
@@ -1415,6 +2684,7 @@ function init() {
     setZoom(state.zoom / zoomConfig.factor, rect.width / 2, rect.height / 2);
   });
   addPageEventListener(floorSelect, "change", () => {
+    clearDistanceMeasurement();
     if (sharedMapRuntime) {
       sharedMapRuntime.setActiveMapContext(floorSelect.value);
     }
@@ -1422,12 +2692,15 @@ function init() {
     const imageSources = getMapImageSources(floorSelect.value);
     applyMapImageSources(imageSources);
     setUndergroundMode(undergroundToggle.checked);
+    mapContextAccessors.invalidate();
+    syncCustomWaypointCategory();
     scheduleRenderMarkers();
     refreshCategoryCounts();
     persistStateToHistory();
   });
 
   addPageEventListener(undergroundToggle, "change", () => {
+    clearDistanceMeasurement();
     setUndergroundMode(undergroundToggle.checked);
     scheduleRenderMarkers();
     persistStateToHistory();
@@ -1462,12 +2735,19 @@ function init() {
     button.classList.toggle("active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
   });
+  syncCustomWaypointCategory();
   refreshCategoryCounts();
 
   // Re-render when map image finishes loading (naturalWidth becomes available)
-  addPageEventListener(mapImage, "load", scheduleRenderMarkers);
+  addPageEventListener(mapImage, "load", () => {
+    renderDistanceMeasurement();
+    scheduleRenderMarkers();
+  });
   // Re-render on resize so px positions stay accurate
-  addPageEventListener(window, "resize", scheduleRenderMarkers);
+  addPageEventListener(window, "resize", () => {
+    renderDistanceMeasurement();
+    scheduleRenderMarkers();
+  });
 
   setUndergroundMode(undergroundToggle.checked);
   scheduleRenderMarkers();
@@ -1489,6 +2769,7 @@ function init() {
   });
 
   addPageEventListener(document, "sao:languagechange", () => {
+    renderDistanceMeasurement();
     markerSearchCache = null;
     state.markerRenderSignature = "";
     scheduleRenderMarkers();
@@ -1498,6 +2779,9 @@ function init() {
     }
     if (searchInput) {
       searchInput.setAttribute("aria-label", t("page.maps.searchPlaceholder"));
+    }
+    if (customWaypointDialog.open && customWaypointStatusKey) {
+      setCustomWaypointStatus(customWaypointStatusKey);
     }
     const selectedMarkerId = sharedMapRuntime.getSelectedMarker();
     if (selectedMarkerId && selectedMarkerId.startsWith("mob-area:")) {
@@ -1524,6 +2808,7 @@ function init() {
 }
 
 function destroyAincradMapRuntime() {
+  clearDistanceMeasurement();
   if (pageDisposer) pageDisposer.dispose();
   pageInitialized = false;
   state.isDragging = false;
@@ -1560,6 +2845,12 @@ function syncStateFromDom() {
   const mapState = urlState.hasParams ? urlState : hist;
 
   if (mapState) {
+    if (
+      (mapState.floor && mapState.floor !== floorSelect.value) ||
+      (typeof mapState.underground === "boolean" && mapState.underground !== Boolean(undergroundToggle?.checked))
+    ) {
+      clearDistanceMeasurement();
+    }
     if (floorSelect && mapState.floor) floorSelect.value = mapState.floor;
     registerContextTranslations();
     const imageSources = getMapImageSources(floorSelect.value);

@@ -84,13 +84,33 @@ function createPageDom() {
     "resetView",
     "zoomIn",
     "zoomOut",
+    "mapContextMenu",
     "globalToast",
+    "journeyMapImportFile",
+    "customWaypointDialog",
+    "customWaypointForm",
+    "customWaypointName",
+    "customWaypointDescription",
+    "customWaypointX",
+    "customWaypointZ",
+    "customWaypointLogo",
+    "customWaypointStatus",
+    "customWaypointCancel",
+    "customWaypointCopy",
+    "customWaypointDeleteConfirm",
+    "customWaypointDeleteCancel",
+    "customWaypointDeleteDialog",
+    "customWaypointSidebarList",
+    "customButtonDeleteConfirm",
+    "customButtonDeleteCancel",
+    "customButtonDeleteDialog",
     "categoryList",
     "categorySectionHeader",
     "mapEmptyState",
     "mapEmptyStateLabel"
   ];
   const elements = Object.fromEntries(ids.map((id) => [id, createNode()]));
+  elements.controls = createNode();
   elements.mapImage.naturalWidth = 0;
   elements.mapImage.naturalHeight = 0;
   elements.markers.clientWidth = 1600;
@@ -108,8 +128,8 @@ function createPageDom() {
     querySelectorAll() {
       return [];
     },
-    querySelector() {
-      return null;
+    querySelector(selector) {
+      return selector === ".controls" ? elements.controls : null;
     },
     createElement(tagName) {
       return createNode(tagName);
@@ -205,6 +225,7 @@ function loadUnderworldPage() {
   loadScript("shared/map-runtime.js", context);
   loadScript("shared/sao-page-helpers.js", context);
   loadScript("shared/sao-map-helpers.js", context);
+  loadScript("shared/sao-custom-waypoints.js", context);
   loadScript("Fractured Underworld/Main UI/underworldData.js", context);
   loadScript("Fractured Underworld/Main UI/adapter.js", context);
 

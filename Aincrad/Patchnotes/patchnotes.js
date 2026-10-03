@@ -1,5 +1,13 @@
 const PATCH_NOTES = [
   {
+    version: "Map Tools & Waypoint Update - v1.6",
+    date: "2026-10-03",
+    title: "Map Tools & Waypoint Update",
+    summary:
+      "• Added Custom Waypoints, letting users create custom categories and waypoints, choose category colors, and manage points directly from the map. More custom points may increase site lag.\n• Added JourneyMap waypoint import and export, organized into categories by waypoint type/category, plus a Map Actions tutorial button that opens the YouTube tutorial directly.\n• Added a Distance Calculator to the map right-click menu. Set Point 1 and Point 2 to calculate distance from converted Minecraft world X/Z coordinates; results stay correct through zooming, panning, and resizing.\n• Added external tutorial links to dungeon information popups, including a test Fallen Labyrinth Dungeon tutorial, without changing existing dungeon coordinates or floor data.\n• Added Step 5 to the Aincrad and Fractured Underworld walkthroughs, temporarily opening the actual Map Actions menu centered and highlighted; it closes and returns to normal behavior when leaving the step.\n• Added a divider before the Map Actions tutorial button and let the menu grow naturally so the button stays within its bounds.\n• Removed the stray tilde-like character from the World Hub welcome screen.",
+    tags: ["Maps", "Waypoints", "Dungeons", "UI"]
+  },
+  {
     version: "Maps, Character Build & Site Improvements - v1.5",
     date: "2026-10-02",
     title: "Maps, Character Build & Site Improvements",
@@ -84,6 +92,7 @@ function getPatchNoteId(entry) {
   const version = entry.version.match(/v\d+(?:\.\d+)?(?:\.\d+)?/i)?.[0].toLowerCase();
   return (
     {
+      "v1.6": "v160",
       "v1.5": "v150",
       "v1.4": "v140",
       "v1.3": "v130",

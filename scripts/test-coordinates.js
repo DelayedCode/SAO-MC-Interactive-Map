@@ -48,6 +48,20 @@ for (const floor of ["floor1", "floor2", "floor3"]) {
     { x: dimensions.width * 0.1, y: dimensions.height * 0.9, label: "interior edge" }
   ];
 
+  const imageCenter = { x: dimensions.width / 2, y: dimensions.height / 2 };
+  const worldCenter = mapWebsiteCoordinates(imageCenter.x, imageCenter.y, floor, dimensions);
+  assertGamePointClose(worldCenter, calibration.centerGame, `${floor} image center maps to its Minecraft calibration center`);
+
+  const referenceSize = Math.min(dimensions.width, dimensions.height);
+  const rawPixelDelta = (10 * referenceSize) / CALIBRATION_MAP_SIZE;
+  const expectedBlockDelta = (10 * calibration.radiusGame) / calibration.radiusPixel;
+  const imageXStep = mapWebsiteCoordinates(imageCenter.x + rawPixelDelta, imageCenter.y, floor, dimensions);
+  assertClose(imageXStep.x, worldCenter.x + expectedBlockDelta, `${floor} image X maps only to Minecraft X`);
+  assertClose(imageXStep.z, worldCenter.z, `${floor} image X does not change Minecraft Z`);
+  const imageYStep = mapWebsiteCoordinates(imageCenter.x, imageCenter.y + rawPixelDelta, floor, dimensions);
+  assertClose(imageYStep.x, worldCenter.x, `${floor} image Y does not change Minecraft X`);
+  assertClose(imageYStep.z, worldCenter.z + expectedBlockDelta, `${floor} image Y maps only to Minecraft Z`);
+
   for (const raw of rawCases) {
     const game = mapWebsiteCoordinates(raw.x, raw.y, floor, dimensions);
     const roundTrip = invertMapCoordinates(game.x, game.z, floor, dimensions);

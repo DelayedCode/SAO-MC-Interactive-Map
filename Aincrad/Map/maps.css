@@ -404,6 +404,11 @@ main {
   letter-spacing: 0.08em;
 }
 
+#infoOverlay #title {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 #content p {
   margin: 0 0 8px;
   line-height: 1.5;
@@ -416,6 +421,18 @@ main {
 #content strong {
   color: var(--text);
   font-weight: 600;
+}
+
+#content .dungeon-tutorial-link {
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 6px 0 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.35;
+  text-decoration: none;
 }
 
 #coordinateDisplay {

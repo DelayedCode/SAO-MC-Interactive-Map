@@ -14,6 +14,32 @@ html {
   overflow-x: hidden;
 }
 
+.global-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translate(-50%, 8px);
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(130, 190, 255, 0.42);
+  background: rgba(10, 18, 32, 0.96);
+  color: var(--text);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  z-index: 40;
+  text-align: center;
+}
+
+.global-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 body {
   margin: 0;
   font-family:
@@ -80,6 +106,11 @@ header::before {
   transform: scale(0.98);
 }
 
+.control-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .controls select:focus,
 .controls input[type="text"]:focus {
   border-color: var(--accent);
@@ -143,6 +174,63 @@ header::before {
 
 *::-webkit-scrollbar-corner {
   background: rgba(14, 20, 34, 0.8);
+}
+
+.map-context-menu {
+  position: fixed;
+  z-index: 1200;
+  min-width: 220px;
+  padding: 8px 0;
+  border: 1px solid rgba(130, 190, 255, 0.26);
+  border-radius: 10px;
+  background: rgba(9, 16, 26, 0.96);
+  box-shadow: 0 18px 38px rgba(3, 7, 12, 0.6);
+  color: var(--text);
+  font-size: 0.88rem;
+}
+
+.map-context-menu-header {
+  padding: 6px 12px 10px;
+  border-bottom: 1px solid rgba(130, 190, 255, 0.16);
+  color: #dfeaf8;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.map-context-menu-item {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.map-context-menu-item:hover:not(:disabled),
+.map-context-menu-item:focus-visible:not(:disabled) {
+  background: rgba(115, 185, 255, 0.12);
+}
+
+.map-context-menu-item:active:not(:disabled) {
+  background: rgba(115, 185, 255, 0.18);
+}
+
+.map-context-menu-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.map-context-menu-divider {
+  height: 1px;
+  margin: 6px 0;
+  background: rgba(130, 190, 255, 0.14);
 }
 
 #mapContainer.grabbing {
@@ -217,6 +305,232 @@ header::before {
 .marker.npc {
   background: #2980b9;
   color: #fff;
+}
+
+.marker.custom-marker {
+  background: var(--custom-waypoint-color, #177d78);
+  color: #fff;
+  border-color: #d9fff8;
+}
+
+.custom-waypoint-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.custom-waypoint-dialog {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  padding: 0;
+  border: 1px solid rgba(130, 190, 255, 0.28);
+  border-radius: 10px;
+  background: #0c1724;
+  color: var(--text);
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.62);
+}
+
+.custom-waypoint-dialog::backdrop {
+  background: rgba(3, 7, 12, 0.76);
+  backdrop-filter: blur(4px);
+}
+
+.custom-waypoint-sidebar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-waypoint-sidebar-row .sidebar-list-button {
+  flex: 1 1 auto;
+}
+
+.custom-button-delete {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.custom-waypoint-form {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px;
+}
+
+.custom-waypoint-header,
+.custom-waypoint-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.custom-waypoint-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+
+.custom-waypoint-form > label,
+.custom-waypoint-coordinates label,
+.custom-waypoint-field-label {
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.custom-waypoint-form input,
+.custom-waypoint-form textarea,
+.custom-waypoint-form select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(130, 190, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(7, 13, 22, 0.94);
+  color: var(--text);
+  font: inherit;
+}
+
+.custom-waypoint-form textarea {
+  resize: vertical;
+}
+
+.custom-waypoint-color-row {
+  display: grid;
+  gap: 8px;
+}
+
+.custom-waypoint-color-picker {
+  position: relative;
+  min-height: 64px;
+  overflow: hidden;
+  border: 1px solid rgba(220, 235, 255, 0.55);
+  border-radius: 6px;
+  background: #000;
+  cursor: pointer;
+}
+
+.custom-waypoint-color-picker:focus-within {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.custom-waypoint-color-picker .custom-waypoint-color-swatch {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.custom-waypoint-color-hint {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 5px 8px;
+  background: rgba(0, 0, 0, 0.64);
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  text-align: center;
+  pointer-events: none;
+}
+
+.custom-waypoint-color-picker input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.custom-waypoint-color-picker[data-locked="true"] {
+  cursor: not-allowed;
+}
+
+.custom-waypoint-color-picker[data-locked="true"] input[type="color"] {
+  cursor: not-allowed;
+}
+
+.custom-waypoint-coordinates {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-waypoint-field-label {
+  grid-column: 1 / -1;
+}
+
+.custom-waypoint-status {
+  min-height: 1.2em;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.custom-waypoint-performance-warning,
+#customWaypointStatusMessage {
+  display: block;
+}
+
+.custom-waypoint-performance-warning {
+  margin-bottom: 3px;
+}
+
+.custom-waypoint-confirm {
+  border-color: rgba(92, 213, 183, 0.45);
+  background: rgba(20, 95, 83, 0.8);
+}
+
+.custom-waypoint-list {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.custom-waypoint-list-item {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(130, 190, 255, 0.16);
+  border-radius: 6px;
+  background: rgba(9, 16, 26, 0.72);
+}
+
+.custom-waypoint-open {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+@media (max-width: 520px) {
+  .custom-waypoint-form {
+    padding: 16px;
+  }
+
+  .custom-waypoint-header,
+  .custom-waypoint-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 .marker.quest {

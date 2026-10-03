@@ -161,6 +161,30 @@
     };
   }
 
+  async function copyTextToClipboard(value) {
+    const text = String(value);
+    if (global.navigator?.clipboard && typeof global.navigator.clipboard.writeText === "function") {
+      try {
+        await global.navigator.clipboard.writeText(text);
+        return true;
+      } catch (_error) {}
+    }
+
+    const temporaryInput = document.createElement("textarea");
+    temporaryInput.value = text;
+    temporaryInput.style.position = "fixed";
+    temporaryInput.style.left = "-9999px";
+    document.body.appendChild(temporaryInput);
+    temporaryInput.select();
+    let copied = false;
+    try {
+      copied = typeof document.execCommand === "function" && document.execCommand("copy");
+    } finally {
+      temporaryInput.remove();
+    }
+    return Boolean(copied);
+  }
+
   /* -------------------------------------------------------------------------
      Progressive waypoint clustering (shared by both map controllers).
 
@@ -440,6 +464,29 @@
     return MARKER_ICON_LIBRARY[kind] || null;
   }
 
+  const CUSTOM_WAYPOINT_ICON_LIBRARY = Object.freeze({
+    pin: `<svg class="custom-waypoint-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22s7-7.1 7-13a7 7 0 1 0-14 0c0 5.9 7 13 7 13Z" fill="currentColor"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg>`,
+    star: `<svg class="custom-waypoint-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 2 2.9 6 6.6.9-4.8 4.6 1.2 6.5-5.9-3.1-5.9 3.1 1.2-6.5-4.8-4.6L9.1 8 12 2Z" fill="currentColor"/></svg>`,
+    flag: `<svg class="custom-waypoint-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 21V4m1 1h12l-2.5 4L18 13H6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    home: `<svg class="custom-waypoint-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11.5 12 4l8 7.5V19a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-7.5Z" fill="currentColor"/></svg>`,
+    shield: `<svg class="custom-waypoint-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.7 18.5 5v6.4c0 4.3-2.8 7.8-6.5 10.1C8.3 19.2 5.5 15.7 5.5 11.4V5L12 2.7Zm-1.8 6.3h3.6v3.1h3.1v3.2h-3.1v3.1h-3.6v-3.1H7.2v-3.2h3Z" fill="currentColor"/></svg>`,
+    target: `<svg class="custom-waypoint-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+  });
+
+  const CUSTOM_WAYPOINT_IMAGE_LIBRARY = Object.freeze({
+    chest: "../../assets/icons/custom-waypoints/chest.png",
+    sword: "../../assets/icons/custom-waypoints/sword.png",
+    skull: "../../assets/icons/custom-waypoints/skull.png",
+    diamond: "../../assets/icons/custom-waypoints/diamond.png"
+  });
+
+  function buildCustomWaypointIcon(logo) {
+    if (CUSTOM_WAYPOINT_IMAGE_LIBRARY[logo]) {
+      return `<img class="custom-waypoint-icon" src="${CUSTOM_WAYPOINT_IMAGE_LIBRARY[logo]}" alt="" aria-hidden="true" draggable="false" />`;
+    }
+    return CUSTOM_WAYPOINT_ICON_LIBRARY[logo] || CUSTOM_WAYPOINT_ICON_LIBRARY.pin;
+  }
+
   /* Mob list markup for one mob area.
 
      Both map controllers declared this identically apart from their empty-state string, so the
@@ -530,6 +577,45 @@
     return Object.freeze({ getDisposer, addListener, scheduleAnimationFrame, scheduleTimeout });
   }
 
+  function createMarkerDatasetView(baseDataset, additionalDataset) {
+    const base = baseDataset || {};
+    const additional = additionalDataset || {};
+    const keys = [
+      ...Reflect.ownKeys(base),
+      ...Reflect.ownKeys(additional).filter((key) => !Object.prototype.hasOwnProperty.call(base, key))
+    ];
+    return new Proxy(Object.create(null), {
+      get(_target, key) {
+        if (Object.prototype.hasOwnProperty.call(additional, key)) return additional[key];
+        return base[key];
+      },
+      has(_target, key) {
+        return Object.prototype.hasOwnProperty.call(additional, key) || Object.prototype.hasOwnProperty.call(base, key);
+      },
+      ownKeys() {
+        return keys;
+      },
+      getOwnPropertyDescriptor(_target, key) {
+        if (
+          !Object.prototype.hasOwnProperty.call(additional, key) &&
+          !Object.prototype.hasOwnProperty.call(base, key)
+        ) {
+          return undefined;
+        }
+        return { configurable: true, enumerable: true, writable: false, value: this.get(_target, key) };
+      },
+      set() {
+        return false;
+      },
+      defineProperty() {
+        return false;
+      },
+      deleteProperty() {
+        return false;
+      }
+    });
+  }
+
   /* Canonical per-context data accessors shared by both map controllers.
 
      The adapter still owns the datasets; this owns the page-level caching of the
@@ -541,6 +627,8 @@
     const config = options || {};
     const getAdapter = typeof config.getAdapter === "function" ? config.getAdapter : () => null;
     const getContextId = typeof config.getContextId === "function" ? config.getContextId : () => "";
+    const getAdditionalMarkers =
+      typeof config.getAdditionalMarkers === "function" ? config.getAdditionalMarkers : () => ({});
 
     let contextData = null;
     let contextDataId = null;
@@ -550,11 +638,20 @@
       const contextId = getContextId();
       if (contextData && contextDataId === contextId) return contextData;
       contextDataId = contextId;
-      contextData = getAdapter()?.getContextData?.(contextId) || {
+      const baseData = getAdapter()?.getContextData?.(contextId) || {
         markerDataset: {},
         mobAreaDataset: [],
         mobAreaMobLookup: {}
       };
+      const additionalMarkers = getAdditionalMarkers(contextId) || {};
+      const additionalIds = Object.keys(additionalMarkers);
+      contextData =
+        additionalIds.length > 0
+          ? Object.freeze({
+              ...baseData,
+              markerDataset: createMarkerDatasetView(baseData.markerDataset, additionalMarkers)
+            })
+          : baseData;
       contextMobAreaLookup = new Map(contextData.mobAreaDataset.map((area) => [area.id, area]));
       if (typeof config.onContextChange === "function") config.onContextChange();
       return contextData;
@@ -568,6 +665,10 @@
       getMobAreaLookup: () => {
         getContextData();
         return contextMobAreaLookup;
+      },
+      invalidate: () => {
+        contextData = null;
+        contextDataId = null;
       }
     });
   }
@@ -640,6 +741,7 @@
     clearTextSelection,
     shouldIgnoreMapDrag,
     getImageLocalCoords,
+    copyTextToClipboard,
     CLUSTER_RADIUS_PX,
     CLUSTER_DISABLE_ZOOM,
     CLUSTER_ID_PREFIX,
@@ -647,11 +749,13 @@
     buildScreenClusters,
     MARKET_CATEGORIES,
     CRAFTSMAN_CATEGORIES,
+    CUSTOM_WAYPOINT_ICON_LIBRARY,
     MOB_AREA_LABEL_VERTICAL_OFFSET,
     buildMarketMarkerIcon,
     buildCraftsmanMarkerIcon,
     MARKER_ICON_LIBRARY,
     buildMarkerIcon,
+    buildCustomWaypointIcon,
     buildMobAreaMobListMarkup,
     createPageLifecycle,
     createMapContextAccessors,

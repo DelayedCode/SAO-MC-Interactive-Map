@@ -633,6 +633,7 @@ Object.assign(DATA, {
     category: "dungeons",
     floor: "floor2",
     coords: { x: 506, z: -724 },
+    tutorial: "",
     drops: ["N/A"],
     description: "A dungeon formed inside Melliona's Hive."
   },
@@ -642,6 +643,7 @@ Object.assign(DATA, {
     category: "dungeons",
     floor: "floor2",
     coords: { x: 721, z: 244 },
+    tutorial: "",
     drops: ["N/A"],
     description: "A dungeon built within the Necromancer's Tomb."
   },
