@@ -16,6 +16,7 @@ const rootUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const AINCRAD_URL = "/Aincrad/Map/maps.html?floor=floor1";
 const AINCRAD_KEY = "sao.customWaypoints.aincrad";
 const WAYPOINT_NAME = "Coordinate lifecycle marker";
+const ZOOM_WAYPOINT_NAME = "Zoomed cursor marker";
 /* The second reported example: the map location the grid used to label 1797,3974 is Minecraft
    1799,3986, and that location carries no marker, so it is safe to click. */
 const EXAMPLE_MINECRAFT = { x: 1799, z: 3986 };
@@ -101,6 +102,101 @@ async function markerProjection(page, { coordinate, title = null, selector = nul
     { target: coordinate, markerTitle: title, elementSelector: selector }
   );
 }
+
+/* Reads the live pan/zoom transform of the movable map layer. */
+async function readMapTransform(page) {
+  return page.evaluate(() => {
+    const match = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)\s*scale\(([-\d.]+)\)/.exec(
+      document.getElementById("mapLayer").style.transform || ""
+    );
+    return match ? { x: Number(match[1]), y: Number(match[2]), zoom: Number(match[3]) } : null;
+  });
+}
+
+async function zoomMapTo(page, target) {
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    const transform = await readMapTransform(page);
+    if (transform && transform.zoom >= target) return transform;
+    await page.locator("#zoomIn").click();
+  }
+  throw new Error(`Could not reach zoom ${target}`);
+}
+
+/* A container point that no marker/chrome element covers, so it can be used to drag the map. */
+async function findFreeMapPoint(page) {
+  return page.evaluate(() => {
+    const container = document.getElementById("mapContainer");
+    const rect = container.getBoundingClientRect();
+    const fractions = [0.15, 0.3, 0.5, 0.7, 0.85];
+    for (const fx of fractions) {
+      for (const fy of fractions) {
+        const point = { x: rect.left + rect.width * fx, y: rect.top + rect.height * fy };
+        const target = document.elementFromPoint(point.x, point.y);
+        if (
+          target &&
+          container.contains(target) &&
+          !target.closest(".marker, button, input, select, textarea, label, dialog, #infoOverlay, #zoomControls")
+        ) {
+          return point;
+        }
+      }
+    }
+    return null;
+  });
+}
+
+/* Drags the map so the given Minecraft coordinate lands near the viewport centre, then returns
+   the (recomputed) client point of that coordinate. Panning moves a fixed world point by exactly
+   the drag delta, so a couple of passes always converge. */
+async function bringCoordinateIntoView(page, minecraft) {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const point = await clientPointForCoordinate(page, minecraft);
+    const box = await page.locator("#mapContainer").boundingBox();
+    const margin = 48;
+    const inside =
+      point.x > box.x + margin &&
+      point.x < box.x + box.width - margin &&
+      point.y > box.y + margin &&
+      point.y < box.y + box.height - margin;
+    if (inside) return point;
+    const free = await findFreeMapPoint(page);
+    if (!free) break;
+    const dx = Math.max(-640, Math.min(640, box.x + box.width / 2 - point.x));
+    const dy = Math.max(-640, Math.min(640, box.y + box.height / 2 - point.y));
+    await page.mouse.move(free.x, free.y);
+    await page.mouse.down();
+    await page.mouse.move(free.x + dx, free.y + dy, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(80);
+  }
+  return clientPointForCoordinate(page, minecraft);
+}
+
+/* Moves the real pointer onto the client point that the authoritative conversion assigns to the
+   given Minecraft coordinate, then requires the on-screen readout to show that exact point. The
+   readout is driven by the same real pointer the cursor hotspot sits on, so this pins the
+   "cursor tip == readout" invariant at whatever zoom/pan state is active. */
+async function assertTipReadout(page, minecraft, label) {
+  const point = await bringCoordinateIntoView(page, minecraft);
+  const box = await page.locator("#mapContainer").boundingBox();
+  assert.ok(
+    point.x > box.x && point.x < box.x + box.width && point.y > box.y && point.y < box.y + box.height,
+    `${label}: the map location is inside the viewport`
+  );
+  const rounded = { x: Math.round(point.x), y: Math.round(point.y) };
+  const expected = await coordinateForClientPoint(page, rounded);
+  await page.mouse.move(rounded.x, rounded.y);
+  await page.waitForFunction(
+    (value) => document.getElementById("overlayMappedCoords").textContent.trim() === value,
+    `X: ${expected.x} Z: ${expected.z}`
+  );
+  assert.ok(
+    Math.abs(expected.x - minecraft.x) <= 4 && Math.abs(expected.z - minecraft.z) <= 4,
+    `${label}: the point under the cursor tip is ${minecraft.x},${minecraft.z} (got ${expected.x},${expected.z})`
+  );
+  return { point: rounded, expected };
+}
+
 
 async function openJourneyMapContextMenu(page) {
   const point = await page.evaluate(() => {
@@ -297,6 +393,129 @@ async function run() {
       "importing the exported file leaves the Minecraft coordinate unchanged"
     );
     assert.equal(records.length, countBeforeImport, "re-importing the same file adds no duplicate");
+
+    /* --- The purpose-built cursor. The arrow tip is the cursor hotspot and the coordinate
+       pipeline keeps reading the browser's real pointer, so the tip, the readout, the click,
+       the created waypoint and the JourneyMap coordinate must agree at every zoom/pan state. --- */
+    const cursorStyles = await page.evaluate(() => {
+      const marker = document.querySelector("#markers .marker[data-marker-id]");
+      return {
+        container: getComputedStyle(document.getElementById("mapContainer")).cursor,
+        infoOverlay: getComputedStyle(document.getElementById("infoOverlay")).cursor,
+        zoomControls: getComputedStyle(document.getElementById("zoomControls")).cursor,
+        marker: marker ? getComputedStyle(marker).cursor : null
+      };
+    });
+    assert.match(cursorStyles.container, /^url\("data:image\/svg\+xml,/, "the map surface uses the SVG cursor");
+    assert.match(cursorStyles.container, / 1 1,\s*auto$/, "the cursor hotspot is the arrow tip");
+    assert.equal(cursorStyles.infoOverlay, "auto", "the info panel keeps an ordinary cursor");
+    assert.equal(cursorStyles.zoomControls, "auto", "the zoom chrome keeps an ordinary cursor");
+    assert.equal(cursorStyles.marker, "pointer", "markers keep the pointer cursor");
+
+    /* Dragging still shows grabbing: the shared #mapContainer.grabbing rule outranks the cursor. */
+    const dragPoint = await findFreeMapPoint(page);
+    assert.ok(dragPoint, "a free map point is available for the drag check");
+    await page.mouse.move(dragPoint.x, dragPoint.y);
+    await page.mouse.down();
+    const grabbingCursor = await page.evaluate(
+      () => getComputedStyle(document.getElementById("mapContainer")).cursor
+    );
+    await page.mouse.up();
+    assert.equal(grabbingCursor, "grabbing", "dragging shows the grabbing cursor");
+
+    const knownTips = [
+      { label: "reference point 1", minecraft: { x: 1800, z: 4190 } },
+      { label: "reference point 2", minecraft: { x: 1799, z: 3986 } }
+    ];
+
+    await page.locator("#resetView").click();
+    for (const known of knownTips) {
+      await assertTipReadout(page, known.minecraft, `${known.label} at 1x`);
+    }
+
+    await zoomMapTo(page, 3);
+    for (const known of knownTips) {
+      await assertTipReadout(page, known.minecraft, `${known.label} at 3x`);
+    }
+
+    const panPoint = await findFreeMapPoint(page);
+    assert.ok(panPoint, "a free map point is available for panning");
+    await page.mouse.move(panPoint.x, panPoint.y);
+    await page.mouse.down();
+    await page.mouse.move(panPoint.x - 130, panPoint.y - 95, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(80);
+    for (const known of knownTips) {
+      await assertTipReadout(page, known.minecraft, `${known.label} at 3x panned`);
+    }
+
+    await zoomMapTo(page, 6);
+    for (const known of knownTips) {
+      await assertTipReadout(page, known.minecraft, `${known.label} at 6x panned`);
+    }
+
+    /* A click under the cursor tip at zoom + pan must create the same coordinate. Every marker
+       category - including the custom category that holds the waypoint created above - is turned
+       off first so nothing can intercept the click. */
+    await page.evaluate(() => {
+      document.querySelectorAll(".sidebar-list-button[data-category]").forEach((button) => {
+        if (button.classList.contains("active")) button.click();
+      });
+      const customButton = document.querySelector("#customWaypointSidebarList [data-custom-button='Default']");
+      if (customButton && customButton.getAttribute("aria-pressed") === "true") customButton.click();
+    });
+    await page.waitForFunction(() => document.querySelectorAll("#markers .marker").length === 0, null, {
+      timeout: 8000
+    });
+
+    const clickTip = await assertTipReadout(page, knownTips[1].minecraft, "click point at 6x panned");
+    const tipIsClear = await page.evaluate(({ x, y }) => {
+      const target = document.elementFromPoint(x, y);
+      const container = document.getElementById("mapContainer");
+      return Boolean(target && container.contains(target) && !target.closest(".marker"));
+    }, clickTip.point);
+    assert.ok(tipIsClear, "the click point under the cursor tip is clear of markers");
+
+    await page.mouse.click(clickTip.point.x, clickTip.point.y, { clickCount: 4, delay: 25 });
+    await page.waitForFunction(() => document.getElementById("customWaypointDialog").open);
+    const zoomDialogCoords = await page.evaluate(() => ({
+      x: Number(document.getElementById("customWaypointX").value),
+      z: Number(document.getElementById("customWaypointZ").value)
+    }));
+    assert.deepEqual(
+      zoomDialogCoords,
+      clickTip.expected,
+      "the click under the cursor tip prefills the same coordinate the readout showed"
+    );
+    await page.locator("#customWaypointName").fill(ZOOM_WAYPOINT_NAME);
+    await page.locator("#customWaypointForm button[type='submit']").click();
+    await page.waitForFunction(
+      (name) => JSON.parse(localStorage.getItem("sao.customWaypoints.aincrad") || "[]").some((record) => record.name === name),
+      ZOOM_WAYPOINT_NAME
+    );
+    const zoomRecord = (await readRecords(page)).find((record) => record.name === ZOOM_WAYPOINT_NAME);
+    assert.deepEqual(
+      { x: zoomRecord.x, z: zoomRecord.z },
+      clickTip.expected,
+      "the zoom + pan waypoint stores the authoritative coordinate"
+    );
+
+    /* The export reads stored markers, so reset the view first: the context-menu helper picks a
+       point from the (untransformed) map layer rect and is only reliable at the default view. */
+    await page.locator("#resetView").click();
+    await page.waitForTimeout(120);
+
+    const zoomExport = await exportJourneyMap(page);
+    const zoomPayload = parseJourneyMapDat(zoomExport.bytes);
+    const zoomExported = Object.values(zoomPayload.waypoints).find(
+      (waypoint) => waypoint.name === ZOOM_WAYPOINT_NAME
+    );
+    assert.ok(zoomExported, "the zoom + pan waypoint reaches JourneyMap");
+    assert.deepEqual(
+      { x: zoomExported.pos.x, z: zoomExported.pos.z },
+      clickTip.expected,
+      "JourneyMap receives the same coordinate as the cursor tip"
+    );
 
     /* An existing Current dataset waypoint keeps its Minecraft coordinate and its map location. */
     await page.evaluate(() => localStorage.setItem("sao.dataset.aincrad", "current"));

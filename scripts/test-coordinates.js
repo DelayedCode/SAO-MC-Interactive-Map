@@ -328,4 +328,70 @@ assert.ok(
   Number.isFinite(CALIBRATION_MAP_SIZE) && CALIBRATION_MAP_SIZE > 0,
   "the implementation exposes a positive calibration map size"
 );
+
+/* ---------------------------------------------------------------------------
+   The map cursor's hotspot is the exact arrow tip.
+
+   The browser places the cursor image so its declared hotspot sits on the real
+   pointer, and the coordinate pipeline reads that same real pointer
+   (event.clientX/clientY). The cursor is therefore exact only if the painted
+   arrow tip lands on the declared hotspot; this recomputes the stroked miter
+   tip from the CSS data URI and pins it to the hotspot.
+   ------------------------------------------------------------------------- */
+
+const mapCss = fs.readFileSync(path.join(root, "Aincrad", "Map", "maps.css"), "utf8");
+const cursorRule = mapCss.match(
+  /#mapContainer\s*\{[^}]*cursor:\s*url\("data:image\/svg\+xml,([^"]+)"\)\s*([\d.]+)\s+([\d.]+)\s*,\s*([a-z-]+)\s*;/
+);
+assert.ok(cursorRule, "the map container declares a data-URI SVG cursor with a hotspot and a fallback");
+const cursorSvg = decodeURIComponent(cursorRule[1]);
+const hotspot = { x: Number(cursorRule[2]), y: Number(cursorRule[3]) };
+assert.equal(cursorRule[4], "auto", "an ordinary pointer remains the fallback cursor");
+
+const cursorSize = Number((cursorSvg.match(/width='(\d+)'/) || [])[1]);
+assert.ok(cursorSize >= 24 && cursorSize <= 32, `the cursor is 24-32px (got ${cursorSize})`);
+
+const arrowPath = (cursorSvg.match(/<path d='(M[^']+)'/) || [])[1];
+assert.ok(arrowPath, "the cursor SVG contains the arrow outline");
+const outlineStrokeWidth = Number((cursorSvg.match(/stroke-width='([\d.]+)' stroke-linejoin='miter'/) || [])[1]);
+assert.ok(Number.isFinite(outlineStrokeWidth), "the arrow outline uses a miter join so its tip stays sharp");
+
+const vertices = [...arrowPath.matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map((match) => [Number(match[1]), Number(match[2])]);
+assert.ok(vertices.length >= 3, "the arrow path has vertices");
+const tipVertex = vertices[0];
+const normalize = (v) => {
+  const length = Math.hypot(v[0], v[1]);
+  return [v[0] / length, v[1] / length];
+};
+const edgeA = normalize([vertices[1][0] - tipVertex[0], vertices[1][1] - tipVertex[1]]);
+const edgeB = normalize([
+  vertices[vertices.length - 1][0] - tipVertex[0],
+  vertices[vertices.length - 1][1] - tipVertex[1]
+]);
+const inwardBisector = normalize([edgeA[0] + edgeB[0], edgeA[1] + edgeB[1]]);
+const cosHalfAngle = edgeA[0] * inwardBisector[0] + edgeA[1] * inwardBisector[1];
+const sinHalfAngle = Math.sqrt(1 - cosHalfAngle * cosHalfAngle);
+const miterDistance = outlineStrokeWidth / 2 / sinHalfAngle;
+const paintedTip = [
+  tipVertex[0] - miterDistance * inwardBisector[0],
+  tipVertex[1] - miterDistance * inwardBisector[1]
+];
+assertClose(paintedTip[0], hotspot.x, "the painted arrow tip X is the cursor hotspot", 0.01);
+assertClose(paintedTip[1], hotspot.y, "the painted arrow tip Y is the cursor hotspot", 0.01);
+
+/* The low-opacity halo uses a rounded join, whose tip cap stops short of the sharp tip, so
+   nothing is painted beyond the hotspot either. */
+const haloStrokeWidth = Number((cursorSvg.match(/stroke-width='([\d.]+)' stroke-linejoin='round'/) || [])[1]);
+assert.ok(Number.isFinite(haloStrokeWidth), "the halo path is present and rounded");
+assert.ok(
+  miterDistance - haloStrokeWidth / 2 > 0,
+  "the halo tip stays inside the sharp tip so it never paints past the hotspot"
+);
+
+/* The map chrome keeps ordinary cursors, and dragging still shows grabbing. */
+assert.match(mapCss, /#infoOverlay,\s*#zoomControls\s*\{\s*cursor:\s*auto;/, "the info panel and zoom chrome keep a normal cursor");
+const sharedMapUiCss = fs.readFileSync(path.join(root, "shared", "sao-map-ui.css"), "utf8");
+assert.match(sharedMapUiCss, /#mapContainer\.grabbing\s*\{\s*cursor:\s*grabbing;/, "dragging still shows the grabbing cursor");
+assert.match(mapCss, /\.marker\s*\{[^}]*cursor:\s*pointer;/, "markers keep the pointer cursor");
+
 console.log("Coordinate regression tests passed.");
