@@ -28,6 +28,7 @@ const SUITES = Object.freeze({
     "test-data-mode-pages-browser.js",
     "test-custom-waypoints.js",
     "test-coordinate-lifecycle-browser.js",
+    "test-cursor-site-wide.js",
     "test-journeymap-color-picker.js",
     "test-journeymap-category-import-browser.js",
     "test-journeymap-export-colors-browser.js",

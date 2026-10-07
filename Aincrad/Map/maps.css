@@ -30,7 +30,6 @@ header {
   border-radius: 7px;
   background: rgba(15, 21, 34, 0.96);
   color: var(--text);
-  cursor: pointer;
   font-size: 0.78rem;
 }
 
@@ -277,30 +276,6 @@ main {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
-}
-
-/* Purpose-built map cursor.
-
-   The arrow tip is the CSS hotspot (1 1) and the SVG is drawn so the stroked arrow's outer
-   miter point lands exactly on that pixel, so the graphic carries no visual offset from the
-   true pointer. Nothing in the coordinate pipeline reads the cursor: the readout, map clicks,
-   custom waypoint creation and JourneyMap all keep using the browser's real mouse position
-   (event.clientX/clientY -> shared/sao-map-helpers.js getImageLocalCoords ->
-   Aincrad/Map/mapData.js mapWebsiteCoordinates). The tip, the readout and every stored
-   coordinate therefore describe the same point at any zoom or pan.
-
-   The first path is a restrained low-opacity halo; its rounded tip stops short of the sharp
-   tip so it never paints past the hotspot. The trailing `auto` keeps a normal pointer if a
-   browser refuses the data URI, dragging still shows `grabbing` (the shared
-   #mapContainer.grabbing rule wins on specificity), and the map chrome below keeps its own
-   cursors. */
-#mapContainer {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cpath d='M1.80 2.95 L1.80 19.95 L6.13 16.14 L9.01 23.35 L11.48 22.32 L8.60 15.21 L13.85 15.21 Z' fill='none' stroke='%238bb7ff' stroke-opacity='0.2' stroke-width='3.2' stroke-linejoin='round'/%3E%3Cpath d='M1.80 2.95 L1.80 19.95 L6.13 16.14 L9.01 23.35 L11.48 22.32 L8.60 15.21 L13.85 15.21 Z' fill='%230b1220' stroke='%238bb7ff' stroke-width='1.6' stroke-linejoin='miter' stroke-miterlimit='6'/%3E%3C/svg%3E") 1 1, auto;
-}
-
-#infoOverlay,
-#zoomControls {
-  cursor: auto;
 }
 
 /* Stationary viewport backdrop. The checker/grid pattern belongs to the viewport, not to the
@@ -560,7 +535,6 @@ main {
 #content .cluster-entry summary {
   padding: 7px 9px;
   color: #dcebfc;
-  cursor: pointer;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -686,7 +660,6 @@ main {
   background: rgba(12, 20, 31, 0.96);
   box-sizing: border-box;
   position: relative;
-  cursor: pointer;
   transition:
     border-color 0.2s ease,
     background 0.2s ease;

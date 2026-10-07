@@ -252,7 +252,7 @@ header::before {
 }
 
 #mapContainer.grabbing {
-  cursor: grabbing;
+  cursor: var(--sao-cursor-grabbing), grabbing;
 }
 
 #mapLayer img {

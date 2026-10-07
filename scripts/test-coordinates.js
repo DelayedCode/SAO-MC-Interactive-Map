@@ -330,33 +330,52 @@ assert.ok(
 );
 
 /* ---------------------------------------------------------------------------
-   The map cursor's hotspot is the exact arrow tip.
+   The site-wide cursor system.
 
-   The browser places the cursor image so its declared hotspot sits on the real
-   pointer, and the coordinate pipeline reads that same real pointer
-   (event.clientX/clientY). The cursor is therefore exact only if the painted
-   arrow tip lands on the declared hotspot; this recomputes the stroked miter
-   tip from the CSS data URI and pins it to the hotspot.
+   Every page links shared/sao-polish.css last, so the cursors are defined once
+   there. The browser places a cursor image so its declared hotspot sits on the
+   real pointer, and the map coordinate pipeline reads that same real pointer
+   (event.clientX/clientY -> getImageLocalCoords -> mapWebsiteCoordinates). The
+   arrow is therefore exact only if its *painted* tip lands on the declared
+   hotspot; this recomputes the stroked miter tip from the CSS data URI and pins
+   it to the hotspot. Nothing here alters any coordinate maths.
    ------------------------------------------------------------------------- */
 
+const polishCss = fs.readFileSync(path.join(root, "shared", "sao-polish.css"), "utf8");
 const mapCss = fs.readFileSync(path.join(root, "Aincrad", "Map", "maps.css"), "utf8");
-const cursorRule = mapCss.match(
-  /#mapContainer\s*\{[^}]*cursor:\s*url\("data:image\/svg\+xml,([^"]+)"\)\s*([\d.]+)\s+([\d.]+)\s*,\s*([a-z-]+)\s*;/
+
+function readCursorVariable(name) {
+  const match = polishCss.match(
+    new RegExp(`--${name}:\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)\\s*([\\d.]+)\\s+([\\d.]+)\\s*;`)
+  );
+  assert.ok(match, `the shared sheet defines ${name} with a hotspot`);
+  return { svg: decodeURIComponent(match[1]), hotspot: { x: Number(match[2]), y: Number(match[3]) } };
+}
+
+const arrowCursor = readCursorVariable("sao-cursor-arrow");
+const clickCursor = readCursorVariable("sao-cursor-click");
+const grabCursor = readCursorVariable("sao-cursor-grab");
+const grabbingCursor = readCursorVariable("sao-cursor-grabbing");
+
+assert.deepEqual(arrowCursor.hotspot, { x: 1, y: 1 }, "the normal cursor hotspot is the arrow tip");
+assert.deepEqual(grabCursor.hotspot, grabbingCursor.hotspot, "grab and grabbing share the palm hotspot");
+
+const arrowSize = Number((arrowCursor.svg.match(/width='(\d+)'/) || [])[1]);
+assert.ok(arrowSize >= 16 && arrowSize <= 32, `the cursor canvas is a normal pointer size (got ${arrowSize})`);
+for (const [name, cursor] of [["click", clickCursor], ["grab", grabCursor], ["grabbing", grabbingCursor]]) {
+  const size = Number((cursor.svg.match(/width='(\d+)'/) || [])[1]);
+  assert.ok(size >= 16 && size <= 32, `the ${name} cursor canvas is a normal pointer size (got ${size})`);
+  assert.ok(cursor.svg.includes("#0b1220") && cursor.svg.includes("#8bb7ff"), `the ${name} cursor uses the shared palette`);
+}
+
+const sharpPath = (arrowCursor.svg.match(/<path d='(M[^']+)' fill='#0b1220'/) || [])[1];
+assert.ok(sharpPath, "the arrow SVG contains the filled outline");
+const outlineStrokeWidth = Number(
+  (arrowCursor.svg.match(/stroke-width='([\d.]+)' stroke-linejoin='miter'/) || [])[1]
 );
-assert.ok(cursorRule, "the map container declares a data-URI SVG cursor with a hotspot and a fallback");
-const cursorSvg = decodeURIComponent(cursorRule[1]);
-const hotspot = { x: Number(cursorRule[2]), y: Number(cursorRule[3]) };
-assert.equal(cursorRule[4], "auto", "an ordinary pointer remains the fallback cursor");
-
-const cursorSize = Number((cursorSvg.match(/width='(\d+)'/) || [])[1]);
-assert.ok(cursorSize >= 24 && cursorSize <= 32, `the cursor is 24-32px (got ${cursorSize})`);
-
-const arrowPath = (cursorSvg.match(/<path d='(M[^']+)'/) || [])[1];
-assert.ok(arrowPath, "the cursor SVG contains the arrow outline");
-const outlineStrokeWidth = Number((cursorSvg.match(/stroke-width='([\d.]+)' stroke-linejoin='miter'/) || [])[1]);
 assert.ok(Number.isFinite(outlineStrokeWidth), "the arrow outline uses a miter join so its tip stays sharp");
 
-const vertices = [...arrowPath.matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map((match) => [Number(match[1]), Number(match[2])]);
+const vertices = [...sharpPath.matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map((match) => [Number(match[1]), Number(match[2])]);
 assert.ok(vertices.length >= 3, "the arrow path has vertices");
 const tipVertex = vertices[0];
 const normalize = (v) => {
@@ -376,22 +395,54 @@ const paintedTip = [
   tipVertex[0] - miterDistance * inwardBisector[0],
   tipVertex[1] - miterDistance * inwardBisector[1]
 ];
-assertClose(paintedTip[0], hotspot.x, "the painted arrow tip X is the cursor hotspot", 0.01);
-assertClose(paintedTip[1], hotspot.y, "the painted arrow tip Y is the cursor hotspot", 0.01);
+assertClose(paintedTip[0], arrowCursor.hotspot.x, "the painted arrow tip X is the cursor hotspot", 0.01);
+assertClose(paintedTip[1], arrowCursor.hotspot.y, "the painted arrow tip Y is the cursor hotspot", 0.01);
 
 /* The low-opacity halo uses a rounded join, whose tip cap stops short of the sharp tip, so
    nothing is painted beyond the hotspot either. */
-const haloStrokeWidth = Number((cursorSvg.match(/stroke-width='([\d.]+)' stroke-linejoin='round'/) || [])[1]);
+const haloStrokeWidth = Number((arrowCursor.svg.match(/stroke-width='([\d.]+)' stroke-linejoin='round'/) || [])[1]);
 assert.ok(Number.isFinite(haloStrokeWidth), "the halo path is present and rounded");
 assert.ok(
   miterDistance - haloStrokeWidth / 2 > 0,
   "the halo tip stays inside the sharp tip so it never paints past the hotspot"
 );
 
-/* The map chrome keeps ordinary cursors, and dragging still shows grabbing. */
-assert.match(mapCss, /#infoOverlay,\s*#zoomControls\s*\{\s*cursor:\s*auto;/, "the info panel and zoom chrome keep a normal cursor");
-const sharedMapUiCss = fs.readFileSync(path.join(root, "shared", "sao-map-ui.css"), "utf8");
-assert.match(sharedMapUiCss, /#mapContainer\.grabbing\s*\{\s*cursor:\s*grabbing;/, "dragging still shows the grabbing cursor");
-assert.match(mapCss, /\.marker\s*\{[^}]*cursor:\s*pointer;/, "markers keep the pointer cursor");
+/* The painted arrow is a normal desktop-pointer size, not a large floating icon. */
+const xs = vertices.map((vertex) => vertex[0]);
+const ys = vertices.map((vertex) => vertex[1]);
+const paintedLeft = Math.min(arrowCursor.hotspot.x, Math.min(...xs) - outlineStrokeWidth / 2);
+const paintedRight = Math.max(...xs) + outlineStrokeWidth / 2;
+const paintedTop = Math.min(arrowCursor.hotspot.y, Math.min(...ys) - outlineStrokeWidth / 2);
+const paintedBottom = Math.max(...ys) + outlineStrokeWidth / 2;
+assert.ok(
+  paintedBottom - paintedTop >= 14 && paintedBottom - paintedTop <= 26,
+  `the painted arrow height is normal-cursor sized (got ${(paintedBottom - paintedTop).toFixed(2)}px)`
+);
+assert.ok(
+  paintedRight - paintedLeft >= 9 && paintedRight - paintedLeft <= 18,
+  `the painted arrow width is normal-cursor sized (got ${(paintedRight - paintedLeft).toFixed(2)}px)`
+);
+
+/* Where each cursor state is applied. */
+assert.match(polishCss, /html\s*\{\s*cursor:\s*var\(--sao-cursor-arrow\),\s*auto;/, "the normal cursor applies site-wide");
+assert.match(
+  polishCss,
+  /html a:not\(\[aria-disabled="true"\]\),\s*html button:not\(:disabled\),[\s\S]*?cursor:\s*var\(--sao-cursor-click\),\s*pointer;/,
+  "clickable elements use the click cursor"
+);
+assert.match(polishCss, /html textarea,[\s\S]*?cursor:\s*text;/, "text entry keeps the text cursor");
+assert.match(
+  polishCss,
+  /html #mapLayer,\s*html \.skill-tree-viewport\s*\{\s*cursor:\s*var\(--sao-cursor-grab\),\s*grab;/,
+  "draggable surfaces use the grab cursor"
+);
+assert.match(
+  polishCss,
+  /html #mapContainer\.grabbing #mapLayer,\s*html \.skill-tree-viewport\.is-dragging\s*\{\s*cursor:\s*var\(--sao-cursor-grabbing\),\s*grabbing;/,
+  "active dragging uses the grabbing cursor"
+);
+assert.match(polishCss, /button:disabled,\s*select:disabled\s*\{\s*cursor:\s*not-allowed;/, "disabled controls keep not-allowed");
+assert.ok(!mapCss.includes("data:image/svg+xml"), "the obsolete Aincrad-only cursor artwork is gone");
+
 
 console.log("Coordinate regression tests passed.");

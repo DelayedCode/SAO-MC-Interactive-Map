@@ -45,6 +45,21 @@ async function clientPointForCoordinate(page, coordinate) {
   }, coordinate);
 }
 
+/* Mirrors shared/sao-map-helpers.js getImageLocalCoords in the other direction: raw map pixel
+   -> the client point that projects onto it. */
+async function clientPointForRawPixel(page, rawPixel) {
+  return page.evaluate((target) => {
+    const image = document.getElementById("mapImage");
+    const rect = image.getBoundingClientRect();
+    const naturalWidth = image.naturalWidth;
+    const naturalHeight = image.naturalHeight;
+    const scale = Math.min(rect.width / naturalWidth, rect.height / naturalHeight);
+    const offsetX = (rect.width - naturalWidth * scale) / 2;
+    const offsetY = (rect.height - naturalHeight * scale) / 2;
+    return { x: rect.left + offsetX + target.x * scale, y: rect.top + offsetY + target.y * scale };
+  }, rawPixel);
+}
+
 async function coordinateForClientPoint(page, point) {
   return page.evaluate(({ x, y }) => {
     const image = document.getElementById("mapImage");
@@ -394,34 +409,37 @@ async function run() {
     );
     assert.equal(records.length, countBeforeImport, "re-importing the same file adds no duplicate");
 
-    /* --- The purpose-built cursor. The arrow tip is the cursor hotspot and the coordinate
-       pipeline keeps reading the browser's real pointer, so the tip, the readout, the click,
-       the created waypoint and the JourneyMap coordinate must agree at every zoom/pan state. --- */
+    /* --- The site-wide cursor. The arrow tip is the hotspot and the coordinate pipeline keeps
+       reading the browser's real pointer, so the tip, the readout, the click, the created
+       waypoint and the JourneyMap coordinate must agree at every zoom/pan state. --- */
     const cursorStyles = await page.evaluate(() => {
       const marker = document.querySelector("#markers .marker[data-marker-id]");
       return {
-        container: getComputedStyle(document.getElementById("mapContainer")).cursor,
+        html: getComputedStyle(document.documentElement).cursor,
+        mapLayer: getComputedStyle(document.getElementById("mapLayer")).cursor,
         infoOverlay: getComputedStyle(document.getElementById("infoOverlay")).cursor,
-        zoomControls: getComputedStyle(document.getElementById("zoomControls")).cursor,
+        zoomIn: getComputedStyle(document.getElementById("zoomIn")).cursor,
+        search: getComputedStyle(document.getElementById("search")).cursor,
         marker: marker ? getComputedStyle(marker).cursor : null
       };
     });
-    assert.match(cursorStyles.container, /^url\("data:image\/svg\+xml,/, "the map surface uses the SVG cursor");
-    assert.match(cursorStyles.container, / 1 1,\s*auto$/, "the cursor hotspot is the arrow tip");
-    assert.equal(cursorStyles.infoOverlay, "auto", "the info panel keeps an ordinary cursor");
-    assert.equal(cursorStyles.zoomControls, "auto", "the zoom chrome keeps an ordinary cursor");
-    assert.equal(cursorStyles.marker, "pointer", "markers keep the pointer cursor");
+    assert.match(cursorStyles.html, / 1 1,\s*auto$/, "the normal site-wide cursor is the arrow with its tip as hotspot");
+    assert.match(cursorStyles.mapLayer, / 9 11,\s*grab$/, "the draggable map artwork shows the grab cursor");
+    assert.match(cursorStyles.infoOverlay, / 1 1,\s*auto$/, "the map info panel keeps the normal cursor");
+    assert.match(cursorStyles.zoomIn, / 4 1,\s*pointer$/, "the zoom controls use the click cursor");
+    assert.equal(cursorStyles.search, "text", "the marker search input keeps the text cursor");
+    assert.ok(cursorStyles.marker === null || / 4 1,\s*pointer$/.test(cursorStyles.marker), "markers use the click cursor");
 
-    /* Dragging still shows grabbing: the shared #mapContainer.grabbing rule outranks the cursor. */
+    /* Dragging still shows grabbing, on the artwork the pointer is over. */
     const dragPoint = await findFreeMapPoint(page);
     assert.ok(dragPoint, "a free map point is available for the drag check");
     await page.mouse.move(dragPoint.x, dragPoint.y);
     await page.mouse.down();
     const grabbingCursor = await page.evaluate(
-      () => getComputedStyle(document.getElementById("mapContainer")).cursor
+      () => getComputedStyle(document.getElementById("mapLayer")).cursor
     );
     await page.mouse.up();
-    assert.equal(grabbingCursor, "grabbing", "dragging shows the grabbing cursor");
+    assert.match(grabbingCursor, / 9 11,\s*grabbing$/, "dragging shows the grabbing cursor");
 
     const knownTips = [
       { label: "reference point 1", minecraft: { x: 1800, z: 4190 } },
@@ -432,6 +450,41 @@ async function run() {
     for (const known of knownTips) {
       await assertTipReadout(page, known.minecraft, `${known.label} at 1x`);
     }
+
+    /* The two reported reference points, checked as pointer positions: the map pixel the
+       legacy grid called 1798,4178 must read Minecraft 1800,4190, and 1797,3974 must read
+       1799,3986. These pin pointer placement and the coordinate conversion together; they are
+       not cursor offsets. */
+    const reportedExamples = [
+      {
+        legacy: { x: 1798, z: 4178 },
+        minecraft: { x: 1800, z: 4190 },
+        rawPixel: { x: 1754.83367359193, y: 4128.237460469957 }
+      },
+      {
+        legacy: { x: 1797, z: 3974 },
+        minecraft: { x: 1799, z: 3986 },
+        rawPixel: { x: 1753.8329130138907, y: 3924.0823025499376 }
+      }
+    ];
+    /* Zoomed in first, so one client pixel is about one block and the readout can be pinned
+       exactly instead of within the fit-view quantisation. */
+    await zoomMapTo(page, 4);
+    for (const example of reportedExamples) {
+      await bringCoordinateIntoView(page, example.minecraft);
+      const point = await clientPointForRawPixel(page, example.rawPixel);
+      const rounded = { x: Math.round(point.x), y: Math.round(point.y) };
+      await page.mouse.move(rounded.x, rounded.y);
+      const readout = await page.evaluate(() => document.getElementById("overlayMappedCoords").textContent.trim());
+      const expectedReadout = `X: ${example.minecraft.x} Z: ${example.minecraft.z}`;
+      assert.equal(
+        readout,
+        expectedReadout,
+        `the pixel the legacy grid called ${example.legacy.x},${example.legacy.z} now reads ${expectedReadout}`
+      );
+    }
+    await page.locator("#resetView").click();
+    await page.waitForTimeout(80);
 
     await zoomMapTo(page, 3);
     for (const known of knownTips) {

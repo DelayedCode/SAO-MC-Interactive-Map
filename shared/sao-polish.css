@@ -12,11 +12,90 @@ summary:focus-visible,
   outline: 2px solid var(--sao-polish-focus);
   outline-offset: 2px;
 }
-button,
-select,
-summary,
-a {
-  cursor: pointer;
+/* ---------------------------------------------------------------------------
+   Site-wide cursor system.
+
+   Every page links this file last, so the cursor is defined once here for the
+   whole site. Four SVG cursors share one visual language: a dark navy body
+   (#0b1220) with a thin light-blue outline (#8bb7ff) and a restrained halo,
+   matching the site palette. Each is 22x22 px with the painted shape at roughly
+   normal desktop-cursor size:
+
+     normal    arrow         painted ~13x20 px   hotspot 1 1
+     click     pointing hand painted ~18x19 px   hotspot 4 1   (the fingertip)
+     grab      open hand     painted ~19x19 px   hotspot 9 11  (the palm)
+     grabbing  closed fist   painted ~19x15 px   hotspot 9 11
+
+   The arrow is drawn so the *stroked* outline's outer miter point lands exactly
+   on the declared hotspot (1 1): the visible tip is the pointer position, which
+   is exactly what the map coordinate code reads (event.clientX/clientY ->
+   getImageLocalCoords -> mapData.js). The halo path uses a rounded join whose tip
+   stops short of the sharp tip, so nothing is painted beyond the hotspot. This
+   layer is purely visual - it never touches the calibration, the projection maths
+   or any stored coordinate.
+
+   The trailing keyword in each rule is the platform fallback used when a browser
+   refuses the data URI (for example older Safari).
+   --------------------------------------------------------------------------- */
+:root {
+  --sao-cursor-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M1.700 2.710 L1.700 16.570 L5.228 13.462 L7.580 19.342 L9.596 18.502 L7.244 12.706 L11.528 12.706 Z' fill='none' stroke='%238bb7ff' stroke-opacity='0.2' stroke-width='2.8' stroke-linejoin='round'/%3E%3Cpath d='M1.700 2.710 L1.700 16.570 L5.228 13.462 L7.580 19.342 L9.596 18.502 L7.244 12.706 L11.528 12.706 Z' fill='%230b1220' stroke='%238bb7ff' stroke-width='1.4' stroke-linejoin='miter' stroke-miterlimit='6'/%3E%3C/svg%3E") 1 1;
+  --sao-cursor-click: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M2.8 1.6 L5 1.6 L5.4 3 L5.4 8.6 L8.2 8.6 L8.2 4.8 L10.4 4.8 L10.8 6.2 L10.8 9 L13.6 9 L13.6 6.4 L15.8 6.4 L16.2 7.8 L16.2 10.2 L17.6 11 L17.6 14.6 L15.4 17.6 L6.4 17.6 L3.4 14.6 L2.8 12 L2.8 3 Z' fill='none' stroke='%238bb7ff' stroke-opacity='0.2' stroke-width='2.8' stroke-linejoin='round'/%3E%3Cpath d='M2.8 1.6 L5 1.6 L5.4 3 L5.4 8.6 L8.2 8.6 L8.2 4.8 L10.4 4.8 L10.8 6.2 L10.8 9 L13.6 9 L13.6 6.4 L15.8 6.4 L16.2 7.8 L16.2 10.2 L17.6 11 L17.6 14.6 L15.4 17.6 L6.4 17.6 L3.4 14.6 L2.8 12 L2.8 3 Z' fill='%230b1220' stroke='%238bb7ff' stroke-width='1.4' stroke-linejoin='miter' stroke-miterlimit='6'/%3E%3C/svg%3E") 4 1;
+  --sao-cursor-grab: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M3 4 L3.4 2.2 L5.4 2.2 L5.8 3.4 L5.8 8.4 L8.4 8.4 L8.4 2.8 L10.4 2.8 L10.8 4 L10.8 8.8 L13.4 8.8 L13.4 3.4 L15.4 3.4 L15.8 4.6 L15.8 9.4 L17 10.4 L17 14.4 L14.8 17.6 L6 17.6 L3 14.4 L1.6 11.6 L3 9.6 Z' fill='none' stroke='%238bb7ff' stroke-opacity='0.2' stroke-width='2.8' stroke-linejoin='round'/%3E%3Cpath d='M3 4 L3.4 2.2 L5.4 2.2 L5.8 3.4 L5.8 8.4 L8.4 8.4 L8.4 2.8 L10.4 2.8 L10.8 4 L10.8 8.8 L13.4 8.8 L13.4 3.4 L15.4 3.4 L15.8 4.6 L15.8 9.4 L17 10.4 L17 14.4 L14.8 17.6 L6 17.6 L3 14.4 L1.6 11.6 L3 9.6 Z' fill='%230b1220' stroke='%238bb7ff' stroke-width='1.4' stroke-linejoin='miter' stroke-miterlimit='6'/%3E%3C/svg%3E") 9 11;
+  --sao-cursor-grabbing: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M3.2 7 L4.6 5.4 L6.6 5.4 L7 6.6 L9.2 6.6 L9.6 5.6 L11.6 5.6 L12 6.8 L14.2 6.8 L14.6 5.8 L16.2 5.8 L16.6 7 L17.6 7.8 L17.6 12.4 L15.4 17 L6.4 17 L3.2 13.8 L1.8 10.8 L3.2 9.4 Z' fill='none' stroke='%238bb7ff' stroke-opacity='0.2' stroke-width='2.8' stroke-linejoin='round'/%3E%3Cpath d='M3.2 7 L4.6 5.4 L6.6 5.4 L7 6.6 L9.2 6.6 L9.6 5.6 L11.6 5.6 L12 6.8 L14.2 6.8 L14.6 5.8 L16.2 5.8 L16.6 7 L17.6 7.8 L17.6 12.4 L15.4 17 L6.4 17 L3.2 13.8 L1.8 10.8 L3.2 9.4 Z' fill='%230b1220' stroke='%238bb7ff' stroke-width='1.4' stroke-linejoin='miter' stroke-miterlimit='6'/%3E%3C/svg%3E") 9 11;
+}
+
+/* Normal cursor site-wide. Descendants inherit it unless they declare their own,
+   so text/disabled/resize affordances keep working. */
+html {
+  cursor: var(--sao-cursor-arrow), auto;
+}
+
+/* Clickable: the standard interactive elements plus the clickable cards and the
+   map colour picker, which are the only interactive elements that are not
+   buttons/links. The "html" prefix and the :not() guards raise specificity above
+   the single-class "cursor: pointer" rules in the page sheets and in the styles
+   the shared scripts inject at runtime, so one definition covers every page. */
+html a:not([aria-disabled="true"]),
+html button:not(:disabled),
+html select:not(:disabled),
+html summary:not([aria-disabled="true"]),
+html [role="button"]:not([aria-disabled="true"]),
+html [role="tab"]:not([aria-disabled="true"]),
+html input[type="checkbox"]:not(:disabled),
+html input[type="radio"]:not(:disabled),
+html input[type="range"]:not(:disabled),
+html input[type="color"]:not(:disabled),
+html input[type="file"]:not(:disabled),
+html .mob-card,
+html .ecompendium-card,
+html .custom-waypoint-color-picker {
+  cursor: var(--sao-cursor-click), pointer;
+}
+
+/* Text entry keeps the text cursor, so selection still feels native. */
+html input:not([type]),
+html input[type="text"],
+html input[type="search"],
+html input[type="email"],
+html input[type="password"],
+html input[type="number"],
+html input[type="tel"],
+html input[type="url"],
+html textarea,
+html [contenteditable="true"],
+html [contenteditable=""] {
+  cursor: text;
+}
+
+/* Draggable surfaces: the map artwork layer and the character-build skill tree.
+   Active dragging overrides the idle grab state. */
+html #mapLayer,
+html .skill-tree-viewport {
+  cursor: var(--sao-cursor-grab), grab;
+}
+html #mapContainer.grabbing #mapLayer,
+html .skill-tree-viewport.is-dragging {
+  cursor: var(--sao-cursor-grabbing), grabbing;
 }
 button:disabled,
 select:disabled {
