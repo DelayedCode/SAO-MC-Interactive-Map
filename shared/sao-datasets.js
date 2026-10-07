@@ -2,16 +2,12 @@
   "use strict";
 
   const DATASET_PARAM = "dataset";
-  const VALID_DATASETS = new Set(["beta", "current"]);
-  const AFFECTED_SECTIONS = new Set([
-    "bestiary",
-    "equipment",
-    "quests",
-    "commands",
-    "miscinfo",
-    "towerDefense",
-    "compendium"
-  ]);
+  const VALID_DATASETS = Object.freeze(["beta", "current"]);
+  const VALID_DATASET_SET = new Set(VALID_DATASETS);
+  const DEFAULT_DATASET = "beta";
+  const VALID_WORLDS = Object.freeze(["aincrad", "underworld"]);
+  const VALID_WORLD_SET = new Set(VALID_WORLDS);
+  const DATASET_STORAGE_PREFIX = "sao.dataset.";
 
   const fallbackStorage = {
     getItem() {
@@ -20,23 +16,113 @@
     setItem() {}
   };
 
-  function getDataset(value) {
-    const candidate = value instanceof URLSearchParams ? value.get(DATASET_PARAM) : value;
-    return VALID_DATASETS.has(candidate) ? candidate : "beta";
+  function getStorage() {
+    return global.SAOStorage || fallbackStorage;
+  }
+
+  /* Only the two shipped modes are ever accepted; every other value is ignored so an
+     invalid ?dataset= link or a corrupted stored value can never reach the pages. */
+  function normalizeDataset(value) {
+    return VALID_DATASET_SET.has(value) ? value : null;
+  }
+
+  function normalizeWorld(value) {
+    return VALID_WORLD_SET.has(value) ? value : null;
+  }
+
+  /* The page's world decides which stored mode applies, so an Aincrad choice can never drive
+     the Fractured Underworld and vice versa. Every world page lives one directory below its
+     world root, so the path alone is enough to tell the two apart. */
+  function resolveWorld(pathname) {
+    const rawPath = String(pathname === undefined ? (global.location && global.location.pathname) || "" : pathname);
+    let path = rawPath;
+    try {
+      /* Browsers report the path with %20 for the spaces in "Fractured Underworld". */
+      path = decodeURIComponent(rawPath);
+    } catch {
+      /* Malformed escapes keep the raw path. */
+    }
+    return /fractured\s*underworld/i.test(path) ? "underworld" : "aincrad";
+  }
+
+  function getStorageKey(world) {
+    const safeWorld = normalizeWorld(world);
+    return safeWorld ? `${DATASET_STORAGE_PREFIX}${safeWorld}` : "";
+  }
+
+  /* An explicit ?dataset= link (deep link, test harness) wins over the stored world mode. */
+  function readDatasetParam(search) {
+    const params = new URLSearchParams(search === undefined ? (global.location && global.location.search) || "" : search);
+    return normalizeDataset(params.get(DATASET_PARAM));
+  }
+
+  function readStoredDataset(world) {
+    const key = getStorageKey(world);
+    if (!key) return null;
+    try {
+      return normalizeDataset(getStorage().getItem(key));
+    } catch {
+      return null;
+    }
+  }
+
+  /* Persists the Welcome Mat choice for one world. Returns the accepted mode, or null when the
+     world or the mode is not one of the shipped values. */
+  function setActiveDataset(world, mode) {
+    const safeWorld = normalizeWorld(world);
+    const safeMode = normalizeDataset(mode);
+    if (!safeWorld || !safeMode) return null;
+    try {
+      getStorage().setItem(getStorageKey(safeWorld), safeMode);
+    } catch {
+      /* Storage can be blocked (private mode); the mode still applies for this navigation. */
+    }
+    return safeMode;
+  }
+
+  function getActiveDataset(world) {
+    const safeWorld = normalizeWorld(world) || resolveWorld();
+    return readDatasetParam() || readStoredDataset(safeWorld) || DEFAULT_DATASET;
   }
 
   function getDatasetFromLocation() {
-    return getDataset(new URLSearchParams(global.location.search));
+    return getActiveDataset(resolveWorld());
+  }
+
+  function getDataset(value) {
+    const candidate = value instanceof URLSearchParams ? value.get(DATASET_PARAM) : value;
+    return normalizeDataset(candidate) || DEFAULT_DATASET;
   }
 
   function addDatasetToUrl(url, dataset, preserveDataset = true) {
     const resolved = new URL(url, global.location.href);
-    if (preserveDataset && VALID_DATASETS.has(dataset)) {
+    if (preserveDataset && VALID_DATASET_SET.has(dataset)) {
       resolved.searchParams.set(DATASET_PARAM, dataset);
     } else {
       resolved.searchParams.delete(DATASET_PARAM);
     }
     return resolved.href;
+  }
+
+  /* Current Data ships the Main Questline waypoints plus the Current accessory waypoints; Beta
+     ships every other map marker. A marker is Current Data when its category is the Main Questline
+     category or when it carries an explicit `dataset: "current"` field - the Current accessory
+     waypoints reuse category names that Beta also uses (Accessories Blacksmith, Occult Merchant),
+     so the category alone cannot tell the two apart. Both map adapters filter through this, so the
+     two worlds cannot drift apart on the rule. */
+  const MAIN_QUEST_CATEGORY = "mainQuests";
+  const CURRENT_DATASET = "current";
+
+  function isCurrentDataMarker(marker) {
+    return marker?.dataset === CURRENT_DATASET || marker?.category === MAIN_QUEST_CATEGORY;
+  }
+
+  function filterMarkerDatasetForActiveMode(markerDataset) {
+    const isCurrent = getDatasetFromLocation() === CURRENT_DATASET;
+    const entries = Object.entries(markerDataset || {});
+    const kept = entries.filter(([, marker]) => isCurrentDataMarker(marker) === isCurrent);
+    if (kept.length === entries.length) return markerDataset || {};
+    return Object.fromEntries(kept);
   }
 
   function localize(key, fallback) {
@@ -56,6 +142,8 @@
     activeDialog = null;
   }
 
+  /* The data-mode chooser. It is opened once per world from the Welcome Mat: choosing a mode
+     stores it for that world and then enters the world, so sections never ask again. */
   function openSelector(options) {
     const config = options || {};
     if (!config.url) return;
@@ -96,9 +184,9 @@
       button.append(label, description);
 
       button.addEventListener("click", () => {
-        const nextUrl = addDatasetToUrl(config.url, dataset, AFFECTED_SECTIONS.has(config.section));
+        setActiveDataset(config.world, dataset);
         closeSelector();
-        global.location.href = nextUrl;
+        global.location.href = addDatasetToUrl(config.url, dataset, false);
       });
       return button;
     };
@@ -138,17 +226,6 @@
     });
   }
 
-  function navigate(options) {
-    const config = options || {};
-    const section = config.section;
-    const dataset = getDatasetFromLocation();
-    if (AFFECTED_SECTIONS.has(section)) {
-      openSelector({ ...config, dataset });
-      return;
-    }
-    global.location.href = addDatasetToUrl(config.url, dataset, false);
-  }
-
   function installStyles() {
     if (document.getElementById("saoDatasetStyles")) return;
     const style = document.createElement("style");
@@ -169,11 +246,21 @@
   }
 
   global.SAODatasets = Object.freeze({
-    affectedSections: AFFECTED_SECTIONS,
+    validDatasets: VALID_DATASETS,
+    validWorlds: VALID_WORLDS,
+    defaultDataset: DEFAULT_DATASET,
+    datasetStoragePrefix: DATASET_STORAGE_PREFIX,
+    normalizeDataset,
+    resolveWorld,
+    MAIN_QUEST_CATEGORY,
+    CURRENT_DATASET,
+    isCurrentDataMarker,
+    filterMarkerDatasetForActiveMode,
     getDataset,
     getDatasetFromLocation,
+    getActiveDataset,
+    setActiveDataset,
     addDatasetToUrl,
-    navigate,
     openSelector,
     installStyles,
     storage: global.SAOStorage || fallbackStorage

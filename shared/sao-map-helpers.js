@@ -272,6 +272,7 @@
     "ingotBlacksmith",
     "keyBlacksmith",
     "accessoriesBlacksmith",
+    "secretAccessoryBlacksmith",
     "runeCraftsmen",
     "refaire"
   ]);
@@ -373,6 +374,14 @@
       <circle cx="12" cy="12.2" r="5.7" fill="#ffe1b9" stroke="#8f622a" stroke-width="1.1"/>
       <circle cx="12" cy="12.2" r="2.5" fill="#26324e"/>
       <path d="M12 4.8v1.8M12 17.8v1.4M4.6 12.2h1.8M17.6 12.2h1.8" stroke="#fff6de" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+  `,
+    secretAccessoryBlacksmith: `
+    <svg class="craftsman-icon secret-accessory-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="13.6" r="5.3" fill="#e6d6ff" stroke="#5b3f86" stroke-width="1.1"/>
+      <circle cx="12" cy="13.6" r="2.3" fill="#2b2140"/>
+      <path d="M12 5.1v2.3M5.5 7.2l1.7 1.7M18.5 7.2l-1.7 1.7" stroke="#f2e8ff" stroke-width="1.1" stroke-linecap="round"/>
+      <circle cx="12" cy="4.4" r="1.4" fill="#ffe9a3" stroke="#8d6a24" stroke-width="0.9"/>
     </svg>
   `,
     runeCraftsmen: `

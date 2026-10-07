@@ -69,28 +69,21 @@
     return `${statLabel === match[1] ? translate(match[1]) : statLabel}: ${translate(match[2])}`;
   }
   function registerCharacterBuildTranslations() {
-    Object.entries(data.prototypeSkillTrees || {}).forEach(([classId, nodes]) =>
-      nodes.forEach((node) => {
-        window.SAOContentTranslations?.registerCharacterBuildNode?.(node, classId, node.branch);
-      })
-    );
+    Object.entries(data.CLASS_SKILLS).forEach(([classId, skills]) => {
+      Object.entries(skills).forEach(([skillId, skill]) => {
+        window.SAOContentTranslations?.registerCharacterBuildNode?.(
+          { ...skill, id: `${classId}-${skillId}`, branch: skillId === "skill1" ? "core" : "branch" },
+          classId,
+          skillId === "skill1" ? "core" : "branch"
+        );
+      });
+    });
   }
   function localizeSkillName(node) {
     return content(`characterBuild.skill.${node.id}.name`, node.name);
   }
   function localizeSkillDescription(node) {
-    const classLabel = localizeClass(state.classId, state.classId);
-    const branchLabel =
-      node.branch === "branch-a"
-        ? t("page.characterBuild.branchA")
-        : node.branch === "branch-b"
-          ? t("page.characterBuild.branchB")
-          : t("page.characterBuild.branchCore");
-    return content(
-      `characterBuild.skill.${node.id}.description`,
-      `Prototype ${node.branch} node for ${state.classId}.`,
-      { branch: branchLabel, classId: classLabel }
-    );
+    return content(`characterBuild.skill.${node.id}.description`, node.description, { className: node.className });
   }
   const storage = window.SAOStorage || { getJSON: (_key, fallback) => fallback, setJSON() {} };
   /* The site-wide dataset default is "beta" (shared/sao-datasets.js getDataset falls back to it
@@ -162,11 +155,95 @@
   function slotById(slotId) {
     return data.slots.find((slot) => slot.id === slotId);
   }
+  function skillNodeId(classId, skillId) {
+    return `${classId}-${skillId}`;
+  }
+  function skillClassName(classId) {
+    if (classId === "guerrier") return "Warrior";
+    const selectedClass = data.classes.find((item) => item.id === classId);
+    return selectedClass ? selectedClass.name.split(" /")[0].trim() : classId;
+  }
+  const skillNeighborsById = (() => {
+    const skillByPointId = new Map(data.SKILL_TREE_LAYOUT.map((point) => [point.id, point.skillId]));
+    const neighbors = new Map(data.SKILL_TREE_LAYOUT.map((point) => [point.skillId, new Set()]));
+    data.SKILL_TREE_CONNECTIONS.forEach(([firstPointId, secondPointId]) => {
+      const firstSkillId = skillByPointId.get(firstPointId);
+      const secondSkillId = skillByPointId.get(secondPointId);
+      neighbors.get(firstSkillId).add(secondSkillId);
+      neighbors.get(secondSkillId).add(firstSkillId);
+    });
+    return new Map([...neighbors].map(([skillId, adjacentSkillIds]) => [skillId, [...adjacentSkillIds]]));
+  })();
   function currentSkillTree() {
-    return data.prototypeSkillTrees[state.classId] || [];
+    const classSkills = data.CLASS_SKILLS[state.classId] || data.WARRIOR_SKILLS;
+    return data.SKILL_TREE_LAYOUT.map((point) => {
+      const config = classSkills[point.skillId];
+      const center = point.skillId === "skill1";
+      const skill58 = point.skillId === "skill58";
+      const value = center ? null : config.statMode === "percent" ? `${config.amount}%` : config.amount;
+      const prerequisiteSkillIds = center
+        ? []
+        : skill58
+          ? config.prerequisites
+          : skillNeighborsById.get(point.skillId);
+      return {
+        id: skillNodeId(state.classId, point.skillId),
+        nodeId: point.skillId,
+        layoutId: point.id,
+        name: config.name,
+        description: config.description,
+        className: skillClassName(state.classId),
+        ...(center ? {} : { stat: config.stat, amount: config.amount, statMode: config.statMode }),
+        cost: center ? 0 : 1,
+        prerequisiteMode: center || !skill58 ? "any" : "all",
+        prerequisites: prerequisiteSkillIds.map((id) => skillNodeId(state.classId, id)),
+        effects: center ? [] : [{ stat: config.stat, value }],
+        x: point.x,
+        y: point.y,
+        branch: center ? "core" : "branch",
+        center
+      };
+    });
+  }
+  function isSkillUnlocked(skillId) {
+    return skillId === skillNodeId(state.classId, "skill1") || Boolean(activeSkillState().selectedSkills[skillId]);
+  }
+  function skillPrerequisitesSatisfied(node, selectedSkillIds = null) {
+    if (!node.prerequisites.length) return true;
+    const isSelected = (skillId) =>
+      skillId === skillNodeId(state.classId, "skill1") ||
+      (selectedSkillIds ? selectedSkillIds.has(skillId) : isSkillUnlocked(skillId));
+    if (node.prerequisiteMode === "any") return node.prerequisites.some(isSelected);
+    return node.prerequisites.every(isSelected);
+  }
+  function pruneInvalidSelectedSkills() {
+    const build = activeSkillState();
+    const selectedSkillIds = new Set(
+      Object.keys(build.selectedSkills || {}).filter((skillId) => build.selectedSkills[skillId])
+    );
+    let removedInvalidSkill;
+    do {
+      removedInvalidSkill = false;
+      currentSkillTree().forEach((node) => {
+        if (node.center || !selectedSkillIds.has(node.id) || skillPrerequisitesSatisfied(node, selectedSkillIds)) return;
+        selectedSkillIds.delete(node.id);
+        removedInvalidSkill = true;
+      });
+    } while (removedInvalidSkill);
+    build.selectedSkills = Object.fromEntries([...selectedSkillIds].map((skillId) => [skillId, true]));
+  }
+  function missingSkillPrerequisites(node) {
+    if (skillPrerequisitesSatisfied(node)) return [];
+    return node.prerequisites.filter((id) => !isSkillUnlocked(id));
   }
   function selectedSkillNodes() {
-    return currentSkillTree().filter((node) => activeSkillState().selectedSkills[node.id]);
+    return currentSkillTree().filter((node) => isSkillUnlocked(node.id));
+  }
+  function availableSkillPoints() {
+    const skills = currentSkillTree();
+    const total = skills.reduce((points, node) => points + node.cost, 0);
+    const spent = skills.reduce((points, node) => points + (isSkillUnlocked(node.id) ? node.cost : 0), 0);
+    return Math.max(0, total - spent);
   }
   function activeItems() {
     return adapter.getItems(state.source);
@@ -286,6 +363,7 @@
       state.activeSlot = "1";
     }
     syncActiveConfiguration();
+    pruneInvalidSelectedSkills();
   }
 
   function saveState() {
@@ -384,7 +462,7 @@
       isAvailable: isCalculationItemAvailable
     });
     const hasPreviousState = previousGroups.length > 0;
-    const baseStats = calculator.createBaseStats ? calculator.createBaseStats() : null;
+    const baseStats = calculator.createBaseStats ? calculator.createBaseStats(state.classId) : null;
     const equippedCount = Object.values(calculationEquipment()).filter(Boolean).length;
     const summary = statsGroups && document.querySelector(".stats-panel .base-value");
     if (summary) {
@@ -414,9 +492,9 @@
 
   function skillNodeState(node) {
     const statusLabel = (key) => t(`page.characterBuild.${key}`);
-    if (activeSkillState().selectedSkills[node.id])
+    if (isSkillUnlocked(node.id))
       return { name: "selected", label: statusLabel("selected"), reason: t("page.characterBuild.alreadyUnlocked") };
-    const missing = node.prerequisites.filter((id) => !activeSkillState().selectedSkills[id]);
+    const missing = missingSkillPrerequisites(node);
     if (missing.length) {
       const requirementNames = missing
         .map((id) => {
@@ -427,7 +505,16 @@
       return {
         name: "locked",
         label: statusLabel("locked"),
-        reason: t("page.characterBuild.requiresSkills", { value: requirementNames })
+        reason: t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requiresSkills", {
+          value: requirementNames
+        })
+      };
+    }
+    if (node.cost > availableSkillPoints()) {
+      return {
+        name: "locked",
+        label: statusLabel("locked"),
+        reason: `Need ${node.cost - availableSkillPoints()} more skill point${node.cost - availableSkillPoints() === 1 ? "" : "s"}.`
       };
     }
     return { name: "available", label: statusLabel("available"), reason: t("page.characterBuild.readyToUnlock") };
@@ -449,34 +536,249 @@
           })
           .join(", ")
       : t("page.characterBuild.none");
+    const effectDetail = node.center ? "" : `<span>${escapeHtml(formatSkillEffects(node))}</span>`;
+    const prerequisiteDetail = node.center
+      ? ""
+      : `<span>${escapeHtml(t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requires", { value: prerequisites }))}</span>`;
+    const descriptionDetail = node.description
+      ? `<span>${escapeHtml(localizeSkillDescription(node))}</span>`
+      : "";
     $("skillDetail").innerHTML =
-      `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(localizeSkillDescription(node))}</span><span>${escapeHtml(t("page.characterBuild.requires", { value: prerequisites }))}</span><span>${escapeHtml(t("page.characterBuild.effect", { value: formatSkillEffects(node) }))}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
+      `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(node.className)}</span>${descriptionDetail}${effectDetail}${prerequisiteDetail}<span>Cost: ${node.cost} skill point${node.cost === 1 ? "" : "s"}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
   }
 
-  function renderSkills() {
+  function renderSkills(selectedNodeId) {
     const skills = currentSkillTree();
-    const nodesById = new Map(skills.map((node) => [node.id, node]));
-    const connections = skills
-      .flatMap((node) =>
-        node.prerequisites.map((parentId) => {
-          const parent = nodesById.get(parentId);
-          const active = activeSkillState().selectedSkills[node.id] || activeSkillState().selectedSkills[parentId];
-          return parent
-            ? `<line class="skill-connection${active ? " is-active" : ""}" x1="${parent.x}" y1="${parent.y}" x2="${node.x}" y2="${node.y}"></line>`
-            : "";
-        })
-      )
-      .join("");
-    const nodes = skills
-      .map((node) => {
+    const layout = data.SKILL_TREE_LAYOUT || [];
+    const layoutById = new Map(layout.map((point) => [point.id, point]));
+    const layoutBySkillId = new Map(layout.map((point) => [point.skillId, point]));
+    const skillsById = new Map(skills.map((node) => [node.id, node]));
+    const skillsByNodeId = new Map(skills.map((node) => [node.nodeId, node]));
+    const drawnConnections = new Set();
+    const connectionMarkup = [];
+    const addConnection = (fromId, toId, active = false) => {
+      const key = [fromId, toId].sort().join(":");
+      if (drawnConnections.has(key)) return;
+      const from = layoutById.get(fromId);
+      const to = layoutById.get(toId);
+      if (!from || !to) return;
+      drawnConnections.add(key);
+      const fromSkill = skillsByNodeId.get(from.skillId);
+      const toSkill = skillsByNodeId.get(to.skillId);
+      connectionMarkup.push(
+        `<line class="skill-connection${active ? " is-active" : ""}" data-from-skill-id="${fromSkill?.id || ""}" data-to-skill-id="${toSkill?.id || ""}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`
+      );
+    };
+    (data.SKILL_TREE_CONNECTIONS || []).forEach(([fromId, toId]) => {
+      const fromPoint = layoutById.get(fromId);
+      const toPoint = layoutById.get(toId);
+      const fromSkill = fromPoint && skillsByNodeId.get(fromPoint.skillId);
+      const toSkill = toPoint && skillsByNodeId.get(toPoint.skillId);
+      const active = (fromSkill && isSkillUnlocked(fromSkill.id)) || (toSkill && isSkillUnlocked(toSkill.id));
+      addConnection(fromId, toId, active);
+    });
+    skills.forEach((node) => {
+      node.prerequisites.forEach((parentId) => {
+        const parent = skillsById.get(parentId);
+        const parentPoint = parent && layoutBySkillId.get(parent.nodeId);
+        const nodePoint = layoutBySkillId.get(node.nodeId);
+        if (parentPoint && nodePoint) addConnection(parentPoint.id, nodePoint.id, isSkillUnlocked(node.id));
+      });
+    });
+    const connections = connectionMarkup.join("");
+    const nodes = layout
+      .map((point) => {
+        const node = skillsByNodeId.get(point.skillId);
+        const position = `--node-x:${point.x}px;--node-y:${point.y}px`;
         const status = skillNodeState(node);
         const selected = status.name === "selected";
-        return `<button class="skill-node is-${status.name}" type="button" data-skill-id="${node.id}" style="--node-x:${node.x}%;--node-y:${node.y}%" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-icon" aria-hidden="true">${node.icon}</span><span class="skill-name">${escapeHtml(localizeSkillName(node))}</span><span class="skill-effect">${escapeHtml(formatSkillEffects(node))}</span></button>`;
+        return `<button class="skill-node is-${status.name}${node.center ? " is-center" : ""}${point.isAnchor ? " is-branch-anchor" : ""}" type="button" data-skill-id="${node.id}" style="${position}" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-core" aria-hidden="true"></span></button>`;
       })
       .join("");
-    $("skillTree").innerHTML =
-      `<div class="skill-tree-toolbar"><span>${t("page.characterBuild.prototypeTree")}</span><span class="skill-tree-hint">${t("page.characterBuild.prototypeDataOnly")}</span></div><div class="skill-tree-viewport"><div class="skill-tree-canvas"><svg class="skill-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${connections}</svg>${nodes}</div></div><div id="skillDetail" class="skill-detail" aria-live="polite"></div>`;
-    renderSkillDetail(skills[0]?.id);
+    const selectedNode = skillsById.get(selectedNodeId) || skills.find((node) => node.center);
+    $("skillTree").innerHTML = `
+      <div class="skill-tree-toolbar">
+        <span data-skill-points>${escapeHtml(skillClassName(state.classId))} · ${availableSkillPoints()} / ${skills.reduce((sum, node) => sum + node.cost, 0)} skill points</span>
+        <button class="skill-tree-reset" type="button" data-reset-view>Reset View</button>
+      </div>
+      <div class="skill-tree-viewport" id="skillTreeViewport" aria-label="Skill tree viewport">
+        <div class="skill-tree-canvas" id="skillTreeCanvas">
+          <svg class="skill-connections" viewBox="0 0 921 923" preserveAspectRatio="none" aria-hidden="true">${connections}</svg>
+          ${nodes}
+        </div>
+      </div>
+      <div id="skillDetail" class="skill-detail" aria-live="polite"></div>
+    `;
+    renderSkillDetail(selectedNode?.id);
+    setupSkillTreeViewport();
+  }
+
+  function updateSkillTreeState(selectedNodeId) {
+    const skills = currentSkillTree();
+    const pointsBySkillId = new Map((data.SKILL_TREE_LAYOUT || []).map((point) => [point.skillId, point]));
+    document.querySelectorAll("#skillTreeCanvas [data-skill-id]").forEach((button) => {
+      const node = skills.find((skill) => skill.id === button.dataset.skillId);
+      if (!node) return;
+      const status = skillNodeState(node);
+      const point = pointsBySkillId.get(node.nodeId);
+      const isCenter = node.center;
+      button.className = `skill-node is-${status.name}${isCenter ? " is-center" : ""}${point?.isAnchor ? " is-branch-anchor" : ""}`;
+      button.setAttribute("aria-pressed", String(status.name === "selected"));
+      button.setAttribute("aria-label", `${localizeSkillName(node)}: ${status.label}`);
+    });
+    document.querySelectorAll("#skillTreeCanvas .skill-connection").forEach((line) => {
+      const fromSelected = isSkillUnlocked(line.dataset.fromSkillId);
+      const toSelected = isSkillUnlocked(line.dataset.toSkillId);
+      line.classList.toggle("is-active", fromSelected || toSelected);
+    });
+    const pointsLabel = $("skillTree").querySelector?.("[data-skill-points]");
+    if (pointsLabel) {
+      const total = skills.reduce((sum, node) => sum + node.cost, 0);
+      pointsLabel.textContent = `${skillClassName(state.classId)} · ${availableSkillPoints()} / ${total} skill points`;
+    }
+    renderSkillDetail(selectedNodeId);
+  }
+
+  const skillTreeViewState = {
+    scale: 1,
+    offsetX: 0,
+    offsetY: 0,
+    pointerStartX: 0,
+    pointerStartY: 0,
+    originX: 0,
+    originY: 0,
+    initialized: false,
+    userInteracted: false,
+    resizeListenerBound: false,
+    dragging: false,
+    pointerId: null
+  };
+
+  function resetSkillTreeViewport(viewport) {
+    if (!viewport) return;
+    const width = viewport.clientWidth || 921;
+    const height = viewport.clientHeight || 923;
+    const scale = Math.min(0.94, (width - 24) / 921, (height - 24) / 923);
+    skillTreeViewState.scale = Math.max(0.4, scale);
+    skillTreeViewState.offsetX = (width - 921 * skillTreeViewState.scale) / 2;
+    skillTreeViewState.offsetY = (height - 923 * skillTreeViewState.scale) / 2;
+    skillTreeViewState.userInteracted = false;
+    applySkillTreeTransform();
+  }
+
+  function applySkillTreeTransform() {
+    const viewport = $("skillTreeViewport");
+    const canvas = $("skillTreeCanvas");
+    if (!viewport || !canvas) return;
+    const clamped = Math.min(2, Math.max(0.4, skillTreeViewState.scale));
+    skillTreeViewState.scale = clamped;
+    if (canvas.style) canvas.style.transform = `translate(${skillTreeViewState.offsetX}px, ${skillTreeViewState.offsetY}px) scale(${clamped})`;
+    if (viewport.classList && typeof viewport.classList.toggle === "function") {
+      viewport.classList.toggle("is-dragging", skillTreeViewState.dragging);
+    } else if (viewport.setAttribute) {
+      viewport.setAttribute("data-dragging", skillTreeViewState.dragging ? "true" : "false");
+    }
+  }
+
+  function setupSkillTreeViewport() {
+    const viewport = $("skillTreeViewport");
+    const canvas = $("skillTreeCanvas");
+    if (!viewport || !canvas) return;
+
+    if (!viewport.addEventListener || !canvas.style) return;
+
+    if (!skillTreeViewState.initialized) {
+      resetSkillTreeViewport(viewport);
+      skillTreeViewState.initialized = true;
+    } else {
+      applySkillTreeTransform();
+    }
+    if (!skillTreeViewState.resizeListenerBound && window.addEventListener) {
+      window.addEventListener("resize", () => {
+        if (!skillTreeViewState.userInteracted) resetSkillTreeViewport($("skillTreeViewport"));
+      });
+      skillTreeViewState.resizeListenerBound = true;
+    }
+
+    const clampOffset = () => {
+      const minX = Math.min(0, viewport.clientWidth - 921 * skillTreeViewState.scale);
+      const minY = Math.min(0, viewport.clientHeight - 923 * skillTreeViewState.scale);
+      const maxX = Math.max(0, viewport.clientWidth - 921 * skillTreeViewState.scale);
+      const maxY = Math.max(0, viewport.clientHeight - 923 * skillTreeViewState.scale);
+      skillTreeViewState.offsetX = Math.max(minX, Math.min(maxX, skillTreeViewState.offsetX));
+      skillTreeViewState.offsetY = Math.max(minY, Math.min(maxY, skillTreeViewState.offsetY));
+    };
+
+    viewport.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const rect = viewport.getBoundingClientRect();
+      const pointerX = event.clientX - rect.left;
+      const pointerY = event.clientY - rect.top;
+      const previousScale = skillTreeViewState.scale;
+      const nextScale = Math.min(2, Math.max(0.4, previousScale * (event.deltaY < 0 ? 1.12 : 0.89)));
+      const worldX = (pointerX - skillTreeViewState.offsetX) / previousScale;
+      const worldY = (pointerY - skillTreeViewState.offsetY) / previousScale;
+      skillTreeViewState.scale = nextScale;
+      skillTreeViewState.offsetX = pointerX - worldX * nextScale;
+      skillTreeViewState.offsetY = pointerY - worldY * nextScale;
+      skillTreeViewState.userInteracted = true;
+      clampOffset();
+      applySkillTreeTransform();
+    }, { passive: false });
+
+    viewport.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || !event.isPrimary || skillTreeViewState.dragging) return;
+      if (event.target.closest("[data-skill-id]")) return;
+      event.preventDefault();
+      skillTreeViewState.dragging = true;
+      skillTreeViewState.pointerId = event.pointerId;
+      skillTreeViewState.pointerStartX = event.clientX;
+      skillTreeViewState.pointerStartY = event.clientY;
+      skillTreeViewState.originX = skillTreeViewState.offsetX;
+      skillTreeViewState.originY = skillTreeViewState.offsetY;
+      skillTreeViewState.userInteracted = true;
+      try {
+        viewport.setPointerCapture?.(event.pointerId);
+      } catch {
+        skillTreeViewState.dragging = false;
+        skillTreeViewState.pointerId = null;
+        applySkillTreeTransform();
+      }
+      if (skillTreeViewState.dragging) applySkillTreeTransform();
+    });
+
+    viewport.addEventListener("pointermove", (event) => {
+      if (!skillTreeViewState.dragging || event.pointerId !== skillTreeViewState.pointerId) return;
+      const deltaX = event.clientX - skillTreeViewState.pointerStartX;
+      const deltaY = event.clientY - skillTreeViewState.pointerStartY;
+      skillTreeViewState.offsetX = skillTreeViewState.originX + deltaX;
+      skillTreeViewState.offsetY = skillTreeViewState.originY + deltaY;
+      clampOffset();
+      applySkillTreeTransform();
+    });
+
+    const stopDrag = (event) => {
+      if (!skillTreeViewState.dragging) return;
+      if (event && event.pointerId !== skillTreeViewState.pointerId) return;
+      const pointerId = skillTreeViewState.pointerId;
+      skillTreeViewState.dragging = false;
+      skillTreeViewState.pointerId = null;
+      if (pointerId !== null && viewport.hasPointerCapture?.(pointerId)) {
+        viewport.releasePointerCapture(pointerId);
+      }
+      applySkillTreeTransform();
+    };
+
+    viewport.addEventListener("pointerup", stopDrag);
+    viewport.addEventListener("pointercancel", stopDrag);
+    viewport.addEventListener("lostpointercapture", stopDrag);
+
+    if ($("skillTree").querySelector) {
+      $("skillTree").querySelector("[data-reset-view]")?.addEventListener("click", (event) => {
+        event.stopPropagation();
+        resetSkillTreeViewport($("skillTreeViewport"));
+      });
+    }
   }
 
   function setFilterOptions() {
@@ -602,28 +904,23 @@
   function unlockSkill(skillId) {
     const node = currentSkillTree().find((item) => item.id === skillId);
     if (!node) return;
+    if (node.center) {
+      renderSkillDetail(skillId);
+      return;
+    }
     const status = skillNodeState(node);
     if (status.name === "selected") {
-      const hasSelectedDescendant = currentSkillTree().some(
-        (candidate) => activeSkillState().selectedSkills[candidate.id] && candidate.prerequisites.includes(node.id)
-      );
-      if (hasSelectedDescendant) {
-        renderSkillDetail(skillId);
-        $("skillDetail").insertAdjacentHTML(
-          "beforeend",
-          `<span>${escapeHtml(t("page.characterBuild.deselectDependent"))}</span>`
-        );
-        return;
-      }
       delete activeSkillState().selectedSkills[node.id];
+      pruneInvalidSelectedSkills();
     } else if (status.name === "available") {
       activeSkillState().selectedSkills[node.id] = true;
+      pruneInvalidSelectedSkills();
     } else {
       renderSkillDetail(skillId);
       return;
     }
     saveState();
-    renderSkills();
+    updateSkillTreeState(skillId);
     renderStats();
   }
 
@@ -787,6 +1084,7 @@
       if (!Object.prototype.hasOwnProperty.call(buildSlots, event.target.value)) return;
       state.activeSlot = event.target.value;
       syncActiveConfiguration();
+      pruneInvalidSelectedSkills();
       setFilterOptions();
       renderConfiguration();
       renderSlots();

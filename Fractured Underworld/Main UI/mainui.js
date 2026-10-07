@@ -17,6 +17,7 @@ function createVirtualControl(initialValue, propertyName) {
 const elements = {
   mapContainer: document.getElementById("mapContainer"),
   sidebar: document.getElementById("sidebar"),
+  mapDataModeBanner: document.getElementById("mapDataModeBanner"),
   sidebarResizeHandle: document.getElementById("sidebarResizeHandle"),
   mapLayer: document.getElementById("mapLayer"),
   mapImage: document.getElementById("mapImage"),
@@ -44,6 +45,7 @@ let categoryToggleButtons = [];
 
 const {
   mapContainer,
+  mapDataModeBanner,
   sidebar,
   sidebarResizeHandle,
   mapLayer,
@@ -125,7 +127,7 @@ function hasRequiredMainUiElements() {
 
 const mapAdapter = window.UnderworldMapAdapter || null;
 let customWaypointStore = null;
-let mapContextMenuState = { event: null, x: null, z: null };
+let mapContextMenuState = { event: null };
 let walkthroughContextMenuDemoState = null;
 let pendingCustomWaypointFloor = "";
 let customWaypointStatusKey = "";
@@ -162,6 +164,18 @@ const mapWalkthroughStorageKey = "sao.walkthrough.mainui.completed";
 const i18n = window.SAOI18n || null;
 const { t, content: contentLookup } = window.SAOPageHelpers.createTranslators(i18n);
 const storage = window.SAOPageHelpers.getStorage();
+
+/* The banner inside the map box states which data mode this world is showing. It is written when
+   the map initialises and again on language changes - never during pan, zoom or marker work. */
+function syncDataModeBanner() {
+  if (!mapDataModeBanner) return;
+  const key =
+    window.SAODatasets?.getDatasetFromLocation() === "current"
+      ? "page.maps.dataModeBanner.current"
+      : "page.maps.dataModeBanner.beta";
+  mapDataModeBanner.setAttribute("data-i18n", key);
+  mapDataModeBanner.textContent = t(key);
+}
 
 const initialCategoryState = Object.freeze({
   custom: false,
@@ -326,8 +340,7 @@ function syncIslandNavigation() {
 function renderCategorySidebar() {
   const categoryList = document.getElementById("categoryList");
   const sectionHeader = document.getElementById("categorySectionHeader");
-  const customSidebarSection =
-    document.getElementById("customMarkerSidebarSection") || document.getElementById("customCategoryItem");
+  const customSidebarSection = document.getElementById("customCategoryItem");
   const customSidebarList = document.getElementById("customWaypointSidebarList");
   const selectedFloor = floorSelect?.value || mapAdapter?.defaultFloor || "";
   const categories = getIslandCategoriesForFloor(selectedFloor);
@@ -504,12 +517,11 @@ function attachSectionNavButtons() {
     const button = event.target.closest("button[data-nav-target]");
     if (!button) return;
 
-    const outcome = window.SAOPageUtils.navigateToSection(button, {
+    window.SAOPageUtils.navigateToSection(button, {
       sectionPaths: window.SAOPageUtils.UNDERWORLD_SECTION_PATHS,
       floorAwareSections: window.SAOPageUtils.UNDERWORLD_FLOOR_AWARE_SECTIONS,
       floorProvider: () => floorSelect.value
     });
-    if (outcome === "dataset") event.preventDefault();
   });
 }
 
@@ -909,7 +921,7 @@ function closeMapContextMenu() {
   if (!menu) return;
   menu.hidden = true;
   menu.setAttribute("aria-hidden", "true");
-  mapContextMenuState = { event: null, x: null, z: null };
+  mapContextMenuState = { event: null };
 }
 
 function updateMapContextMenuPosition(clientX, clientY) {
@@ -947,7 +959,7 @@ function openMapContextMenu(event) {
   const menu = document.getElementById("mapContextMenu");
   if (!menu) return;
 
-  mapContextMenuState = { event, x: mapped?.x ?? null, z: mapped?.z ?? null };
+  mapContextMenuState = { event };
   menu.hidden = false;
   menu.setAttribute("aria-hidden", "false");
   updateMapContextMenuPosition(event.clientX, event.clientY);
@@ -997,57 +1009,24 @@ function exitWalkthroughContextMenuDemo() {
   walkthroughContextMenuDemoState = null;
 }
 
+/* Collects the enabled Fractured Underworld waypoint categories for export. The shared exporter
+   builds the category structure; this only supplies the Underworld's own category state, marker
+   dataset, ids and custom-category colour resolver. */
 function getJourneyMapExportCategories() {
   const runtime = sharedMapRuntime || window.__underworldMapRuntime || null;
   const activeCategories = runtime && typeof runtime.getCategoryStates === "function" ? runtime.getCategoryStates() : {};
-  const floor = floorSelect ? floorSelect.value : mapAdapter?.defaultFloor || "";
   const contextData = getContextData ? getContextData() : { markerDataset: {} };
-  const result = {};
-
-  Object.entries(activeCategories).forEach(([category, isEnabled]) => {
-    if (!isEnabled) return;
-
-    Object.values(contextData.markerDataset || {}).forEach((marker) => {
-      if (!marker || marker.floor !== floor || marker.category !== category) return;
-
-      const x = Number(marker.coords && marker.coords.x !== undefined ? marker.coords.x : marker.x ?? 0);
-      const y = Number(marker.coords && marker.coords.y !== undefined ? marker.coords.y : marker.y ?? -30);
-      const z = Number(marker.coords && marker.coords.z !== undefined ? marker.coords.z : marker.z ?? 0);
-      const exportCategory =
-        marker.category === "custom"
-          ? String(marker.customWaypointButton || "Custom").trim() || "Custom"
-          : category;
-      const world = mapAdapter?.mapId || mapAdapter?.id || "underworld";
-      const colorUtils = window.SAOColorUtils || window.SAOJourneyMapColors;
-      const categoryColor =
-        marker.category === "custom"
-          ? customWaypointStore?.getButtonColor(exportCategory, floor) ||
-            ensurePersistedCustomWaypointCategoryColor(exportCategory, floor)
-          : colorUtils?.getHardcodedCategoryColor?.(exportCategory) ||
-            colorUtils?.getJourneyMapColorValue?.(exportCategory, { world });
-      const waypointColor = marker.category === "custom" ? marker.color ?? categoryColor : categoryColor;
-
-      const entry = {
-        name: String(marker.title || marker.id || category).trim() || category,
-        x: Number.isFinite(x) ? x : 0,
-        y: Number.isFinite(y) ? y : -30,
-        z: Number.isFinite(z) ? z : 0,
-        dim: String(mapAdapter?.id || "overworld"),
-        icon: marker.icon || marker.customLogo || marker.logo || "pin",
-        color: waypointColor,
-        categoryColor,
-        enabled: 1,
-        visible: 1,
-        group: exportCategory,
-        uuid: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`),
-        id: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`)
-      };
-      if (!result[exportCategory]) result[exportCategory] = [];
-      result[exportCategory].push(entry);
-    });
+  const world = mapAdapter?.mapId || mapAdapter?.id || "underworld";
+  return window.SAOJourneyMapExport.collectJourneyMapExportCategories({
+    categories: activeCategories,
+    markers: contextData.markerDataset || {},
+    floor: floorSelect ? floorSelect.value : mapAdapter?.defaultFloor || "",
+    world,
+    dimensionId: String(mapAdapter?.id || "overworld"),
+    resolveCustomCategoryColor: (buttonName, floor) =>
+      customWaypointStore?.getButtonColor(buttonName, floor) ||
+      ensurePersistedCustomWaypointCategoryColor(buttonName, floor)
   });
-
-  return result;
 }
 
 function exportCurrentJourneyMapWaypoints() {
@@ -1500,7 +1479,11 @@ function updateCustomWaypointCategoryColorState() {
   if (picker) picker.dataset.locked = String(isBiomes);
   if (colorInput) colorInput.disabled = isBiomes;
   if (hexInput) hexInput.readOnly = isBiomes;
-  if (hint) hint.textContent = isBiomes ? "Biomes color is locked to white" : "Click to choose a color";
+  if (hint) {
+    hint.textContent = t(
+      isBiomes ? "page.maps.customWaypoint.colorHintBiomes" : "page.maps.customWaypoint.colorHint"
+    );
+  }
   const enteredHex = hexInput?.value || "";
   const pickerValue = colorInput?.value || "";
   const currentValue = normalizeCustomWaypointCategoryColor(enteredHex)
@@ -1516,7 +1499,7 @@ function getCustomWaypointCategoryColorValue() {
   const colorInput = document.getElementById("customWaypointCategoryColor");
   const value = normalizeCustomWaypointCategoryColor((hexInput && hexInput.value) || (colorInput && colorInput.value) || "");
   if (hexInput && !value) {
-    hexInput.setCustomValidity("Invalid HEX color");
+    hexInput.setCustomValidity(t("page.maps.customWaypoint.invalidHex"));
     hexInput.reportValidity();
     return null;
   }
@@ -1667,7 +1650,7 @@ function createCustomWaypoint(event) {
     document.getElementById("customWaypointButtonSelect")?.value === "__create__" &&
     !categoryColor
   ) {
-    document.getElementById("customWaypointCategoryHex")?.setCustomValidity("Invalid HEX color");
+    document.getElementById("customWaypointCategoryHex")?.setCustomValidity(t("page.maps.customWaypoint.invalidHex"));
     document.getElementById("customWaypointCategoryHex")?.reportValidity();
     return;
   }
@@ -2337,6 +2320,7 @@ function init() {
     floorSelect.value = requestedFloor;
   }
   registerUnderworldMapTranslations();
+  syncDataModeBanner();
   if (undergroundToggle) {
     undergroundToggle.checked = Boolean(initialState.underground);
   }
@@ -2433,7 +2417,7 @@ function init() {
         customWaypointColorHexInput.setCustomValidity("");
         applyCustomWaypointCategoryColor(normalized);
       } else {
-        customWaypointColorHexInput.setCustomValidity("Invalid HEX color");
+        customWaypointColorHexInput.setCustomValidity(t("page.maps.customWaypoint.invalidHex"));
       }
     });
   }
@@ -2569,6 +2553,7 @@ function init() {
   });
 
   addPageEventListener(document, "sao:languagechange", () => {
+    syncDataModeBanner();
     renderCategorySidebar();
     syncMainCategoryButtonVisibility();
     markerSearchCache = null;

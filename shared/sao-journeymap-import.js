@@ -413,6 +413,8 @@
       if (!target || !target.floors || !target.floors[target.defaultFloor]) fail("unsupported");
       const floor = target.defaultFloor;
       const identity = JSON.stringify(["JourneyMap", world, waypoint.groupId, waypoint.guid]);
+      /* JourneyMap files already carry Minecraft coordinates, which is what the waypoint store
+         holds, so the file position is copied through unchanged. */
       prepared.push({
         world,
         record: {

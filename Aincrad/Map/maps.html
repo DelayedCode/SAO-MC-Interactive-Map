@@ -103,6 +103,16 @@
       </nav>
       <div class="header-main">
         <h1 data-i18n="page.maps.title">SAO Interactive Map</h1>
+        <div
+          id="mapDataModeBanner"
+          class="map-data-banner"
+          role="note"
+          data-i18n="page.maps.dataModeBanner.beta"
+        >
+          This is Beta-Test Data! A lot of the information is inaccurate, so please don’t come to me if something
+          here is wrong. I only recommend viewing this Data Type if you can’t find what you’re looking for in
+          Current Data.
+        </div>
         <div class="controls">
           <label for="floorSelect" data-i18n="page.maps.floorLabel">Floor:</label>
           <div class="sao-select-wrap" id="floorSelectWrap">
@@ -545,6 +555,16 @@
               <button
                 class="sidebar-list-button"
                 type="button"
+                data-category="secretAccessoryBlacksmith"
+                data-i18n="page.maps.categories.secretAccessoryBlacksmith"
+              >
+                Secret Accessory Blacksmith
+              </button>
+            </li>
+            <li>
+              <button
+                class="sidebar-list-button"
+                type="button"
                 data-category="weaponsmith"
                 data-i18n="page.maps.categories.weaponsmith"
               >
@@ -584,17 +604,19 @@
           <input id="customWaypointButtonName" name="buttonName" type="text" maxlength="40" />
         </div>
         <div id="customWaypointCategoryColorRow" hidden>
-          <label for="customWaypointCategoryColor">Color Selector for "JourneyMap" Export</label>
+          <label for="customWaypointCategoryColor" data-i18n="page.maps.customWaypoint.colorSelectorLabel">Color Selector for "JourneyMap" Export</label>
           <div class="custom-waypoint-color-row">
             <div class="custom-waypoint-color-picker">
               <span id="customWaypointCategorySwatch" class="custom-waypoint-color-swatch" aria-hidden="true"></span>
-              <span id="customWaypointCategoryColorHint" class="custom-waypoint-color-hint">Click to choose a color</span>
+              <span id="customWaypointCategoryColorHint" class="custom-waypoint-color-hint" data-i18n="page.maps.customWaypoint.colorHint">Click to choose a color</span>
               <input
                 id="customWaypointCategoryColor"
                 name="categoryColor"
                 type="color"
                 value="#000000"
+                data-i18n-aria-label="page.maps.customWaypoint.colorPickerAria"
                 aria-label="Choose JourneyMap category color"
+                data-i18n-title="page.maps.customWaypoint.colorHint"
                 title="Click to choose a color"
               />
             </div>
@@ -605,7 +627,9 @@
               inputmode="text"
               spellcheck="false"
               maxlength="7"
+              data-i18n-aria-label="page.maps.customWaypoint.colorHexAria"
               aria-label="JourneyMap category HEX color"
+              data-i18n-placeholder="page.maps.customWaypoint.colorHexPlaceholder"
               placeholder="#RRGGBB"
             />
           </div>
@@ -721,6 +745,7 @@
     <script src="maps_floor2.js"></script>
     <script src="maps_floor3.js"></script>
     <script src="maps_mainquests.js"></script>
+    <script src="maps_current.js"></script>
     <script src="../../shared/sao-storage.js"></script>
     <script src="../../shared/sao-page-utils.js"></script>
     <script src="../../shared/sao-i18n.js?v=aincrad-map-labels"></script>

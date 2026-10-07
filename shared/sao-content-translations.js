@@ -1052,9 +1052,11 @@ const curatedTerminology = {
   "Effect: Repair": ["Efecto: reparación", "Effet : réparation"],
   "Effect: Spirit Increase": ["Efecto: aumento de espíritu", "Effet : augmentation de l'esprit"],
   "Effect: Stamina": ["Efecto: resistencia", "Effet : endurance"],
+  "Dodge": ["Esquiva", "Esquive"],
   "Falls Reduction": ["Reducción de caídas", "Réduction des chutes"],
   "Health Regeneration": ["Regeneración de salud", "Régénération de santé"],
   "Health Restored": ["Salud restaurada", "Santé restaurée"],
+  "Life Steal": ["Robo de vida", "Vol de vie"],
   "Max Health": ["Salud máxima", "Santé maximale"],
   "Max Health Boost": ["Aumento de salud máxima", "Augmentation de santé maximale"],
   "Max Stamina": ["Resistencia máxima", "Endurance maximale"],
@@ -1063,6 +1065,7 @@ const curatedTerminology = {
   "Projectile Damage": ["Daño de proyectil", "Dégâts de projectile"],
   "Skill Critical Damage": ["Daño crítico de habilidad", "Dégâts critiques de compétence"],
   "Skill Damage": ["Daño de habilidad", "Dégâts de compétence"],
+  "Spell Vampirism": ["Vampirismo de hechizos", "Vampirisme de sorts"],
   "Stamina Regeneration": ["Regeneración de resistencia", "Régénération d'endurance"],
   "Stamina Restored": ["Resistencia restaurada", "Endurance restaurée"],
   "Weapon Damage": ["Daño de arma", "Dégâts d'arme"],
@@ -1743,7 +1746,24 @@ const curatedTerminology = {
   "Orichalcum Ingot": ["Lingote de oricalco", "Lingot d'orichalque"],
   "Ring Without Name": ["Anillo sin nombre", "Anneau sans nom"],
   "Scots Bark": ["Corteza de pino silvestre", "Écorce de pin sylvestre"],
-  Sharkfish: ["Pez tiburón", "Poisson-requin"]
+  Sharkfish: ["Pez tiburón", "Poisson-requin"],
+  /* --- Current-Data accessory materials (the Ice Spirits, Ice Golem, Peaceful Deer and Shark
+     sets). "Hard Glacial Hide" and "Shark Carapace" name the same materials the glossary already
+     curates as "Glacial Hardhide" and "Shark Shell", so they reuse those translations --- */
+  "Birch String": ["Cuerda de abedul", "Corde de bouleau"],
+  "Hard Glacial Hide": ["Cuero duro glacial", "Cuir glacé"],
+  "Mountain Stag Hide": ["Piel de ciervo montañés", "Peau de cerf des montagnes"],
+  "Oak String": ["Cuerda de roble", "Corde de chêne"],
+  "Shark Carapace": ["Caparazón de tiburón", "Carapace de requin"],
+  /* --- Current-Data accessory materials added with the Iron, Copper, Nepenthes, Elite Treant,
+     secret and Shadow Neophyte sets. "Sylve Sprout" is the same material the glossary already
+     curates as "Sylve shoot" --- */
+  "Copper String": ["Cuerda de cobre", "Corde de cuivre"],
+  "Fragment of the Bear's Soul": ["Fragmento del alma del oso", "Fragment de l'âme de l'ours"],
+  "Iron String": ["Cuerda de hierro", "Corde de fer"],
+  "Leaf Fragments": ["Fragmentos de hojas", "Fragments de feuilles"],
+  "Spider Venom": ["Veneno de araña", "Venin d'araignée"],
+  "Sylve Sprout": ["Brote de Sylve", "Pousse de Sylve"]
   /* end curated terminology */
 };
 Object.assign(equipmentTerminology, curatedTerminology);
@@ -6345,7 +6365,7 @@ function translateCharacterBuildText(value, language) {
   return translated;
 }
 
-window.SAOContentTranslations.registerCharacterBuildNode = function registerCharacterBuildNode(node, classId, branch) {
+window.SAOContentTranslations.registerCharacterBuildNode = function registerCharacterBuildNode(node) {
   const baseKey = `characterBuild.skill.${node.id}`;
   window.SAOContentTranslations.register(
     baseKey + ".name",
@@ -6355,9 +6375,9 @@ window.SAOContentTranslations.registerCharacterBuildNode = function registerChar
   );
   window.SAOContentTranslations.register(
     baseKey + ".description",
-    `Prototype {branch} node for {classId}.`,
-    `Nodo de prototipo {branch} para {classId}.`,
-    `Nœud prototype {branch} pour {classId}.`
+    node.description,
+    translateCharacterBuildText(node.description, "es"),
+    translateCharacterBuildText(node.description, "fr")
   );
 };
 

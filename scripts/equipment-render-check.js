@@ -52,6 +52,80 @@ async function verifyCategory(page, floor, category) {
   return expected.length;
 }
 
+/* The Current dataset renders from window.SAO_CURRENT_EQUIPMENT_DATA. Every supplied item must
+   appear in its category tab with its exact stats, level, set and crafting resources (including the
+   Col cost). */
+async function verifyCurrentDataset(page) {
+  await page.goto(`${rootUrl}/Aincrad/eCompendium/ecompendium.html?floor=floor1&dataset=current`, {
+    waitUntil: "networkidle",
+    timeout: 120000
+  });
+  const expectedByCategory = await page.evaluate(() => {
+    const floor = window.SAO_CURRENT_EQUIPMENT_DATA?.floor1 || {};
+    const expected = {};
+    Object.entries(floor).forEach(([category, entries]) => {
+      if (!Array.isArray(entries) || entries.length === 0) return;
+      expected[category] = entries
+        .slice()
+        .sort((first, second) => (first.level || 0) - (second.level || 0) || first.name.localeCompare(second.name))
+        .map((entry) => ({
+          name: entry.name,
+          level: entry.level === undefined ? null : String(entry.level),
+          set: entry.set || null,
+          stats: Object.entries(entry.stats || {}).map(([name, value]) => [name, String(value)]),
+          resources: (entry.craftingResources || []).map((resource) => [resource.item, String(resource.amount)])
+        }));
+    });
+    return expected;
+  });
+  const categories = Object.keys(expectedByCategory);
+  assert.ok(categories.length > 0, "the Current dataset ships equipment");
+
+  let renderedCount = 0;
+  for (const category of categories) {
+    const expected = expectedByCategory[category];
+    await page.locator(`.list-tab[data-category="${category}"]`).click();
+    await page.locator("#ecompendiumSearch").fill("");
+    await page.waitForFunction((count) => document.querySelectorAll(".ecompendium-card").length === count, expected.length, {
+      timeout: 20000
+    });
+
+    const rendered = await page.locator(".ecompendium-card").evaluateAll((cards) =>
+      cards.map((card) => {
+        const meta = [...card.querySelectorAll(".ecompendium-meta p")].map((row) => [
+          row.children[0].textContent,
+          row.children[1].textContent
+        ]);
+        return {
+          name: card.querySelector(".ecompendium-name")?.textContent.trim(),
+          level: meta.find(([label]) => label === "Level")?.[1] ?? null,
+          set: meta.find(([label]) => label === "Set")?.[1] ?? null,
+          stats: [...card.querySelectorAll(".stat-list li")].map((row) => [row.children[0].textContent, row.children[1].textContent]),
+          resources: [...card.querySelectorAll(".resource-list li")].map((row) => [
+            row.querySelector("span").textContent,
+            row.querySelector("strong").textContent.replace(/^x/, "")
+          ])
+        };
+      })
+    );
+
+    assert.deepEqual(
+      rendered.map((card) => card.name),
+      expected.map((entry) => entry.name),
+      `Current Data renders every supplied ${category} item`
+    );
+    expected.forEach((entry, index) => {
+      const card = rendered[index];
+      assert.equal(card.level, entry.level, `${entry.name}: rendered minimum level`);
+      assert.equal(card.set, entry.set, `${entry.name}: rendered set`);
+      assert.deepEqual(card.stats, entry.stats, `${entry.name}: rendered statistics`);
+      assert.deepEqual(card.resources, entry.resources, `${entry.name}: rendered resources and Col cost`);
+    });
+    renderedCount += rendered.length;
+  }
+  return { categories, items: renderedCount };
+}
+
 async function verifyLocalizedEquipmentEntry(page, floor, itemName, expectedName, expectedResource) {
   await page.goto(`${rootUrl}/Aincrad/eCompendium/ecompendium.html?floor=${floor}&dataset=beta`, {
     waitUntil: "networkidle",
@@ -307,21 +381,28 @@ async function verifyOccultBonusRows(page, language) {
       await verifyOccultBonusRows(page, language);
     }
 
+    /* The Current dataset ships accessories only: the other categories are still empty states, and
+       the accessory tab renders every supplied Current accessory. The Compendium restores the last
+       category and search it stored, so both are set explicitly before asserting. */
     await page.goto(`${rootUrl}/Aincrad/eCompendium/ecompendium.html?floor=floor1&dataset=current`, {
       waitUntil: "networkidle",
       timeout: 120000
     });
-    await page.evaluate(() => window.SAOI18n.setLanguage("es"));
+    await page.locator("#ecompendiumSearch").fill("");
+    await page.locator('.list-tab[data-category="weapon"]').click();
     await page.locator(".empty-state").waitFor();
     assert.equal(
       await page.locator(".ecompendium-card").count(),
       0,
-      "Current Data contains no fabricated equipment examples"
+      "Current Data ships no weapon records"
     );
+    await page.evaluate(() => window.SAOI18n.setLanguage("es"));
     assert.equal(
       await page.locator(".empty-state").textContent(),
       await page.evaluate(() => window.SAOI18n.t("page.ecompendium.noEntriesFound"))
     );
+    await page.evaluate(() => window.SAOI18n.setLanguage("en"));
+    const currentDataset = await verifyCurrentDataset(page);
     assert.deepEqual(browserErrors, []);
     console.log(
       JSON.stringify(
@@ -331,7 +412,11 @@ async function verifyOccultBonusRows(page, language) {
           floors: ["floor1", "floor2", "floor3"],
           languages: ["en", "es", "fr"],
           mobile: "passed",
-          currentDataEmptyState: "passed",
+          currentEquipment: {
+            emptyWeaponCategory: true,
+            categories: currentDataset.categories,
+            items: currentDataset.items
+          },
           status: "passed"
         },
         null,

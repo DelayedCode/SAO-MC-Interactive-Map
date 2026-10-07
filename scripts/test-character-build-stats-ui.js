@@ -93,6 +93,62 @@ const DOCUMENTED_CLASS_BONUSES = {
 /* Level 1 is the base, so a build at level N holds (N - 1) increments. */
 const LEVELS_TO_CHECK = [1, 2, 15, 25];
 
+/* The Level 1 class base stats every build starts from; the level gains above are added on top. */
+const DOCUMENTED_CLASS_BASE_STATS = {
+  assassin: {
+    Health: gain(24),
+    Damage: gain(1),
+    Mana: gain(20),
+    Evasion: gain(5),
+    "Attack Speed": gain(0, 12.5),
+    "Critical Hit Chance": gain(0, 1),
+    "Critical Hit Damage": gain(0, 200),
+    "Movement Speed": gain(0, -68)
+  },
+  archer: {
+    Health: gain(20),
+    Damage: gain(1),
+    Mana: gain(20),
+    Evasion: gain(5),
+    "Attack Speed": gain(0, 12.5),
+    "Critical Hit Chance": gain(0, 1),
+    "Critical Hit Damage": gain(0, 200),
+    "Movement Speed": gain(0, 16)
+  },
+  guerrier: {
+    Health: gain(28),
+    Damage: gain(1),
+    Mana: gain(20),
+    Evasion: gain(5),
+    "Attack Speed": gain(0, 12.5),
+    "Critical Hit Chance": gain(0, 1),
+    "Critical Hit Damage": gain(0, 200),
+    "Movement Speed": gain(0, 10)
+  },
+  mage: {
+    Health: gain(20),
+    Damage: gain(1),
+    Mana: gain(20),
+    Evasion: gain(5),
+    "Attack Speed": gain(0, 12.5),
+    "Critical Hit Chance": gain(0, 1),
+    "Critical Hit Damage": gain(0, 200),
+    "Movement Speed": gain(0, 10)
+  },
+  shaman: {
+    Health: gain(20),
+    Damage: gain(1),
+    Mana: gain(20),
+    Evasion: gain(5),
+    "Attack Speed": gain(0, 12.5),
+    "Critical Hit Chance": gain(0, 1),
+    "Critical Hit Damage": gain(0, 200),
+    "Movement Speed": gain(0, 10)
+  },
+  /* The calculator defines no Level 1 base stats for this class. */
+  "martial-artist": {}
+};
+
 function parseRenderedValue(text) {
   const clean = String(text).replace(/\*$/, "").trim();
   const percentMatch = clean.match(/\(([-+]?\d+(?:\.\d+)?)%\)/);
@@ -266,15 +322,17 @@ async function openCharacterBuild(browser, language) {
   return { context, page, ...diagnostics };
 }
 
-/* Asserts the rendered stats equal the documented class gains for the checked level. */
+/* Asserts the rendered stats equal the class' Level 1 base plus the documented gains for the level. */
 function assertStatsMatch(values, { label, classId, level }) {
   const bonuses = DOCUMENTED_CLASS_BONUSES[classId] || {};
+  const bases = DOCUMENTED_CLASS_BASE_STATS[classId] || {};
   const increments = level - 1;
   assert.equal(values.length, SUPPORTED_STATS.length, `${label}: every supported stat renders`);
   SUPPORTED_STATS.forEach((stat, index) => {
     const bonus = bonuses[stat] || { flat: 0, percent: 0 };
-    const expectedFlat = bonus.flat * increments;
-    const expectedPercent = bonus.percent * increments;
+    const base = bases[stat] || { flat: 0, percent: 0 };
+    const expectedFlat = base.flat + bonus.flat * increments;
+    const expectedPercent = base.percent + bonus.percent * increments;
     const rendered = parseRenderedValue(values[index]);
     assert.ok(
       Math.abs(rendered.flat - expectedFlat) < 1e-6,
@@ -284,7 +342,7 @@ function assertStatsMatch(values, { label, classId, level }) {
       Math.abs(rendered.percent - expectedPercent) < 1e-6,
       `${label}: ${stat} percent should be ${expectedPercent}% (rendered ${values[index]})`
     );
-    const expectedModified = expectedFlat !== 0 || expectedPercent !== 0;
+    const expectedModified = expectedFlat !== base.flat || expectedPercent !== base.percent;
     assert.equal(
       rendered.modified,
       expectedModified,
@@ -533,6 +591,10 @@ async function verifyRuneAndResetFlow(browser, language) {
           );
           const calculated = window.CharacterBuildCalculator.calculateBuildStats({
             equipment: { "main-weapon": item },
+            /* The sheet also carries the live Level 1 class base and the level gains, so the
+               expectation uses the same class and level the panel is showing. */
+            classId: document.getElementById("characterClass").value,
+            level: Number(document.getElementById("characterLevel").value),
             isAvailable: () => true
           });
           return {

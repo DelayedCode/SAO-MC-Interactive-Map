@@ -3,10 +3,11 @@ const CALIBRATION_MAP_SIZE = 900;
 const MAP_CALIBRATION = {
   /* Floor 1 carries a small alignment correction in centerGame: the coordinate grid sat 3 units
      high in X and 14 units low in Z against the artwork, so the reference center is offset by
-     (-3, +14) from its measured value. The projection math, the scale
-     (radiusGame/radiusPixel) and every stored waypoint coordinate are unchanged - this only
-     shifts where the existing coordinate grid sits on the floor 1 artwork. The shift is applied
-     in whole game units, so all distances and neighbouring readings stay consistent. */
+     (-3, +14) from its measured value. The projection math and the scale
+     (radiusGame/radiusPixel) are unchanged - this only shifts where the coordinate grid sits on the
+     floor 1 artwork. The shift is applied in whole game units, so all distances and neighbouring
+     readings stay consistent. It is a grid/artwork correction and is unrelated to the
+     map <-> Minecraft alignment below, which is applied on top of these calibration values. */
   floor1: {
     centerPixel: { x: 450, y: 450 },
     centerGame: { x: 2542.6, z: 2551 },
@@ -55,26 +56,62 @@ function calibrationPixelsToRaw(px, py, dimensions) {
   };
 }
 
+/* The canonical map <-> Minecraft boundary.
+ 
+   The map's own coordinate grid is what MAP_CALIBRATION is expressed in, and it is also what every
+   stored waypoint in maps_floor*.js and maps_mainquests.js holds: that grid sits 2 blocks west and
+   12 blocks north of the Minecraft position it describes. mapWebsiteCoordinates() therefore returns
+   Minecraft coordinates and invertMapCoordinates() accepts them, so one corrected system is shared
+   by marker placement, the coordinate readout, distance measurement, custom waypoint creation and
+   JourneyMap import/export - while the artwork itself, and therefore every marker's pixel, is
+   unchanged. */
+const MAP_COORDINATE_ALIGNMENT = Object.freeze({ x: 2, z: 12 });
+
+/* Map-grid coordinate -> the Minecraft coordinate for the same physical position. */
+function mapToMinecraftCoordinate(x, z) {
+  return {
+    x: Number(x) + MAP_COORDINATE_ALIGNMENT.x,
+    z: Number(z) + MAP_COORDINATE_ALIGNMENT.z
+  };
+}
+
+/* Minecraft coordinate -> the map-grid coordinate for the same physical position. */
+function minecraftToMapCoordinate(x, z) {
+  return {
+    x: Number(x) - MAP_COORDINATE_ALIGNMENT.x,
+    z: Number(z) - MAP_COORDINATE_ALIGNMENT.z
+  };
+}
+
+/* Only the Aincrad map is calibrated against the map grid, so only Aincrad's stored coordinates are
+   in that grid. The Underworld map has no calibration, so its coordinates are already Minecraft
+   coordinates and are never shifted. */
+const MAP_COORDINATE_ALIGNMENT_BY_WORLD = Object.freeze({ aincrad: MAP_COORDINATE_ALIGNMENT });
+
+function getMapCoordinateAlignment(world) {
+  return MAP_COORDINATE_ALIGNMENT_BY_WORLD[String(world || "").trim().toLowerCase()] || null;
+}
+
 function mapWebsiteCoordinates(rawX, rawY, floor, dimensions) {
   const calibration = MAP_CALIBRATION[floor];
   if (!calibration) return null;
 
   const pixel = rawToCalibrationPixels(rawX, rawY, dimensions);
   const scale = calibration.radiusGame / calibration.radiusPixel;
+  const gridX = calibration.centerGame.x + (pixel.x - calibration.centerPixel.x) * scale;
+  const gridZ = calibration.centerGame.z + (pixel.y - calibration.centerPixel.y) * scale;
 
-  return {
-    x: calibration.centerGame.x + (pixel.x - calibration.centerPixel.x) * scale,
-    z: calibration.centerGame.z + (pixel.y - calibration.centerPixel.y) * scale
-  };
+  return mapToMinecraftCoordinate(gridX, gridZ);
 }
 
 function invertMapCoordinates(x, z, floor, dimensions) {
   const calibration = MAP_CALIBRATION[floor];
   if (!calibration) return null;
 
+  const grid = minecraftToMapCoordinate(x, z);
   const scale = calibration.radiusPixel / calibration.radiusGame;
-  const pixelX = calibration.centerPixel.x + (x - calibration.centerGame.x) * scale;
-  const pixelY = calibration.centerPixel.y + (z - calibration.centerGame.z) * scale;
+  const pixelX = calibration.centerPixel.x + (grid.x - calibration.centerGame.x) * scale;
+  const pixelY = calibration.centerPixel.y + (grid.z - calibration.centerGame.z) * scale;
 
   return calibrationPixelsToRaw(pixelX, pixelY, dimensions);
 }

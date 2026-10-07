@@ -1058,7 +1058,12 @@
           data-i18n-aria-label="page.index.selectorAria"
           aria-label="Gamemode selector"
         >
-          <button class="mode-button aincrad" type="button" data-href="Aincrad/Map/maps.html">
+          <button
+            class="mode-button aincrad"
+            type="button"
+            data-href="Aincrad/Map/maps.html"
+            data-dataset-world="aincrad"
+          >
             <div class="card-title-row">
               <div class="title-cluster">
                 <span class="card-icon" aria-hidden="true"></span>
@@ -1073,7 +1078,12 @@
             </div>
           </button>
 
-          <button class="mode-button underworld" type="button" data-href="Fractured Underworld/Main UI/mainui.html">
+          <button
+            class="mode-button underworld"
+            type="button"
+            data-href="Fractured Underworld/Main UI/mainui.html"
+            data-dataset-world="underworld"
+          >
             <div class="card-title-row">
               <div class="title-cluster">
                 <span class="card-icon" aria-hidden="true"></span>
@@ -1224,6 +1234,7 @@
     <div id="status-toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="shared/sao-storage.js"></script>
+    <script src="shared/sao-datasets.js"></script>
     <script src="shared/sao-i18n.js"></script>
     <script src="shared/sao-walkthrough.js"></script>
     <script src="shared/sao-welcome-warning.js"></script>
@@ -1346,9 +1357,22 @@
               })
             : null;
 
+        /* Entering a world always asks for the data mode first, so the mode is chosen once per
+           world instead of being re-asked on every section page. Choosing again from here simply
+           overwrites the previous mode. */
+        const openWorldWithModeChoice = (button) => {
+          const world = button.dataset.datasetWorld;
+          const datasets = window.SAODatasets;
+          if (!world || !datasets || typeof datasets.openSelector !== "function") return false;
+          datasets.installStyles();
+          datasets.openSelector({ url: button.dataset.href, world });
+          return true;
+        };
+
         grid?.addEventListener("click", (event) => {
           const button = event.target.closest("button[data-href]");
           if (button) {
+            if (openWorldWithModeChoice(button)) return;
             window.location.assign(button.dataset.href);
             return;
           }

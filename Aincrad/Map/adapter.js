@@ -33,6 +33,20 @@
     ingotBlacksmith: true,
     keyBlacksmith: true,
     accessoriesBlacksmith: true,
+    secretAccessoryBlacksmith: true,
+    runeCraftsmen: true,
+    refaire: true
+  });
+
+  /* Categories that belong to Beta-Test Data only. Current Data has no waypoints behind them, so
+     the map hides their buttons while the Current Data mode is active; Beta keeps every button.
+     The categories themselves stay declared above, so the marker filtering and the Beta map are
+     unchanged. */
+  const betaOnlyCategories = Object.freeze({
+    weaponsmith: true,
+    armorBlacksmith: true,
+    ingotBlacksmith: true,
+    weaponSellers: true,
     runeCraftsmen: true,
     refaire: true
   });
@@ -58,10 +72,17 @@
     }
   });
 
-  const markerDataset = typeof DATA !== "undefined" ? DATA : globalObject.DATA || {};
-  const mobAreaDataset =
+  const fullMarkerDataset = typeof DATA !== "undefined" ? DATA : globalObject.DATA || {};
+  const fullMobAreaDataset =
     typeof MOB_AREAS !== "undefined" ? MOB_AREAS : Array.isArray(globalObject.MOB_AREAS) ? globalObject.MOB_AREAS : [];
   const mobAreaMobLookup = typeof MOB_AREA_MOBS !== "undefined" ? MOB_AREA_MOBS : globalObject.MOB_AREA_MOBS || {};
+
+  /* Main Quest waypoints are Current-Data-only (see shared/sao-datasets.js): Beta drops them and
+     Current keeps only them. Current also ships no Beta mob areas, so Beta keeps the full dataset. */
+  const isCurrentDataset = globalObject.SAODatasets?.getDatasetFromLocation?.() === "current";
+  const markerDataset =
+    globalObject.SAODatasets?.filterMarkerDatasetForActiveMode?.(fullMarkerDataset) || fullMarkerDataset;
+  const mobAreaDataset = isCurrentDataset ? [] : fullMobAreaDataset;
   const getContextData = globalObject.SAOMapRuntime.createContextDataResolver({
     markerDataset,
     mobAreaDataset,
@@ -85,6 +106,7 @@
     defaultFloor,
     floors,
     categories,
+    betaOnlyCategories,
     mapImageSources,
     assetAvailability: Object.freeze({
       floor1: true,

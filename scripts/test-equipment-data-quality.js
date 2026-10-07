@@ -37,7 +37,11 @@ assert.equal(
     .statsFields.some((field) => /Piece Set Bonus/.test(field)),
   false
 );
-assert.equal(report.currentDatasetEquipmentItems, 0);
+/* The Current dataset now ships the Ice Spirits, Ice Golem, Peaceful Deer, Shark, Little Slime,
+   Spider, Iron, Copper, Nepenthes, Elite Treant, Standard Skeleton and Shadow Neophyte accessory
+   sets plus the Starting Town tools; scripts/test-current-equipment.js pins their contents in
+   detail. The audit counts the equipment categories (weapon, armor, accessory, tool). */
+assert.equal(report.currentDatasetEquipmentItems, 55);
 assert.deepEqual(report.sameTierStatConflicts, []);
 assert.deepEqual(thiefBracelet, {
   name: "Thief's Bracelet",

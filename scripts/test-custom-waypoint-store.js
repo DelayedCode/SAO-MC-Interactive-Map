@@ -291,4 +291,65 @@ assert.equal(restoredAincrad.getRecord(first.id).z, -4, "records restore from lo
 assert.equal(restoredAincrad.remove(first.id), true, "removing a known record succeeds");
 assert.equal(restoredAincrad.remove(first.id), false, "unknown IDs are harmless");
 
+/* Focused regression for the one-time coordinate migration: waypoints created on the map were stored
+   in the map's own grid, JourneyMap-imported waypoints already hold Minecraft coordinates, and the
+   version key makes sure the shift happens exactly once. */
+const migrationWorld = "migration-check";
+storage.setJSON(`sao.customWaypoints.${migrationWorld}`, [
+  {
+    id: "map-created-1",
+    name: "Map created",
+    description: "",
+    x: 1798,
+    z: 4178,
+    floor: "floor1",
+    world: migrationWorld,
+    button: "Default",
+    logo: "pin"
+  },
+  {
+    id: "journeymap-import-1234567890abcdef",
+    name: "Imported",
+    description: "",
+    x: 1798,
+    z: 4178,
+    floor: "floor1",
+    world: migrationWorld,
+    button: "Default",
+    logo: "pin"
+  }
+]);
+const migrationAlignment = { x: 2, z: 12 };
+const migrationStore = createStore({
+  storage,
+  world: migrationWorld,
+  floorIds: ["floor1"],
+  coordinateAlignment: migrationAlignment
+});
+assert.equal(migrationStore.getRecord("map-created-1").x, 1800, "map-created waypoints move to Minecraft X");
+assert.equal(migrationStore.getRecord("map-created-1").z, 4190, "map-created waypoints move to Minecraft Z");
+assert.equal(
+  migrationStore.getRecord("journeymap-import-1234567890abcdef").x,
+  1798,
+  "JourneyMap-imported waypoints already hold Minecraft coordinates"
+);
+assert.equal(
+  migrationStore.getRecord("journeymap-import-1234567890abcdef").z,
+  4178,
+  "JourneyMap-imported waypoints are never shifted"
+);
+assert.equal(migrationStore.getCoordinateMigrationVersion(), 2, "the migration records its version");
+
+const migrationReload = createStore({
+  storage,
+  world: migrationWorld,
+  floorIds: ["floor1"],
+  coordinateAlignment: migrationAlignment
+});
+assert.equal(migrationReload.getRecord("map-created-1").x, 1800, "reloading never shifts a record twice");
+assert.equal(migrationReload.getRecord("map-created-1").z, 4190, "reloading never shifts a record twice");
+
+const unshiftedStore = createStore({ storage, world: migrationWorld, floorIds: ["floor1"] });
+assert.equal(unshiftedStore.getRecord("map-created-1").x, 1800, "a store without an alignment never shifts records");
+
 console.log("Custom waypoint store regression tests passed.");

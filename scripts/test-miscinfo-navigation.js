@@ -6,14 +6,15 @@ const rootUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const miscInfoUrl = `${rootUrl}/Aincrad/Misc%20Info/miscinfo.html`;
 
 /* Floor-aware sections carry ?floor=; Misc Info itself is not floor-aware, so every
-   expectation below is the destination's own contract. */
+   expectation below is the destination's own contract. The data mode is chosen once per world
+   from the Welcome Mat, so no section adds a ?dataset= parameter or opens a mode dialog. */
 const expectations = {
-  maps: { pathname: "/Aincrad/Map/maps.html", floor: true, dataset: false },
-  bestiary: { pathname: "/Aincrad/Bestiary/bestiary.html", floor: true, dataset: true },
-  equipment: { pathname: "/Aincrad/eCompendium/ecompendium.html", floor: true, dataset: true },
-  quests: { pathname: "/Aincrad/Quests/quests.html", floor: true, dataset: true },
-  patchnotes: { pathname: "/Aincrad/Patchnotes/patchnotes.html", floor: false, dataset: false },
-  menu: { pathname: "/index.html", floor: false, dataset: false }
+  maps: { pathname: "/Aincrad/Map/maps.html", floor: true },
+  bestiary: { pathname: "/Aincrad/Bestiary/bestiary.html", floor: true },
+  equipment: { pathname: "/Aincrad/eCompendium/ecompendium.html", floor: true },
+  quests: { pathname: "/Aincrad/Quests/quests.html", floor: true },
+  patchnotes: { pathname: "/Aincrad/Patchnotes/patchnotes.html", floor: false },
+  menu: { pathname: "/index.html", floor: false }
 };
 
 const floors = ["floor1", "floor2", "floor3"];
@@ -37,26 +38,14 @@ async function navigateFromMiscInfo(browser, floor, target, expectation) {
   assert.equal(await button.count(), 1, `${floor}/${target}: the Misc Info nav button exists`);
 
   await button.click();
-  await page.waitForTimeout(300);
-
-  const dialogOpen = await page.evaluate(() => Boolean(document.querySelector(".sao-dataset-dialog")));
-  assert.equal(
-    dialogOpen,
-    expectation.dataset,
-    `${floor}/${target}: dataset dialog ${expectation.dataset ? "is offered" : "is not offered"}`
-  );
-
-  if (dialogOpen) {
-    const betaChoice = page.locator(".sao-dataset-choice").first();
-    assert.equal(await betaChoice.count(), 1, `${floor}/${target}: the dataset dialog offers a choice`);
-    await Promise.all([
-      page.waitForURL((url) => !decodeURIComponent(url.pathname).endsWith("/miscinfo.html"), { timeout: 8000 }),
-      betaChoice.click()
-    ]);
-  } else {
-    await page.waitForURL((url) => !decodeURIComponent(url.pathname).endsWith("/miscinfo.html"), { timeout: 8000 });
-  }
+  await page.waitForURL((url) => !decodeURIComponent(url.pathname).endsWith("/miscinfo.html"), { timeout: 8000 });
   await page.waitForTimeout(200);
+
+  assert.equal(
+    await page.evaluate(() => Boolean(document.querySelector(".sao-dataset-dialog"))),
+    false,
+    `${floor}/${target}: the section does not re-ask for the data mode`
+  );
 
   const actual = describeUrl(page.url());
   assert.equal(actual.pathname, expectation.pathname, `${floor}/${target}: lands on ${expectation.pathname}`);
@@ -65,11 +54,7 @@ async function navigateFromMiscInfo(browser, floor, target, expectation) {
     expectation.floor ? floor : null,
     `${floor}/${target}: floor ${expectation.floor ? "is preserved" : "is not added"} (${actual.search || "no query"})`
   );
-  assert.equal(
-    actual.dataset,
-    expectation.dataset ? "beta" : null,
-    `${floor}/${target}: dataset ${expectation.dataset ? "is preserved as beta" : "is not added"}`
-  );
+  assert.equal(actual.dataset, null, `${floor}/${target}: no dataset query parameter is added`);
 
   assert.deepEqual(session.errors, [], `${floor}/${target}: no console errors`);
   assert.deepEqual(session.failedRequests, [], `${floor}/${target}: no failed requests`);

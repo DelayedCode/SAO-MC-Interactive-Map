@@ -6,7 +6,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1343, z: 3051 },
+    coords: { x: 1345, z: 3063 },
     drops: ["N/A"],
     description: "A dense and hostile marsh, where mist poisons the air and masks dangers. Few emerge unscathed..."
   },
@@ -15,7 +15,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 448, z: 3038 },
+    coords: { x: 450, z: 3050 },
     drops: ["N/A"],
     description:
       "Perched at the top of a windy massif, Vallhat watches, silent and isolated. Its heights hide many secrets."
@@ -25,7 +25,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1165, z: 3540 },
+    coords: { x: 1167, z: 3552 },
     drops: ["N/A"],
     description:
       "An ancient arena carved from red rock. It is said that a single eye still watches over it, ready to judge intruders by brute force."
@@ -35,7 +35,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1484, z: 3425 },
+    coords: { x: 1486, z: 3437 },
     drops: ["N/A"],
     description:
       "A wooded hamlet nestled between the hills where wild boars prowl on the edge. Cradle of the first clashes."
@@ -45,52 +45,52 @@ Object.assign(DATA, {
     type: "Biome",
     category: "farmingSpots",
     floor: "floor1",
-    coords: { x: 984, z: 3479 },
+    coords: { x: 986, z: 3491 },
     drops: ["Coal", "Copper", "Iron"],
-    description: "West Mines — Coordinates X: 984 Z: 3479. Gather Coal, Copper, and Iron."
+    description: "West Mines — Coordinates X: 986 Z: 3491. Gather Coal, Copper, and Iron."
   },
   "east-mines": {
     title: "East Mines",
     type: "Biome",
     category: "farmingSpots",
     floor: "floor1",
-    coords: { x: 2397, z: 3498 },
+    coords: { x: 2399, z: 3510 },
     drops: ["Coal", "Copper", "Iron"],
-    description: "East Mines — Coordinates X: 2397 Z: 3498. Gather Coal, Copper, and Iron."
+    description: "East Mines — Coordinates X: 2399 Z: 3510. Gather Coal, Copper, and Iron."
   },
   "oak-forest": {
     title: "Oak Forest",
     type: "Biome",
     category: "farmingSpots",
     floor: "floor1",
-    coords: { x: 2457, z: 4308 },
+    coords: { x: 2459, z: 4320 },
     drops: ["Oak Wood"],
-    description: "Oak Forest — Coordinates X: 2457 Z: 4308. Gather Oak Wood."
+    description: "Oak Forest — Coordinates X: 2459 Z: 4320. Gather Oak Wood."
   },
   "birch-forest": {
     title: "Birch Forest",
     type: "Biome",
     category: "farmingSpots",
     floor: "floor1",
-    coords: { x: 1786, z: 1184 },
+    coords: { x: 1788, z: 1196 },
     drops: ["Birch Wood"],
-    description: "Birch Forest — Coordinates X: 1786 Z: 1184. Gather Birch Wood."
+    description: "Birch Forest — Coordinates X: 1788 Z: 1196. Gather Birch Wood."
   },
   farm: {
     title: "Farm",
     type: "Biome",
     category: "farmingSpots",
     floor: "floor1",
-    coords: { x: 2349, z: 3650 },
+    coords: { x: 2351, z: 3662 },
     drops: ["Allium", "Wheat"],
-    description: "Farm — Coordinates X: 2349 Z: 3650. Gather Allium and Wheat."
+    description: "Farm — Coordinates X: 2351 Z: 3662. Gather Allium and Wheat."
   },
   "town-of-beginnings": {
     title: "Town of Beginnings",
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1800, z: 4282 },
+    coords: { x: 1802, z: 4294 },
     drops: ["N/A"],
     description:
       "The Town of Beginnings is a peaceful haven in a still unknown virtual world. This is where every adventure begins."
@@ -100,7 +100,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1007, z: 4159 },
+    coords: { x: 1009, z: 4171 },
     drops: ["N/A"],
     description:
       "An enchanted valley where the petals dance in the wind. The scent of flowers soothes the souls of travelers. But behind the beauty... lies an ancient secret."
@@ -110,7 +110,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 2553, z: 3848 },
+    coords: { x: 2555, z: 3860 },
     drops: ["N/A"],
     description:
       "A foggy valley where the howls still resonate. It is said that no wolf hunts there alone... Their shadows watch from the heights."
@@ -120,7 +120,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 2839, z: 4682 },
+    coords: { x: 2841, z: 4694 },
     drops: ["N/A"],
     description:
       "The ruins of a forgotten castle, eaten away by time. Its collapsed walls still whisper the echoes of yesteryear. A place that even the light seems to flee."
@@ -130,7 +130,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 3299, z: 4084 },
+    coords: { x: 3301, z: 4096 },
     drops: ["N/A"],
     description:
       "A tropical archipelago where giant tortoises gather. Each island hides ancient mysteries and unique wildlife. Calm is just a facade..."
@@ -140,7 +140,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 3139, z: 3673 },
+    coords: { x: 3141, z: 3685 },
     drops: ["N/A"],
     description:
       "Small peaceful village nestled on the edge of a clear lake. The inhabitants live to the rhythm of the waves and the wind. A perfect place to breathe between two battles."
@@ -150,7 +150,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 4171, z: 3879 },
+    coords: { x: 4173, z: 3891 },
     drops: ["N/A"],
     description:
       "Dug into the heart of the mountain, the Geldorak mine was once home to a colony of renowned miners. But one day a scream rang out in the galleries... Since then, the corridors have been sealed and no one dares to go down there anymore."
@@ -160,7 +160,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 2308, z: 3252 },
+    coords: { x: 2310, z: 3264 },
     drops: ["N/A"],
     description:
       "The stronghold of the renowned and feared OG Guild. A strategic location reserved for elite veterans. The walls exude glory and past victories."
@@ -170,7 +170,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 2870, z: 2975 },
+    coords: { x: 2872, z: 2987 },
     drops: ["N/A"],
     description:
       "Perched at the top of a forgotten ridge, the hamlet of CastelBrume watches over the valley. Its mills howl in the icy mist, like a call to lost souls..."
@@ -180,7 +180,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 2601, z: 2759 },
+    coords: { x: 2603, z: 2771 },
     drops: ["N/A"],
     description: "Calm and mystery surround its troubled waters... A place of meditation, but also of disappearance."
   },
@@ -189,7 +189,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 367, z: 2422 },
+    coords: { x: 369, z: 2434 },
     drops: ["N/A"],
     description:
       "A forgotten place where nature has reclaimed its rights. Some say they hear voices whispered in the wind, as if the giants were still watching. A peaceful oasis... in appearance only."
@@ -199,7 +199,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1218, z: 1394 },
+    coords: { x: 1220, z: 1406 },
     drops: ["N/A"],
     description:
       "In the depths of Arakh'Nol, light struggles to break through. Each tree is knotted with thick, living webs. The whispers of the wind hide the whispers of ancient spirits, and those who stray from them rarely guess the stories being told. A forgotten entity weaves more than traps there."
@@ -209,7 +209,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1570, z: 1966 },
+    coords: { x: 1572, z: 1978 },
     drops: ["N/A"],
     description:
       "Nestled on the edge of an unfathomable sea chasm, the village of Virelune lives to the rhythm of lunar tides. Fishermen say they see two moons reflected in the waters... But one of them never follows the sky."
@@ -219,7 +219,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 2444, z: 1717 },
+    coords: { x: 2446, z: 1729 },
     drops: ["N/A"],
     description:
       "This old mine contains crystals of exceptional purity. It is said that their brilliance is linked to human emotions... But some miners, fascinated, got lost there forever."
@@ -229,7 +229,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 3044, z: 1181 },
+    coords: { x: 3046, z: 1193 },
     drops: ["N/A"],
     description: "Luminescent crystals with mysterious properties. Protected by Tolbana mages..."
   },
@@ -238,7 +238,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 3407, z: 960 },
+    coords: { x: 3409, z: 972 },
     drops: ["N/A"],
     description: "An ancient ruined tower, lair of Ilfang Lord Kobold. Dark murmurs rise from its depths."
   },
@@ -247,7 +247,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 3310, z: 1608 },
+    coords: { x: 3312, z: 1620 },
     drops: ["N/A"],
     description:
       "Built on the mountainside, Tolbana is home to the largest magical libraries in the known world. Its streets vibrate with energy, and its towers resonate with the echo of age-old incantations."
@@ -257,7 +257,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 3992, z: 1998 },
+    coords: { x: 3994, z: 2010 },
     drops: ["N/A"],
     description:
       "Once an impregnable bastion, the Snow Citadel was the scene of a forgotten siege, lost in the snowflakes of time. Its ramparts, frozen in ice, guard the scars. Today, only the most daring dare to pass through its doors..."
@@ -267,7 +267,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 4770, z: 2410 },
+    coords: { x: 4772, z: 2422 },
     drops: ["N/A"],
     description:
       "The Merchants Guild Headquarters, a lively place where riches and secrets are exchanged. The streets are teeming with activity and negotiation."
@@ -277,7 +277,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1999, z: 753 },
+    coords: { x: 2001, z: 765 },
     drops: ["N/A"],
     description:
       "Nestled between the steep peaks, Candelia seems frozen in time. Its lanterns flicker without wind, and the fields never wither. The ancients say that souls still whisper there at nightfall..."
@@ -287,7 +287,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor1",
-    coords: { x: 1387, z: 2029 },
+    coords: { x: 1389, z: 2041 },
     drops: ["N/A"],
     description:
       "In the heart of a forgotten cave sleeps an ancient serpent: Aepep No one knows if he's awake... or still dreaming. Its gigantic body would have shaped the galleries.",
@@ -298,7 +298,7 @@ Object.assign(DATA, {
     type: "Dungeon",
     category: "dungeons",
     floor: "floor1",
-    coords: { x: 1032, z: 1172 },
+    coords: { x: 1034, z: 1184 },
     tutorial: "",
     drops: ["N/A"],
     description:
@@ -309,7 +309,7 @@ Object.assign(DATA, {
     type: "Dungeon",
     category: "dungeons",
     floor: "floor1",
-    coords: { x: 3407, z: 960 },
+    coords: { x: 3409, z: 972 },
     tutorial: "",
     drops: ["N/A"],
     description:
@@ -320,7 +320,7 @@ Object.assign(DATA, {
     type: "Dungeon",
     category: "dungeons",
     floor: "floor1",
-    coords: { x: 2381, z: 2403 },
+    coords: { x: 2383, z: 2415 },
     tutorial: "",
     drops: ["N/A"],
     description:
@@ -331,7 +331,7 @@ Object.assign(DATA, {
     type: "Dungeon",
     category: "dungeons",
     floor: "floor1",
-    coords: { x: 2780, z: 4410 },
+    coords: { x: 2782, z: 4422 },
     tutorial: "",
     drops: ["N/A"],
     description:
@@ -342,7 +342,7 @@ Object.assign(DATA, {
     type: "Dungeon",
     category: "dungeons",
     floor: "floor1",
-    coords: { x: 4268, z: 3876 },
+    coords: { x: 4270, z: 3888 },
     tutorial: "",
     drops: ["N/A"],
     description:
@@ -353,7 +353,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 479, z: 3014 },
+    coords: { x: 481, z: 3026 },
     drops: ["N/A"],
     description: "Side Quest NPC in Vallhat."
   },
@@ -362,7 +362,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1526, z: 3375 },
+    coords: { x: 1528, z: 3387 },
     drops: ["N/A"],
     description: "Side Quest NPC in Hanaka."
   },
@@ -371,7 +371,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1533, z: 4329 },
+    coords: { x: 1535, z: 4341 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -380,7 +380,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3291, z: 2908 },
+    coords: { x: 3293, z: 2920 },
     drops: ["N/A"],
     description: "Side Quest NPC in Castlemist."
   },
@@ -389,7 +389,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 405, z: 3077 },
+    coords: { x: 407, z: 3089 },
     drops: ["N/A"],
     description: "Side Quest NPC in Vallhat."
   },
@@ -398,7 +398,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3113, z: 3702 },
+    coords: { x: 3115, z: 3714 },
     drops: ["N/A"],
     description: "Side Quest NPC in Mizunari."
   },
@@ -407,7 +407,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1984, z: 754 },
+    coords: { x: 1986, z: 766 },
     drops: ["N/A"],
     description: "Side Quest NPC in Candelia."
   },
@@ -416,7 +416,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3395, z: 2948 },
+    coords: { x: 3397, z: 2960 },
     drops: ["N/A"],
     description: "Side Quest NPC in Castlemist."
   },
@@ -425,7 +425,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1532, z: 3374 },
+    coords: { x: 1534, z: 3386 },
     drops: ["N/A"],
     description: "Side Quest NPC in Hanaka."
   },
@@ -434,7 +434,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1700, z: 1018 },
+    coords: { x: 1702, z: 1030 },
     drops: ["N/A"],
     description: "Side Quest NPC in Candelia."
   },
@@ -443,7 +443,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1958, z: 793 },
+    coords: { x: 1960, z: 805 },
     drops: ["N/A"],
     description: "Side Quest NPC in Candelia."
   },
@@ -452,7 +452,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1438, z: 3407 },
+    coords: { x: 1440, z: 3419 },
     drops: ["N/A"],
     description: "Side Quest NPC in Hanaka."
   },
@@ -461,7 +461,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1866, z: 2112 },
+    coords: { x: 1868, z: 2124 },
     drops: ["N/A"],
     description: "Side Quest NPC in Virelune."
   },
@@ -470,7 +470,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3084, z: 1914 },
+    coords: { x: 3086, z: 1926 },
     drops: ["N/A"],
     description: "Side Quest NPC in Tolbana."
   },
@@ -479,7 +479,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1758, z: 4735 },
+    coords: { x: 1760, z: 4747 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -488,7 +488,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3224, z: 2891 },
+    coords: { x: 3226, z: 2903 },
     drops: ["N/A"],
     description: "Side Quest NPC in Castlemist."
   },
@@ -497,7 +497,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1638, z: 2048 },
+    coords: { x: 1640, z: 2060 },
     drops: ["N/A"],
     description: "Side Quest NPC in Virelune."
   },
@@ -506,7 +506,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 2033, z: 3858 },
+    coords: { x: 2035, z: 3870 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -515,7 +515,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3148, z: 3704 },
+    coords: { x: 3150, z: 3716 },
     drops: ["N/A"],
     description: "Side Quest NPC in Mizunari."
   },
@@ -524,7 +524,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1624, z: 1851 },
+    coords: { x: 1626, z: 1863 },
     drops: ["N/A"],
     description: "Side Quest NPC in Virelune."
   },
@@ -533,7 +533,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3151, z: 3671 },
+    coords: { x: 3153, z: 3683 },
     drops: ["N/A"],
     description: "Side Quest NPC in Mizunari."
   },
@@ -542,7 +542,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1501, z: 3561 },
+    coords: { x: 1503, z: 3573 },
     drops: ["N/A"],
     description: "Side Quest NPC in Hanaka."
   },
@@ -551,7 +551,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1271, z: 4310 },
+    coords: { x: 1273, z: 4322 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -560,7 +560,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3131, z: 3667 },
+    coords: { x: 3133, z: 3679 },
     drops: ["N/A"],
     description: "Side Quest NPC in Mizunari."
   },
@@ -569,7 +569,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 2206, z: 4187 },
+    coords: { x: 2208, z: 4199 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -578,7 +578,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1573, z: 1952 },
+    coords: { x: 1575, z: 1964 },
     drops: ["N/A"],
     description: "Side Quest NPC in Virelune."
   },
@@ -587,7 +587,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1745, z: 4726 },
+    coords: { x: 1747, z: 4738 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -596,7 +596,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 3149, z: 3712 },
+    coords: { x: 3151, z: 3724 },
     drops: ["N/A"],
     description: "Side Quest NPC in Mizunari."
   },
@@ -605,7 +605,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 2018, z: 877 },
+    coords: { x: 2020, z: 889 },
     drops: ["N/A"],
     description: "Side Quest NPC in Candelia."
   },
@@ -614,7 +614,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1556, z: 4315 },
+    coords: { x: 1558, z: 4327 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -623,7 +623,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1501, z: 3534 },
+    coords: { x: 1503, z: 3546 },
     drops: ["N/A"],
     description: "Side Quest NPC in Hanaka."
   },
@@ -632,7 +632,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1991, z: 832 },
+    coords: { x: 1993, z: 844 },
     drops: ["N/A"],
     description: "Side Quest NPC in Candelia."
   },
@@ -641,7 +641,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1600, z: 2006 },
+    coords: { x: 1602, z: 2018 },
     drops: ["N/A"],
     description: "Side Quest NPC in Virelune."
   },
@@ -650,7 +650,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1272, z: 4318 },
+    coords: { x: 1274, z: 4330 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -659,7 +659,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 491, z: 3028 },
+    coords: { x: 493, z: 3040 },
     drops: ["N/A"],
     description: "Side Quest NPC in Vallhat."
   },
@@ -668,7 +668,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1405, z: 3435 },
+    coords: { x: 1407, z: 3447 },
     drops: ["N/A"],
     description: "Side Quest NPC in Hanaka."
   },
@@ -677,7 +677,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1884, z: 4009 },
+    coords: { x: 1886, z: 4021 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -686,7 +686,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1356, z: 3441 },
+    coords: { x: 1358, z: 3453 },
     drops: ["N/A"],
     description: "Side Quest NPC in Hanaka."
   },
@@ -695,7 +695,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 1956, z: 815 },
+    coords: { x: 1958, z: 827 },
     drops: ["N/A"],
     description: "Side Quest NPC in Candelia."
   },
@@ -704,7 +704,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 2068, z: 4291 },
+    coords: { x: 2070, z: 4303 },
     drops: ["N/A"],
     description: "Side Quest NPC in Town of Beginnings."
   },
@@ -713,7 +713,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 2014, z: 834 },
+    coords: { x: 2016, z: 846 },
     drops: ["N/A"],
     description: "Side Quest NPC in Candelia."
   },
@@ -722,7 +722,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor1",
-    coords: { x: 499, z: 3050 },
+    coords: { x: 501, z: 3062 },
     drops: ["N/A"],
     description: "Side Quest NPC in Vallhat."
   },
@@ -731,7 +731,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "alchemist",
     floor: "floor1",
-    coords: { x: 3336, z: 1597 },
+    coords: { x: 3338, z: 1609 },
     drops: ["N/A"],
     description: "Alchemist"
   },
@@ -740,7 +740,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "alchemist",
     floor: "floor1",
-    coords: { x: 1773, z: 4085 },
+    coords: { x: 1775, z: 4097 },
     drops: ["N/A"],
     description: "Alchemist, Crystallograph, Assistant to the Alchemist"
   },
@@ -749,7 +749,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "alchemist",
     floor: "floor1",
-    coords: { x: 1813, z: 4163 },
+    coords: { x: 1815, z: 4175 },
     drops: ["N/A"],
     description: "Purification Alchemist"
   },
@@ -758,7 +758,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lumberjack",
     floor: "floor1",
-    coords: { x: 2462, z: 4287 },
+    coords: { x: 2464, z: 4299 },
     drops: ["N/A"],
     description: "Lumberjack"
   },
@@ -767,7 +767,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 3295, z: 1620 },
+    coords: { x: 3297, z: 1632 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -776,7 +776,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 1604, z: 1956 },
+    coords: { x: 1606, z: 1968 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -785,7 +785,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 414, z: 3075 },
+    coords: { x: 416, z: 3087 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -794,7 +794,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 3132, z: 3696 },
+    coords: { x: 3134, z: 3708 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -803,7 +803,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 2464, z: 4309 },
+    coords: { x: 2466, z: 4321 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -812,7 +812,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 1790, z: 4171 },
+    coords: { x: 1792, z: 4183 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -821,7 +821,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 2397, z: 3549 },
+    coords: { x: 2399, z: 3561 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -830,7 +830,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 2359, z: 3636 },
+    coords: { x: 2361, z: 3648 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -839,7 +839,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor1",
-    coords: { x: 1509, z: 3418 },
+    coords: { x: 1511, z: 3430 },
     drops: ["N/A"],
     description: "Loot Buyer"
   },
@@ -848,7 +848,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "weaponSellers",
     floor: "floor1",
-    coords: { x: 1491, z: 3406 },
+    coords: { x: 1493, z: 3418 },
     drops: ["N/A"],
     description: "Weapon Seller"
   },
@@ -857,7 +857,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "weaponSellers",
     floor: "floor1",
-    coords: { x: 1787, z: 4165 },
+    coords: { x: 1789, z: 4177 },
     drops: ["N/A"],
     description: "Weapon Seller"
   },
@@ -866,7 +866,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "travelingMerchants",
     floor: "floor1",
-    coords: { x: 3488, z: 1319 },
+    coords: { x: 3490, z: 1331 },
     drops: ["N/A"],
     description: "Traveling Merchant"
   },
@@ -875,7 +875,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "travelingMerchants",
     floor: "floor1",
-    coords: { x: 1455, z: 1148 },
+    coords: { x: 1457, z: 1160 },
     drops: ["N/A"],
     description: "Traveling Merchant"
   },
@@ -884,7 +884,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "travelingMerchants",
     floor: "floor1",
-    coords: { x: 1210, z: 2086 },
+    coords: { x: 1212, z: 2098 },
     drops: ["N/A"],
     description: "Traveling Merchant"
   },
@@ -893,7 +893,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "travelingMerchants",
     floor: "floor1",
-    coords: { x: 1415, z: 2985 },
+    coords: { x: 1417, z: 2997 },
     drops: ["N/A"],
     description: "Traveling Merchant"
   },
@@ -902,7 +902,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "travelingMerchants",
     floor: "floor1",
-    coords: { x: 588, z: 3176 },
+    coords: { x: 590, z: 3188 },
     drops: ["N/A"],
     description: "Traveling Merchant"
   },
@@ -911,7 +911,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "travelingMerchants",
     floor: "floor1",
-    coords: { x: 3600, z: 3390 },
+    coords: { x: 3602, z: 3402 },
     drops: ["N/A"],
     description: "Traveling Merchant"
   },
@@ -920,7 +920,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "travelingMerchants",
     floor: "floor1",
-    coords: { x: 2819, z: 4830 },
+    coords: { x: 2821, z: 4842 },
     drops: ["N/A"],
     description: "Traveling Merchant"
   },
@@ -929,7 +929,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "travelingMerchants",
     floor: "floor1",
-    coords: { x: 2086, z: 3750 },
+    coords: { x: 2088, z: 3762 },
     drops: ["N/A"],
     description: "Traveling Merchant"
   },
@@ -938,7 +938,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "equipmentMerchants",
     floor: "floor1",
-    coords: { x: 3302, z: 1633 },
+    coords: { x: 3304, z: 1645 },
     drops: ["N/A"],
     description: "Equipment Merchant"
   },
@@ -947,7 +947,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "equipmentMerchants",
     floor: "floor1",
-    coords: { x: 1507, z: 3399 },
+    coords: { x: 1509, z: 3411 },
     drops: ["N/A"],
     description: "Equipment Merchant"
   },
@@ -956,7 +956,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "toolMerchants",
     floor: "floor1",
-    coords: { x: 3335, z: 1612 },
+    coords: { x: 3337, z: 1624 },
     drops: ["N/A"],
     description: "Tool Merchant"
   },
@@ -965,7 +965,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "toolMerchants",
     floor: "floor1",
-    coords: { x: 2001, z: 810 },
+    coords: { x: 2003, z: 822 },
     drops: ["N/A"],
     description: "Tool Merchant"
   },
@@ -974,7 +974,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "toolMerchants",
     floor: "floor1",
-    coords: { x: 1602, z: 1933 },
+    coords: { x: 1604, z: 1945 },
     drops: ["N/A"],
     description: "Tool Merchant"
   },
@@ -983,7 +983,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "toolMerchants",
     floor: "floor1",
-    coords: { x: 3150, z: 3694 },
+    coords: { x: 3152, z: 3706 },
     drops: ["N/A"],
     description: "Tool Merchant"
   },
@@ -992,7 +992,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "toolMerchants",
     floor: "floor1",
-    coords: { x: 1786, z: 4146 },
+    coords: { x: 1788, z: 4158 },
     drops: ["N/A"],
     description: "Tool Merchant"
   },
@@ -1001,7 +1001,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesMerchants",
     floor: "floor1",
-    coords: { x: 3320, z: 1598 },
+    coords: { x: 3322, z: 1610 },
     drops: ["N/A"],
     description: "Accessories Merchant"
   },
@@ -1010,7 +1010,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesMerchants",
     floor: "floor1",
-    coords: { x: 483, z: 3046 },
+    coords: { x: 485, z: 3058 },
     drops: ["N/A"],
     description: "Accessories Merchant"
   },
@@ -1019,7 +1019,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor1",
-    coords: { x: 3320, z: 1657 },
+    coords: { x: 3322, z: 1669 },
     drops: ["N/A"],
     description: "Occult Merchant"
   },
@@ -1028,7 +1028,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor1",
-    coords: { x: 3349, z: 1625 },
+    coords: { x: 3351, z: 1637 },
     drops: ["N/A"],
     description: "Occult Merchant"
   },
@@ -1037,7 +1037,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor1",
-    coords: { x: 3319, z: 1713 },
+    coords: { x: 3321, z: 1725 },
     drops: ["N/A"],
     description: "Occult Merchant"
   },
@@ -1046,7 +1046,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor1",
-    coords: { x: 3372, z: 1690 },
+    coords: { x: 3374, z: 1702 },
     drops: ["N/A"],
     description: "Occult Merchant"
   },
@@ -1055,7 +1055,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor1",
-    coords: { x: 867, z: 4007 },
+    coords: { x: 869, z: 4019 },
     drops: ["N/A"],
     description: "Occult Merchant"
   },
@@ -1064,7 +1064,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "consumablesMerchants",
     floor: "floor1",
-    coords: { x: 3323, z: 1634 },
+    coords: { x: 3325, z: 1646 },
     drops: ["N/A"],
     description: "Consumables Merchant"
   },
@@ -1073,7 +1073,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "keyBlacksmith",
     floor: "floor1",
-    coords: { x: 1041, z: 1157 },
+    coords: { x: 1043, z: 1169 },
     drops: ["N/A"],
     description: "Key Blacksmith"
   },
@@ -1082,7 +1082,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "keyBlacksmith",
     floor: "floor1",
-    coords: { x: 2392, z: 2405 },
+    coords: { x: 2394, z: 2417 },
     drops: ["N/A"],
     description: "Key Blacksmith"
   },
@@ -1091,7 +1091,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "keyBlacksmith",
     floor: "floor1",
-    coords: { x: 4270, z: 3876 },
+    coords: { x: 4272, z: 3888 },
     drops: ["N/A"],
     description: "Key Blacksmith"
   },
@@ -1100,7 +1100,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "keyBlacksmith",
     floor: "floor1",
-    coords: { x: 1815, z: 4164 },
+    coords: { x: 1817, z: 4176 },
     drops: ["N/A"],
     description: "Key Blacksmith"
   },
@@ -1109,7 +1109,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "ingotBlacksmith",
     floor: "floor1",
-    coords: { x: 2400, z: 3550 },
+    coords: { x: 2402, z: 3562 },
     drops: ["N/A"],
     description: "Ingot Blacksmith"
   },
@@ -1118,7 +1118,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 1150, z: 1160 },
+    coords: { x: 1152, z: 1172 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -1127,7 +1127,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 388, z: 3054 },
+    coords: { x: 390, z: 3066 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -1136,7 +1136,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 1165, z: 3529 },
+    coords: { x: 1167, z: 3541 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -1145,7 +1145,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 1775, z: 3525 },
+    coords: { x: 1777, z: 3537 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -1154,7 +1154,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 4212, z: 1797 },
+    coords: { x: 4214, z: 1809 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -1163,7 +1163,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 1767, z: 4118 },
+    coords: { x: 1769, z: 4130 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -1172,7 +1172,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 2494, z: 3687 },
+    coords: { x: 2496, z: 3699 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -1181,7 +1181,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 1320, z: 2095 },
+    coords: { x: 1322, z: 2107 },
     drops: ["N/A"],
     description: "Accessories Blacksmith",
     underground: true
@@ -1191,7 +1191,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor1",
-    coords: { x: 3623, z: 1326 },
+    coords: { x: 3625, z: 1338 },
     drops: ["N/A"],
     description: "Accessories Blacksmith",
     underground: true
@@ -1201,7 +1201,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "weaponsmith",
     floor: "floor1",
-    coords: { x: 2417, z: 2378 },
+    coords: { x: 2419, z: 2390 },
     drops: ["N/A"],
     description: "Weaponsmith",
     underground: true
@@ -1211,7 +1211,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "weaponsmith",
     floor: "floor1",
-    coords: { x: 3234, z: 1467 },
+    coords: { x: 3236, z: 1479 },
     drops: ["N/A"],
     description: "Weaponsmith",
     underground: true
@@ -1221,7 +1221,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "armorBlacksmith",
     floor: "floor1",
-    coords: { x: 3232, z: 1460 },
+    coords: { x: 3234, z: 1472 },
     drops: ["N/A"],
     description: "Armor Blacksmith",
     underground: true
@@ -1231,7 +1231,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "armorBlacksmith",
     floor: "floor1",
-    coords: { x: 10, z: -100 },
+    coords: { x: 12, z: -88 },
     drops: ["N/A"],
     description: "Armor Blacksmith"
   },
@@ -1240,7 +1240,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1857, z: 3594 },
+    coords: { x: 1859, z: 3606 },
     drops: ["N/A"],
     description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
   },
@@ -1249,7 +1249,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1675, z: 3569 },
+    coords: { x: 1677, z: 3581 },
     drops: ["N/A"],
     description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
   },
@@ -1258,7 +1258,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1972, z: 3571 },
+    coords: { x: 1974, z: 3583 },
     drops: ["N/A"],
     description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
   },
@@ -1267,7 +1267,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1929, z: 3503 },
+    coords: { x: 1931, z: 3515 },
     drops: ["N/A"],
     description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
   },
@@ -1276,7 +1276,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1236, z: 2960 },
+    coords: { x: 1238, z: 2972 },
     drops: ["N/A"],
     description:
       "Forged in stone and awakened by ancient magic, it guards forgotten lands against any intrusion. His steps alone make the forest shake..."
@@ -1286,7 +1286,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1272, z: 3138 },
+    coords: { x: 1274, z: 3150 },
     drops: ["N/A"],
     description:
       "Forged in stone and awakened by ancient magic, it guards forgotten lands against any intrusion. His steps alone make the forest shake..."
@@ -1296,7 +1296,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1075, z: 3240 },
+    coords: { x: 1077, z: 3252 },
     drops: ["N/A"],
     description:
       "Forged in stone and awakened by ancient magic, it guards forgotten lands against any intrusion. His steps alone make the forest shake..."
@@ -1306,7 +1306,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 4575, z: 1600 },
+    coords: { x: 4577, z: 1612 },
     drops: ["N/A"],
     description:
       "Forged in stone and awakened by ancient magic, it guards forgotten lands against any intrusion. His steps alone make the forest shake..."
@@ -1316,7 +1316,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 300, z: 3190 },
+    coords: { x: 302, z: 3202 },
     drops: ["N/A"],
     description:
       "A gelatinous colossus, master of swarms of slimes. He crushes everything in his path, slowly but surely."
@@ -1326,7 +1326,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 2615, z: 3825 },
+    coords: { x: 2617, z: 3837 },
     drops: ["N/A"],
     description: "A lone wolf with icy silver eyes. Its passage leaves a mist and silence."
   },
@@ -1335,7 +1335,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 2510, z: 3955 },
+    coords: { x: 2512, z: 3967 },
     drops: ["N/A"],
     description: "A lone wolf with icy silver eyes. Its passage leaves a mist and silence."
   },
@@ -1344,7 +1344,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 2390, z: 3820 },
+    coords: { x: 2392, z: 3832 },
     drops: ["N/A"],
     description: "A lone wolf with icy silver eyes. Its passage leaves a mist and silence."
   },
@@ -1353,7 +1353,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 2827, z: 4235 },
+    coords: { x: 2829, z: 4247 },
     drops: ["N/A"],
     description:
       "A cursed entity emerging from ancient darkness, it prowls, invisible, ready to tear the souls of the living.",
@@ -1364,7 +1364,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 2720, z: 4320 },
+    coords: { x: 2722, z: 4332 },
     drops: ["N/A"],
     description:
       "A cursed entity emerging from ancient darkness, it prowls, invisible, ready to tear apart the souls of the living.",
@@ -1375,7 +1375,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 4000, z: 1995 },
+    coords: { x: 4002, z: 2007 },
     drops: ["N/A"],
     description:
       "Born in the coldest caves of the mountains, the Ice Bear embodies the brute force of the North. Its roar makes the air shiver, and its icy breath freezes everything in its path."
@@ -1385,7 +1385,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 2440, z: 945 },
+    coords: { x: 2442, z: 957 },
     drops: ["N/A"],
     description: "Kazor uses erratic leaps and high burst phases, demanding coordinated interrupts from the party."
   },
@@ -1394,7 +1394,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 0, z: -10 },
+    coords: { x: 2, z: 2 },
     drops: ["N/A"],
     description:
       "The iconic first-floor raid tyrant, infamous for sudden weapon swaps and punishing final-phase aggression."
@@ -1404,7 +1404,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1230, z: 1090 },
+    coords: { x: 1232, z: 1102 },
     drops: ["N/A"],
     description:
       "An ancient and cunning creature, Pricilia weaves her webs in the forgotten corners of the darkest forests. Its prey never sees death... only his glowing eyes.",
@@ -1415,7 +1415,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1100, z: 1215 },
+    coords: { x: 1102, z: 1227 },
     drops: ["N/A"],
     description:
       "Lurking in the damp darkness of the dungeon, Yula is a spider feared by adventurers. Its sharp legs and glowing eyes inspire terror in anyone who crosses its path.",
@@ -1426,7 +1426,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 985, z: 1235 },
+    coords: { x: 987, z: 1247 },
     drops: ["N/A"],
     description:
       "Silent in the heart of the dungeon, Kamilia weaves invisible traps in the shadows. Its bite injects paralyzing venom, leaving its prey conscious, but unable to flee.",
@@ -1437,7 +1437,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1190, z: 1395 },
+    coords: { x: 1192, z: 1407 },
     drops: ["N/A"],
     description:
       "A silent creature lurking between the canvases, Jira watches every corner of the dungeon. Faster than lightning, she strikes without warning, leaving behind only silence... and bloody webs.",
@@ -1448,7 +1448,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 4250, z: 3845 },
+    coords: { x: 4252, z: 3857 },
     drops: ["N/A"],
     description:
       "A creeping entity born from the mines of Geldorak, Vyrmos soaks up spores and damp earth. His skin is covered in living foam, and his breath corrupts everything he touches.",
@@ -1459,7 +1459,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 4300, z: 3960 },
+    coords: { x: 4302, z: 3972 },
     drops: ["N/A"],
     description:
       "Massive and wild, this creature watches over the forest. She repels intruders with devastating punches. No words, only the brute force of nature.",
@@ -1470,7 +1470,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor1",
-    coords: { x: 1410, z: 2130 },
+    coords: { x: 1412, z: 2142 },
     drops: ["N/A"],
     description:
       "A mythical snake sliding between deep currents, Nymbrea embodies the grace and treachery of calm waters. Its scales sparkle like cursed pearls, and its hypnotic gaze draws the unwary towards the abyss.",
@@ -1540,13 +1540,13 @@ MOB_AREAS.push(
     fill: "rgba(74, 191, 102, 0.26)",
     stroke: "#65d07e",
     corners: [
-      { x: 128, z: 2773 },
-      { x: 292, z: 2679 },
-      { x: 501, z: 2700 },
-      { x: 629, z: 2824 },
-      { x: 584, z: 3144 },
-      { x: 468, z: 3315 },
-      { x: 261, z: 3378 }
+      { x: 130, z: 2785 },
+      { x: 294, z: 2691 },
+      { x: 503, z: 2712 },
+      { x: 631, z: 2836 },
+      { x: 586, z: 3156 },
+      { x: 470, z: 3327 },
+      { x: 263, z: 3390 }
     ]
   },
   {
@@ -1556,10 +1556,10 @@ MOB_AREAS.push(
     fill: "rgba(146, 86, 56, 0.30)",
     stroke: "#da8d64",
     corners: [
-      { x: 1013, z: 2875 },
-      { x: 1603, z: 2800 },
-      { x: 1706, z: 3180 },
-      { x: 1036, z: 3276 }
+      { x: 1015, z: 2887 },
+      { x: 1605, z: 2812 },
+      { x: 1708, z: 3192 },
+      { x: 1038, z: 3288 }
     ]
   },
   {
@@ -1569,12 +1569,12 @@ MOB_AREAS.push(
     fill: "rgba(98, 98, 196, 0.28)",
     stroke: "#8da0ff",
     corners: [
-      { x: 1635, z: 3627 },
-      { x: 1804, z: 3465 },
-      { x: 1924, z: 3448 },
-      { x: 2022, z: 3589 },
-      { x: 1992, z: 3629 },
-      { x: 1882, z: 3590 }
+      { x: 1637, z: 3639 },
+      { x: 1806, z: 3477 },
+      { x: 1926, z: 3460 },
+      { x: 2024, z: 3601 },
+      { x: 1994, z: 3641 },
+      { x: 1884, z: 3602 }
     ]
   },
   {
@@ -1584,11 +1584,11 @@ MOB_AREAS.push(
     fill: "rgba(243, 223, 120, 0.25)",
     stroke: "#fff2b5",
     corners: [
-      { x: 2478, z: 3649 },
-      { x: 2371, z: 3890 },
-      { x: 2469, z: 3995 },
-      { x: 2713, z: 3858 },
-      { x: 2637, z: 3657 }
+      { x: 2480, z: 3661 },
+      { x: 2373, z: 3902 },
+      { x: 2471, z: 4007 },
+      { x: 2715, z: 3870 },
+      { x: 2639, z: 3669 }
     ]
   },
   {
@@ -1598,10 +1598,10 @@ MOB_AREAS.push(
     fill: "rgba(240, 167, 60, 0.28)",
     stroke: "#ffd074",
     corners: [
-      { x: 2767, z: 4357 },
-      { x: 2770, z: 4490 },
-      { x: 2913, z: 4500 },
-      { x: 2910, z: 4372 }
+      { x: 2769, z: 4369 },
+      { x: 2772, z: 4502 },
+      { x: 2915, z: 4512 },
+      { x: 2912, z: 4384 }
     ]
   },
   {
@@ -1611,12 +1611,12 @@ MOB_AREAS.push(
     fill: "rgba(84, 156, 236, 0.25)",
     stroke: "#80beff",
     corners: [
-      { x: 3234, z: 3994 },
-      { x: 3186, z: 4089 },
-      { x: 3217, z: 4191 },
-      { x: 3370, z: 4195 },
-      { x: 3431, z: 4143 },
-      { x: 3411, z: 4021 }
+      { x: 3236, z: 4006 },
+      { x: 3188, z: 4101 },
+      { x: 3219, z: 4203 },
+      { x: 3372, z: 4207 },
+      { x: 3433, z: 4155 },
+      { x: 3413, z: 4033 }
     ]
   },
   {
@@ -1626,10 +1626,10 @@ MOB_AREAS.push(
     fill: "rgba(176, 206, 88, 0.28)",
     stroke: "#d5f079",
     corners: [
-      { x: 3375, z: 3680 },
-      { x: 3293, z: 3717 },
-      { x: 3363, z: 3822 },
-      { x: 3444, z: 3764 }
+      { x: 3377, z: 3692 },
+      { x: 3295, z: 3729 },
+      { x: 3365, z: 3834 },
+      { x: 3446, z: 3776 }
     ]
   },
   {
@@ -1639,9 +1639,9 @@ MOB_AREAS.push(
     fill: "rgba(162, 207, 255, 0.24)",
     stroke: "#e2f3ff",
     corners: [
-      { x: 3954, z: 3820 },
-      { x: 4053, z: 4100 },
-      { x: 4384, z: 3870 }
+      { x: 3956, z: 3832 },
+      { x: 4055, z: 4112 },
+      { x: 4386, z: 3882 }
     ]
   },
   {
@@ -1651,10 +1651,10 @@ MOB_AREAS.push(
     fill: "rgba(162, 207, 255, 0.24)",
     stroke: "#e2f3ff",
     corners: [
-      { x: 3911, z: 1943 },
-      { x: 3912, z: 2005 },
-      { x: 4021, z: 1999 },
-      { x: 4023, z: 1929 }
+      { x: 3913, z: 1955 },
+      { x: 3914, z: 2017 },
+      { x: 4023, z: 2011 },
+      { x: 4025, z: 1941 }
     ]
   },
   {
@@ -1664,9 +1664,9 @@ MOB_AREAS.push(
     fill: "rgba(98, 98, 196, 0.28)",
     stroke: "#8da0ff",
     corners: [
-      { x: 2606, z: 1970 },
-      { x: 2582, z: 2133 },
-      { x: 2797, z: 2060 }
+      { x: 2608, z: 1982 },
+      { x: 2584, z: 2145 },
+      { x: 2799, z: 2072 }
     ]
   },
   {
@@ -1676,10 +1676,10 @@ MOB_AREAS.push(
     fill: "rgba(162, 207, 255, 0.24)",
     stroke: "#e2f3ff",
     corners: [
-      { x: 1389, z: 1945 },
-      { x: 1298, z: 2029 },
-      { x: 1425, z: 2121 },
-      { x: 1482, z: 2010 }
+      { x: 1391, z: 1957 },
+      { x: 1300, z: 2041 },
+      { x: 1427, z: 2133 },
+      { x: 1484, z: 2022 }
     ]
   },
   {
@@ -1689,10 +1689,10 @@ MOB_AREAS.push(
     fill: "rgba(191, 153, 84, 0.28)",
     stroke: "#e0bc7c",
     corners: [
-      { x: 4174, z: 1192 },
-      { x: 4057, z: 1124 },
-      { x: 4149, z: 960 },
-      { x: 4267, z: 1041 }
+      { x: 4176, z: 1204 },
+      { x: 4059, z: 1136 },
+      { x: 4151, z: 972 },
+      { x: 4269, z: 1053 }
     ]
   },
   {
@@ -1702,14 +1702,14 @@ MOB_AREAS.push(
     fill: "rgba(162, 207, 255, 0.24)",
     stroke: "#e2f3ff",
     corners: [
-      { x: 1129, z: 1120 },
-      { x: 1075, z: 1188 },
-      { x: 1213, z: 1291 },
-      { x: 1147, z: 1361 },
-      { x: 1052, z: 1692 },
-      { x: 1227, z: 1677 },
-      { x: 1560, z: 1414 },
-      { x: 1492, z: 1150 }
+      { x: 1131, z: 1132 },
+      { x: 1077, z: 1200 },
+      { x: 1215, z: 1303 },
+      { x: 1149, z: 1373 },
+      { x: 1054, z: 1704 },
+      { x: 1229, z: 1689 },
+      { x: 1562, z: 1426 },
+      { x: 1494, z: 1162 }
     ]
   },
   {
@@ -1720,34 +1720,34 @@ MOB_AREAS.push(
     fill: "rgba(146, 103, 255, 0.26)",
     stroke: "#b48cff",
     corners: [
-      { x: 987, z: 1068 },
-      { x: 979, z: 1118 },
-      { x: 1029, z: 1128 },
-      { x: 1037, z: 1116 },
-      { x: 1078, z: 1137 },
-      { x: 1006, z: 1146 },
-      { x: 1000, z: 1195 },
-      { x: 1060, z: 1204 },
-      { x: 1064, z: 1252 },
-      { x: 1044, z: 1287 },
-      { x: 998, z: 1286 },
-      { x: 1029, z: 1259 },
-      { x: 1024, z: 1218 },
-      { x: 953, z: 1220 },
-      { x: 951, z: 1262 },
-      { x: 979, z: 1317 },
-      { x: 1043, z: 1307 },
-      { x: 1069, z: 1330 },
-      { x: 1070, z: 1367 },
-      { x: 1152, z: 1437 },
-      { x: 1225, z: 1440 },
-      { x: 1124, z: 1369 },
-      { x: 1094, z: 1356 },
-      { x: 1115, z: 1281 },
-      { x: 1126, z: 1200 },
-      { x: 1237, z: 1258 },
-      { x: 1395, z: 1259 },
-      { x: 1393, z: 1084 }
+      { x: 989, z: 1080 },
+      { x: 981, z: 1130 },
+      { x: 1031, z: 1140 },
+      { x: 1039, z: 1128 },
+      { x: 1080, z: 1149 },
+      { x: 1008, z: 1158 },
+      { x: 1002, z: 1207 },
+      { x: 1062, z: 1216 },
+      { x: 1066, z: 1264 },
+      { x: 1046, z: 1299 },
+      { x: 1000, z: 1298 },
+      { x: 1031, z: 1271 },
+      { x: 1026, z: 1230 },
+      { x: 955, z: 1232 },
+      { x: 953, z: 1274 },
+      { x: 981, z: 1329 },
+      { x: 1045, z: 1319 },
+      { x: 1071, z: 1342 },
+      { x: 1072, z: 1379 },
+      { x: 1154, z: 1449 },
+      { x: 1227, z: 1452 },
+      { x: 1126, z: 1381 },
+      { x: 1096, z: 1368 },
+      { x: 1117, z: 1293 },
+      { x: 1128, z: 1212 },
+      { x: 1239, z: 1270 },
+      { x: 1397, z: 1271 },
+      { x: 1395, z: 1096 }
     ]
   },
   {
@@ -1758,25 +1758,25 @@ MOB_AREAS.push(
     fill: "rgba(255, 120, 188, 0.26)",
     stroke: "#ff9ad1",
     corners: [
-      { x: 2775, z: 4203 },
-      { x: 2775, z: 4318 },
-      { x: 2692, z: 4290 },
-      { x: 2688, z: 4361 },
-      { x: 2775, z: 4340 },
-      { x: 2775, z: 4385 },
-      { x: 2802, z: 4400 },
-      { x: 2825, z: 4400 },
-      { x: 2853, z: 4385 },
-      { x: 2853, z: 4340 },
-      { x: 2869, z: 4338 },
-      { x: 2869, z: 4366 },
-      { x: 2941, z: 4366 },
-      { x: 2941, z: 4292 },
-      { x: 2869, z: 4292 },
-      { x: 2871, z: 4318 },
-      { x: 2853, z: 4318 },
-      { x: 2848, z: 4199 },
-      { x: 2778, z: 4197 }
+      { x: 2777, z: 4215 },
+      { x: 2777, z: 4330 },
+      { x: 2694, z: 4302 },
+      { x: 2690, z: 4373 },
+      { x: 2777, z: 4352 },
+      { x: 2777, z: 4397 },
+      { x: 2804, z: 4412 },
+      { x: 2827, z: 4412 },
+      { x: 2855, z: 4397 },
+      { x: 2855, z: 4352 },
+      { x: 2871, z: 4350 },
+      { x: 2871, z: 4378 },
+      { x: 2943, z: 4378 },
+      { x: 2943, z: 4304 },
+      { x: 2871, z: 4304 },
+      { x: 2873, z: 4330 },
+      { x: 2855, z: 4330 },
+      { x: 2850, z: 4211 },
+      { x: 2780, z: 4209 }
     ]
   },
   {
@@ -1787,10 +1787,10 @@ MOB_AREAS.push(
     fill: "rgba(108, 212, 128, 0.26)",
     stroke: "#7be694",
     corners: [
-      { x: 4275, z: 4179 },
-      { x: 4333, z: 4179 },
-      { x: 4360, z: 3836 },
-      { x: 4215, z: 3829 }
+      { x: 4277, z: 4191 },
+      { x: 4335, z: 4191 },
+      { x: 4362, z: 3848 },
+      { x: 4217, z: 3841 }
     ]
   }
 );

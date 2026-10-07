@@ -138,7 +138,8 @@ assert.strictEqual(firstLoad.elements.get("levelValue").textContent, 1);
 assert.strictEqual(firstLoad.elements.get("characterClass").value, "archer");
 assert(firstLoad.elements.get("armorSlots").innerHTML.includes("Empty slot"));
 assert(!firstLoad.elements.get("armorSlots").innerHTML.includes("rune-button"));
-assert(!firstLoad.elements.get("skillTree").innerHTML.includes("is-selected"));
+assert(firstLoad.elements.get("skillTree").innerHTML.includes("skill-node is-selected is-center"));
+assert(firstLoad.elements.get("skillTree").innerHTML.includes("76 / 76 skill points"));
 
 firstLoad.elements.get("buildSlot").value = "2";
 firstLoad.elements.get("buildSlot").dispatch("change");

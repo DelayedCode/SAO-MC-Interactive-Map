@@ -40,6 +40,24 @@ html {
   transform: translate(-50%, 0);
 }
 
+/* Data-mode information banner. It fills the header's empty middle area, between the page title
+   and the map controls, and never sits over the map itself. Text only: the map script rewrites its
+   text and the active data-mode key on init and on language change, never during pan, zoom or
+   marker work. It is pointer-transparent so it can never intercept a header control. */
+.map-data-banner {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 6px 12px;
+  border: 1px solid rgba(130, 190, 255, 0.24);
+  border-radius: 10px;
+  background: rgba(9, 16, 26, 0.62);
+  color: var(--muted, #97b1cf);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+}
+
 body {
   margin: 0;
   font-family:

@@ -1,5 +1,6 @@
 const elements = {
   mapContainer: document.getElementById("mapContainer"),
+  mapDataModeBanner: document.getElementById("mapDataModeBanner"),
   sidebar: document.getElementById("sidebar"),
   sidebarResizeHandle: document.getElementById("sidebarResizeHandle"),
   mapLayer: document.getElementById("mapLayer"),
@@ -26,6 +27,7 @@ const elements = {
 
 const {
   mapContainer,
+  mapDataModeBanner,
   sidebar,
   sidebarResizeHandle,
   mapLayer,
@@ -108,7 +110,7 @@ function hasRequiredMapElements() {
 
 const mapAdapter = window.AincradMapAdapter || null;
 let customWaypointStore = null;
-let mapContextMenuState = { event: null, x: null, z: null };
+let mapContextMenuState = { event: null };
 let walkthroughContextMenuDemoState = null;
 let pendingCustomWaypointFloor = "";
 let customWaypointStatusKey = "";
@@ -299,6 +301,31 @@ const i18n = window.SAOI18n || null;
 const { t, content: contentLookup } = window.SAOPageHelpers.createTranslators(i18n);
 const storage = window.SAOPageHelpers.getStorage();
 
+/* The banner inside the map box states which data mode this world is showing. It is written when
+   the map initialises and again on language changes - never during pan, zoom or marker work. */
+function syncDataModeBanner() {
+  if (!mapDataModeBanner) return;
+  const key =
+    window.SAODatasets?.getDatasetFromLocation() === "current"
+      ? "page.maps.dataModeBanner.current"
+      : "page.maps.dataModeBanner.beta";
+  mapDataModeBanner.setAttribute("data-i18n", key);
+  mapDataModeBanner.textContent = t(key);
+}
+
+/* Beta-only categories (see the Aincrad map adapter) have no Current Data waypoints behind them,
+   so their sidebar buttons are hidden while the Current Data mode is active. Beta keeps every
+   button. Written once when the map initialises; the mode cannot change without a page load. */
+function syncDataModeCategoryButtons() {
+  if (window.SAODatasets?.getDatasetFromLocation() !== "current") return;
+  const betaOnlyCategories = window.AincradMapAdapter?.betaOnlyCategories || {};
+  categoryToggleButtons.forEach((button) => {
+    if (!betaOnlyCategories[button.dataset.category]) return;
+    const row = button.closest("li");
+    (row || button).hidden = true;
+  });
+}
+
 const initialCategoryState = Object.freeze({
   custom: false,
   biomes: false,
@@ -323,6 +350,7 @@ const initialCategoryState = Object.freeze({
   ingotBlacksmith: false,
   keyBlacksmith: false,
   accessoriesBlacksmith: false,
+  secretAccessoryBlacksmith: false,
   runeCraftsmen: false
 });
 
@@ -417,6 +445,8 @@ const state = window.SAOMapHelpers.createInitialMapState();
 let distanceMeasurementState = null;
 let distanceMeasurementLayer = null;
 let distanceMeasurementNodes = null;
+/* Cached letterbox geometry for the measurement overlay (see getDistanceMeasurementGeometry). */
+let distanceMeasurementGeometry = null;
 
 function clearDistanceMeasurement() {
   distanceMeasurementState = {
@@ -502,6 +532,30 @@ function getDistanceMeasurementPointFromEvent(event) {
   };
 }
 
+/* Letterbox geometry for the measurement overlay. The map image is laid out at 100% of the map
+   layer, so its untransformed size only changes when the viewport or sidebar resizes (pan and
+   zoom are CSS transforms and never change layout). Caching it keeps the layout read out of the
+   pan/zoom frames; the handlers that can change the container size or the image invalidate it. */
+function invalidateDistanceMeasurementGeometry() {
+  distanceMeasurementGeometry = null;
+}
+
+function getDistanceMeasurementGeometry() {
+  if (distanceMeasurementGeometry) return distanceMeasurementGeometry;
+  const naturalWidth = mapImage.naturalWidth || mapImage.width || 0;
+  const naturalHeight = mapImage.naturalHeight || mapImage.height || 0;
+  const imageWidth = mapImage.offsetWidth || mapImage.getBoundingClientRect().width / state.zoom;
+  const imageHeight = mapImage.offsetHeight || mapImage.getBoundingClientRect().height / state.zoom;
+  if (!naturalWidth || !naturalHeight || !imageWidth || !imageHeight) return null;
+  const scale = Math.min(imageWidth / naturalWidth, imageHeight / naturalHeight);
+  distanceMeasurementGeometry = {
+    scale,
+    offsetX: (imageWidth - naturalWidth * scale) / 2,
+    offsetY: (imageHeight - naturalHeight * scale) / 2
+  };
+  return distanceMeasurementGeometry;
+}
+
 function renderDistanceMeasurement() {
   const measurementState = distanceMeasurementState;
   const hasPoint1 = Boolean(measurementState?.point1);
@@ -515,15 +569,9 @@ function renderDistanceMeasurement() {
   }
 
   ensureDistanceMeasurementLayer();
-  const naturalWidth = mapImage.naturalWidth || mapImage.width || 0;
-  const naturalHeight = mapImage.naturalHeight || mapImage.height || 0;
-  const imageWidth = mapImage.offsetWidth || mapImage.getBoundingClientRect().width / state.zoom;
-  const imageHeight = mapImage.offsetHeight || mapImage.getBoundingClientRect().height / state.zoom;
-  if (!naturalWidth || !naturalHeight || !imageWidth || !imageHeight) return;
-
-  const scale = Math.min(imageWidth / naturalWidth, imageHeight / naturalHeight);
-  const offsetX = (imageWidth - naturalWidth * scale) / 2;
-  const offsetY = (imageHeight - naturalHeight * scale) / 2;
+  const geometry = getDistanceMeasurementGeometry();
+  if (!geometry) return;
+  const { scale, offsetX, offsetY } = geometry;
   const zoom = state.zoom;
   const toViewport = (point) => ({
     x: state.translateX + (offsetX + point.rawX * scale) * zoom,
@@ -570,51 +618,6 @@ function renderDistanceMeasurement() {
   label.style.display = "";
 }
 
-function setDistanceMeasurementFromEvent(event) {
-  const nextPoint = getDistanceMeasurementPointFromEvent(event);
-  if (!nextPoint) return false;
-
-  const point1 = distanceMeasurementState?.point1 ?? null;
-  const point2 = distanceMeasurementState?.point2 ?? null;
-
-  if (!point1 && !point2) {
-    distanceMeasurementState = { floor: floorSelect.value, point1: nextPoint, point2: null, distance: 0 };
-    renderDistanceMeasurement();
-    return true;
-  }
-
-  if (point1 && !point2) {
-    distanceMeasurementState = {
-      floor: floorSelect.value,
-      point1,
-      point2: nextPoint,
-      distance: getDistanceMeasurementDistance(point1, nextPoint)
-    };
-    renderDistanceMeasurement();
-    return true;
-  }
-
-  if (!point1 && point2) {
-    distanceMeasurementState = {
-      floor: floorSelect.value,
-      point1: nextPoint,
-      point2,
-      distance: getDistanceMeasurementDistance(nextPoint, point2)
-    };
-    renderDistanceMeasurement();
-    return true;
-  }
-
-  distanceMeasurementState = {
-    floor: floorSelect.value,
-    point1,
-    point2: nextPoint,
-    distance: getDistanceMeasurementDistance(point1, nextPoint)
-  };
-  renderDistanceMeasurement();
-  return true;
-}
-
 function setDistanceMeasurementPointFromContext(event, pointIndex) {
   const point = getDistanceMeasurementPointFromEvent(event);
   if (!point) return false;
@@ -652,7 +655,7 @@ function closeMapContextMenu() {
   if (!menu) return;
   menu.hidden = true;
   menu.setAttribute("aria-hidden", "true");
-  mapContextMenuState = { event: null, x: null, z: null };
+  mapContextMenuState = { event: null };
 }
 
 function updateMapContextMenuPosition(clientX, clientY) {
@@ -682,7 +685,7 @@ function openMapContextMenu(event) {
   const menu = document.getElementById("mapContextMenu");
   if (!menu) return;
 
-  mapContextMenuState = { event, x: mapped.x, z: mapped.z };
+  mapContextMenuState = { event };
   menu.hidden = false;
   menu.setAttribute("aria-hidden", "false");
   updateMapContextMenuPosition(event.clientX, event.clientY);
@@ -732,57 +735,24 @@ function exitWalkthroughContextMenuDemo() {
   walkthroughContextMenuDemoState = null;
 }
 
+/* Collects the enabled Aincrad waypoint categories for export. The shared exporter builds the
+   category structure; this only supplies Aincrad's own category state, marker dataset, ids and
+   custom-category colour resolver. */
 function getJourneyMapExportCategories() {
   const runtime = sharedMapRuntime || window.__aincradMapRuntime || null;
   const activeCategories = runtime && typeof runtime.getCategoryStates === "function" ? runtime.getCategoryStates() : {};
-  const floor = floorSelect ? floorSelect.value : mapAdapter?.defaultFloor || "";
   const contextData = getContextData ? getContextData() : { markerDataset: {} };
-  const result = {};
-
-  Object.entries(activeCategories).forEach(([category, isEnabled]) => {
-    if (!isEnabled) return;
-
-    Object.values(contextData.markerDataset || {}).forEach((marker) => {
-      if (!marker || marker.floor !== floor || marker.category !== category) return;
-
-      const x = Number(marker.coords && marker.coords.x !== undefined ? marker.coords.x : marker.x ?? 0);
-      const y = Number(marker.coords && marker.coords.y !== undefined ? marker.coords.y : marker.y ?? -30);
-      const z = Number(marker.coords && marker.coords.z !== undefined ? marker.coords.z : marker.z ?? 0);
-      const exportCategory =
-        marker.category === "custom"
-          ? String(marker.customWaypointButton || "Custom").trim() || "Custom"
-          : category;
-      const world = mapAdapter?.mapId || mapAdapter?.id || "aincrad";
-      const colorUtils = window.SAOColorUtils || window.SAOJourneyMapColors;
-      const categoryColor =
-        marker.category === "custom"
-          ? customWaypointStore?.getButtonColor(exportCategory, floor) ||
-            ensurePersistedCustomWaypointCategoryColor(exportCategory, floor)
-          : colorUtils?.getHardcodedCategoryColor?.(exportCategory) ||
-            colorUtils?.getJourneyMapColorValue?.(exportCategory, { world });
-      const waypointColor = marker.category === "custom" ? marker.color ?? categoryColor : categoryColor;
-
-      const entry = {
-        name: String(marker.title || marker.id || category).trim() || category,
-        x: Number.isFinite(x) ? x : 0,
-        y: Number.isFinite(y) ? y : -30,
-        z: Number.isFinite(z) ? z : 0,
-        dim: String(mapAdapter?.id || "overworld"),
-        icon: marker.icon || marker.customLogo || marker.logo || "pin",
-        color: waypointColor,
-        categoryColor,
-        enabled: 1,
-        visible: 1,
-        group: exportCategory,
-        uuid: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`),
-        id: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`)
-      };
-      if (!result[exportCategory]) result[exportCategory] = [];
-      result[exportCategory].push(entry);
-    });
+  const world = mapAdapter?.mapId || mapAdapter?.id || "aincrad";
+  return window.SAOJourneyMapExport.collectJourneyMapExportCategories({
+    categories: activeCategories,
+    markers: contextData.markerDataset || {},
+    floor: floorSelect ? floorSelect.value : mapAdapter?.defaultFloor || "",
+    world,
+    dimensionId: String(mapAdapter?.id || "overworld"),
+    resolveCustomCategoryColor: (buttonName, floor) =>
+      customWaypointStore?.getButtonColor(buttonName, floor) ||
+      ensurePersistedCustomWaypointCategoryColor(buttonName, floor)
   });
-
-  return result;
 }
 
 function exportCurrentJourneyMapWaypoints() {
@@ -892,7 +862,9 @@ async function importJourneyMapFile(file) {
         : window.SAOCustomWaypoints.createCustomWaypointStore({
             storage,
             world,
-            floorIds: Object.keys(targets.get(world)?.floors || {})
+            floorIds: Object.keys(targets.get(world)?.floors || {}),
+            coordinateAlignment:
+              typeof getMapCoordinateAlignment === "function" ? getMapCoordinateAlignment(world) : null
           });
       if (!store || !store.canAddMany(records)) throw new Error("store-validation");
       stores.set(world, store);
@@ -1030,10 +1002,9 @@ function attachSectionNavButtons() {
     const button = event.target.closest("button[data-nav-target]");
     if (!button) return;
 
-    const outcome = window.SAOPageUtils.navigateToSection(button, {
+    window.SAOPageUtils.navigateToSection(button, {
       floorProvider: () => floorSelect.value
     });
-    if (outcome === "dataset") event.preventDefault();
   });
 }
 
@@ -1536,7 +1507,11 @@ function updateCustomWaypointCategoryColorState() {
   if (picker) picker.dataset.locked = String(isBiomes);
   if (colorInput) colorInput.disabled = isBiomes;
   if (hexInput) hexInput.readOnly = isBiomes;
-  if (hint) hint.textContent = isBiomes ? "Biomes color is locked to white" : "Click to choose a color";
+  if (hint) {
+    hint.textContent = t(
+      isBiomes ? "page.maps.customWaypoint.colorHintBiomes" : "page.maps.customWaypoint.colorHint"
+    );
+  }
   const enteredHex = hexInput?.value || "";
   const pickerValue = colorInput?.value || "";
   const currentValue = normalizeCustomWaypointCategoryColor(enteredHex)
@@ -1552,7 +1527,7 @@ function getCustomWaypointCategoryColorValue() {
   const colorInput = document.getElementById("customWaypointCategoryColor");
   const value = normalizeCustomWaypointCategoryColor((hexInput && hexInput.value) || (colorInput && colorInput.value) || "");
   if (hexInput && !value) {
-    hexInput.setCustomValidity("Invalid HEX color");
+    hexInput.setCustomValidity(t("page.maps.customWaypoint.invalidHex"));
     hexInput.reportValidity();
     return null;
   }
@@ -1653,11 +1628,9 @@ async function copyCustomWaypointCoordinates() {
 }
 
 function syncCustomWaypointCategory() {
-  const categoryItem =
-    document.getElementById("customCategoryItem") || document.getElementById("customMarkerSidebarSection");
+  const categoryItem = document.getElementById("customCategoryItem");
   const categoryButton = categoryItem?.querySelector("[data-category='custom']");
-  const customSidebarSection =
-    document.getElementById("customMarkerSidebarSection") || document.getElementById("customCategoryItem");
+  const customSidebarSection = categoryItem;
   const customSidebarList = document.getElementById("customWaypointSidebarList");
   customWaypointStore?.initializeButtonEnabledState(sharedMapRuntime.getCategoryState("custom"));
   const hasEnabledButtons = Boolean(customWaypointStore?.hasEnabledButtons(floorSelect.value));
@@ -1752,7 +1725,7 @@ function createCustomWaypoint(event) {
     document.getElementById("customWaypointButtonSelect")?.value === "__create__" &&
     !categoryColor
   ) {
-    document.getElementById("customWaypointCategoryHex")?.setCustomValidity("Invalid HEX color");
+    document.getElementById("customWaypointCategoryHex")?.setCustomValidity(t("page.maps.customWaypoint.invalidHex"));
     document.getElementById("customWaypointCategoryHex")?.reportValidity();
     return;
   }
@@ -2494,7 +2467,9 @@ function init() {
     customWaypointStore = window.SAOCustomWaypoints.createCustomWaypointStore({
       storage,
       world: "aincrad",
-      floorIds: Object.keys(mapAdapter.floors)
+      floorIds: Object.keys(mapAdapter.floors),
+      coordinateAlignment:
+        typeof getMapCoordinateAlignment === "function" ? getMapCoordinateAlignment("aincrad") : null
     });
     mapContextAccessors.invalidate();
   }
@@ -2529,6 +2504,7 @@ function init() {
       document,
       window,
       onWidthChange: () => {
+        invalidateDistanceMeasurementGeometry();
         renderDistanceMeasurement();
         scheduleRenderMarkers();
       },
@@ -2549,6 +2525,8 @@ function init() {
     floorSelect.value = requestedFloor;
   }
   registerContextTranslations();
+  syncDataModeBanner();
+  syncDataModeCategoryButtons();
   if (undergroundToggle) {
     undergroundToggle.checked = Boolean(initialState.underground);
   }
@@ -2631,7 +2609,7 @@ function init() {
         customWaypointColorHexInput.setCustomValidity("");
         applyCustomWaypointCategoryColor(normalized);
       } else {
-        customWaypointColorHexInput.setCustomValidity("Invalid HEX color");
+        customWaypointColorHexInput.setCustomValidity(t("page.maps.customWaypoint.invalidHex"));
       }
     });
   }
@@ -2740,11 +2718,13 @@ function init() {
 
   // Re-render when map image finishes loading (naturalWidth becomes available)
   addPageEventListener(mapImage, "load", () => {
+    invalidateDistanceMeasurementGeometry();
     renderDistanceMeasurement();
     scheduleRenderMarkers();
   });
   // Re-render on resize so px positions stay accurate
   addPageEventListener(window, "resize", () => {
+    invalidateDistanceMeasurementGeometry();
     renderDistanceMeasurement();
     scheduleRenderMarkers();
   });
@@ -2769,6 +2749,7 @@ function init() {
   });
 
   addPageEventListener(document, "sao:languagechange", () => {
+    syncDataModeBanner();
     renderDistanceMeasurement();
     markerSearchCache = null;
     state.markerRenderSignature = "";

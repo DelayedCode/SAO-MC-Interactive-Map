@@ -675,7 +675,11 @@ async function run() {
     );
     assert.equal(importedAincrad.logo, "star");
     assert.equal(importedAincrad.description, "");
-    assert.equal(importedAincrad.buttonColor, "#00FF00", "legacy group category color falls back to its waypoint color");
+    assert.equal(
+      importedAincrad.buttonColor,
+      "#00FF00",
+      "legacy group category color falls back to its waypoint color"
+    );
     assert.equal(importedAincrad.waypointColor, "#00FF00", "legacy waypoint color is retained independently");
     assert.deepEqual(
       { world: importedUnderworld.world, floor: importedUnderworld.floor, button: importedUnderworld.button },

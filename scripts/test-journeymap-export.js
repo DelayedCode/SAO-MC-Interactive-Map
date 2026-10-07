@@ -18,6 +18,7 @@ const expectedHardcodedCategories = [
   "alchemist", "lumberjack", "lootBuyers", "weaponSellers", "travelingMerchants", "equipmentMerchants",
   "toolMerchants", "accessoriesMerchants", "occultMerchants", "consumablesMerchants", "refaire",
   "weaponsmith", "armorBlacksmith", "ingotBlacksmith", "keyBlacksmith", "accessoriesBlacksmith",
+  "secretAccessoryBlacksmith",
   "runeCraftsmen", "npc", "rulid", "fishingSpot", "oakWood", "copper", "iron", "coal"
 ].sort();
 const hardcodedColors = colorUtils.HARDCODED_CATEGORY_COLORS;

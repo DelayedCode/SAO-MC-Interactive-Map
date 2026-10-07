@@ -114,7 +114,7 @@
           underworldDesc: "Open the Fractured Underworld map hub to start building and testing this module.",
           ggoDesc: "The GGO menu is not published yet, so no module is available to open.",
           interactiveMode: "Interactive mode",
-          guildLabel: "Guild: N/A",
+          guildLabel: "Guild: Moonlit Black Cats",
           guildAria: "Guild tribute",
           discordModalTitle: "Links",
           discordModalCloseAria: "Close links menu",
@@ -434,7 +434,7 @@
           underworldDesc: "Abre el mapa de Fractured Underworld para empezar a construir y probar este modulo.",
           ggoDesc: "El menu de GGO aun no se publica, por eso no hay modulo disponible.",
           interactiveMode: "Modo interactivo",
-          guildLabel: "Gremio: N/D",
+          guildLabel: "Gremio: Moonlit Black Cats",
           guildAria: "Tributo al gremio",
           discordModalTitle: "Enlaces",
           discordModalCloseAria: "Cerrar menú de enlaces",
@@ -522,7 +522,7 @@
             "Ouvrez le hub de carte Fractured Underworld pour commencer a construire et tester ce module.",
           ggoDesc: "Le menu GGO n'est pas encore publie, donc aucun module n'est disponible.",
           interactiveMode: "Mode interactif",
-          guildLabel: "Guilde : N/D",
+          guildLabel: "Guilde : Moonlit Black Cats",
           guildAria: "Hommage a la guilde",
           discordModalTitle: "Liens",
           discordModalCloseAria: "Fermer le menu des liens",
@@ -662,6 +662,7 @@
             travelingMerchants: "Traveling Merchants",
             weaponSellers: "Weapon Sellers",
             accessoriesBlacksmith: "Accessories Blacksmith",
+            secretAccessoryBlacksmith: "Secret Accessory Blacksmith",
             armorBlacksmith: "Armor Blacksmith",
             ingotBlacksmith: "Ingot Blacksmith",
             keyBlacksmith: "Key Blacksmith",
@@ -717,7 +718,6 @@
             importInvalid: "This JourneyMap file is invalid.",
             importUnsupported: "This JourneyMap file uses an unsupported format or dimension.",
             importFailure: "JourneyMap import failed. No waypoints were added.",
-            importDuplicates: "{count} JourneyMap waypoints were already imported.",
             importPartial: "Imported {newLabel}; skipped {duplicateLabel}.",
             importNewOne: "1 new waypoint",
             importNewMany: "{count} new waypoints",
@@ -728,6 +728,11 @@
           },
           distanceCalculator: { distance: "Distance: {value}" },
           coordinatesPlaceholder: "X: -- Z: --",
+          dataModeBanner: {
+            beta: "This is Beta-Test Data! A lot of the information is inaccurate, so please don’t come to me if something here is wrong. I only recommend viewing this Data Type if you can’t find what you’re looking for in Current Data.",
+            current:
+              "This is Current Data, If any information here is wrong, DM me about it and I’ll fix it ASAP. If you can’t find something, check the Beta-Test Data for what you’re looking for. Just keep in mind a lot of that information is wrong there so don't take it as 100% fact."
+          },
           customWaypoint: {
             category: "Custom Markers",
             createTitle: "Create Custom Waypoint",
@@ -751,6 +756,13 @@
             logoSkull: "Skull",
             logoDiamond: "Diamond",
             logoTarget: "Target",
+            colorSelectorLabel: 'Color Selector for "JourneyMap" Export',
+            colorHint: "Click to choose a color",
+            colorHintBiomes: "Biomes color is locked to white",
+            colorPickerAria: "Choose JourneyMap category color",
+            colorHexAria: "JourneyMap category HEX color",
+            colorHexPlaceholder: "#RRGGBB",
+            invalidHex: "Invalid HEX color",
             confirm: "Confirm Creation",
             cancel: "Cancel Creation",
             confirmAction: "Confirm",
@@ -769,9 +781,7 @@
             deleteButtonWarning: "All waypoints in this button will be removed along with the button",
             areYouSure: "Are you sure?",
             confirmDelete: "Confirm Delete",
-            countdownRemaining: "{seconds}s remaining",
             deleteConfirm: "Delete this custom waypoint?",
-            deleted: "Custom waypoint deleted."
           }
         },
         mainui: {
@@ -799,7 +809,6 @@
             importInvalid: "This JourneyMap file is invalid.",
             importUnsupported: "This JourneyMap file uses an unsupported format or dimension.",
             importFailure: "JourneyMap import failed. No waypoints were added.",
-            importDuplicates: "{count} JourneyMap waypoints were already imported.",
             importPartial: "Imported {newLabel}; skipped {duplicateLabel}.",
             importNewOne: "1 new waypoint",
             importNewMany: "{count} new waypoints",
@@ -1163,6 +1172,7 @@
             travelingMerchants: "Mercaderes ambulantes",
             weaponSellers: "Vendedores de armas",
             accessoriesBlacksmith: "Herrero de accesorios",
+            secretAccessoryBlacksmith: "Herrero secreto de accesorios",
             armorBlacksmith: "Herrero de armaduras",
             ingotBlacksmith: "Herrero de lingotes",
             keyBlacksmith: "Herrero de llaves",
@@ -1223,7 +1233,6 @@
             importInvalid: "Este archivo de JourneyMap no es válido.",
             importUnsupported: "Este archivo de JourneyMap usa un formato o una dimensión no compatible.",
             importFailure: "La importación de JourneyMap falló. No se añadieron puntos de ruta.",
-            importDuplicates: "Estos {count} puntos de ruta de JourneyMap ya se habían importado.",
             importPartial: "Importados: {newLabel}; omitidos: {duplicateLabel}.",
             importNewOne: "1 punto de ruta nuevo",
             importNewMany: "{count} puntos de ruta nuevos",
@@ -1234,6 +1243,11 @@
           },
           distanceCalculator: { distance: "Distancia: {value}" },
           coordinatesPlaceholder: "X: -- Z: --",
+          dataModeBanner: {
+            beta: "¡Estos son datos de prueba beta! Gran parte de la información es inexacta, así que no me escribas si algo de aquí está mal. Solo recomiendo ver este tipo de datos si no encuentras lo que buscas en los datos actuales.",
+            current:
+              "Estos son datos actuales. Si algo de aquí está mal, envíame un mensaje y lo corregiré lo antes posible. Si no encuentras algo, revisa los datos de prueba beta. Ten en cuenta que gran parte de esa información es incorrecta, así que no la tomes como un hecho al 100%."
+          },
           customWaypoint: {
             category: "Marcadores personalizados",
             createTitle: "Crear punto de ruta personalizado",
@@ -1242,6 +1256,7 @@
             coordinatesLabel: "Coordenadas",
             xLabel: "X",
             zLabel: "Z",
+            buttonLabel: "Botón",
             buttonDefault: "Predeterminado",
             createButton: "Crear un botón",
             buttonNameLabel: "Nombre del botón",
@@ -1249,6 +1264,20 @@
             logoPin: "Pin",
             logoStar: "Estrella",
             logoFlag: "Bandera",
+            logoHome: "Casa",
+            logoChest: "Cofre",
+            logoSword: "Espada",
+            logoShield: "Escudo",
+            logoSkull: "Calavera",
+            logoDiamond: "Diamante",
+            logoTarget: "Objetivo",
+            colorSelectorLabel: 'Selector de color para exportar a "JourneyMap"',
+            colorHint: "Haz clic para elegir un color",
+            colorHintBiomes: "El color de los biomas está fijado en blanco",
+            colorPickerAria: "Elegir el color de la categoría de JourneyMap",
+            colorHexAria: "Color HEX de la categoría de JourneyMap",
+            colorHexPlaceholder: "#RRGGBB",
+            invalidHex: "Color HEX no válido",
             confirm: "Confirmar creación",
             cancel: "Cancelar creación",
             confirmAction: "Confirmar",
@@ -1267,9 +1296,7 @@
             deleteButtonWarning: "Todos los puntos de ruta de este botón se eliminarán junto con el botón",
             areYouSure: "¿Estás seguro?",
             confirmDelete: "Confirmar eliminación",
-            countdownRemaining: "Quedan {seconds}s",
             deleteConfirm: "¿Eliminar este punto de ruta personalizado?",
-            deleted: "Punto de ruta personalizado eliminado."
           }
         },
         mainui: {
@@ -1297,7 +1324,6 @@
             importInvalid: "Este archivo de JourneyMap no es válido.",
             importUnsupported: "Este archivo de JourneyMap usa un formato o una dimensión no compatible.",
             importFailure: "La importación de JourneyMap falló. No se añadieron puntos de ruta.",
-            importDuplicates: "Estos {count} puntos de ruta de JourneyMap ya se habían importado.",
             importPartial: "Importados: {newLabel}; omitidos: {duplicateLabel}.",
             importNewOne: "1 punto de ruta nuevo",
             importNewMany: "{count} puntos de ruta nuevos",
@@ -1677,6 +1703,7 @@
             travelingMerchants: "Marchands ambulants",
             weaponSellers: "Vendeurs d'armes",
             accessoriesBlacksmith: "Forgeron d'accessoires",
+            secretAccessoryBlacksmith: "Forgeron secret d'accessoires",
             armorBlacksmith: "Forgeron d'armures",
             ingotBlacksmith: "Forgeron de lingots",
             keyBlacksmith: "Forgeron de clés",
@@ -1737,7 +1764,6 @@
             importInvalid: "Ce fichier JourneyMap n'est pas valide.",
             importUnsupported: "Ce fichier JourneyMap utilise un format ou une dimension non pris en charge.",
             importFailure: "L'importation JourneyMap a échoué. Aucun point de passage n'a été ajouté.",
-            importDuplicates: "Ces {count} points de passage JourneyMap ont déjà été importés.",
             importPartial: "Import : {newLabel} ; doublons ignorés : {duplicateLabel}.",
             importNewOne: "1 nouveau point de passage",
             importNewMany: "{count} nouveaux points de passage",
@@ -1748,6 +1774,11 @@
           },
           distanceCalculator: { distance: "Distance : {value}" },
           coordinatesPlaceholder: "X : -- Z : --",
+          dataModeBanner: {
+            beta: "Ce sont des données de test bêta ! Une grande partie des informations est inexacte, alors ne m'écris pas si quelque chose ici est faux. Je recommande de consulter ce type de données uniquement si tu ne trouves pas ce que tu cherches dans les données actuelles.",
+            current:
+              "Ce sont des données actuelles. Si une information ici est fausse, envoie-moi un message et je la corrigerai dès que possible. Si tu ne trouves pas quelque chose, consulte les données de test bêta. Garde simplement en tête qu'une grande partie de ces informations est incorrecte, alors ne les prends pas pour 100 % exactes."
+          },
           customWaypoint: {
             category: "Marqueurs personnalisés",
             createTitle: "Créer un point de passage personnalisé",
@@ -1756,6 +1787,7 @@
             coordinatesLabel: "Coordonnées",
             xLabel: "X",
             zLabel: "Z",
+            buttonLabel: "Bouton",
             buttonDefault: "Par défaut",
             createButton: "Créer un bouton",
             buttonNameLabel: "Nom du bouton",
@@ -1763,6 +1795,20 @@
             logoPin: "Repère",
             logoStar: "Étoile",
             logoFlag: "Drapeau",
+            logoHome: "Maison",
+            logoChest: "Coffre",
+            logoSword: "Épée",
+            logoShield: "Bouclier",
+            logoSkull: "Crâne",
+            logoDiamond: "Diamant",
+            logoTarget: "Cible",
+            colorSelectorLabel: 'Sélecteur de couleur pour l\'export "JourneyMap"',
+            colorHint: "Cliquez pour choisir une couleur",
+            colorHintBiomes: "La couleur des biomes est fixée au blanc",
+            colorPickerAria: "Choisir la couleur de la catégorie JourneyMap",
+            colorHexAria: "Couleur HEX de la catégorie JourneyMap",
+            colorHexPlaceholder: "#RRGGBB",
+            invalidHex: "Couleur HEX non valide",
             confirm: "Confirmer la création",
             cancel: "Annuler la création",
             confirmAction: "Confirmer",
@@ -1781,9 +1827,7 @@
             deleteButtonWarning: "Tous les points de passage de ce bouton seront supprimés avec le bouton",
             areYouSure: "Es-tu sûr ?",
             confirmDelete: "Confirmer la suppression",
-            countdownRemaining: "{seconds}s restantes",
             deleteConfirm: "Supprimer ce point de passage personnalisé ?",
-            deleted: "Point de passage personnalisé supprimé."
           }
         },
         mainui: {
@@ -1811,7 +1855,6 @@
             importInvalid: "Ce fichier JourneyMap n'est pas valide.",
             importUnsupported: "Ce fichier JourneyMap utilise un format ou une dimension non pris en charge.",
             importFailure: "L'importation JourneyMap a échoué. Aucun point de passage n'a été ajouté.",
-            importDuplicates: "Ces {count} points de passage JourneyMap ont déjà été importés.",
             importPartial: "Import : {newLabel} ; doublons ignorés : {duplicateLabel}.",
             importNewOne: "1 nouveau point de passage",
             importNewMany: "{count} nouveaux points de passage",
@@ -2424,6 +2467,7 @@
           prototypeTree: "Prototype tree",
           prototypeDataOnly: "Prototype data only",
           requires: "Requires: {value}",
+          requiresAny: "Requires any one of: {value}",
           effect: "Effect: {value}",
           state: "State: {value}",
           none: "None",
@@ -2531,6 +2575,7 @@
           prototypeTree: "Árbol de prueba",
           prototypeDataOnly: "Solo datos de prueba",
           requires: "Requiere: {value}",
+          requiresAny: "Requiere una de estas opciones: {value}",
           effect: "Efecto: {value}",
           state: "Estado: {value}",
           none: "Ninguno",
@@ -2639,6 +2684,7 @@
           prototypeTree: "Arbre prototype",
           prototypeDataOnly: "Données de prototype uniquement",
           requires: "Nécessite : {value}",
+          requiresAny: "Nécessite l'une de ces options : {value}",
           effect: "Effet : {value}",
           state: "État : {value}",
           none: "Aucun",
@@ -2942,6 +2988,7 @@
     eyebrow: "AINCRAD / MISC. INFO",
     subtitle: "Useful reference information about Aincrad, progression, systems, and the website.",
     referenceHub: "Reference hub",
+    noCurrentData: "No Current Data has been added for this section yet.",
     progression: "Progression",
     playerProgression: "Player Progression",
     xpThresholds: "XP thresholds",
@@ -2984,6 +3031,7 @@
     eyebrow: "AINCRAD / INFO. VARIA",
     subtitle: "Información útil sobre Aincrad, la progresión, los sistemas y el sitio web.",
     referenceHub: "Centro de referencia",
+    noCurrentData: "Todavía no se han añadido datos actuales para esta sección.",
     progression: "Progresión",
     playerProgression: "Progresión del jugador",
     xpThresholds: "Umbrales de XP",
@@ -3027,6 +3075,7 @@
     eyebrow: "AINCRAD / INFOS DIVERSES",
     subtitle: "Informations utiles sur Aincrad, la progression, les systèmes et le site web.",
     referenceHub: "Centre de référence",
+    noCurrentData: "Aucune donnée actuelle n'a encore été ajoutée pour cette section.",
     progression: "Progression",
     playerProgression: "Progression du joueur",
     xpThresholds: "Seuils d'XP",
@@ -3241,8 +3290,8 @@
       summary:
         "• Added Custom Waypoints, letting users create custom categories and waypoints, choose category colors, and manage points directly from the map. More custom points may increase site lag.\n• Added JourneyMap waypoint import and export, organized into categories by waypoint type/category, plus a Map Actions tutorial button that opens the YouTube tutorial directly.\n• Added a Distance Calculator to the map right-click menu. Set Point 1 and Point 2 to calculate distance from converted Minecraft world X/Z coordinates; results stay correct through zooming, panning, and resizing.\n• Added external tutorial links to dungeon information popups, including a test Fallen Labyrinth Dungeon tutorial, without changing existing dungeon coordinates or floor data.\n• Added Step 5 to the Aincrad and Fractured Underworld walkthroughs, temporarily opening the actual Map Actions menu centered and highlighted; it closes and returns to normal behavior when leaving the step.\n• Added a divider before the Map Actions tutorial button and let the menu grow naturally so the button stays within its bounds.\n• Removed the stray tilde-like character from the World Hub welcome screen."
     },
-    currentImprovements: {
-      version: "Current Improvements",
+    v150: {
+      version: "Maps, Character Build & Site Improvements - v1.5",
       title: "Maps, Character Build & Site Improvements",
       summary:
         "• Corrected map coordinate placement and waypoint positioning.\n• Improved Character Build calculations, equipment and stat displays, build selection, and reset controls.\n• Expanded French and Spanish translations and corrected mixed-language text.\n• Updated guided walkthroughs, including Character Build's level controls, and improved the Welcome Mat warning with a Skip option after repeated visits and a responsive layout.\n• Refined page layouts and fixed other visual issues."
@@ -3255,8 +3304,8 @@
       summary:
         "• Se añadieron los puntos de ruta personalizados, que permiten crear categorías y puntos propios, elegir colores para las categorías y administrar los puntos directamente desde el mapa. Tener más puntos personalizados puede aumentar la lentitud del sitio.\n• Se añadió la importación y exportación de puntos de JourneyMap, organizados en categorías según el tipo o la categoría del punto, junto con un botón de tutorial en Acciones del mapa que abre directamente el tutorial de YouTube.\n• Se añadió una calculadora de distancia al menú del mapa con clic derecho. Define el Punto 1 y el Punto 2 para calcular la distancia usando las coordenadas X/Z convertidas del mundo de Minecraft; el resultado sigue siendo correcto al acercar, alejar, desplazar o cambiar el tamaño del mapa.\n• Se añadieron enlaces externos a tutoriales en las ventanas de información de las mazmorras, incluido un enlace de prueba para la mazmorras Fallen Labyrinth, sin modificar sus coordenadas ni los datos de pisos existentes.\n• Se añadió el Paso 5 a los recorridos guiados de Aincrad y Underworld Fragmentado. Abre temporalmente el menú real de Acciones del mapa, centrado y resaltado; al salir del paso, se cierra y vuelve al comportamiento normal.\n• Se añadió un separador antes del botón del tutorial de Acciones del mapa y el menú ahora crece para mantener el botón dentro de sus límites.\n• Se eliminó el carácter similar a una tilde que sobraba en la pantalla de bienvenida de World Hub."
     },
-    currentImprovements: {
-      version: "Mejoras recientes",
+    v150: {
+      version: "Mejoras en mapas, Character Build y el sitio - v1.5",
       title: "Mejoras en mapas, Character Build y el sitio",
       summary:
         "• Se corrigieron la ubicación de coordenadas y el posicionamiento de los puntos de ruta del mapa.\n• Se mejoraron los cálculos de Character Build, la visualización del equipo y las estadísticas, la selección de configuraciones y los controles de reinicio.\n• Se ampliaron las traducciones al francés y al español y se corrigieron textos que mezclaban idiomas.\n• Se actualizaron los recorridos guiados, incluida la sección de controles de nivel de Character Build, y se mejoró el aviso de bienvenida con la opción Omitir tras varias visitas y un diseño adaptable.\n• Se ajustaron los diseños de las páginas y se corrigieron otros problemas visuales."
@@ -3269,8 +3318,8 @@
       summary:
         "• Ajout des points de passage personnalisés : création de catégories et de points, choix de couleurs pour les catégories et gestion des points directement depuis la carte. Un grand nombre de points personnalisés peut ralentir le site.\n• Ajout de l'importation et de l'exportation des points JourneyMap, classés par type ou catégorie, ainsi que d'un bouton de tutoriel dans Actions de la carte qui ouvre directement le tutoriel YouTube.\n• Ajout d'une calculatrice de distance au menu contextuel de la carte. Définis le Point 1 et le Point 2 pour calculer la distance à partir des coordonnées X/Z converties du monde Minecraft ; le résultat reste correct après zoom, déplacement ou redimensionnement de la carte.\n• Ajout de liens externes vers des tutoriels dans les fenêtres d'information des donjons, dont un lien de test pour le donjon Fallen Labyrinth, sans modifier les coordonnées ni les données d'étage existantes.\n• Ajout de l'étape 5 aux visites guidées d'Aincrad et de l'Underworld Fracturé. Elle ouvre temporairement le véritable menu Actions de la carte, centré et mis en évidence ; il se ferme et reprend son comportement normal en quittant l'étape.\n• Ajout d'un séparateur avant le bouton de tutoriel des Actions de la carte ; le menu s'agrandit naturellement pour garder le bouton dans ses limites.\n• Suppression du caractère ressemblant à un tilde qui apparaissait sur l'écran d'accueil de World Hub."
     },
-    currentImprovements: {
-      version: "Améliorations récentes",
+    v150: {
+      version: "Améliorations des cartes, de Character Build et du site - v1.5",
       title: "Améliorations des cartes, de Character Build et du site",
       summary:
         "• Correction du placement des coordonnées et des points de passage sur les cartes.\n• Amélioration des calculs de Character Build, de l'affichage de l'équipement et des statistiques, de la sélection des configurations et des commandes de réinitialisation.\n• Extension des traductions françaises et espagnoles et correction de textes mêlant plusieurs langues.\n• Mise à jour des visites guidées, notamment de la section sur les commandes de niveau de Character Build. Amélioration de l'avertissement de bienvenue avec l'option Ignorer après plusieurs affichages et une mise en page adaptée aux petits écrans.\n• Ajustement de la mise en page des pages et correction d'autres problèmes visuels."
