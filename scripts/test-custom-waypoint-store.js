@@ -292,8 +292,9 @@ assert.equal(restoredAincrad.remove(first.id), true, "removing a known record su
 assert.equal(restoredAincrad.remove(first.id), false, "unknown IDs are harmless");
 
 /* Focused regression for the one-time coordinate migration: waypoints created on the map were stored
-   in the map's own grid, JourneyMap-imported waypoints already hold Minecraft coordinates, and the
-   version key makes sure the shift happens exactly once. */
+   in the floor's legacy grid, JourneyMap-imported waypoints already hold Minecraft coordinates, and
+   the version key makes sure the shift happens exactly once. Only floors with a declared migration
+   move; a floor without one (floor 2) is left untouched. */
 const migrationWorld = "migration-check";
 storage.setJSON(`sao.customWaypoints.${migrationWorld}`, [
   {
@@ -317,14 +318,25 @@ storage.setJSON(`sao.customWaypoints.${migrationWorld}`, [
     world: migrationWorld,
     button: "Default",
     logo: "pin"
+  },
+  {
+    id: "floor2-created-1",
+    name: "Floor 2 created",
+    description: "",
+    x: 100,
+    z: -200,
+    floor: "floor2",
+    world: migrationWorld,
+    button: "Default",
+    logo: "pin"
   }
 ]);
 const migrationAlignment = { x: 2, z: 12 };
 const migrationStore = createStore({
   storage,
   world: migrationWorld,
-  floorIds: ["floor1"],
-  coordinateAlignment: migrationAlignment
+  floorIds: ["floor1", "floor2"],
+  storedCoordinateMigrations: { floor1: migrationAlignment }
 });
 assert.equal(migrationStore.getRecord("map-created-1").x, 1800, "map-created waypoints move to Minecraft X");
 assert.equal(migrationStore.getRecord("map-created-1").z, 4190, "map-created waypoints move to Minecraft Z");
@@ -338,18 +350,30 @@ assert.equal(
   4178,
   "JourneyMap-imported waypoints are never shifted"
 );
+assert.equal(
+  migrationStore.getRecord("floor2-created-1").x,
+  100,
+  "floors without a declared migration are never shifted"
+);
+assert.equal(
+  migrationStore.getRecord("floor2-created-1").z,
+  -200,
+  "an uncalibrated floor keeps its stored coordinates"
+);
 assert.equal(migrationStore.getCoordinateMigrationVersion(), 2, "the migration records its version");
 
 const migrationReload = createStore({
   storage,
   world: migrationWorld,
-  floorIds: ["floor1"],
-  coordinateAlignment: migrationAlignment
+  floorIds: ["floor1", "floor2"],
+  storedCoordinateMigrations: { floor1: migrationAlignment }
 });
 assert.equal(migrationReload.getRecord("map-created-1").x, 1800, "reloading never shifts a record twice");
 assert.equal(migrationReload.getRecord("map-created-1").z, 4190, "reloading never shifts a record twice");
+assert.equal(migrationReload.getRecord("floor2-created-1").x, 100, "reloading never shifts other floors");
 
-const unshiftedStore = createStore({ storage, world: migrationWorld, floorIds: ["floor1"] });
-assert.equal(unshiftedStore.getRecord("map-created-1").x, 1800, "a store without an alignment never shifts records");
+const unshiftedStore = createStore({ storage, world: migrationWorld, floorIds: ["floor1", "floor2"] });
+assert.equal(unshiftedStore.getRecord("map-created-1").x, 1800, "a store without migrations never shifts records");
+assert.equal(unshiftedStore.getRecord("floor2-created-1").x, 100, "missing migrations leave every floor alone");
 
 console.log("Custom waypoint store regression tests passed.");

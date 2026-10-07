@@ -863,8 +863,8 @@ async function importJourneyMapFile(file) {
             storage,
             world,
             floorIds: Object.keys(targets.get(world)?.floors || {}),
-            coordinateAlignment:
-              typeof getMapCoordinateAlignment === "function" ? getMapCoordinateAlignment(world) : null
+            storedCoordinateMigrations:
+              typeof getStoredCoordinateMigrations === "function" ? getStoredCoordinateMigrations(world) : null
           });
       if (!store || !store.canAddMany(records)) throw new Error("store-validation");
       stores.set(world, store);
@@ -2468,8 +2468,8 @@ function init() {
       storage,
       world: "aincrad",
       floorIds: Object.keys(mapAdapter.floors),
-      coordinateAlignment:
-        typeof getMapCoordinateAlignment === "function" ? getMapCoordinateAlignment("aincrad") : null
+      storedCoordinateMigrations:
+        typeof getStoredCoordinateMigrations === "function" ? getStoredCoordinateMigrations("aincrad") : null
     });
     mapContextAccessors.invalidate();
   }

@@ -8,11 +8,11 @@ const rootUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const mapUrl = "/Aincrad/Map/maps.html?floor=floor1";
 const dungeonId = "fallen-labyrinth-dungeon";
 const expectedDungeonData = [
-  { id: "fallen-labyrinth-dungeon", floor: "floor1", coords: { x: 2381, z: 2403 } },
-  { id: "geldorak-mine-dungeon", floor: "floor1", coords: { x: 4268, z: 3876 } },
-  { id: "kobold-tower-dungeon", floor: "floor1", coords: { x: 3407, z: 960 } },
-  { id: "nasgul-sub-dungeon", floor: "floor1", coords: { x: 2780, z: 4410 } },
-  { id: "xal-zirith-dungeon", floor: "floor1", coords: { x: 1032, z: 1172 } },
+  { id: "fallen-labyrinth-dungeon", floor: "floor1", coords: { x: 2383, z: 2415 } },
+  { id: "geldorak-mine-dungeon", floor: "floor1", coords: { x: 4270, z: 3888 } },
+  { id: "kobold-tower-dungeon", floor: "floor1", coords: { x: 3409, z: 972 } },
+  { id: "nasgul-sub-dungeon", floor: "floor1", coords: { x: 2782, z: 4422 } },
+  { id: "xal-zirith-dungeon", floor: "floor1", coords: { x: 1034, z: 1184 } },
   { id: "donjon_ruche_de_melliona", floor: "floor2", coords: { x: 506, z: -724 } },
   { id: "donjon_tombeau_du_necromancien", floor: "floor2", coords: { x: 721, z: 244 } }
 ];
@@ -110,7 +110,7 @@ async function run() {
     );
     const missingRows = await readPopupRows(page);
     assert.ok(missingRows.some((row) => row.startsWith("Floor: Floor 1")));
-    assert.ok(missingRows.some((row) => row.startsWith("Coordinates: X: 2381 Z: 2403")));
+    assert.ok(missingRows.some((row) => row.startsWith("Coordinates: X: 2383 Z: 2415")));
     assert.equal(
       missingRows.some((row) => row.startsWith("Tutorial:")),
       false

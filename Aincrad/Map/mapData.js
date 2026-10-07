@@ -1,32 +1,125 @@
 const CALIBRATION_MAP_SIZE = 900;
 
+/* ---------------------------------------------------------------------------------------------
+   Authoritative map coordinate system.
+
+   Every coordinate-dependent feature (marker placement, the cursor coordinate readout,
+   distance measurement, custom waypoint creation, JourneyMap import/export) goes through the
+   two projection functions below, and through them alone. There are no global coordinate
+   offsets and no per-feature corrections anywhere else in the repository.
+
+   MAP_CALIBRATION holds one independent calibration record per map floor. Each record
+   describes that floor's own map image geometry:
+
+     centerPixel    calibration-space pixel that sits on centerGame
+     centerGame     world coordinate of that pixel
+     radiusPixel    calibration-space distance from the center to the playable edge
+     radiusGame     world-space distance of the same edge
+
+   The calibration space is a CALIBRATION_MAP_SIZE x CALIBRATION_MAP_SIZE square that maps
+   linearly onto the raw image pixels (see rawToCalibrationPixels/calibrationPixelsToRaw), so
+   one record serves any image dimensions - the WebP siblings and the underground layer
+   included.
+
+   coordinateSystem:
+     "minecraft"    the record is calibrated against real Minecraft block coordinates. The
+                    projection functions return true Minecraft X/Z, and every stored marker
+                    coordinate for that floor is a Minecraft coordinate.
+     "map-local"    the record still describes the floor's own coordinate grid and is not yet
+                    verified against Minecraft. The projection functions keep returning that
+                    grid, preserving the map's existing behaviour until the floor's own
+                    calibration is measured. A floor NEVER inherits another floor's
+                    calibration.
+
+   Floor 1 is fully calibrated (derivation documented in its record). Floor 2, Floor 3 and
+   any future map keep their original grids until their own calibration is measured. The
+   Fractured Underworld page does not use this module: it has no map images yet and its
+   stored coordinates are already Minecraft coordinates.
+
+   Future maps: add a calibration record here (and, if an existing grid is being replaced,
+   a legacyGrid entry so stored user data can migrate exactly once). The coordinate engine
+   itself needs no changes.
+   --------------------------------------------------------------------------------------------- */
+
 const MAP_CALIBRATION = {
-  /* Floor 1 carries a small alignment correction in centerGame: the coordinate grid sat 3 units
-     high in X and 14 units low in Z against the artwork, so the reference center is offset by
-     (-3, +14) from its measured value. The projection math and the scale
-     (radiusGame/radiusPixel) are unchanged - this only shifts where the coordinate grid sits on the
-     floor 1 artwork. The shift is applied in whole game units, so all distances and neighbouring
-     readings stay consistent. It is a grid/artwork correction and is unrelated to the
-     map <-> Minecraft alignment below, which is applied on top of these calibration values. */
+  /* Floor 1 - The Town of Beginnings. Calibrated against real Minecraft coordinates.
+
+     Derivation: two verified in-game (JourneyMap) reference points were measured on this
+     map: website readout (1798, 4178) is Minecraft (1800, 4190), and website readout
+     (1797, 3974) is Minecraft (1799, 3986). Both points fit the previous grid's uniform
+     scale (radiusGame / radiusPixel) with an exact translation of (+2, +12) in X/Z, so the
+     reference center is the previous center plus that translation:
+     (2542.6 + 2, 2551 + 12) = (2544.6, 2563). The scale is unchanged - it was measured from
+     the world border and remains valid.
+
+     Artwork cross-check: floor1.png is 5000x5000 px; its playable circle measures center
+     pixel (2514.5, 2496.4), radius 2476.0 px, which this calibration projects to Minecraft
+     centre (2559.1, 2559.4), radius 2474.1 blocks (~1.0 image pixel per block at source
+     resolution).
+
+     Independent cross-check: the user-supplied "Current Data" markers (already Minecraft
+     coordinates) land within a few blocks of the calibrated floor markers that describe
+     the same NPCs, e.g. Level 5 Weapon Buyer (1493, 3418) sits 2 blocks from the Current
+     Data Elite Treant Accessories marker (1491, 3419).
+
+     legacyGrid preserves the grid this floor used before calibration so that user data
+     stored under it (custom waypoints) can migrate exactly once. */
   floor1: {
+    coordinateSystem: "minecraft",
     centerPixel: { x: 450, y: 450 },
-    centerGame: { x: 2542.6, z: 2551 },
+    centerGame: { x: 2544.6, z: 2563 },
     radiusPixel: 450,
-    radiusGame: 2498.1
+    radiusGame: 2498.1,
+    legacyGrid: {
+      centerGame: { x: 2542.6, z: 2551 },
+      note: "Floor 1's coordinate grid before it was calibrated against Minecraft."
+    }
   },
   floor2: {
+    coordinateSystem: "map-local",
     centerPixel: { x: 450, y: 450 },
     centerGame: { x: -1.3, z: 0.8 },
     radiusPixel: 450,
     radiusGame: 1072.5
   },
   floor3: {
+    coordinateSystem: "map-local",
     centerPixel: { x: 450, y: 450 },
     centerGame: { x: 597, z: 771 },
     radiusPixel: 450,
     radiusGame: 850
   }
 };
+
+function getMapCalibration(floor) {
+  return MAP_CALIBRATION[String(floor || "").trim()] || null;
+}
+
+/* One-time migration delta for stored user data that still lives in a floor's legacy grid.
+   Returns { x, z } when the floor's calibration moved away from a legacy grid, otherwise
+   null. Consumed exclusively by the custom waypoint store's versioned, idempotent
+   migration - the live coordinate pipeline never applies it. */
+function getStoredCoordinateMigration(floor) {
+  const calibration = getMapCalibration(floor);
+  if (!calibration || !calibration.legacyGrid) return null;
+  return {
+    x: calibration.centerGame.x - calibration.legacyGrid.centerGame.x,
+    z: calibration.centerGame.z - calibration.legacyGrid.centerGame.z
+  };
+}
+
+/* Per-world map of floors whose stored user data needs the one-time migration. Derived from
+   the calibration records, so a future floor calibration only adds a legacyGrid entry. */
+function getStoredCoordinateMigrations(world) {
+  const normalizedWorld = String(world || "").trim().toLowerCase();
+  if (normalizedWorld !== "aincrad") return null;
+  const migrations = {};
+  Object.keys(MAP_CALIBRATION).forEach((floor) => {
+    const migration = getStoredCoordinateMigration(floor);
+    if (migration) migrations[floor] = migration;
+  });
+  return Object.keys(migrations).length > 0 ? migrations : null;
+}
 
 function getReferenceSize(dimensions) {
   if (!dimensions) return CALIBRATION_MAP_SIZE;
@@ -56,62 +149,30 @@ function calibrationPixelsToRaw(px, py, dimensions) {
   };
 }
 
-/* The canonical map <-> Minecraft boundary.
- 
-   The map's own coordinate grid is what MAP_CALIBRATION is expressed in, and it is also what every
-   stored waypoint in maps_floor*.js and maps_mainquests.js holds: that grid sits 2 blocks west and
-   12 blocks north of the Minecraft position it describes. mapWebsiteCoordinates() therefore returns
-   Minecraft coordinates and invertMapCoordinates() accepts them, so one corrected system is shared
-   by marker placement, the coordinate readout, distance measurement, custom waypoint creation and
-   JourneyMap import/export - while the artwork itself, and therefore every marker's pixel, is
-   unchanged. */
-const MAP_COORDINATE_ALIGNMENT = Object.freeze({ x: 2, z: 12 });
-
-/* Map-grid coordinate -> the Minecraft coordinate for the same physical position. */
-function mapToMinecraftCoordinate(x, z) {
-  return {
-    x: Number(x) + MAP_COORDINATE_ALIGNMENT.x,
-    z: Number(z) + MAP_COORDINATE_ALIGNMENT.z
-  };
-}
-
-/* Minecraft coordinate -> the map-grid coordinate for the same physical position. */
-function minecraftToMapCoordinate(x, z) {
-  return {
-    x: Number(x) - MAP_COORDINATE_ALIGNMENT.x,
-    z: Number(z) - MAP_COORDINATE_ALIGNMENT.z
-  };
-}
-
-/* Only the Aincrad map is calibrated against the map grid, so only Aincrad's stored coordinates are
-   in that grid. The Underworld map has no calibration, so its coordinates are already Minecraft
-   coordinates and are never shifted. */
-const MAP_COORDINATE_ALIGNMENT_BY_WORLD = Object.freeze({ aincrad: MAP_COORDINATE_ALIGNMENT });
-
-function getMapCoordinateAlignment(world) {
-  return MAP_COORDINATE_ALIGNMENT_BY_WORLD[String(world || "").trim().toLowerCase()] || null;
-}
-
+/* Raw image pixel -> the floor's world coordinate at that pixel. For a "minecraft"
+   calibrated floor this is the true Minecraft X/Z; for a "map-local" floor it is that
+   floor's own (still unverified) coordinate grid. */
 function mapWebsiteCoordinates(rawX, rawY, floor, dimensions) {
-  const calibration = MAP_CALIBRATION[floor];
+  const calibration = getMapCalibration(floor);
   if (!calibration) return null;
 
   const pixel = rawToCalibrationPixels(rawX, rawY, dimensions);
   const scale = calibration.radiusGame / calibration.radiusPixel;
-  const gridX = calibration.centerGame.x + (pixel.x - calibration.centerPixel.x) * scale;
-  const gridZ = calibration.centerGame.z + (pixel.y - calibration.centerPixel.y) * scale;
 
-  return mapToMinecraftCoordinate(gridX, gridZ);
+  return {
+    x: calibration.centerGame.x + (pixel.x - calibration.centerPixel.x) * scale,
+    z: calibration.centerGame.z + (pixel.y - calibration.centerPixel.y) * scale
+  };
 }
 
+/* World coordinate (true Minecraft X/Z for calibrated floors) -> raw image pixel. */
 function invertMapCoordinates(x, z, floor, dimensions) {
-  const calibration = MAP_CALIBRATION[floor];
+  const calibration = getMapCalibration(floor);
   if (!calibration) return null;
 
-  const grid = minecraftToMapCoordinate(x, z);
   const scale = calibration.radiusPixel / calibration.radiusGame;
-  const pixelX = calibration.centerPixel.x + (grid.x - calibration.centerGame.x) * scale;
-  const pixelY = calibration.centerPixel.y + (grid.z - calibration.centerGame.z) * scale;
+  const pixelX = calibration.centerPixel.x + (x - calibration.centerGame.x) * scale;
+  const pixelY = calibration.centerPixel.y + (z - calibration.centerGame.z) * scale;
 
   return calibrationPixelsToRaw(pixelX, pixelY, dimensions);
 }

@@ -6,7 +6,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "alchemist",
     floor: "floor2",
-    coords: { x: -566, z: -281 },
+    coords: { x: -568, z: -293 },
     drops: ["N/A"],
     description: "Alchemist"
   },
@@ -15,7 +15,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "alchemist",
     floor: "floor2",
-    coords: { x: -572, z: -287 },
+    coords: { x: -574, z: -299 },
     drops: ["N/A"],
     description: "Assistant to the Alchemist"
   },
@@ -24,7 +24,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lumberjack",
     floor: "floor2",
-    coords: { x: -573, z: -281 },
+    coords: { x: -575, z: -293 },
     drops: ["N/A"],
     description: "Makes Wooden Boards and Acacia Wood Powder."
   },
@@ -33,7 +33,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -616, z: 541 },
+    coords: { x: -618, z: 529 },
     drops: ["N/A"],
     description: "Crushed Harpy Ring Blacksmith."
   },
@@ -42,7 +42,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -692, z: 217 },
+    coords: { x: -694, z: 205 },
     underground: true,
     drops: ["N/A"],
     description: "Flaming Harpy Ring Blacksmith."
@@ -52,7 +52,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -816, z: 110 },
+    coords: { x: -818, z: 98 },
     drops: ["N/A"],
     description: "Drowned Harpy Ring Blacksmith."
   },
@@ -61,7 +61,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -496, z: -734 },
+    coords: { x: -498, z: -746 },
     drops: ["N/A"],
     description: "Wild Gloves Blacksmith."
   },
@@ -70,7 +70,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -36, z: 211 },
+    coords: { x: -38, z: 199 },
     drops: ["N/A"],
     description: "Runic Necklace Blacksmith."
   },
@@ -79,7 +79,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -711, z: -97 },
+    coords: { x: -713, z: -109 },
     drops: ["N/A"],
     description: "Corrupt Mask Blacksmith."
   },
@@ -88,7 +88,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: 80, z: -59 },
+    coords: { x: 78, z: -71 },
     drops: ["N/A"],
     description: "Fierce Talisman Blacksmith."
   },
@@ -97,7 +97,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor2",
-    coords: { x: -579, z: -261 },
+    coords: { x: -581, z: -273 },
     drops: ["N/A"],
     description: "Local Farmer - Buys Loot."
   },
@@ -106,7 +106,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "refaire",
     floor: "floor2",
-    coords: { x: 2, z: -343 },
+    coords: { x: 0, z: -355 },
     drops: ["N/A"],
     description: "Transforms Resources and Spider Threads to make useful strings in making Accessories."
   },
@@ -115,7 +115,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -500, z: 346 },
+    coords: { x: -502, z: 334 },
     drops: ["N/A"],
     description: "Impure Onyx Accessories Blacksmith."
   },
@@ -124,7 +124,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: 341, z: 517 },
+    coords: { x: 339, z: 505 },
     underground: true,
     drops: ["N/A"],
     description: "Pure Onyx Accessories Blacksmith."
@@ -134,7 +134,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -192, z: 32 },
+    coords: { x: -194, z: 20 },
     drops: ["N/A"],
     description: "Bauxite Accessories Blacksmith."
   },
@@ -143,7 +143,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -775, z: 29 },
+    coords: { x: -777, z: 17 },
     drops: ["N/A"],
     description: "Scrap Accessories Blacksmith."
   },
@@ -152,7 +152,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: -600, z: -273 },
+    coords: { x: -602, z: -285 },
     drops: ["N/A"],
     description: "Bull & Bear Accessories Blacksmith"
   },
@@ -161,7 +161,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesBlacksmith",
     floor: "floor2",
-    coords: { x: 113, z: -396 },
+    coords: { x: 111, z: -408 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -170,7 +170,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "weaponsmith",
     floor: "floor2",
-    coords: { x: 593, z: -688 },
+    coords: { x: 591, z: -700 },
     underground: true,
     drops: ["N/A"],
     description: "Bees Weapon Blacksmith"
@@ -180,7 +180,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "weaponsmith",
     floor: "floor2",
-    coords: { x: 729, z: 277 },
+    coords: { x: 727, z: 265 },
     underground: true,
     drops: ["N/A"],
     description: "Necrotic Weaponsmith"
@@ -190,7 +190,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "armorBlacksmith",
     floor: "floor2",
-    coords: { x: 593, z: -663 },
+    coords: { x: 591, z: -675 },
     underground: true,
     drops: ["N/A"],
     description: "Bee Armor Blacksmith"
@@ -200,7 +200,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "armorBlacksmith",
     floor: "floor2",
-    coords: { x: 724, z: 276 },
+    coords: { x: 722, z: 264 },
     underground: true,
     drops: ["N/A"],
     description: "Necromancer Armor Blacksmith"
@@ -210,7 +210,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "toolMerchants",
     floor: "floor2",
-    coords: { x: 724, z: 280 },
+    coords: { x: 722, z: 268 },
     underground: true,
     drops: ["N/A"],
     description: "Necrotic Tool Blacksmith"
@@ -220,7 +220,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "ingotBlacksmith",
     floor: "floor2",
-    coords: { x: 870, z: -283 },
+    coords: { x: 868, z: -295 },
     drops: ["N/A"],
     description: "Pure Onyx Ingot Blacksmith"
   },
@@ -229,7 +229,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "ingotBlacksmith",
     floor: "floor2",
-    coords: { x: 126, z: -373 },
+    coords: { x: 124, z: -385 },
     drops: ["N/A"],
     description: "Bauxite Ingots & Impure Onyx Blacksmith"
   },
@@ -238,7 +238,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "accessoriesMerchants",
     floor: "floor2",
-    coords: { x: -566, z: -275 },
+    coords: { x: -568, z: -287 },
     drops: ["N/A"],
     description: "Accessories Merchant"
   },
@@ -247,7 +247,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor2",
-    coords: { x: -349, z: 889 },
+    coords: { x: -351, z: 877 },
     underground: true,
     drops: ["N/A"],
     description: "Occult Amulet Merchant"
@@ -257,7 +257,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor2",
-    coords: { x: -352, z: 894 },
+    coords: { x: -354, z: 882 },
     underground: true,
     drops: ["N/A"],
     description: "Occult Ringman"
@@ -267,7 +267,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor2",
-    coords: { x: -319, z: 127 },
+    coords: { x: -321, z: 115 },
     underground: true,
     drops: ["N/A"],
     description: "Occult Artifact Merchant"
@@ -277,7 +277,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "equipmentMerchants",
     floor: "floor2",
-    coords: { x: -574, z: -276 },
+    coords: { x: -576, z: -288 },
     drops: ["N/A"],
     description: "Sell Weapons and Consumables for newcomers."
   },
@@ -286,7 +286,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "toolMerchants",
     floor: "floor2",
-    coords: { x: -581, z: -274 },
+    coords: { x: -583, z: -286 },
     drops: ["N/A"],
     description: "Sell Tier 2 Tools; Savanna tools."
   },
@@ -295,7 +295,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor2",
-    coords: { x: -341, z: 891 },
+    coords: { x: -343, z: 879 },
     underground: true,
     drops: ["N/A"],
     description: "Occult Bracelet Merchant"
@@ -305,7 +305,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "occultMerchants",
     floor: "floor2",
-    coords: { x: -343, z: 899 },
+    coords: { x: -345, z: 887 },
     underground: true,
     drops: ["N/A"],
     description: "Occult Gloves Merchant"
@@ -315,7 +315,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor2",
-    coords: { x: 131, z: -368 },
+    coords: { x: 129, z: -380 },
     drops: ["N/A"],
     description: "Miner of the Corner"
   },
@@ -324,7 +324,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "keyBlacksmith",
     floor: "floor2",
-    coords: { x: 4, z: -344 },
+    coords: { x: 2, z: -356 },
     drops: ["N/A"],
     description: "Transforms Resources and Spider Threads to make useful strings in making Accessories."
   },
@@ -333,7 +333,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor2",
-    coords: { x: 593, z: -678 },
+    coords: { x: 591, z: -690 },
     underground: true,
     drops: ["N/A"],
     description: "Honeyed Loot Buyer"
@@ -343,7 +343,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor2",
-    coords: { x: -566, z: -243 },
+    coords: { x: -568, z: -255 },
     drops: ["N/A"],
     description: "Harpies Loot Buyer"
   },
@@ -352,7 +352,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor2",
-    coords: { x: 712, z: -265 },
+    coords: { x: 710, z: -277 },
     drops: ["N/A"],
     description: "Sells objects from the Sanctuary of Khesûn."
   },
@@ -361,7 +361,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor2",
-    coords: { x: 730, z: 280 },
+    coords: { x: 728, z: 268 },
     underground: true,
     drops: ["N/A"],
     description: "Sells Necrotic Loot."
@@ -371,7 +371,7 @@ Object.assign(DATA, {
     type: "NPC",
     category: "lootBuyers",
     floor: "floor2",
-    coords: { x: 70, z: -331 },
+    coords: { x: 68, z: -343 },
     drops: ["N/A"],
     description: "Take back items from Bulls and Bears."
   },
@@ -380,7 +380,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 572, z: -458 },
+    coords: { x: 570, z: -470 },
     drops: ["N/A"],
     description: "A mysterious moonlit altar located at the heart of Map 2."
   },
@@ -389,7 +389,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -778, z: 183 },
+    coords: { x: -780, z: 171 },
     drops: ["N/A"],
     description: "A shoreline biome where monsters gather along restless waves."
   },
@@ -398,7 +398,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -86, z: -80 },
+    coords: { x: -88, z: -92 },
     drops: ["N/A"],
     description: "A giant ancient baobab tree standing watch over the area."
   },
@@ -407,7 +407,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -370, z: -544 },
+    coords: { x: -372, z: -556 },
     drops: ["N/A"],
     description: "A harsh desert known for its silver sands and dangerous predators."
   },
@@ -416,7 +416,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -548, z: 488 },
+    coords: { x: -550, z: 476 },
     drops: ["N/A"],
     description: "A vibrant forest filled with lush foliage and winged creatures."
   },
@@ -425,7 +425,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 486, z: -653 },
+    coords: { x: 484, z: -665 },
     drops: ["N/A"],
     description: "A fragrant woodland alive with sweet flora and hidden paths."
   },
@@ -434,7 +434,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -314, z: -82 },
+    coords: { x: -316, z: -94 },
     underground: true,
     drops: ["N/A"],
     description: "A dark underground cave beneath Taran, home to hidden dangers."
@@ -444,7 +444,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -581, z: -252 },
+    coords: { x: -583, z: -264 },
     drops: ["N/A"],
     description: "A remote biome named Kaelor, known for its unusual terrain."
   },
@@ -453,7 +453,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 120, z: -56 },
+    coords: { x: 118, z: -68 },
     drops: ["N/A"],
     description: "A quiet lake surrounded by rugged scenery and wild beasts."
   },
@@ -462,7 +462,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 227, z: 307 },
+    coords: { x: 225, z: 295 },
     underground: true,
     drops: ["N/A"],
     description: "Underground mineral veins near Sablemor, rich with rare ore."
@@ -472,7 +472,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -428, z: -416 },
+    coords: { x: -430, z: -428 },
     drops: ["N/A"],
     description: "A small settlement of Ngangas houses with mystic inhabitants."
   },
@@ -481,7 +481,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 723, z: -269 },
+    coords: { x: 721, z: -281 },
     drops: ["N/A"],
     description: "A coastal enclave with tropical life and hidden secrets."
   },
@@ -490,7 +490,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -579, z: 246 },
+    coords: { x: -581, z: 234 },
     underground: true,
     drops: ["N/A"],
     description: "A fiery underground nest where blazing creatures gather."
@@ -500,7 +500,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 800, z: 265 },
+    coords: { x: 798, z: 253 },
     drops: ["N/A"],
     description: "A hidden oasis tucked away in Map 2's desert regions."
   },
@@ -509,7 +509,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 508, z: -712 },
+    coords: { x: 506, z: -724 },
     drops: ["N/A"],
     description: "The buzzing hive where Melliona's creatures gather."
   },
@@ -518,7 +518,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -4, z: 193 },
+    coords: { x: -6, z: 181 },
     drops: ["N/A"],
     description: "A sacred sanctuary dedicated to the guardian Khesun."
   },
@@ -527,7 +527,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -425, z: 284 },
+    coords: { x: -427, z: 272 },
     drops: ["N/A"],
     description: "A rugged region known for strong winds and sparse vegetation."
   },
@@ -536,7 +536,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 723, z: 256 },
+    coords: { x: 721, z: 244 },
     underground: true,
     drops: ["N/A"],
     description: "An ancient tomb filled with necromantic energies."
@@ -546,7 +546,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: -158, z: 807 },
+    coords: { x: -160, z: 795 },
     drops: ["N/A"],
     description: "A towering spire watched over by Taurus."
   },
@@ -555,7 +555,7 @@ Object.assign(DATA, {
     type: "Biome",
     category: "biomes",
     floor: "floor2",
-    coords: { x: 66, z: -336 },
+    coords: { x: 64, z: -348 },
     drops: ["N/A"],
     description: "The town of Urbus, a key waypoint in the Map 2 region."
   },
@@ -564,7 +564,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
-    coords: { x: 2, z: 202 },
+    coords: { x: 0, z: 190 },
     underground: true,
     drops: ["N/A"],
     description: "A powerful boss guarding the sacred sanctuary."
@@ -574,7 +574,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
-    coords: { x: 230, z: 328 },
+    coords: { x: 228, z: 316 },
     underground: true,
     drops: ["N/A"],
     description: "A fearsome boss encountered underground in Map 2."
@@ -584,7 +584,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
-    coords: { x: 177, z: -397 },
+    coords: { x: 175, z: -409 },
     underground: true,
     drops: ["N/A"],
     description: "A dangerous boss lurking in the depths of Map 2."
@@ -594,7 +594,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
-    coords: { x: 585, z: -175 },
+    coords: { x: 583, z: -187 },
     underground: true,
     drops: ["N/A"],
     description: "A subterranean boss found deep below Map 2."
@@ -604,7 +604,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
-    coords: { x: -153, z: 583 },
+    coords: { x: -155, z: 571 },
     drops: ["N/A"],
     description: "A colossal boss roaming the northern reaches of Map 2."
   },
@@ -613,7 +613,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
-    coords: { x: 802, z: 312 },
+    coords: { x: 800, z: 300 },
     underground: true,
     drops: ["N/A"],
     description: "A shadowy boss hidden beneath the surface."
@@ -623,7 +623,7 @@ Object.assign(DATA, {
     type: "Boss",
     category: "bossSpawns",
     floor: "floor2",
-    coords: { x: 580, z: -762 },
+    coords: { x: 578, z: -774 },
     drops: ["N/A"],
     description: "A rare boss found in the western areas of Map 2."
   },
@@ -632,7 +632,7 @@ Object.assign(DATA, {
     type: "Dungeon",
     category: "dungeons",
     floor: "floor2",
-    coords: { x: 508, z: -712 },
+    coords: { x: 506, z: -724 },
     tutorial: "",
     drops: ["N/A"],
     description: "A dungeon formed inside Melliona's Hive."
@@ -642,7 +642,7 @@ Object.assign(DATA, {
     type: "Dungeon",
     category: "dungeons",
     floor: "floor2",
-    coords: { x: 723, z: 256 },
+    coords: { x: 721, z: 244 },
     tutorial: "",
     drops: ["N/A"],
     description: "A dungeon built within the Necromancer's Tomb."
@@ -652,7 +652,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 64, z: -416 },
+    coords: { x: 62, z: -428 },
     drops: ["N/A"],
     description: "A side quest about uncovering a hidden facet of reality."
   },
@@ -661,7 +661,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -583, z: -243 },
+    coords: { x: -585, z: -255 },
     drops: ["N/A"],
     description: "A side quest to locate the Ngangas people."
   },
@@ -670,7 +670,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -561, z: -243 },
+    coords: { x: -563, z: -255 },
     drops: ["N/A"],
     description: "A quest to assist with cooking and preparation tasks."
   },
@@ -679,7 +679,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -608, z: -233 },
+    coords: { x: -610, z: -245 },
     drops: ["N/A"],
     description: "A quest to help Yuko with an important task."
   },
@@ -688,7 +688,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -575, z: -244 },
+    coords: { x: -577, z: -256 },
     drops: ["N/A"],
     description: "A quest that tests resilience through painful trials."
   },
@@ -697,7 +697,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 137, z: -362 },
+    coords: { x: 135, z: -374 },
     drops: ["N/A"],
     description: "A quest guiding the player toward Urbus."
   },
@@ -706,7 +706,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 745, z: -245 },
+    coords: { x: 743, z: -257 },
     drops: ["N/A"],
     description: "A quest focused on communicating with Yaa."
   },
@@ -715,7 +715,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 162, z: -300 },
+    coords: { x: 160, z: -312 },
     drops: ["N/A"],
     description: "A quest involving the forgotten tomb dungeon."
   },
@@ -724,7 +724,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 162, z: -300 },
+    coords: { x: 160, z: -312 },
     drops: ["N/A"],
     description: "A quest about creating a key with a master smith."
   },
@@ -733,7 +733,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -429, z: 291 },
+    coords: { x: -431, z: 279 },
     drops: ["N/A"],
     description: "A quest centered around a rivalry with the color green."
   },
@@ -742,7 +742,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 107, z: -380 },
+    coords: { x: 105, z: -392 },
     drops: ["N/A"],
     description: "A quest exploring how to work with animal hides."
   },
@@ -751,7 +751,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 114, z: -379 },
+    coords: { x: 112, z: -391 },
     drops: ["N/A"],
     description: "A quest focused on collecting or crafting with feathers."
   },
@@ -760,7 +760,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 622, z: -555 },
+    coords: { x: 620, z: -567 },
     drops: ["N/A"],
     description: "A quest tied to the legacy left by the seas."
   },
@@ -769,7 +769,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -200, z: -676 },
+    coords: { x: -202, z: -688 },
     drops: ["N/A"],
     description: "A hunting trial to prove your skills."
   },
@@ -778,7 +778,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 726, z: -289 },
+    coords: { x: 724, z: -301 },
     drops: ["N/A"],
     description: "A quest about recovering an onyx of knowledge."
   },
@@ -787,7 +787,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -39, z: 217 },
+    coords: { x: -41, z: 205 },
     drops: ["N/A"],
     description: "A philosophical quest inspired by Bushi teachings."
   },
@@ -796,7 +796,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -551, z: -252 },
+    coords: { x: -553, z: -264 },
     drops: ["N/A"],
     description: "A relaxed quest involving a calm cat companion."
   },
@@ -805,7 +805,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -583, z: -233 },
+    coords: { x: -585, z: -245 },
     drops: ["N/A"],
     description: "A quest centered around a haunted bell tower."
   },
@@ -814,7 +814,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -14, z: -811 },
+    coords: { x: -16, z: -823 },
     drops: ["N/A"],
     description: "A second step in an ongoing side quest series."
   },
@@ -823,7 +823,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -505, z: -48 },
+    coords: { x: -507, z: -60 },
     drops: ["N/A"],
     description: "A quest to complete a cleansing ritual."
   },
@@ -832,7 +832,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 641, z: -251 },
+    coords: { x: 639, z: -263 },
     drops: ["N/A"],
     description: "A quest involving the roof of a cabin shelter."
   },
@@ -841,7 +841,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -627, z: -284 },
+    coords: { x: -629, z: -296 },
     drops: ["N/A"],
     description: "A quest about offering tribute before judgment."
   },
@@ -850,7 +850,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 641, z: -251 },
+    coords: { x: 639, z: -263 },
     drops: ["N/A"],
     description: "A quest focused on building a cabin foundation."
   },
@@ -859,7 +859,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 641, z: -251 },
+    coords: { x: 639, z: -263 },
     drops: ["N/A"],
     description: "A quest about putting up the walls of a cabin."
   },
@@ -868,7 +868,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 18, z: -293 },
+    coords: { x: 16, z: -305 },
     drops: ["N/A"],
     description: "A quest where you obtain your first weapon."
   },
@@ -877,7 +877,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -430, z: 284 },
+    coords: { x: -432, z: 272 },
     drops: ["N/A"],
     description: "A quest to clear the skies above Taran."
   },
@@ -886,7 +886,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 698, z: -265 },
+    coords: { x: 696, z: -277 },
     drops: ["N/A"],
     description: "A quest about defending your choice of style."
   },
@@ -895,7 +895,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 15, z: -653 },
+    coords: { x: 13, z: -665 },
     drops: ["N/A"],
     description: "A quest to speak with an enigmatic woman."
   },
@@ -904,7 +904,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: 64, z: -416 },
+    coords: { x: 62, z: -428 },
     drops: ["N/A"],
     description: "A quest to return back to the town of Urbus."
   },
@@ -913,7 +913,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -157, z: 22 },
+    coords: { x: -159, z: 10 },
     drops: ["N/A"],
     description: "A side quest centered around preparing a meal."
   },
@@ -922,7 +922,7 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -434, z: -430 },
+    coords: { x: -436, z: -442 },
     drops: ["N/A"],
     description: "A quest in which the player must prove their worth."
   },
@@ -931,101 +931,101 @@ Object.assign(DATA, {
     type: "Quest",
     category: "sideQuests",
     floor: "floor2",
-    coords: { x: -446, z: 279 },
+    coords: { x: -448, z: 267 },
     drops: ["N/A"],
     description: "A side quest that covers a bit of everything."
   }
 });
 
 const RAW_MAP2_WAYPOINT_LINES = [
-  "Alchemist - surface - -566 - -281",
-  "Alchemist - surface - -572 - -287",
-  "Lumberjack - surface - -573 - -281",
-  "Accessories Blacksmith - surface - -616 - 541",
-  "Accessories Blacksmith - underground - -692 - 217",
-  "Accessories Blacksmith - surface - -816 - 110",
-  "Accessories Blacksmith - surface - -496 - -734",
-  "Accessories Blacksmith - surface - -36 - 211",
-  "Accessories Blacksmith - surface - -711 - -97",
-  "Accessories Blacksmith - surface - 80 - -59",
-  "loot_buyer - surface - -579 - -261",
-  "craft_accessories - surface - -500 - 346",
-  "craft_accessories - underground - 341 - 517",
-  "craft_accessories - surface - -192 - 32",
-  "craft_ingots - surface - -775 - 29",
-  "craft_accessories - surface - -600 - -273",
-  "craft_accessories - surface - 113 - -396",
-  "craft_weapons - underground - 593 - -688",
-  "craft_weapons - underground - 729 - 277",
-  "craft_armor - underground - 593 - -663",
-  "craft_armor - underground - 724 - 276",
-  "tool_merchant - underground - 724 - 280",
-  "craft_ingots - surface - 870 - -283",
-  "craft_ingots - surface - 126 - -373",
-  "accessory_merchant - surface - -566 - -275",
-  "occult_merchant - underground - -349 - 889",
-  "occult_merchant - underground - -352 - 894",
-  "occult_merchant - underground - -319 - 127",
-  "equipment_merchant - surface - -574 - -276",
-  "tool_merchant - surface - -581 - -274",
-  "occult_merchant - underground - -341 - 891",
-  "occult_merchant - underground - -343 - 899",
-  "loot_buyer - surface - 131 - -368",
-  "reforger - surface - 4 - -344",
-  "loot_buyer - underground - 593 - -678",
-  "loot_buyer - surface - -566 - -243",
-  "loot_buyer - surface - 712 - -265",
-  "loot_taker - underground - 730 - 280",
-  "loot_taker - surface - 70 - -331",
-  "Altar of the Two Moons - région - surface - 572 - -458",
-  "Wavy Monster Bay - Biome - surface - -778 - 183",
-  "Millennium Baobab - Biome - surface - -86 - -80",
-  "Silver Fang Desert - Biome - surface - -370 - -544",
-  "Emerald Wings Forest - Biome - surface - -548 - 488",
-  "Sweet Forest - Biome - surface - 486 - -653",
-  "Taran Cave - Biome - underground - -314 - -82",
-  "Kaelor - Biome - surface - -581 - -252",
-  "Lake of the Bulls - Biome - surface - 120 - -56",
-  "Sablemor Veins - Biome - underground - 227 - 307",
-  "Ngangas Houses - Biome - surface - -428 - -416",
-  "Marome - Biome - surface - 723 - -269",
-  "Blaze Nest - Biome - underground - -579 - 246",
-  "Secret Oasis - Biome - surface - 800 - 265",
-  "Melliona Hive - Biome - surface - 508 - -712",
-  "Khesun Sanctuary - Biome - surface - -4 - 193",
-  "Taran - Biome - surface - -425 - 284",
-  "Necromancer's Tomb - Biome - underground - 723 - 256",
-  "Taurus Tower - Biome - surface - -158 - 807",
-  "Urbus - Biome - surface - 66 - -336",
-  "Sanctuary Guardian - Boss Spawns - underground - 2 - 202",
-  "Magnus - Boss Spawns - underground - 230 - 328",
-  "Melisara - Boss Spawns - underground - 177 - -397",
-  "Morveth - Boss Spawns - underground - 585 - -175",
-  "Rugiboeuf - Boss Spawns - surface - -153 - 583",
-  "Velindra - Boss Spawns - underground - 802 - 312",
-  "Winnie - Boss Spawns - surface - 580 - -762",
-  "Melliona's Hive Dungeon - Dungeons - surface - 508 - -712",
-  "Necromancer's Tomb Dungeon - Dungeons - surface - 723 - 256",
-  "kitchen_help - side_quest - surface - -561 - -243",
-  "helping_yuko - side_quest - surface - -608 - -233",
-  "it_stings_but_feels_good - side_quest - surface - -575 - -244",
-  "hating_the_green - side_quest - surface - -429 - 291",
-  "the_art_of_hides - side_quest - surface - 107 - -380",
-  "the_art_of_feathers - side_quest - surface - 114 - -379",
-  "the_imprint_of_the_seas - side_quest - surface - 622 - -555",
-  "the_hunter_s_trial - side_quest - surface - -200 - -676",
-  "the_onyx_of_knowledge - side_quest - surface - 726 - -289",
-  "bushi_s_philosophy - side_quest - surface - -39 - 217",
-  "the_relaxed_cat - side_quest - surface - -551 - -252",
-  "the_dark_messenger_s_bell_tower - side_quest - surface - -583 - -233",
-  "cabin_roof - side_quest - surface - 641 - -251",
-  "cabin_foundation - side_quest - surface - 641 - -251",
-  "cabin_walls - side_quest - surface - 641 - -251",
-  "my_first_weapon - side_quest - surface - 18 - -293",
-  "clearing_taran_s_skies - side_quest - surface - -430 - 284",
-  "non_c_est_de_la_sape - side quest - surface - 698 - -265",
-  "un_bon_petit_repas - side quest - surface - -157 - 22",
-  "un_peu_de_chaque - side quest - surface - -446 - 279"
+  "Alchemist - surface - -568 - -293",
+  "Alchemist - surface - -574 - -299",
+  "Lumberjack - surface - -575 - -293",
+  "Accessories Blacksmith - surface - -618 - 529",
+  "Accessories Blacksmith - underground - -694 - 205",
+  "Accessories Blacksmith - surface - -818 - 98",
+  "Accessories Blacksmith - surface - -498 - -746",
+  "Accessories Blacksmith - surface - -38 - 199",
+  "Accessories Blacksmith - surface - -713 - -109",
+  "Accessories Blacksmith - surface - 78 - -71",
+  "loot_buyer - surface - -581 - -273",
+  "craft_accessories - surface - -502 - 334",
+  "craft_accessories - underground - 339 - 505",
+  "craft_accessories - surface - -194 - 20",
+  "craft_ingots - surface - -777 - 17",
+  "craft_accessories - surface - -602 - -285",
+  "craft_accessories - surface - 111 - -408",
+  "craft_weapons - underground - 591 - -700",
+  "craft_weapons - underground - 727 - 265",
+  "craft_armor - underground - 591 - -675",
+  "craft_armor - underground - 722 - 264",
+  "tool_merchant - underground - 722 - 268",
+  "craft_ingots - surface - 868 - -295",
+  "craft_ingots - surface - 124 - -385",
+  "accessory_merchant - surface - -568 - -287",
+  "occult_merchant - underground - -351 - 877",
+  "occult_merchant - underground - -354 - 882",
+  "occult_merchant - underground - -321 - 115",
+  "equipment_merchant - surface - -576 - -288",
+  "tool_merchant - surface - -583 - -286",
+  "occult_merchant - underground - -343 - 879",
+  "occult_merchant - underground - -345 - 887",
+  "loot_buyer - surface - 129 - -380",
+  "reforger - surface - 2 - -356",
+  "loot_buyer - underground - 591 - -690",
+  "loot_buyer - surface - -568 - -255",
+  "loot_buyer - surface - 710 - -277",
+  "loot_taker - underground - 728 - 268",
+  "loot_taker - surface - 68 - -343",
+  "Altar of the Two Moons - région - surface - 570 - -470",
+  "Wavy Monster Bay - Biome - surface - -780 - 171",
+  "Millennium Baobab - Biome - surface - -88 - -92",
+  "Silver Fang Desert - Biome - surface - -372 - -556",
+  "Emerald Wings Forest - Biome - surface - -550 - 476",
+  "Sweet Forest - Biome - surface - 484 - -665",
+  "Taran Cave - Biome - underground - -316 - -94",
+  "Kaelor - Biome - surface - -583 - -264",
+  "Lake of the Bulls - Biome - surface - 118 - -68",
+  "Sablemor Veins - Biome - underground - 225 - 295",
+  "Ngangas Houses - Biome - surface - -430 - -428",
+  "Marome - Biome - surface - 721 - -281",
+  "Blaze Nest - Biome - underground - -581 - 234",
+  "Secret Oasis - Biome - surface - 798 - 253",
+  "Melliona Hive - Biome - surface - 506 - -724",
+  "Khesun Sanctuary - Biome - surface - -6 - 181",
+  "Taran - Biome - surface - -427 - 272",
+  "Necromancer's Tomb - Biome - underground - 721 - 244",
+  "Taurus Tower - Biome - surface - -160 - 795",
+  "Urbus - Biome - surface - 64 - -348",
+  "Sanctuary Guardian - Boss Spawns - underground - 0 - 190",
+  "Magnus - Boss Spawns - underground - 228 - 316",
+  "Melisara - Boss Spawns - underground - 175 - -409",
+  "Morveth - Boss Spawns - underground - 583 - -187",
+  "Rugiboeuf - Boss Spawns - surface - -155 - 571",
+  "Velindra - Boss Spawns - underground - 800 - 300",
+  "Winnie - Boss Spawns - surface - 578 - -774",
+  "Melliona's Hive Dungeon - Dungeons - surface - 506 - -724",
+  "Necromancer's Tomb Dungeon - Dungeons - surface - 721 - 244",
+  "kitchen_help - side_quest - surface - -563 - -255",
+  "helping_yuko - side_quest - surface - -610 - -245",
+  "it_stings_but_feels_good - side_quest - surface - -577 - -256",
+  "hating_the_green - side_quest - surface - -431 - 279",
+  "the_art_of_hides - side_quest - surface - 105 - -392",
+  "the_art_of_feathers - side_quest - surface - 112 - -391",
+  "the_imprint_of_the_seas - side_quest - surface - 620 - -567",
+  "the_hunter_s_trial - side_quest - surface - -202 - -688",
+  "the_onyx_of_knowledge - side_quest - surface - 724 - -301",
+  "bushi_s_philosophy - side_quest - surface - -41 - 205",
+  "the_relaxed_cat - side_quest - surface - -553 - -264",
+  "the_dark_messenger_s_bell_tower - side_quest - surface - -585 - -245",
+  "cabin_roof - side_quest - surface - 639 - -263",
+  "cabin_foundation - side_quest - surface - 639 - -263",
+  "cabin_walls - side_quest - surface - 639 - -263",
+  "my_first_weapon - side_quest - surface - 16 - -305",
+  "clearing_taran_s_skies - side_quest - surface - -432 - 272",
+  "non_c_est_de_la_sape - side quest - surface - 696 - -277",
+  "un_bon_petit_repas - side quest - surface - -159 - 10",
+  "un_peu_de_chaque - side quest - surface - -448 - 267"
 ];
 
 Object.assign(DATA, createMap2WaypointEntries(RAW_MAP2_WAYPOINT_LINES));
@@ -1069,10 +1069,10 @@ MOB_AREAS.push(
     fill: "rgba(210, 180, 140, 0.26)",
     stroke: "#d2b48c",
     corners: [
-      { x: -234, z: -626 },
-      { x: -498, z: -576 },
-      { x: -495, z: -461 },
-      { x: -274, z: -528 }
+      { x: -236, z: -638 },
+      { x: -500, z: -588 },
+      { x: -497, z: -473 },
+      { x: -276, z: -540 }
     ]
   },
   {
@@ -1082,10 +1082,10 @@ MOB_AREAS.push(
     fill: "rgba(162, 230, 120, 0.28)",
     stroke: "#8bcf46",
     corners: [
-      { x: 365, z: -741 },
-      { x: 329, z: -607 },
-      { x: 598, z: -585 },
-      { x: 574, z: -760 }
+      { x: 363, z: -753 },
+      { x: 327, z: -619 },
+      { x: 596, z: -597 },
+      { x: 572, z: -772 }
     ]
   },
   {
@@ -1095,10 +1095,10 @@ MOB_AREAS.push(
     fill: "rgba(134, 126, 212, 0.28)",
     stroke: "#7f60dc",
     corners: [
-      { x: -562, z: -40 },
-      { x: -885, z: 145 },
-      { x: -870, z: 244 },
-      { x: -508, z: 147 }
+      { x: -564, z: -52 },
+      { x: -887, z: 133 },
+      { x: -872, z: 232 },
+      { x: -510, z: 135 }
     ]
   },
   {
@@ -1108,14 +1108,14 @@ MOB_AREAS.push(
     fill: "rgba(144, 220, 126, 0.28)",
     stroke: "#68b941",
     corners: [
-      { x: -627, z: 428 },
-      { x: -613, z: 418 },
-      { x: -583, z: 446 },
-      { x: -529, z: 436 },
-      { x: -532, z: 481 },
-      { x: -553, z: 500 },
-      { x: -586, z: 491 },
-      { x: -584, z: 464 }
+      { x: -629, z: 416 },
+      { x: -615, z: 406 },
+      { x: -585, z: 434 },
+      { x: -531, z: 424 },
+      { x: -534, z: 469 },
+      { x: -555, z: 488 },
+      { x: -588, z: 479 },
+      { x: -586, z: 452 }
     ]
   },
   {
@@ -1125,11 +1125,11 @@ MOB_AREAS.push(
     fill: "rgba(250, 235, 123, 0.26)",
     stroke: "#e3d365",
     corners: [
-      { x: -22, z: 142 },
-      { x: 18, z: 139 },
-      { x: 47, z: 225 },
-      { x: -52, z: 256 },
-      { x: -62, z: 214 }
+      { x: -24, z: 130 },
+      { x: 16, z: 127 },
+      { x: 45, z: 213 },
+      { x: -54, z: 244 },
+      { x: -64, z: 202 }
     ]
   },
   {
@@ -1139,11 +1139,11 @@ MOB_AREAS.push(
     fill: "rgba(170, 152, 204, 0.24)",
     stroke: "#9c8fb8",
     corners: [
-      { x: 167, z: -138 },
-      { x: 48, z: -114 },
-      { x: 23, z: -52 },
-      { x: 110, z: -4 },
-      { x: 196, z: -39 }
+      { x: 165, z: -150 },
+      { x: 46, z: -126 },
+      { x: 21, z: -64 },
+      { x: 108, z: -16 },
+      { x: 194, z: -51 }
     ]
   },
   {
@@ -1154,13 +1154,13 @@ MOB_AREAS.push(
     fill: "rgba(255, 184, 0, 0.24)",
     stroke: "#f4b400",
     corners: [
-      { x: 559, z: -696 },
-      { x: 654, z: -672 },
-      { x: 654, z: -473 },
-      { x: 517, z: -385 },
-      { x: 232, z: -375 },
-      { x: 232, z: -535 },
-      { x: 345, z: -725 }
+      { x: 557, z: -708 },
+      { x: 652, z: -684 },
+      { x: 652, z: -485 },
+      { x: 515, z: -397 },
+      { x: 230, z: -387 },
+      { x: 230, z: -547 },
+      { x: 343, z: -737 }
     ]
   },
   {
@@ -1171,10 +1171,10 @@ MOB_AREAS.push(
     fill: "rgba(255, 92, 0, 0.24)",
     stroke: "#ff5c00",
     corners: [
-      { x: -766, z: 264 },
-      { x: -541, z: 379 },
-      { x: -446, z: 221 },
-      { x: -568, z: 169 }
+      { x: -768, z: 252 },
+      { x: -543, z: 367 },
+      { x: -448, z: 209 },
+      { x: -570, z: 157 }
     ]
   },
   {
@@ -1185,12 +1185,12 @@ MOB_AREAS.push(
     fill: "rgba(255, 248, 220, 0.28)",
     stroke: "#f2e8c6",
     corners: [
-      { x: -40, z: 224 },
-      { x: -40, z: 79 },
-      { x: -19, z: 53 },
-      { x: 8, z: 53 },
-      { x: 30, z: 79 },
-      { x: 30, z: 224 }
+      { x: -42, z: 212 },
+      { x: -42, z: 67 },
+      { x: -21, z: 41 },
+      { x: 6, z: 41 },
+      { x: 28, z: 67 },
+      { x: 28, z: 212 }
     ]
   },
   {
@@ -1201,10 +1201,10 @@ MOB_AREAS.push(
     fill: "rgba(245, 240, 90, 0.24)",
     stroke: "#d8d94b",
     corners: [
-      { x: 154, z: 274 },
-      { x: 154, z: 388 },
-      { x: 291, z: 388 },
-      { x: 289, z: 274 }
+      { x: 152, z: 262 },
+      { x: 152, z: 376 },
+      { x: 289, z: 376 },
+      { x: 287, z: 262 }
     ]
   },
   {
@@ -1215,11 +1215,11 @@ MOB_AREAS.push(
     fill: "rgba(182, 74, 167, 0.24)",
     stroke: "#b24aa7",
     corners: [
-      { x: 526, z: 301 },
-      { x: 976, z: 301 },
-      { x: 976, z: 51 },
-      { x: 735, z: -138 },
-      { x: 526, z: 156 }
+      { x: 524, z: 289 },
+      { x: 974, z: 289 },
+      { x: 974, z: 39 },
+      { x: 733, z: -150 },
+      { x: 524, z: 144 }
     ]
   }
 );

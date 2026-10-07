@@ -9,28 +9,27 @@ const mapDataSource = fs.readFileSync(path.join(root, "Aincrad", "Map", "mapData
 const context = vm.createContext({ console });
 
 vm.runInContext(
-  `${mapDataSource}\nthis.__coordinateApi = {\n  CALIBRATION_MAP_SIZE,\n  MAP_CALIBRATION,\n  MAP_COORDINATE_ALIGNMENT,\n  MAP_COORDINATE_ALIGNMENT_BY_WORLD,\n  getMapCoordinateAlignment,\n  mapToMinecraftCoordinate,\n  minecraftToMapCoordinate,\n  mapWebsiteCoordinates,\n  invertMapCoordinates\n};`,
+  `${mapDataSource}\nthis.__coordinateApi = {\n  CALIBRATION_MAP_SIZE,\n  MAP_CALIBRATION,\n  getMapCalibration,\n  getStoredCoordinateMigration,\n  getStoredCoordinateMigrations,\n  mapWebsiteCoordinates,\n  invertMapCoordinates\n};`,
   context,
   { filename: "Aincrad/Map/mapData.js" }
 );
 
-for (const floor of [1, 2, 3]) {
-  const source = fs.readFileSync(path.join(root, "Aincrad", "Map", `maps_floor${floor}.js`), "utf8");
-  vm.runInContext(source, context, { filename: `Aincrad/Map/maps_floor${floor}.js` });
+const dataContext = vm.createContext({ console });
+vm.runInContext(mapDataSource, dataContext, { filename: "Aincrad/Map/mapData.js" });
+for (const file of ["Aincrad/Map/maps_floor1.js", "Aincrad/Map/maps_floor2.js", "Aincrad/Map/maps_floor3.js"]) {
+  vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), dataContext, { filename: file });
 }
 
 const {
   CALIBRATION_MAP_SIZE,
   MAP_CALIBRATION,
-  MAP_COORDINATE_ALIGNMENT,
-  MAP_COORDINATE_ALIGNMENT_BY_WORLD,
-  getMapCoordinateAlignment,
-  mapToMinecraftCoordinate,
-  minecraftToMapCoordinate,
+  getMapCalibration,
+  getStoredCoordinateMigration,
+  getStoredCoordinateMigrations,
   mapWebsiteCoordinates,
   invertMapCoordinates
 } = context.__coordinateApi;
-const data = vm.runInContext("DATA", context);
+const data = vm.runInContext("DATA", dataContext);
 
 function assertClose(actual, expected, message, tolerance = 1e-9) {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${message}: expected ${expected}, got ${actual}`);
@@ -46,10 +45,64 @@ function assertGamePointClose(actual, expected, message) {
   assertClose(actual.z, expected.z, `${message} z`);
 }
 
+/* ---------------------------------------------------------------------------
+   The coordinate engine is a single authoritative boundary.
+   ------------------------------------------------------------------------- */
+
+assert.ok(
+  typeof MAP_COORDINATE_ALIGNMENT === "undefined" &&
+    typeof mapToMinecraftCoordinate === "undefined" &&
+    typeof minecraftToMapCoordinate === "undefined" &&
+    typeof getMapCoordinateAlignment === "undefined",
+  "the old alignment layer is gone: the calibration itself is the only boundary"
+);
+
+for (const floor of ["floor1", "floor2", "floor3"]) {
+  assert.ok(getMapCalibration(floor), `${floor} has a calibration record`);
+  assert.ok(Number.isFinite(MAP_CALIBRATION[floor].centerGame.x), `${floor} calibration centre X is finite`);
+  assert.ok(Number.isFinite(MAP_CALIBRATION[floor].centerGame.z), `${floor} calibration centre Z is finite`);
+}
+assert.equal(getMapCalibration("floor1").coordinateSystem, "minecraft", "floor 1 is Minecraft-calibrated");
+assert.equal(getMapCalibration("floor2").coordinateSystem, "map-local", "floor 2 keeps its own grid");
+assert.equal(getMapCalibration("floor3").coordinateSystem, "map-local", "floor 3 keeps its own grid");
+assert.equal(getMapCalibration("playerIsland"), null, "the Underworld has no calibration here");
+
+/* ---------------------------------------------------------------------------
+   Floor 1 calibration: derived from the verified Minecraft reference points.
+   ------------------------------------------------------------------------- */
+
+const floor1Calibration = getMapCalibration("floor1");
+assertGamePointClose(
+  floor1Calibration.centerGame,
+  { x: 2544.6, z: 2563 },
+  "floor 1 reference centre is the Minecraft coordinate of the image centre"
+);
+assertGamePointClose(
+  floor1Calibration.legacyGrid.centerGame,
+  { x: 2542.6, z: 2551 },
+  "floor 1 preserves its pre-calibration grid for one-time data migration"
+);
+assert.deepEqual(
+  { ...getStoredCoordinateMigration("floor1") },
+  { x: 2, z: 12 },
+  "the legacy grid sat 2 blocks west and 12 blocks north of Minecraft"
+);
+assert.equal(getStoredCoordinateMigration("floor2"), null, "floor 2 has no migration");
+assert.equal(getStoredCoordinateMigration("floor3"), null, "floor 3 has no migration");
+assert.deepEqual(
+  JSON.parse(JSON.stringify(getStoredCoordinateMigrations("aincrad"))),
+  { floor1: { x: 2, z: 12 } },
+  "only floor 1 migrates stored Aincrad waypoints"
+);
+assert.equal(getStoredCoordinateMigrations("underworld"), null, "the Underworld never migrates");
+
+/* ---------------------------------------------------------------------------
+   Round trips for every floor.
+   ------------------------------------------------------------------------- */
+
 for (const floor of ["floor1", "floor2", "floor3"]) {
   const dimensions = readPngDimensions(path.join(root, "Aincrad", "Map", `${floor}.png`));
-  const calibration = MAP_CALIBRATION[floor];
-  assert.ok(calibration, `${floor} calibration is present`);
+  const calibration = getMapCalibration(floor);
 
   const rawCases = [
     { x: 0, y: 0, label: "top-left boundary" },
@@ -60,21 +113,17 @@ for (const floor of ["floor1", "floor2", "floor3"]) {
 
   const imageCenter = { x: dimensions.width / 2, y: dimensions.height / 2 };
   const worldCenter = mapWebsiteCoordinates(imageCenter.x, imageCenter.y, floor, dimensions);
-  assertGamePointClose(
-    worldCenter,
-    mapToMinecraftCoordinate(calibration.centerGame.x, calibration.centerGame.z),
-    `${floor} image center maps to its calibration center in Minecraft coordinates`
-  );
+  assertGamePointClose(worldCenter, calibration.centerGame, `${floor} image center maps to its calibration center`);
 
   const referenceSize = Math.min(dimensions.width, dimensions.height);
   const rawPixelDelta = (10 * referenceSize) / CALIBRATION_MAP_SIZE;
   const expectedBlockDelta = (10 * calibration.radiusGame) / calibration.radiusPixel;
   const imageXStep = mapWebsiteCoordinates(imageCenter.x + rawPixelDelta, imageCenter.y, floor, dimensions);
-  assertClose(imageXStep.x, worldCenter.x + expectedBlockDelta, `${floor} image X maps only to Minecraft X`);
-  assertClose(imageXStep.z, worldCenter.z, `${floor} image X does not change Minecraft Z`);
+  assertClose(imageXStep.x, worldCenter.x + expectedBlockDelta, `${floor} image X maps only to world X`);
+  assertClose(imageXStep.z, worldCenter.z, `${floor} image X does not change world Z`);
   const imageYStep = mapWebsiteCoordinates(imageCenter.x, imageCenter.y + rawPixelDelta, floor, dimensions);
-  assertClose(imageYStep.x, worldCenter.x, `${floor} image Y does not change Minecraft X`);
-  assertClose(imageYStep.z, worldCenter.z + expectedBlockDelta, `${floor} image Y maps only to Minecraft Z`);
+  assertClose(imageYStep.x, worldCenter.x, `${floor} image Y does not change world X`);
+  assertClose(imageYStep.z, worldCenter.z + expectedBlockDelta, `${floor} image Y maps only to world Z`);
 
   for (const raw of rawCases) {
     const game = mapWebsiteCoordinates(raw.x, raw.y, floor, dimensions);
@@ -108,108 +157,81 @@ for (const floor of ["floor1", "floor2", "floor3"]) {
   }
 }
 
+/* Every marker's stored coordinate must round-trip through its own floor's calibration. */
 for (const floor of ["floor1", "floor2", "floor3"]) {
   const dimensions = readPngDimensions(path.join(root, "Aincrad", "Map", `${floor}.png`));
   const marker = Object.values(data).find((entry) => entry.floor === floor && entry.coords);
   assert.ok(marker, `${floor} has a marker with coordinates`);
-
   const raw = invertMapCoordinates(marker.coords.x, marker.coords.z, floor, dimensions);
   const game = mapWebsiteCoordinates(raw.rawX, raw.rawY, floor, dimensions);
   assertGamePointClose(game, marker.coords, `${floor} marker ${marker.title}`);
 }
 
-const waypoint = Object.values(data).find(
-  (entry) => entry.floor === "floor2" && entry.type === "Quest" && entry.coords
-);
-assert.ok(waypoint, "a floor 2 waypoint with coordinates is present");
-const waypointDimensions = readPngDimensions(path.join(root, "Aincrad", "Map", "floor2.png"));
-const waypointRaw = invertMapCoordinates(waypoint.coords.x, waypoint.coords.z, "floor2", waypointDimensions);
-const waypointGame = mapWebsiteCoordinates(waypointRaw.rawX, waypointRaw.rawY, "floor2", waypointDimensions);
-assertGamePointClose(waypointGame, waypoint.coords, `floor 2 waypoint ${waypoint.title}`);
+/* ---------------------------------------------------------------------------
+   The two reported reference points, pinned to their exact map pixels.
+   ------------------------------------------------------------------------- */
 
-/* Focused regression for the two reported examples. The map location that the old grid labelled
-   1798,4178 is the Minecraft position 1800,4190, and it must keep the exact same pixel: the
-   correction moves coordinates, never markers. The raw pixel values below were captured from the
-   conversion before the correction, so they pin the "same physical map location" invariant. */
-assert.deepEqual(
-  { ...MAP_COORDINATE_ALIGNMENT },
-  { x: 2, z: 12 },
-  "the shared boundary is the reported +2 X / +12 Z correction"
-);
-assert.deepEqual(
-  { ...getMapCoordinateAlignment("aincrad") },
-  { x: 2, z: 12 },
-  "Aincrad is the world whose stored coordinates sit in the map grid"
-);
-assert.equal(getMapCoordinateAlignment("underworld"), null, "the Underworld map is not shifted");
-assert.equal(MAP_COORDINATE_ALIGNMENT_BY_WORLD.underworld, undefined);
-
+const floor1Dimensions = readPngDimensions(path.join(root, "Aincrad", "Map", "floor1.png"));
 const exampleCases = [
   {
-    grid: { x: 1798, z: 4178 },
     minecraft: { x: 1800, z: 4190 },
+    legacyGrid: { x: 1798, z: 4178 },
     rawPixel: { x: 1754.83367359193, y: 4128.237460469957 }
   },
   {
-    grid: { x: 1797, z: 3974 },
     minecraft: { x: 1799, z: 3986 },
+    legacyGrid: { x: 1797, z: 3974 },
     rawPixel: { x: 1753.8329130138907, y: 3924.0823025499376 }
   }
 ];
-const exampleDimensions = readPngDimensions(path.join(root, "Aincrad", "Map", "floor1.png"));
 
 exampleCases.forEach((example, index) => {
-  assert.deepEqual(
-    { ...mapToMinecraftCoordinate(example.grid.x, example.grid.z) },
-    example.minecraft,
-    `example ${index + 1}: grid ${example.grid.x},${example.grid.z} is Minecraft ${example.minecraft.x},${example.minecraft.z}`
-  );
-  assert.deepEqual(
-    { ...minecraftToMapCoordinate(example.minecraft.x, example.minecraft.z) },
-    example.grid,
-    `example ${index + 1}: the Minecraft coordinate maps back to the same grid coordinate`
-  );
-
-  const pixel = invertMapCoordinates(example.minecraft.x, example.minecraft.z, "floor1", exampleDimensions);
-  assertRawPointClose(pixel, example.rawPixel, `example ${index + 1} keeps its pre-correction map pixel`);
-
-  const readout = mapWebsiteCoordinates(example.rawPixel.x, example.rawPixel.y, "floor1", exampleDimensions);
+  const readout = mapWebsiteCoordinates(example.rawPixel.x, example.rawPixel.y, "floor1", floor1Dimensions);
   assertGamePointClose(
     readout,
     example.minecraft,
-    `example ${index + 1} map location now reports the corrected Minecraft coordinate`
+    `example ${index + 1}: the map location now reports the true Minecraft coordinate`
+  );
+  const pixel = invertMapCoordinates(example.minecraft.x, example.minecraft.z, "floor1", floor1Dimensions);
+  assertRawPointClose(pixel, example.rawPixel, `example ${index + 1} keeps its map pixel`);
+  const migration = getStoredCoordinateMigration("floor1");
+  assert.deepEqual(
+    { x: example.legacyGrid.x + migration.x, z: example.legacyGrid.z + migration.z },
+    example.minecraft,
+    `example ${index + 1}: the legacy grid migrates to the Minecraft coordinate`
   );
 });
 
-/* The Beta datasets were moved to Minecraft coordinates, so their stored values and their own
-   displayed coordinate text agree, while the Current dataset (already Minecraft) is untouched. */
-const mineMarker = Object.values(data).find((entry) => entry.title === "West Mines");
-assert.ok(mineMarker, "the migrated farming marker is present");
-assert.deepEqual({ x: mineMarker.coords.x, z: mineMarker.coords.z }, { x: 986, z: 3491 });
-assert.match(mineMarker.description, /Coordinates X: 986 Z: 3491/, "displayed coordinate text agrees with the marker");
+/* ---------------------------------------------------------------------------
+   Floor 1 marker regression against the user's exported waypoint file
+   (OurNotWorkingWaypointData.dat carries the pre-calibration website grid).
+   ------------------------------------------------------------------------- */
 
-/* The Main Questline loads on its own so its description triples can be checked without changing the
-   marker set the floor assertions above search. */
-const questContext = vm.createContext({ console });
-vm.runInContext(mapDataSource, questContext, { filename: "Aincrad/Map/mapData.js" });
-vm.runInContext(
-  fs.readFileSync(path.join(root, "Aincrad", "Map", "maps_mainquests.js"), "utf8"),
-  questContext,
-  { filename: "Aincrad/Map/maps_mainquests.js" }
-);
-const questData = vm.runInContext("DATA", questContext);
-const questMarker = Object.values(questData).find((entry) => entry.title === "The Geldorack Mine");
-assert.ok(questMarker, "the migrated Main Questline marker is present");
-assert.deepEqual(
-  { x: questMarker.coords.x, z: questMarker.coords.z },
-  { x: 4289, z: 3902 },
-  "Main Questline markers hold Minecraft coordinates"
-);
-assert.match(
-  questMarker.description,
-  /\(4289, \d+, 3902\)/,
-  "the Main Questline description triple carries the same Minecraft coordinate"
-);
+const exportedWaypoints = {
+  "Swamp Putride": { x: 1343, z: 3051 },
+  Vallhat: { x: 448, z: 3038 },
+  "Town of Beginnings": { x: 1800, z: 4282 },
+  "Petals Valley": { x: 1007, z: 4159 },
+  "Geldorak Mine": { x: 4171, z: 3879 },
+  Tolbana: { x: 3310, z: 1608 },
+  "Garden of Giants": { x: 367, z: 2422 },
+  Candelia: { x: 1999, z: 753 }
+};
+
+for (const [title, legacy] of Object.entries(exportedWaypoints)) {
+  const marker = Object.values(data).find((entry) => entry.title === title && entry.coords && entry.floor === "floor1");
+  assert.ok(marker, `the ${title} floor 1 marker exists`);
+  assert.deepEqual(
+    { x: marker.coords.x, z: marker.coords.z },
+    { x: legacy.x + 2, z: legacy.z + 12 },
+    `${title} stores the true Minecraft coordinate`
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   Cross-check: the user-supplied Current Data markers (already Minecraft
+   coordinates) agree with the calibrated floor markers describing the same NPCs.
+   ------------------------------------------------------------------------- */
 
 const currentContext = vm.createContext({ console });
 vm.runInContext(mapDataSource, currentContext, { filename: "Aincrad/Map/mapData.js" });
@@ -219,13 +241,88 @@ vm.runInContext(
   { filename: "Aincrad/Map/maps_current.js" }
 );
 const currentData = vm.runInContext("DATA", currentContext);
-const currentMarker = Object.values(currentData).find((entry) => entry.title === "Starting Merchant");
-assert.ok(currentMarker, "the Current dataset marker is present");
+
+const crossChecks = [
+  { current: "Elite Treant Accessories", floorTitle: "Level 5 Weapon Buyer", tolerance: 4 },
+  { current: "Nepenthes Accessories", floorTitle: "Tool Merchant", tolerance: 8 },
+  { current: "Sticky Ring", floorTitle: "Manufacturer of the Glutinous Ring", tolerance: 4 },
+  { current: "Skeleton Skull", floorTitle: "Skeleton Skull Manufacturer", tolerance: 8 },
+  { current: "Occult Merchant - Bracelet", floorTitle: "Occult Bracelet Merchant", tolerance: 6 }
+];
+
+for (const crossCheck of crossChecks) {
+  const currentMarker = Object.values(currentData).find((entry) => entry.title === crossCheck.current);
+  assert.ok(currentMarker, `the Current Data ${crossCheck.current} marker exists`);
+  /* Several floor markers share a title (e.g. merchants in different towns), so pick the
+     same-NPC marker closest to the Current Data coordinate. */
+  const candidates = Object.values(data).filter(
+    (entry) => entry.title === crossCheck.floorTitle && entry.coords
+  );
+  assert.ok(candidates.length > 0, `the calibrated ${crossCheck.floorTitle} marker exists`);
+  const floorMarker = candidates.reduce((closest, entry) => {
+    const entryDistance = Math.hypot(entry.coords.x - currentMarker.coords.x, entry.coords.z - currentMarker.coords.z);
+    return entryDistance < closest.distance ? { distance: entryDistance, entry } : closest;
+  }, { distance: Infinity, entry: null }).entry;
+  const distance = Math.hypot(
+    currentMarker.coords.x - floorMarker.coords.x,
+    currentMarker.coords.z - floorMarker.coords.z
+  );
+  assert.ok(
+    distance <= crossCheck.tolerance,
+    `${crossCheck.current} (${currentMarker.coords.x},${currentMarker.coords.z}) and ${crossCheck.floorTitle} ` +
+      `(${floorMarker.coords.x},${floorMarker.coords.z}) agree within ${crossCheck.tolerance} blocks (got ${distance.toFixed(2)})`
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   Uncalibrated floors keep their original grids and values.
+   ------------------------------------------------------------------------- */
+
+const floor2Alchemist = Object.values(data).find((entry) => entry.title === "Alchemist" && entry.floor === "floor2");
 assert.deepEqual(
-  { x: currentMarker.coords.x, z: currentMarker.coords.z },
-  { x: 1787, z: 4179 },
-  "the Current dataset is already in Minecraft coordinates and was not shifted"
+  { x: floor2Alchemist.coords.x, z: floor2Alchemist.coords.z },
+  { x: -568, z: -293 },
+  "floor 2 data keeps its original map-local values"
 );
+const floor3Boss = Object.values(data).find(
+  (entry) => entry.title === "Furacas, Guardian of the Labyrinth" && entry.floor === "floor3"
+);
+assert.deepEqual(
+  { x: floor3Boss.coords.x, z: floor3Boss.coords.z },
+  { x: 393, z: 340 },
+  "floor 3 data keeps its original map-local values"
+);
+const floor2Dimensions = readPngDimensions(path.join(root, "Aincrad", "Map", "floor2.png"));
+const floor2Readout = mapWebsiteCoordinates(
+  floor2Dimensions.width / 2,
+  floor2Dimensions.height / 2,
+  "floor2",
+  floor2Dimensions
+);
+assertGamePointClose(floor2Readout, { x: -1.3, z: 0.8 }, "floor 2 keeps its original coordinate grid");
+
+/* ---------------------------------------------------------------------------
+   Main Questline data (floor 1) is stored in Minecraft coordinates.
+   ------------------------------------------------------------------------- */
+
+const questContext = vm.createContext({ console });
+vm.runInContext(mapDataSource, questContext, { filename: "Aincrad/Map/mapData.js" });
+vm.runInContext(
+  fs.readFileSync(path.join(root, "Aincrad", "Map", "maps_mainquests.js"), "utf8"),
+  questContext,
+  { filename: "Aincrad/Map/maps_mainquests.js" }
+);
+const questData = vm.runInContext("DATA", questContext);
+const questMarker = Object.values(questData).find((entry) => entry.title === "The Geldorack Mine");
+assert.ok(questMarker, "the Main Questline marker is present");
+assert.deepEqual(
+  { x: questMarker.coords.x, z: questMarker.coords.z },
+  { x: 4289, z: 3902 },
+  "Main Questline markers hold Minecraft coordinates"
+);
+const questRaw = invertMapCoordinates(questMarker.coords.x, questMarker.coords.z, "floor1", floor1Dimensions);
+const questRoundTrip = mapWebsiteCoordinates(questRaw.rawX, questRaw.rawY, "floor1", floor1Dimensions);
+assertGamePointClose(questRoundTrip, questMarker.coords, "Main Questline coordinates round-trip through floor 1");
 
 assert.ok(
   Number.isFinite(CALIBRATION_MAP_SIZE) && CALIBRATION_MAP_SIZE > 0,

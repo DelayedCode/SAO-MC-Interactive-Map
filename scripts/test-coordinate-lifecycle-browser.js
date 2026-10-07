@@ -18,7 +18,6 @@ const AINCRAD_KEY = "sao.customWaypoints.aincrad";
 const WAYPOINT_NAME = "Coordinate lifecycle marker";
 /* The second reported example: the map location the grid used to label 1797,3974 is Minecraft
    1799,3986, and that location carries no marker, so it is safe to click. */
-const EXAMPLE_GRID = { x: 1797, z: 3974 };
 const EXAMPLE_MINECRAFT = { x: 1799, z: 3986 };
 const CURRENT_MARKER = { title: "Starting Merchant", minecraft: { x: 1787, z: 4179 } };
 
@@ -182,23 +181,23 @@ async function run() {
       timeout: 30000
     });
 
-    /* The two reported examples, straight through the shared boundary the page exposes. */
+    /* The two reported examples, straight through the authoritative calibration the page exposes. */
     const examples = await page.evaluate(() => ({
-      first: { ...mapToMinecraftCoordinate(1798, 4178) },
-      firstBack: { ...minecraftToMapCoordinate(1800, 4190) },
-      second: { ...mapToMinecraftCoordinate(1797, 3974) },
-      secondBack: { ...minecraftToMapCoordinate(1799, 3986) },
-      alignment: { ...MAP_COORDINATE_ALIGNMENT },
-      aincradAlignment: { ...getMapCoordinateAlignment("aincrad") },
-      underworldAlignment: getMapCoordinateAlignment("underworld")
+      floor1Center: { ...getMapCalibration("floor1").centerGame },
+      floor1LegacyCenter: { ...getMapCalibration("floor1").legacyGrid.centerGame },
+      floor1Migration: { ...getStoredCoordinateMigration("floor1") },
+      aincradMigrations: getStoredCoordinateMigrations("aincrad"),
+      underworldMigrations: getStoredCoordinateMigrations("underworld"),
+      floor2System: getMapCalibration("floor2").coordinateSystem,
+      globalAlignmentType: typeof MAP_COORDINATE_ALIGNMENT
     }));
-    assert.deepEqual(examples.first, { x: 1800, z: 4190 }, "grid 1798,4178 is Minecraft 1800,4190");
-    assert.deepEqual(examples.second, { x: 1799, z: 3986 }, "grid 1797,3974 is Minecraft 1799,3986");
-    assert.deepEqual(examples.firstBack, { x: 1798, z: 4178 }, "the inverse restores the grid coordinate");
-    assert.deepEqual(examples.secondBack, EXAMPLE_GRID, "the inverse restores the grid coordinate");
-    assert.deepEqual(examples.alignment, { x: 2, z: 12 }, "the shared alignment is +2 X / +12 Z");
-    assert.deepEqual(examples.aincradAlignment, { x: 2, z: 12 }, "Aincrad uses the alignment");
-    assert.equal(examples.underworldAlignment, null, "the Underworld map is never shifted");
+    assert.deepEqual(examples.floor1Center, { x: 2544.6, z: 2563 }, "floor 1 calibration centre is Minecraft");
+    assert.deepEqual(examples.floor1LegacyCenter, { x: 2542.6, z: 2551 }, "floor 1 keeps its legacy grid");
+    assert.deepEqual(examples.floor1Migration, { x: 2, z: 12 }, "the legacy grid migrated +2 X / +12 Z");
+    assert.deepEqual(examples.aincradMigrations, { floor1: { x: 2, z: 12 } }, "only floor 1 migrates stored waypoints");
+    assert.equal(examples.underworldMigrations, null, "the Underworld map never migrates");
+    assert.equal(examples.floor2System, "map-local", "floor 2 stays on its own map-local grid");
+    assert.equal(examples.globalAlignmentType, "undefined", "no global coordinate correction constants remain");
 
     /* map location -> calculated Minecraft coordinate -> create waypoint. The browser dispatches
        integer client coordinates, so the click point is rounded first and the expected coordinate is
@@ -317,10 +316,6 @@ async function run() {
       CURRENT_MARKER.title,
       { timeout: 15000 }
     );
-    const currentProjection = await markerProjection(page, {
-      coordinate: CURRENT_MARKER.minecraft,
-      title: CURRENT_MARKER.title
-    });
     /* The map only renders the markers inside the viewport, so the dataset is the source of truth for
        the coordinate itself while a rendered Current marker proves the projection. */
     const currentDatasetMarker = await page.evaluate((title) => {
@@ -361,9 +356,9 @@ async function run() {
       return null;
     });
     assert.ok(renderedCurrentMarker, "a Current dataset marker is rendered in Current mode");
-    assert.deepEqual(
-      renderedCurrentMarker.roundTrip,
-      renderedCurrentMarker.coords,
+    assert.ok(
+      Math.abs(renderedCurrentMarker.roundTrip.x - renderedCurrentMarker.coords.x) < 1e-6 &&
+        Math.abs(renderedCurrentMarker.roundTrip.z - renderedCurrentMarker.coords.z) < 1e-6,
       "the rendered Current marker projects back to its own Minecraft coordinate"
     );
     assert.ok(
