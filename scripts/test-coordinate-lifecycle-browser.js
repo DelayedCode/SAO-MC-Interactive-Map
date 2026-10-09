@@ -424,11 +424,11 @@ async function run() {
       };
     });
     assert.match(cursorStyles.html, / 1 1,\s*auto$/, "the normal site-wide cursor is the arrow with its tip as hotspot");
-    assert.match(cursorStyles.mapLayer, / 9 11,\s*grab$/, "the draggable map artwork shows the grab cursor");
+    assert.match(cursorStyles.mapLayer, / 1 1,\s*auto$/, "the draggable map artwork keeps the arrow cursor");
     assert.match(cursorStyles.infoOverlay, / 1 1,\s*auto$/, "the map info panel keeps the normal cursor");
-    assert.match(cursorStyles.zoomIn, / 4 1,\s*pointer$/, "the zoom controls use the click cursor");
+    assert.match(cursorStyles.zoomIn, / 6 0,\s*pointer$/, "the zoom controls use the click cursor");
     assert.equal(cursorStyles.search, "text", "the marker search input keeps the text cursor");
-    assert.ok(cursorStyles.marker === null || / 4 1,\s*pointer$/.test(cursorStyles.marker), "markers use the click cursor");
+    assert.ok(cursorStyles.marker === null || / 6 0,\s*pointer$/.test(cursorStyles.marker), "markers use the click cursor");
 
     /* Dragging still shows grabbing, on the artwork the pointer is over. */
     const dragPoint = await findFreeMapPoint(page);
@@ -439,7 +439,7 @@ async function run() {
       () => getComputedStyle(document.getElementById("mapLayer")).cursor
     );
     await page.mouse.up();
-    assert.match(grabbingCursor, / 9 11,\s*grabbing$/, "dragging shows the grabbing cursor");
+    assert.match(grabbingCursor, / 11 11,\s*grabbing$/, "dragging shows the grabbing cursor");
 
     const knownTips = [
       { label: "reference point 1", minecraft: { x: 1800, z: 4190 } },

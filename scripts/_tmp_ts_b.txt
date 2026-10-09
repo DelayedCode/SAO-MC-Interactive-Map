@@ -1,0 +1,52 @@
+﻿ 142:         if (skill58Requirements[classId].includes("skill58")) errors.push(`${classId}: Skill 58 requires itself`);
+ 143:         if ((skills.skill61.prerequisites || []).includes("skill58")) {
+ 144:           errors.push(`${classId}: Skill 61 must not require Skill 58`);
+ 145:         }
+ 146:       }
+ 147:       return {
+ 148:         nodeCount: data.SKILL_TREE_LAYOUT.length,
+ 149:         connectionCount: data.SKILL_TREE_CONNECTIONS.length,
+ 150:         adjacency: Object.fromEntries([...neighbors].map(([skillId, adjacent]) => [skillId, [...adjacent]])),
+ 151:         skill58Requirements,
+ 152:         layout: data.SKILL_TREE_LAYOUT.map((point) => ({
+ 153:           skillId: point.skillId,
+ 154:           x: `${point.x}px`,
+ 155:           y: `${point.y}px`
+ 156:         })),
+ 157:         errors
+ 158:       };
+ 159:     }, classIds);
+ 160: 
+ 161:     assert.equal(audit.nodeCount, 77);
+ 162:     assert.equal(audit.connectionCount, 100);
+ 163:     assert.equal(audit.adjacency.skill1.length, 4, "root adjacency comes from the visual connections");
+ 164:     assert.deepEqual(sorted(audit.adjacency.skill4), sorted(screenshotTwoPrerequisites), "Skill 4 uses the four screenshot-marked visual alternatives");
+ 165:     classIds.forEach((classId) =>
+ 166:       assert.deepEqual(audit.skill58Requirements[classId], sorted(screenshotThreePrerequisites), `${classId}: Skill 58 ALL inputs`)
+ 167:     );
+ 168:     assert.deepEqual(audit.errors, [], "special Skill 58 requirements are valid and Skill 61 does not require it");
+ 169: 
+ 170:     let sharedRenderedLayout;
+ 171:     for (const classId of classIds) {
+ 172:       const renderedLayout = await switchToClass(page, classId);
+ 173:       assert.deepEqual(renderedLayout, audit.layout, `${classId}: rendered coordinates match the shared layout`);
+ 174:       if (sharedRenderedLayout) assert.deepEqual(renderedLayout, sharedRenderedLayout, `${classId}: same rendered layout`);
+ 175:       sharedRenderedLayout = renderedLayout;
+ 176:       await assertCurrentModel(page, classId, audit.adjacency);
+ 177:       const skill8DataPrerequisites = await page.evaluate(
+ 178:         (selectedClassId) => window.CharacterBuildData.CLASS_SKILLS[selectedClassId].skill8.prerequisites,
+ 179:         classId
+ 180:       );
+ 181:       assert(!skill8DataPrerequisites.includes("skill7"), `${classId}: test distinguishes visual adjacency from stored skill data`);
+ 182:       await unlock(page, classId, "skill6", audit.adjacency);
+ 183:       await unlock(page, classId, "skill7", audit.adjacency);
+ 184:       assert(audit.adjacency.skill8.includes("skill7"), "Skill 7 is directly adjacent to Skill 8");
+ 185:       assert((await page.locator(`[data-skill-id="${classId}-skill8"]`).getAttribute("class")).includes("is-available"));
+ 186:       await unlock(page, classId, "skill8", audit.adjacency);
+ 187:       await deselectSkill(page, classId, "skill7", audit.adjacency);
+ 188:       assert.equal(await page.locator(`[data-skill-id="${classId}-skill8"]`).getAttribute("aria-pressed"), "false");
+ 189:       await assertCurrentModel(page, classId, audit.adjacency);
+ 190:       await page.locator("#resetBuild").click();
+ 191:       if (classId !== "archer") await switchToClass(page, classId);
+ 192:       await assertCurrentModel(page, classId, audit.adjacency);
+ 193:       const skill4 = page.locator(`[data-skill-id="${classId}-skill4"]`);

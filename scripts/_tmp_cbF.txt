@@ -1,0 +1,100 @@
+      const toSkill = toPoint && skillsByNodeId.get(toPoint.skillId);
+      const active = (fromSkill && isSkillUnlocked(fromSkill.id)) || (toSkill && isSkillUnlocked(toSkill.id));
+      addConnection(fromId, toId, active);
+    });
+    skills.forEach((node) => {
+      node.prerequisites.forEach((parentId) => {
+        const parent = skillsById.get(parentId);
+        const parentPoint = parent && layoutBySkillId.get(parent.nodeId);
+        const nodePoint = layoutBySkillId.get(node.nodeId);
+        if (parentPoint && nodePoint) addConnection(parentPoint.id, nodePoint.id, isSkillUnlocked(node.id));
+      });
+    });
+    const connections = connectionMarkup.join("");
+    const nodes = layout
+      .map((point) => {
+        const node = skillsByNodeId.get(point.skillId);
+        const position = `--node-x:${point.x}px;--node-y:${point.y}px`;
+        const status = skillNodeState(node);
+        const selected = status.name === "selected";
+        return `<button class="skill-node is-${status.name}${node.center ? " is-center" : ""}${point.isAnchor ? " is-branch-anchor" : ""}" type="button" data-skill-id="${node.id}" style="${position}" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-core" aria-hidden="true"></span></button>`;
+      })
+      .join("");
+    const selectedNode = skillsById.get(selectedNodeId) || skills.find((node) => node.center);
+    $("skillTree").innerHTML = `
+      <div class="skill-tree-toolbar">
+        <span data-skill-points>${escapeHtml(skillClassName(state.classId))} · ${availableSkillPoints()} / ${skills.reduce((sum, node) => sum + node.cost, 0)} skill points</span>
+        <button class="skill-tree-reset" type="button" data-reset-view>Reset View</button>
+      </div>
+      <div class="skill-tree-viewport" id="skillTreeViewport" aria-label="Skill tree viewport">
+        <div class="skill-tree-canvas" id="skillTreeCanvas">
+          <svg class="skill-connections" viewBox="0 0 921 923" preserveAspectRatio="none" aria-hidden="true">${connections}</svg>
+          ${nodes}
+        </div>
+      </div>
+      <div id="skillDetail" class="skill-detail" aria-live="polite"></div>
+    `;
+    renderSkillDetail(selectedNode?.id);
+    setupSkillTreeViewport();
+  }
+
+  function updateSkillTreeState(selectedNodeId) {
+    const skills = currentSkillTree();
+    const pointsBySkillId = new Map((data.SKILL_TREE_LAYOUT || []).map((point) => [point.skillId, point]));
+    document.querySelectorAll("#skillTreeCanvas [data-skill-id]").forEach((button) => {
+      const node = skills.find((skill) => skill.id === button.dataset.skillId);
+      if (!node) return;
+      const status = skillNodeState(node);
+      const point = pointsBySkillId.get(node.nodeId);
+      const isCenter = node.center;
+      button.className = `skill-node is-${status.name}${isCenter ? " is-center" : ""}${point?.isAnchor ? " is-branch-anchor" : ""}`;
+      button.setAttribute("aria-pressed", String(status.name === "selected"));
+      button.setAttribute("aria-label", `${localizeSkillName(node)}: ${status.label}`);
+    });
+    document.querySelectorAll("#skillTreeCanvas .skill-connection").forEach((line) => {
+      const fromSelected = isSkillUnlocked(line.dataset.fromSkillId);
+      const toSelected = isSkillUnlocked(line.dataset.toSkillId);
+      line.classList.toggle("is-active", fromSelected || toSelected);
+    });
+    const pointsLabel = $("skillTree").querySelector?.("[data-skill-points]");
+    if (pointsLabel) {
+      const total = skills.reduce((sum, node) => sum + node.cost, 0);
+      pointsLabel.textContent = `${skillClassName(state.classId)} · ${availableSkillPoints()} / ${total} skill points`;
+    }
+    renderSkillDetail(selectedNodeId);
+  }
+
+  const skillTreeViewState = {
+    scale: 1,
+    offsetX: 0,
+    offsetY: 0,
+    pointerStartX: 0,
+    pointerStartY: 0,
+    originX: 0,
+    originY: 0,
+    initialized: false,
+    userInteracted: false,
+    resizeListenerBound: false,
+    dragging: false,
+    pointerId: null
+  };
+
+  function resetSkillTreeViewport(viewport) {
+    if (!viewport) return;
+    const width = viewport.clientWidth || 921;
+    const height = viewport.clientHeight || 923;
+    const scale = Math.min(0.94, (width - 24) / 921, (height - 24) / 923);
+    skillTreeViewState.scale = Math.max(0.4, scale);
+    skillTreeViewState.offsetX = (width - 921 * skillTreeViewState.scale) / 2;
+    skillTreeViewState.offsetY = (height - 923 * skillTreeViewState.scale) / 2;
+    skillTreeViewState.userInteracted = false;
+    applySkillTreeTransform();
+  }
+
+  function applySkillTreeTransform() {
+    const viewport = $("skillTreeViewport");
+    const canvas = $("skillTreeCanvas");
+    if (!viewport || !canvas) return;
+    const clamped = Math.min(2, Math.max(0.4, skillTreeViewState.scale));
+    skillTreeViewState.scale = clamped;
+    if (canvas.style) canvas.style.transform = `translate(${skillTreeViewState.offsetX}px, ${skillTreeViewState.offsetY}px) scale(${clamped})`;

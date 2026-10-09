@@ -105,6 +105,34 @@ async function run() {
     );
     assert.deepEqual(await readStoredModes(page), { aincrad: null, underworld: null }, "no mode is stored yet");
 
+    /* The chooser itself: sentence-case copy, one short badge per card, both cards keyboard
+       buttons and a secondary Cancel that closes without choosing or storing anything. */
+    await page.locator(AINCRAD_CARD).click();
+    await page.waitForSelector(".sao-dataset-dialog", { timeout: 6000 });
+    const modal = await page.evaluate(() => {
+      const cards = [...document.querySelectorAll(".sao-dataset-choice")];
+      const description = (card) => card.querySelector(".sao-dataset-description").textContent;
+      return {
+        labels: cards.map((card) => card.querySelector("strong").textContent),
+        badges: cards.map((card) => card.querySelector(".sao-dataset-badge")?.textContent),
+        descriptions: cards.map(description),
+        keyboardCards: cards.every((card) => card.tagName === "BUTTON" && card.type === "button"),
+        cancel: document.querySelector(".sao-dataset-close")?.textContent
+      };
+    });
+    assert.deepEqual(modal.labels, ["Beta-Test Data", "Current Data"], "the modal keeps both data modes");
+    assert.deepEqual(modal.badges, ["Legacy", "Recommended"], "each card carries its short badge");
+    assert.ok(modal.keyboardCards, "both cards stay keyboard-activatable buttons");
+    assert.ok(
+      modal.descriptions.every((text) => text.length > 20 && text !== text.toUpperCase()),
+      "the descriptions stay readable sentence-case copy"
+    );
+    assert.equal(modal.cancel, "Cancel", "the modal keeps its Cancel action");
+    await page.locator(".sao-dataset-close").click();
+    await page.waitForSelector(".sao-dataset-dialog", { state: "detached", timeout: 4000 });
+    assert.ok(page.url().endsWith("/index.html"), "Cancel closes the modal without choosing a dataset");
+    assert.deepEqual(await readStoredModes(page), { aincrad: null, underworld: null }, "Cancel stores no mode");
+
     /* --- Aincrad -> Current ----------------------------------------------- */
     await enterWorldFromHub(page, AINCRAD_CARD, "Current Data");
     assert.equal(await readMode(page, "aincrad"), "current", "choosing Current stores it for Aincrad");
@@ -117,10 +145,17 @@ async function run() {
       { inHeader: true, inMapBox: false },
       "the banner sits in the map header, not over the map image"
     );
+    /* Current Data ships its own copy of the Beta mob areas, minus "Wild Boar Meadow". */
+    const currentMobAreaIds = await page.evaluate(() =>
+      window.AincradMapAdapter.getContextData("floor1").mobAreaDataset.map((area) => area.id)
+    );
+    assert.equal(currentMobAreaIds.length, 15, "Current carries the copied floor 1 mob areas");
+    assert.ok(!currentMobAreaIds.includes("wild-boar-meadow"), "Current leaves Wild Boar Meadow out");
+    assert.ok(currentMobAreaIds.includes("wild-boar-zone"), "Current keeps the other Wild Boar area");
     assert.equal(
-      await page.evaluate(() => window.AincradMapAdapter.getContextData("floor1").mobAreaDataset.length),
-      0,
-      "Current carries no Beta mob areas"
+      await page.evaluate(() => window.AincradMapAdapter.mobAreaDataset.length),
+      26,
+      "Current carries the whole copied mob-area set"
     );
     assert.ok(
       await page.evaluate(() =>
@@ -131,8 +166,10 @@ async function run() {
       "the Current map dataset keeps only the Main Questline and the Current waypoints"
     );
 
-    /* Enabled Beta-only categories stay empty; the Main Quest waypoints still render. */
-    for (const category of ["biomes", "mobAreas", "sideQuests", "mainQuests"]) {
+    /* Categories with no Current Data waypoints stay empty; the Main Quest waypoints and the
+       Current Data copy of the mob areas still render. The Biome category now ships Current Data
+       waypoints, so it is checked separately. */
+    for (const category of ["mobAreas", "sideQuests", "mainQuests"]) {
       await page.locator(`[data-category='${category}']`).click();
       await page.waitForFunction((name) => window.__aincradMapRuntime.getCategoryState(name), category);
     }
@@ -143,12 +180,32 @@ async function run() {
       Array.from(document.querySelectorAll("#markers .marker")).map((element) => element.dataset.markerId)
     );
     assert.ok(
-      renderedIds.every((id) => id.startsWith("mq-") || id.startsWith("cluster:mq-")),
-      `Current renders only Main Quest waypoints (got ${renderedIds.slice(0, 6).join(", ")})`
+      renderedIds.every((id) => /mob-area:|(^|cluster:)mq-/.test(id)),
+      `Current renders only Main Quest waypoints and the copied mob areas (got ${renderedIds.slice(0, 6).join(", ")})`
+    );
+    /* Switching the mob areas back off leaves the Main Questline alone on the map, exactly as it
+       rendered before Current Data gained its mob-area copy. */
+    await page.locator("[data-category='mobAreas']").click();
+    await page.waitForFunction(() => !window.__aincradMapRuntime.getCategoryState("mobAreas"));
+    await page.waitForFunction(() => !document.querySelector("#markers .marker.mob-area-marker"));
+    const questOnlyIds = await page.evaluate(() =>
+      Array.from(document.querySelectorAll("#markers .marker")).map((element) => element.dataset.markerId)
     );
     assert.ok(
-      renderedIds.some((id) => id.startsWith("mq-")),
-      "Current renders the Main Quest waypoints themselves"
+      questOnlyIds.length > 0 && questOnlyIds.every((id) => /(^|cluster:)mq-/.test(id)),
+      `Current renders the Main Quest waypoints themselves (got ${questOnlyIds.slice(0, 6).join(", ")})`
+    );
+    assert.ok(
+      renderedIds.some((id) => id.includes("mob-area:")),
+      "Current renders the copied mob areas"
+    );
+    assert.ok(
+      !renderedIds.some((id) => id.includes("wild-boar-meadow")),
+      "Current never renders Wild Boar Meadow"
+    );
+    assert.ok(
+      !renderedIds.some((id) => id.includes("side-quest")),
+      "Current still renders no side quests"
     );
 
     /* The Current accessory waypoints sit behind three category buttons that already belong to the
@@ -239,6 +296,32 @@ async function run() {
       );
     }
 
+    /* The Biome category now ships a Current Data copy of the Beta biome waypoints, so its button
+       renders those markers instead of staying empty. */
+    await page.locator("#clearFilters").click();
+    const biomeMarkerIds = await page.evaluate(() =>
+      Object.entries(window.AincradMapAdapter.getContextData("floor1").markerDataset)
+        .filter(([, marker]) => marker.category === "biomes")
+        .map(([id]) => id)
+    );
+    assert.ok(biomeMarkerIds.length > 0, "Current Data carries Biome waypoints on floor 1");
+    const biomeButton = page.locator(".sidebar-list-button[data-category='biomes']");
+    assert.equal(await biomeButton.count(), 1, "the Current map lists the Biome category");
+    await biomeButton.click();
+    await page.waitForFunction(() => window.__aincradMapRuntime.getCategoryState("biomes"));
+    await page.waitForFunction(() => document.querySelectorAll("#markers .marker").length > 0, null, {
+      timeout: 10000
+    });
+    const renderedBiomeIds = await page.evaluate(() =>
+      Array.from(document.querySelectorAll("#markers .marker")).map((element) => element.dataset.markerId)
+    );
+    renderedBiomeIds.forEach((id) =>
+      assert.ok(
+        biomeMarkerIds.includes(id.replace(/^cluster:/, "")),
+        `${id} rendered by the biomes category belongs to it`
+      )
+    );
+
     /* The Beta-only categories keep their buttons in Beta but have no Current Data waypoints, so
        their sidebar buttons are hidden while Current Data is active. */
     const betaOnlyCategories = [
@@ -266,13 +349,34 @@ async function run() {
     await page.locator("button[data-nav-target='bestiary']").click();
     await page.waitForURL((url) => url.pathname.endsWith("/Aincrad/Bestiary/bestiary.html"), { timeout: 10000 });
     assert.equal(await page.locator(".sao-dataset-dialog").count(), 0, "the Bestiary does not re-ask for a mode");
-    await page.waitForSelector("#mobList .empty-state", { timeout: 10000 });
-    assert.equal(await page.locator("#mobList .mob-card").count(), 0, "Current Bestiary is empty");
+    await page.waitForFunction(() => document.querySelectorAll("#mobList .mob-card").length > 0);
+    assert.ok((await page.locator("#mobList .mob-card").count()) > 0, "Current Bestiary shows Current data");
 
     await page.goto(`${server.url}${EQUIPMENT}?floor=floor1`, { waitUntil: "load", timeout: 60000 });
     assert.equal(await page.locator(".sao-dataset-dialog").count(), 0, "Equipment does not re-ask for a mode");
-    await page.waitForSelector("#entryList .empty-state", { timeout: 10000 });
-    assert.equal(await page.locator("#entryList .ecompendium-card").count(), 0, "Current Equipment is empty");
+    /* Current Data ships its own floor 1 equipment (the beginner weapons and the Starting Town
+       tools), so the compendium renders the Current entries instead of its empty state. The count is
+       taken from the Current dataset itself, so a Beta fallback could never satisfy it. */
+    const currentEquipmentView = await page.evaluate(() => {
+      const category = document.querySelector(".list-tab.is-active")?.dataset.category ?? null;
+      const entries = category ? window.SAO_CURRENT_EQUIPMENT_DATA?.floor1?.[category] : null;
+      return { category, expected: Array.isArray(entries) ? entries.length : 0 };
+    });
+    assert.ok(
+      currentEquipmentView.expected > 0,
+      `the Current dataset ships floor 1 ${currentEquipmentView.category} entries`
+    );
+    await page.waitForFunction(
+      (expected) => document.querySelectorAll("#entryList .ecompendium-card").length === expected,
+      currentEquipmentView.expected,
+      { timeout: 10000 }
+    );
+    assert.equal(
+      await page.locator("#entryList .ecompendium-card").count(),
+      currentEquipmentView.expected,
+      `Current Equipment shows the Current ${currentEquipmentView.category} entries`
+    );
+    assert.equal(await page.locator("#entryList .empty-state").count(), 0, "Current Equipment is not empty");
 
     await page.goto(`${server.url}${QUESTS}?floor=floor1`, { waitUntil: "load", timeout: 60000 });
     await page.waitForFunction(() => document.querySelectorAll("#questTableRoot tbody tr").length > 0);
@@ -317,6 +421,18 @@ async function run() {
     assert.equal(await readMode(page, "aincrad"), "beta", "re-choosing from the hub overwrites the mode");
     await assertBanner(page, "beta", "Aincrad Beta");
     assert.equal(await readMode(page, "underworld"), null, "the Aincrad choice never touches FU");
+
+    /* Beta keeps the untouched original mob-area dataset, Wild Boar Meadow included. */
+    const betaMobAreaIds = await page.evaluate(() =>
+      window.AincradMapAdapter.mobAreaDataset.map((area) => area.id)
+    );
+    assert.equal(betaMobAreaIds.length, 27, "Beta keeps every original mob area");
+    assert.ok(betaMobAreaIds.includes("wild-boar-meadow"), "Beta still ships Wild Boar Meadow");
+    assert.equal(
+      await page.evaluate(() => window.AincradMapAdapter.getContextData("floor1").mobAreaDataset.length),
+      16,
+      "Beta keeps all sixteen floor 1 mob areas"
+    );
 
     /* Beta drops the Main Questline waypoints but keeps the rest of its map data. */
     assert.ok(

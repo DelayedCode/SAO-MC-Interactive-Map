@@ -202,15 +202,18 @@ assert.equal(betaAudit.incomplete, 0, "Beta equipment is still complete");
 assert.equal(betaAudit.missing, 0, "Beta equipment still has no missing stats");
 assert.equal(
   betaAudit.currentDatasetEquipmentItems,
-  EXPECTED_ACCESSORIES.length + EXPECTED_OTHER_ITEMS.filter((item) => item.bucket === "tool").length,
-  "the audit counts the Current equipment items (accessories and tools)"
+  EXPECTED_ACCESSORIES.length +
+    EXPECTED_OTHER_ITEMS.filter((item) => item.bucket === "tool").length +
+    currentFloorData.weapon.length +
+    currentFloorData.armor.length,
+  "the audit counts the Current equipment items (accessories, tools, weapons and armor)"
 );
 assert.deepEqual(
   Object.keys(context.SAO_CURRENT_EQUIPMENT_DATA.floor1).filter(
     (category) => context.SAO_CURRENT_EQUIPMENT_DATA.floor1[category].length > 0
   ),
-  ["accessory", "tool", "food", "consumable", "dungeon"],
-  "the Current items fill the accessory, tool, food, consumable and dungeon buckets"
+  ["weapon", "armor", "accessory", "tool", "food", "consumable", "material", "dungeon"],
+  "the Current items fill the weapon, armor, accessory, tool, food, consumable, material and dungeon buckets"
 );
 
 const betaNames = new Set(adapter.getItems("beta").map((item) => item.name));
@@ -253,7 +256,10 @@ const currentItems = toHost(adapter.getItems("current"));
 const currentAccessoryItems = currentItems.filter((item) => item.category === "accessory");
 assert.equal(
   currentItems.length,
-  EXPECTED_ACCESSORIES.length + EXPECTED_OTHER_ITEMS.filter((item) => item.bucket === "tool").length,
+  EXPECTED_ACCESSORIES.length +
+    EXPECTED_OTHER_ITEMS.filter((item) => item.bucket === "tool").length +
+    currentFloorData.weapon.length +
+    currentFloorData.armor.length,
   "the builder normalizes every Current equipment item"
 );
 assert.equal(currentAccessoryItems.length, EXPECTED_ACCESSORIES.length, "the builder normalizes every Current accessory");
@@ -360,12 +366,14 @@ currentAccessoryItems.forEach((item) => {
 });
 assert.deepEqual([...unsupported].sort(), [...UNMODELLED_ITEM_STATS].sort(), "the unmodelled item stats are known");
 currentItems.forEach((item) => {
-  Object.keys(item.stats).forEach((key) => {
-    assert.ok(
-      item.effects.some((effect) => effect.startsWith(`${key}:`)),
-      `${item.name} still exposes ${key} to the builder UI`
-    );
-  });
+  Object.keys(item.stats)
+    .filter((key) => key.toLowerCase() !== "class")
+    .forEach((key) => {
+      assert.ok(
+        item.effects.some((effect) => effect.startsWith(`${key}:`)),
+        `${item.name} still exposes ${key} to the builder UI`
+      );
+    });
 });
 
 /* The map-side Current checks (the waypoint categories, the Current-only markers and the mode

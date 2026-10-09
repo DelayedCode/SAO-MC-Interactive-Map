@@ -63,6 +63,9 @@ const {
   getOppositeHexColor,
   getMobAreaCenter,
   formatZoomLabel,
+  getNextZoom,
+  getMapContentScale,
+  getMapImageRendering,
   getGridSquareSize,
   clearTextSelection,
   shouldIgnoreMapDrag,
@@ -447,6 +450,10 @@ let distanceMeasurementLayer = null;
 let distanceMeasurementNodes = null;
 /* Cached letterbox geometry for the measurement overlay (see getDistanceMeasurementGeometry). */
 let distanceMeasurementGeometry = null;
+/* Cached screen-px-per-source-px at 1x (see getMapContentScale). Like the geometry above it only
+   depends on the image element's layout size, so it is cached and invalidated alongside it to keep
+   the layout read out of the pan/zoom frames. */
+let mapContentScaleCache = null;
 
 function clearDistanceMeasurement() {
   distanceMeasurementState = {
@@ -538,6 +545,13 @@ function getDistanceMeasurementPointFromEvent(event) {
    pan/zoom frames; the handlers that can change the container size or the image invalidate it. */
 function invalidateDistanceMeasurementGeometry() {
   distanceMeasurementGeometry = null;
+  mapContentScaleCache = null;
+}
+
+/* Cached screen-px-per-source-px at 1x, read by the adaptive image-rendering decision. */
+function getMapContentScaleCached() {
+  if (mapContentScaleCache === null) mapContentScaleCache = getMapContentScale(mapImage);
+  return mapContentScaleCache;
 }
 
 function getDistanceMeasurementGeometry() {
@@ -736,8 +750,8 @@ function exitWalkthroughContextMenuDemo() {
 }
 
 /* Collects the enabled Aincrad waypoint categories for export. The shared exporter builds the
-   category structure; this only supplies Aincrad's own category state, marker dataset, ids and
-   custom-category colour resolver. */
+   category structure; this only supplies Aincrad's own category state, marker and mob-area
+   datasets, ids and custom-category colour resolver. */
 function getJourneyMapExportCategories() {
   const runtime = sharedMapRuntime || window.__aincradMapRuntime || null;
   const activeCategories = runtime && typeof runtime.getCategoryStates === "function" ? runtime.getCategoryStates() : {};
@@ -746,9 +760,13 @@ function getJourneyMapExportCategories() {
   return window.SAOJourneyMapExport.collectJourneyMapExportCategories({
     categories: activeCategories,
     markers: contextData.markerDataset || {},
+    /* The adapter already resolves mob areas for the active data mode, so the export inherits the
+       Beta-Test / Current Data split (and Current Data's own exclusions) without a second filter. */
+    mobAreas: contextData.mobAreaDataset || [],
     floor: floorSelect ? floorSelect.value : mapAdapter?.defaultFloor || "",
     world,
     dimensionId: String(mapAdapter?.id || "overworld"),
+    resolveMobAreaCenter: getMobAreaCenter,
     resolveCustomCategoryColor: (buttonName, floor) =>
       customWaypointStore?.getButtonColor(buttonName, floor) ||
       ensurePersistedCustomWaypointCategoryColor(buttonName, floor)
@@ -1793,6 +1811,14 @@ function updateTransform() {
   mapLayer.style.transform = mapTransform;
   markerLayer.style.setProperty("--marker-zoom-compensation", (1 / state.zoom).toFixed(6));
   renderDistanceMeasurement();
+  /* Below 1:1 the map is downscaled (smooth interpolation); at/above 1:1 it is upscaled and
+     nearest-neighbour keeps the ~1 px-per-block artwork crisp enough to aim at. Written only when
+     it changes, so panning never touches it. */
+  const imageRendering = getMapImageRendering(state.zoom, getMapContentScaleCached());
+  if (mapImage.style.imageRendering !== imageRendering) {
+    mapImage.style.imageRendering = imageRendering;
+    undergroundMapImage.style.imageRendering = imageRendering;
+  }
   /* The viewport checker/grid squares scale with zoom but stay anchored to the viewport, so panning
      never moves them. Only written when the value changes, to avoid repainting the grid while
      dragging. */
@@ -2417,8 +2443,7 @@ function handleWheel(event) {
   const offsetX = event.clientX - rect.left;
   const offsetY = event.clientY - rect.top;
   const direction = event.deltaY < 0 ? 1 : -1;
-  const nextZoom = state.zoom * (direction > 0 ? zoomConfig.factor : 1 / zoomConfig.factor);
-  setZoom(nextZoom, offsetX, offsetY);
+  setZoom(getNextZoom(state.zoom, direction, zoomConfig), offsetX, offsetY);
 }
 
 function startDrag(event) {
@@ -2505,7 +2530,7 @@ function init() {
       window,
       onWidthChange: () => {
         invalidateDistanceMeasurementGeometry();
-        renderDistanceMeasurement();
+        updateTransform();
         scheduleRenderMarkers();
       },
       onResizeStart: () => document.body.classList.add("resizing-sidebar"),
@@ -2654,12 +2679,12 @@ function init() {
   addPageEventListener(document.getElementById("zoomIn"), "click", (event) => {
     event.stopPropagation();
     const rect = mapContainer.getBoundingClientRect();
-    setZoom(state.zoom * zoomConfig.factor, rect.width / 2, rect.height / 2);
+    setZoom(getNextZoom(state.zoom, 1, zoomConfig), rect.width / 2, rect.height / 2);
   });
   addPageEventListener(document.getElementById("zoomOut"), "click", (event) => {
     event.stopPropagation();
     const rect = mapContainer.getBoundingClientRect();
-    setZoom(state.zoom / zoomConfig.factor, rect.width / 2, rect.height / 2);
+    setZoom(getNextZoom(state.zoom, -1, zoomConfig), rect.width / 2, rect.height / 2);
   });
   addPageEventListener(floorSelect, "change", () => {
     clearDistanceMeasurement();
@@ -2719,13 +2744,13 @@ function init() {
   // Re-render when map image finishes loading (naturalWidth becomes available)
   addPageEventListener(mapImage, "load", () => {
     invalidateDistanceMeasurementGeometry();
-    renderDistanceMeasurement();
+    updateTransform();
     scheduleRenderMarkers();
   });
   // Re-render on resize so px positions stay accurate
   addPageEventListener(window, "resize", () => {
     invalidateDistanceMeasurementGeometry();
-    renderDistanceMeasurement();
+    updateTransform();
     scheduleRenderMarkers();
   });
 

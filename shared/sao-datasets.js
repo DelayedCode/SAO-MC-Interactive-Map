@@ -172,16 +172,34 @@
     const choices = document.createElement("div");
     choices.className = "sao-dataset-choices";
 
-    const makeChoice = (dataset, labelKey, labelFallback, descriptionKey, descriptionFallback) => {
+    const makeChoice = ({
+      dataset,
+      labelKey,
+      labelFallback,
+      descriptionKey,
+      descriptionFallback,
+      badgeKey,
+      badgeFallback,
+      badgeVariant
+    }) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "sao-dataset-choice";
 
+      /* The label and its badge share one row so both cards keep the same rhythm. */
+      const heading = document.createElement("span");
+      heading.className = "sao-dataset-choice-head";
       const label = document.createElement("strong");
       label.textContent = localize(labelKey, labelFallback);
+      const badge = document.createElement("span");
+      badge.className = badgeVariant ? `sao-dataset-badge ${badgeVariant}` : "sao-dataset-badge";
+      badge.textContent = localize(badgeKey, badgeFallback);
+      heading.append(label, badge);
+
       const description = document.createElement("span");
+      description.className = "sao-dataset-description";
       description.textContent = localize(descriptionKey, descriptionFallback);
-      button.append(label, description);
+      button.append(heading, description);
 
       button.addEventListener("click", () => {
         setActiveDataset(config.world, dataset);
@@ -192,20 +210,27 @@
     };
 
     choices.append(
-      makeChoice(
-        "beta",
-        "dataset.betaLabel",
-        "Beta-Test Data",
-        "dataset.betaDescription",
-        "THIS INFO IS FROM BETA TESTS. INFORMATION MAY BE OFF."
-      ),
-      makeChoice(
-        "current",
-        "dataset.currentLabel",
-        "Current Data",
-        "dataset.currentDescription",
-        "THIS INFO IS ACTIVELY BEING UPDATED. IF YOU CANNOT FIND SOMETHING, PLEASE CHECK 'BETA-TEST DATA' FOR IT UNTIL WE GET THE INFO FOR IT."
-      )
+      makeChoice({
+        dataset: "beta",
+        labelKey: "dataset.betaLabel",
+        labelFallback: "Beta-Test Data",
+        descriptionKey: "dataset.betaDescription",
+        descriptionFallback: "Experimental information from beta testing. Some details may be incomplete or inaccurate.",
+        badgeKey: "dataset.betaBadge",
+        badgeFallback: "Legacy",
+        badgeVariant: "is-experimental"
+      }),
+      makeChoice({
+        dataset: "current",
+        labelKey: "dataset.currentLabel",
+        labelFallback: "Current Data",
+        descriptionKey: "dataset.currentDescription",
+        descriptionFallback:
+          "The actively maintained dataset. If something is missing, check Beta-Test Data until the information is available here.",
+        badgeKey: "dataset.currentBadge",
+        badgeFallback: "Recommended",
+        badgeVariant: ""
+      })
     );
 
     const closeButton = document.createElement("button");
@@ -232,15 +257,26 @@
     style.id = "saoDatasetStyles";
     style.textContent = `
       .sao-dataset-dialog { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; padding: 18px; }
-      .sao-dataset-backdrop { position: absolute; inset: 0; border: 0; background: rgba(3, 8, 14, .76); cursor: pointer; }
-      .sao-dataset-panel { position: relative; width: min(100%, 480px); padding: 22px; border: 1px solid rgba(130, 190, 255, .3); border-radius: 12px; background: rgba(18, 27, 39, .98); color: #eef4ff; box-shadow: 0 20px 70px rgba(0, 0, 0, .42); }
-      .sao-dataset-panel h2 { margin: 0 0 16px; font-size: 1.2rem; }
-      .sao-dataset-choices { display: grid; gap: 10px; }
-      .sao-dataset-choice { display: grid; gap: 5px; width: 100%; padding: 13px 15px; border: 1px solid rgba(130, 190, 255, .24); border-radius: 9px; background: rgba(26, 38, 53, .95); color: inherit; text-align: left; cursor: pointer; }
-      .sao-dataset-choice:hover, .sao-dataset-choice:focus-visible { border-color: #73b9ff; background: rgba(38, 56, 78, .98); }
-      .sao-dataset-choice span { color: #b9cce3; font-size: .83rem; line-height: 1.45; }
-      .sao-dataset-close { margin-top: 14px; border: 0; background: transparent; color: #b9cce3; cursor: pointer; }
-      .sao-dataset-close:hover, .sao-dataset-close:focus-visible { color: #eef4ff; }
+      .sao-dataset-backdrop { position: absolute; inset: 0; border: 0; background: rgba(3, 8, 14, .78); cursor: pointer; }
+      .sao-dataset-panel { position: relative; display: grid; gap: 13px; width: min(100%, 430px); max-height: min(100%, 620px); overflow-y: auto; padding: 19px; border: 1px solid rgba(130, 190, 255, .3); border-radius: 16px; background: linear-gradient(180deg, rgba(18, 28, 41, .98), rgba(9, 15, 24, .98)); color: #eef4ff; box-shadow: 0 22px 60px rgba(0, 0, 0, .48), inset 0 1px 0 rgba(255, 255, 255, .04); }
+      .sao-dataset-panel h2 { margin: 0; font-size: 1.04rem; font-weight: 700; letter-spacing: .01em; line-height: 1.3; }
+      .sao-dataset-panel h2::after { content: ""; display: block; width: 44px; height: 2px; margin-top: 9px; border-radius: 999px; background: linear-gradient(90deg, #73b9ff, rgba(115, 185, 255, 0)); }
+      .sao-dataset-choices { display: grid; gap: 9px; }
+      .sao-dataset-choice { display: grid; gap: 7px; width: 100%; padding: 13px 14px; border: 1px solid rgba(130, 190, 255, .22); border-radius: 12px; background: rgba(22, 33, 47, .92); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease; }
+      .sao-dataset-choice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+      .sao-dataset-choice strong { font-size: .94rem; letter-spacing: .01em; }
+      .sao-dataset-badge { flex: none; padding: 3px 8px; border: 1px solid rgba(115, 185, 255, .45); border-radius: 999px; background: rgba(115, 185, 255, .12); color: #a8d2ff; font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+      .sao-dataset-badge.is-experimental { border-color: rgba(231, 189, 112, .45); background: rgba(231, 189, 112, .12); color: #f0d59d; }
+      .sao-dataset-description { color: #b9cce3; font-size: .82rem; line-height: 1.5; }
+      .sao-dataset-choice:hover { transform: translateY(-1px); border-color: rgba(115, 185, 255, .6); background: rgba(28, 42, 60, .96); box-shadow: 0 10px 22px rgba(0, 0, 0, .26); }
+      .sao-dataset-choice:focus-visible { outline: 2px solid #8bb7ff; outline-offset: 2px; border-color: rgba(115, 185, 255, .75); background: rgba(28, 42, 60, .96); }
+      .sao-dataset-choice:active { transform: translateY(0) scale(.995); }
+      .sao-dataset-close { width: 100%; padding: 10px 14px; border: 1px solid rgba(174, 198, 223, .24); border-radius: 10px; background: rgba(10, 17, 27, .85); color: #b9cce3; font: inherit; font-size: .84rem; cursor: pointer; transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease; }
+      .sao-dataset-close:hover { border-color: rgba(115, 185, 255, .5); background: rgba(17, 29, 43, .96); color: #eef4ff; }
+      .sao-dataset-close:focus-visible { outline: 2px solid #8bb7ff; outline-offset: 2px; color: #eef4ff; }
+      .sao-dataset-close:active { transform: scale(.99); }
+      @media (prefers-reduced-motion: reduce) { .sao-dataset-choice, .sao-dataset-close { transition: none; } .sao-dataset-choice:hover, .sao-dataset-choice:active, .sao-dataset-close:active { transform: none; } }
+      @media (max-width: 420px) { .sao-dataset-panel { gap: 11px; padding: 15px; } .sao-dataset-choice { padding: 12px; } .sao-dataset-choice-head { flex-wrap: wrap; } }
     `;
     document.head.appendChild(style);
   }

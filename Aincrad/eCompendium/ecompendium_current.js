@@ -12,8 +12,144 @@
    no value is invented here. Beta Data is untouched and still lives in ecompendium_floor*.js. */
 window.SAO_CURRENT_EQUIPMENT_DATA = {
   floor1: {
-    weapon: [],
-    armor: [],
+    weapon: [
+      {
+        name: "Training Sword",
+        level: 1,
+        description: "Given to beginners, it allows the first training sessions",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Warrior", "Attack Damage": "2.5", "Attack Speed": "1.1/s" }
+      },
+      {
+        name: "Training Bow",
+        level: 1,
+        description: "A rudimentary bow used by first-time shooters",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Archer", "Attack Damage": "3", "Attack Speed": "1.2/s" }
+      },
+      {
+        name: "Training Crossbow",
+        level: 1,
+        description: "A rudimentary training crossbow, entrusted to apprentice shooters.",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Archer", "Attack Damage": "2", "Attack Speed": "1/s", "Skill Critical Chance": "+0.5%" }
+      },
+      {
+        name: "Training Dagger",
+        level: 1,
+        description: "Given to beginners, it allows the first training sessions",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Assassin", "Attack Damage": "3", "Attack Speed": "1.4/s" }
+      },
+      {
+        name: "Training Scythe",
+        level: 1,
+        description: "Given to beginners, it allows the first training sessions",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: {
+          Class: "Assassin",
+          "Two-Handed": "Yes",
+          "Attack Damage": "4.5",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+0.5%",
+          "Stamina Regeneration": "+0.05/s"
+        }
+      },
+      {
+        name: "Katana Training",
+        level: 1,
+        description: "Given to beginners, it allows the first training sessions",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: {
+          Class: "Assassin",
+          "Two-Handed": "Yes",
+          "Attack Damage": "3.5",
+          "Attack Speed": "1.2/s",
+          "Life Steal": "+5%",
+          Dodge: "+5%",
+          "Movement Speed": "+15%"
+        }
+      },
+      {
+        name: "Training Magic Staff",
+        level: 1,
+        description: "A harmless magical learning staff, but a bearer of energy.",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Mage, Shaman", "Attack Damage": "3.5", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Unbound Grimoire",
+        level: 1,
+        description: "An incomplete book overflowing with arcane magic.",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Mage", "Max Mana": "+1" }
+      },
+      {
+        name: "Training Lantern",
+        level: 1,
+        description: "A learning lantern emitting a faint glow.",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Mage, Shaman", "Magic Damage": "+1%" }
+      },
+      {
+        name: "Wild Grimoire",
+        level: 1,
+        description: "An unstable book overflowing with wild magic.",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Shaman", "Bonus Healing": "+1" }
+      },
+      {
+        name: "Training Dagger",
+        level: 1,
+        description: "Given to beginners, it allows for the first training sessions.",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Assassin", "Critical Chance": "+0.5%" }
+      },
+      {
+        name: "Training Quiver",
+        level: 1,
+        description: "A training quiver for apprentice archers.",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Archer", "Critical Chance": "+0.5%" }
+      },
+      {
+        name: "Training Buckler",
+        level: 1,
+        description: "An old shield. It still blocks despite its great weight.",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Warrior", Defense: "+1", "Guard Durability": "8", Health: "+8", "Movement Speed": "-5%" }
+      },
+      {
+        name: "Training Buckler",
+        level: 1,
+        description: "An old shield. It still blocks",
+        craftingResources: [{ item: "Col", amount: 1 }],
+        stats: { Class: "Warrior", "Attack Damage": "0.25", "Guard Durability": "4", Health: "+4" }
+      }
+    ],
+    armor: [
+      {
+        name: "Beginner's Tunic",
+        level: 1,
+        description: "Barely protects against a blade, but it's always better than nothing.",
+        craftingResources: [{ item: "Col", amount: 50 }],
+        stats: { Class: "Any", Health: "+2" }
+      },
+      {
+        name: "Beginner Leggings",
+        level: 1,
+        description: "Barely protects against a blade, but it's always better than nothing.",
+        craftingResources: [{ item: "Col", amount: 50 }],
+        stats: { Class: "Any", Health: "10" }
+      },
+      {
+        name: "Beginner's Boots",
+        level: 1,
+        description: "Barely protects against a blade, but it's always better than nothing.",
+        craftingResources: [{ item: "Col", amount: 50 }],
+        stats: { Class: "Any", Health: "+1" }
+      }
+    ],
     accessory: [
       {
         name: "Glacial Ring",
@@ -1031,9 +1167,356 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
           Cooldown: "15s",
           "Effect: Mana": "MANA"
         }
+      },
+      {
+        name: "Stamina Potion I",
+        level: 1,
+        description: "Restores your stamina immediately and applies a 15s cooldown to all stamina potions.",
+        craftingResources: [{ item: "Col", amount: 5 }],
+        stats: {
+          "Stamina Restored": "5",
+          Cooldown: "15s",
+          Unique: "Yes",
+          "Effect: Stamina": "STAMINA"
+        }
+      },
+      {
+        name: "Quality Vitality Fortifier I",
+        level: 8,
+        description:
+          "Boosts max health by 5 and stamina regeneration by 0.1/s for 15 minutes, then applies a 1-hour cooldown to all Fortifiers.",
+        craftingResources: [
+          { item: "Magic Wood Shard", amount: 16 },
+          { item: "Wood Heart", amount: 2 },
+          { item: "Slime Core", amount: 2 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Increased Health": "Boosts max health by 5 for 15 minutes",
+          "Increased Regeneration": "Boosts stamina regeneration by 0.1/s for 15 minutes",
+          Cooldown: "3600s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Quality Ferocity Fortifier I",
+        level: 8,
+        description:
+          "Boosts attack damage by 5% and critical damage by 5% for 15 minutes, then applies a 1-hour cooldown to all Fortifiers.",
+        craftingResources: [
+          { item: "Wolf Fangs", amount: 16 },
+          { item: "Wheat Flower", amount: 2 },
+          { item: "Fangs of Albal", amount: 1 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Increased Strength": "Boosts attack damage by 5% for 15 minutes",
+          "Increased Crit": "Boosts critical damage by 5% for 15 minutes",
+          Cooldown: "3600s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Quality Knowledge Fortifier I",
+        level: 8,
+        description:
+          "Boosts magic damage by 5% and critical skill by 5% for 15 minutes, then applies a 1-hour cooldown to all Fortifiers.",
+        craftingResources: [
+          { item: "Allium Flower", amount: 16 },
+          { item: "Lavender", amount: 2 },
+          { item: "Refined Allium", amount: 1 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Increased Magic": "Boosts magic damage by 5% for 15 minutes",
+          "Increased Crit": "Boosts critical skill by 5% for 15 minutes",
+          Cooldown: "3600s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Quality Endurance Fortifier I",
+        level: 8,
+        description:
+          "Boosts speed by 2.5%, max mana by 2 and max endurance by 2 for 15 minutes, then applies a 1-hour cooldown to all Fortifiers.",
+        craftingResources: [
+          { item: "Wheat", amount: 16 },
+          { item: "Wheat Leaves", amount: 2 },
+          { item: "Refined Wheat", amount: 1 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Increased Speed": "Boosts speed by 2.5% for 15 minutes",
+          "Increased Mana": "Boosts max mana by 2 for 15 minutes",
+          "Increased Endurance": "Boosts max endurance by 2 for 15 minutes",
+          Cooldown: "3600s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Quality Resistance Fortifier I",
+        level: 8,
+        description:
+          "Boosts knockback resistance by 5%, block chance by 2% and block power by 2% for 15 minutes, then applies a 1-hour cooldown to all Fortifiers.",
+        craftingResources: [
+          { item: "Hard Glacial Hide", amount: 16 },
+          { item: "Wisteria", amount: 2 },
+          { item: "Ancestral Root", amount: 2 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Increased Mastery": "Boosts knockback resistance by 5% for 15 minutes",
+          "Increased Block": "Boosts block chance by 2% for 15 minutes",
+          "Increased Tenacity": "Boosts block power by 2% for 15 minutes",
+          Cooldown: "3600s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Quality Patience Fortifier I",
+        level: 8,
+        description:
+          "Boosts dodge chance by 3% and mana and stamina regeneration by 0.1/s for 15 minutes, then applies a 1-hour cooldown to all Fortifiers.",
+        craftingResources: [
+          { item: "Soul of the Ruins", amount: 16 },
+          { item: "Glacial Magic Shard", amount: 8 },
+          { item: "Fragment of the Bear's Soul", amount: 1 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Increased Agility": "Boosts dodge chance by 3% for 15 minutes",
+          "Increased Energy": "Boosts mana regeneration by 0.1/s for 15 minutes",
+          "Increased Rest": "Boosts stamina regeneration by 0.1/s for 15 minutes",
+          Cooldown: "3600s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Healing Crystal",
+        level: 10,
+        description: "Restores 150 HP immediately and applies a 30-minute cooldown to all healing crystals.",
+        craftingResources: [
+          { item: "Ancestral Root", amount: 16 },
+          { item: "Frost Dust", amount: 32 },
+          { item: "Magic Mycelium", amount: 4 },
+          { item: "Essence of Gorbel", amount: 1 },
+          { item: "Col", amount: 50 }
+        ],
+        stats: {
+          "Health Restored": "150",
+          Cooldown: "1800s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Mana Crystal",
+        level: 10,
+        description: "Restores 50 Mana immediately and applies a 30-minute cooldown to all restorative crystals.",
+        craftingResources: [
+          { item: "Ancestral Root", amount: 16 },
+          { item: "Glacial Magic Shard", amount: 32 },
+          { item: "Magic Mycelium", amount: 4 },
+          { item: "Essence of Gorbel", amount: 1 },
+          { item: "Col", amount: 50 }
+        ],
+        stats: {
+          "Mana Restored": "50",
+          Cooldown: "1800s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Stamina Crystal",
+        level: 10,
+        description: "Restores 50 Stamina immediately and applies a 30-minute cooldown to all restorative crystals.",
+        craftingResources: [
+          { item: "Ancestral Root", amount: 16 },
+          { item: "Hard Glacial Hide", amount: 32 },
+          { item: "Magic Mycelium", amount: 4 },
+          { item: "Essence of Gorbel", amount: 1 },
+          { item: "Col", amount: 50 }
+        ],
+        stats: {
+          "Stamina Restored": "50",
+          Cooldown: "1800s",
+          Uses: "1"
+        }
+      },
+      {
+        name: "Quality Health Potion I",
+        level: 1,
+        description: "Restores 12 HP immediately and applies a 15s cooldown to all healing potions.",
+        craftingResources: [
+          { item: "Sylve Sprout", amount: 8 },
+          { item: "Allium Flower", amount: 8 },
+          { item: "Col", amount: 5 }
+        ],
+        stats: {
+          "Health Restored": "12",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "5 Cols per 1",
+          "Effect: Healing": "HEALING"
+        }
+      },
+      {
+        name: "Quality Health Potion II",
+        level: 5,
+        description: "Restores 25 HP immediately and applies a 15s cooldown to all healing potions.",
+        craftingResources: [
+          { item: "Sylve Sprout", amount: 8 },
+          { item: "Bone Dust", amount: 8 },
+          { item: "Allium Flower", amount: 12 },
+          { item: "Col", amount: 7 }
+        ],
+        stats: {
+          "Health Restored": "25",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "10 Cols per 1",
+          "Effect: Healing": "HEALING"
+        }
+      },
+      {
+        name: "Quality Health Potion III",
+        level: 8,
+        description: "Restores 32 HP immediately and applies a 15s cooldown to all healing potions.",
+        craftingResources: [
+          { item: "Sylve Sprout", amount: 8 },
+          { item: "Bone Dust", amount: 8 },
+          { item: "Ancestral Root", amount: 1 },
+          { item: "Allium Flower", amount: 16 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Health Restored": "32",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "15 Cols per 1",
+          "Effect: Healing": "HEALING"
+        }
+      },
+      {
+        name: "Quality Mana Potion I",
+        level: 1,
+        description: "Restores 6 Mana immediately and applies a 15s cooldown to all mana potions.",
+        craftingResources: [
+          { item: "Soul of the Ruins", amount: 8 },
+          { item: "Allium Flower", amount: 8 },
+          { item: "Col", amount: 5 }
+        ],
+        stats: {
+          "Mana Restored": "6",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "5 Cols per 1",
+          "Effect: Mana": "MANA"
+        }
+      },
+      {
+        name: "Quality Mana Potion II",
+        level: 5,
+        description: "Restores 8 Mana immediately and applies a 15s cooldown to all mana potions.",
+        craftingResources: [
+          { item: "Soul of the Ruins", amount: 8 },
+          { item: "Bone Dust", amount: 8 },
+          { item: "Allium Flower", amount: 12 },
+          { item: "Col", amount: 7 }
+        ],
+        stats: {
+          "Mana Restored": "8",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "10 Cols per 1",
+          "Effect: Mana": "MANA"
+        }
+      },
+      {
+        name: "Quality Mana Potion III",
+        level: 8,
+        description: "Restores 10 Mana immediately and applies a 15s cooldown to all mana potions.",
+        craftingResources: [
+          { item: "Soul of the Ruins", amount: 8 },
+          { item: "Bone Dust", amount: 8 },
+          { item: "Ancestral Root", amount: 1 },
+          { item: "Allium Flower", amount: 16 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Mana Restored": "10",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "15 Cols per 1",
+          "Effect: Mana": "MANA"
+        }
+      },
+      {
+        name: "Quality Stamina Potion I",
+        level: 1,
+        description: "Restores 6 Stamina immediately and applies a 15s cooldown to all stamina potions.",
+        craftingResources: [
+          { item: "Wheat", amount: 8 },
+          { item: "Allium Flower", amount: 8 },
+          { item: "Col", amount: 5 }
+        ],
+        stats: {
+          "Stamina Restored": "6",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "5 Cols per 1",
+          "Effect: Stamina": "STAMINA"
+        }
+      },
+      {
+        name: "Quality Stamina Potion II",
+        level: 5,
+        description: "Restores 8 Stamina immediately and applies a 15s cooldown to all stamina potions.",
+        craftingResources: [
+          { item: "Wheat", amount: 8 },
+          { item: "Bone Dust", amount: 8 },
+          { item: "Allium Flower", amount: 12 },
+          { item: "Col", amount: 7 }
+        ],
+        stats: {
+          "Stamina Restored": "8",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "10 Cols per 1",
+          "Effect: Stamina": "STAMINA"
+        }
+      },
+      {
+        name: "Quality Stamina Potion III",
+        level: 8,
+        description: "Restores 10 Stamina immediately and applies a 15s cooldown to all stamina potions.",
+        craftingResources: [
+          { item: "Wheat", amount: 8 },
+          { item: "Bone Dust", amount: 8 },
+          { item: "Ancestral Root", amount: 1 },
+          { item: "Allium Flower", amount: 16 },
+          { item: "Col", amount: 10 }
+        ],
+        stats: {
+          "Stamina Restored": "10",
+          Cooldown: "15s",
+          Quantity: "3x",
+          "Purchase Price": "15 Cols per 1",
+          "Effect: Stamina": "STAMINA"
+        }
       }
     ],
-    material: [],
+    material: [
+      {
+        name: "Purification Elixir",
+        description: "A cold, milky liquid, its scent evokes the sap of ancient forests.",
+        craftingResources: [
+          { item: "Ancestral Root", amount: 1 },
+          { item: "Frost Dust", amount: 1 },
+          { item: "Bone Dust", amount: 1 },
+          { item: "Slime Core", amount: 1 }
+        ]
+      }
+    ],
     quest_item: [],
     resource: [],
     dungeon: [

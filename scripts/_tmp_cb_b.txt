@@ -1,0 +1,119 @@
+﻿ 500:         .map((id) => {
+ 501:           const prerequisite = currentSkillTree().find((item) => item.id === id);
+ 502:           return prerequisite ? localizeSkillName(prerequisite) : id;
+ 503:         })
+ 504:         .join(", ");
+ 505:       return {
+ 506:         name: "locked",
+ 507:         label: statusLabel("locked"),
+ 508:         reason: t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requiresSkills", {
+ 509:           value: requirementNames
+ 510:         })
+ 511:       };
+ 512:     }
+ 513:     if (node.cost > availableSkillPoints()) {
+ 514:       return {
+ 515:         name: "locked",
+ 516:         label: statusLabel("locked"),
+ 517:         reason: `Need ${node.cost - availableSkillPoints()} more skill point${node.cost - availableSkillPoints() === 1 ? "" : "s"}.`
+ 518:       };
+ 519:     }
+ 520:     return { name: "available", label: statusLabel("available"), reason: t("page.characterBuild.readyToUnlock") };
+ 521:   }
+ 522: 
+ 523:   function formatSkillEffects(node) {
+ 524:     return node.effects.map((effect) => `${localizeStat(effect.stat)}: ${effect.value}`).join(" / ");
+ 525:   }
+ 526: 
+ 527:   function renderSkillDetail(nodeId) {
+ 528:     const node = currentSkillTree().find((item) => item.id === nodeId) || currentSkillTree()[0];
+ 529:     if (!node || !$("skillDetail")) return;
+ 530:     const status = skillNodeState(node);
+ 531:     const prerequisites = node.prerequisites.length
+ 532:       ? node.prerequisites
+ 533:           .map((id) => {
+ 534:             const prerequisite = currentSkillTree().find((item) => item.id === id);
+ 535:             return prerequisite ? localizeSkillName(prerequisite) : id;
+ 536:           })
+ 537:           .join(", ")
+ 538:       : t("page.characterBuild.none");
+ 539:     const effectDetail = node.center ? "" : `<span>${escapeHtml(formatSkillEffects(node))}</span>`;
+ 540:     const prerequisiteDetail = node.center
+ 541:       ? ""
+ 542:       : `<span>${escapeHtml(t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requires", { value: prerequisites }))}</span>`;
+ 543:     const descriptionDetail = node.description
+ 544:       ? `<span>${escapeHtml(localizeSkillDescription(node))}</span>`
+ 545:       : "";
+ 546:     $("skillDetail").innerHTML =
+ 547:       `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(node.className)}</span>${descriptionDetail}${effectDetail}${prerequisiteDetail}<span>Cost: ${node.cost} skill point${node.cost === 1 ? "" : "s"}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
+ 548:   }
+ 549: 
+ 550:   function renderSkills(selectedNodeId) {
+ 551:     const skills = currentSkillTree();
+ 552:     const layout = data.SKILL_TREE_LAYOUT || [];
+ 553:     const layoutById = new Map(layout.map((point) => [point.id, point]));
+ 554:     const layoutBySkillId = new Map(layout.map((point) => [point.skillId, point]));
+ 555:     const skillsById = new Map(skills.map((node) => [node.id, node]));
+ 556:     const skillsByNodeId = new Map(skills.map((node) => [node.nodeId, node]));
+ 557:     const drawnConnections = new Set();
+ 558:     const connectionMarkup = [];
+ 559:     const addConnection = (fromId, toId, active = false) => {
+ 560:       const key = [fromId, toId].sort().join(":");
+ 561:       if (drawnConnections.has(key)) return;
+ 562:       const from = layoutById.get(fromId);
+ 563:       const to = layoutById.get(toId);
+ 564:       if (!from || !to) return;
+ 565:       drawnConnections.add(key);
+ 566:       const fromSkill = skillsByNodeId.get(from.skillId);
+ 567:       const toSkill = skillsByNodeId.get(to.skillId);
+ 568:       connectionMarkup.push(
+ 569:         `<line class="skill-connection${active ? " is-active" : ""}" data-from-skill-id="${fromSkill?.id || ""}" data-to-skill-id="${toSkill?.id || ""}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`
+ 570:       );
+ 571:     };
+ 572:     (data.SKILL_TREE_CONNECTIONS || []).forEach(([fromId, toId]) => {
+ 573:       const fromPoint = layoutById.get(fromId);
+ 574:       const toPoint = layoutById.get(toId);
+ 575:       const fromSkill = fromPoint && skillsByNodeId.get(fromPoint.skillId);
+ 576:       const toSkill = toPoint && skillsByNodeId.get(toPoint.skillId);
+ 577:       const active = (fromSkill && isSkillUnlocked(fromSkill.id)) || (toSkill && isSkillUnlocked(toSkill.id));
+ 578:       addConnection(fromId, toId, active);
+ 579:     });
+ 580:     skills.forEach((node) => {
+ 581:       node.prerequisites.forEach((parentId) => {
+ 582:         const parent = skillsById.get(parentId);
+ 583:         const parentPoint = parent && layoutBySkillId.get(parent.nodeId);
+ 584:         const nodePoint = layoutBySkillId.get(node.nodeId);
+ 585:         if (parentPoint && nodePoint) addConnection(parentPoint.id, nodePoint.id, isSkillUnlocked(node.id));
+ 586:       });
+ 587:     });
+ 588:     const connections = connectionMarkup.join("");
+ 589:     const nodes = layout
+ 590:       .map((point) => {
+ 591:         const node = skillsByNodeId.get(point.skillId);
+ 592:         const position = `--node-x:${point.x}px;--node-y:${point.y}px`;
+ 593:         const status = skillNodeState(node);
+ 594:         const selected = status.name === "selected";
+ 595:         return `<button class="skill-node is-${status.name}${node.center ? " is-center" : ""}${point.isAnchor ? " is-branch-anchor" : ""}" type="button" data-skill-id="${node.id}" style="${position}" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-core" aria-hidden="true"></span></button>`;
+ 596:       })
+ 597:       .join("");
+ 598:     const selectedNode = skillsById.get(selectedNodeId) || skills.find((node) => node.center);
+ 599:     $("skillTree").innerHTML = `
+ 600:       <div class="skill-tree-toolbar">
+ 601:         <span data-skill-points>${escapeHtml(skillClassName(state.classId))} Â· ${availableSkillPoints()} / ${skills.reduce((sum, node) => sum + node.cost, 0)} skill points</span>
+ 602:         <button class="skill-tree-reset" type="button" data-reset-view>Reset View</button>
+ 603:       </div>
+ 604:       <div class="skill-tree-viewport" id="skillTreeViewport" aria-label="Skill tree viewport">
+ 605:         <div class="skill-tree-canvas" id="skillTreeCanvas">
+ 606:           <svg class="skill-connections" viewBox="0 0 921 923" preserveAspectRatio="none" aria-hidden="true">${connections}</svg>
+ 607:           ${nodes}
+ 608:         </div>
+ 609:       </div>
+ 610:       <div id="skillDetail" class="skill-detail" aria-live="polite"></div>
+ 611:     `;
+ 612:     renderSkillDetail(selectedNode?.id);
+ 613:     setupSkillTreeViewport();
+ 614:   }
+ 615: 
+ 616:   function updateSkillTreeState(selectedNodeId) {
+ 617:     const skills = currentSkillTree();
+ 618:     const pointsBySkillId = new Map((data.SKILL_TREE_LAYOUT || []).map((point) => [point.skillId, point]));

@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const { readPngDimensions } = require("./harness-helpers");
+const { readCursor, readArrowGeometry, rasterize, outermostPaintedSample } = require("./cursor-artwork");
 
 const root = path.resolve(__dirname, "..");
 const mapDataSource = fs.readFileSync(path.join(root, "Aincrad", "Map", "mapData.js"), "utf8");
@@ -333,87 +334,80 @@ assert.ok(
    The site-wide cursor system.
 
    Every page links shared/sao-polish.css last, so the cursors are defined once
-   there. The browser places a cursor image so its declared hotspot sits on the
-   real pointer, and the map coordinate pipeline reads that same real pointer
+   there. The normal arrow is a custom SVG cursor whose painted tip is the
+   declared hotspot; the browser places the image so that hotspot sits on the real
+   pointer, and the map coordinate pipeline reads that same real pointer
    (event.clientX/clientY -> getImageLocalCoords -> mapWebsiteCoordinates). The
    arrow is therefore exact only if its *painted* tip lands on the declared
    hotspot; this recomputes the stroked miter tip from the CSS data URI and pins
-   it to the hotspot. Nothing here alters any coordinate maths.
+   it to the hotspot. Click/grab/grabbing are custom SVG cursors too (standard
+   silhouettes recoloured to the arrow's skin); their hotspots are checked to land
+   on painted artwork. Nothing here alters any coordinate maths.
    ------------------------------------------------------------------------- */
 
 const polishCss = fs.readFileSync(path.join(root, "shared", "sao-polish.css"), "utf8");
 const mapCss = fs.readFileSync(path.join(root, "Aincrad", "Map", "maps.css"), "utf8");
 
+/* Every custom cursor is a data URI SVG plus a declared hotspot. The parsing, the stroked-miter
+   geometry and the rasterisation come from scripts/cursor-artwork.js, so this file and the browser
+   hotspot test read the artwork identically instead of re-declaring the same regexes. */
 function readCursorVariable(name) {
-  const match = polishCss.match(
-    new RegExp(`--${name}:\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)\\s*([\\d.]+)\\s+([\\d.]+)\\s*;`)
-  );
-  assert.ok(match, `the shared sheet defines ${name} with a hotspot`);
-  return { svg: decodeURIComponent(match[1]), hotspot: { x: Number(match[2]), y: Number(match[3]) } };
+  let cursor = null;
+  try {
+    cursor = readCursor(name, polishCss);
+  } catch (_error) {
+    cursor = null;
+  }
+  assert.ok(cursor, `the shared sheet defines sao-cursor-${name} with a hotspot`);
+  return cursor;
 }
 
-const arrowCursor = readCursorVariable("sao-cursor-arrow");
-const clickCursor = readCursorVariable("sao-cursor-click");
-const grabCursor = readCursorVariable("sao-cursor-grab");
-const grabbingCursor = readCursorVariable("sao-cursor-grabbing");
+const arrowCursor = readCursorVariable("arrow");
+const clickCursor = readCursorVariable("click");
+const grabCursor = readCursorVariable("grab");
+const grabbingCursor = readCursorVariable("grabbing");
 
 assert.deepEqual(arrowCursor.hotspot, { x: 1, y: 1 }, "the normal cursor hotspot is the arrow tip");
-assert.deepEqual(grabCursor.hotspot, grabbingCursor.hotspot, "grab and grabbing share the palm hotspot");
 
 const arrowSize = Number((arrowCursor.svg.match(/width='(\d+)'/) || [])[1]);
 assert.ok(arrowSize >= 16 && arrowSize <= 32, `the cursor canvas is a normal pointer size (got ${arrowSize})`);
-for (const [name, cursor] of [["click", clickCursor], ["grab", grabCursor], ["grabbing", grabbingCursor]]) {
-  const size = Number((cursor.svg.match(/width='(\d+)'/) || [])[1]);
-  assert.ok(size >= 16 && size <= 32, `the ${name} cursor canvas is a normal pointer size (got ${size})`);
-  assert.ok(cursor.svg.includes("#0b1220") && cursor.svg.includes("#8bb7ff"), `the ${name} cursor uses the shared palette`);
-}
+assert.equal(arrowCursor.size, arrowCursor.height, "the arrow canvas is square");
+assert.deepEqual(arrowCursor.viewBox, [0, 0, arrowSize, arrowSize], "the arrow viewBox maps 1:1 onto the canvas");
 
-const sharpPath = (arrowCursor.svg.match(/<path d='(M[^']+)' fill='#0b1220'/) || [])[1];
-assert.ok(sharpPath, "the arrow SVG contains the filled outline");
-const outlineStrokeWidth = Number(
-  (arrowCursor.svg.match(/stroke-width='([\d.]+)' stroke-linejoin='miter'/) || [])[1]
+/* The arrow's painted tip, derived from the SVG's own geometry (see scripts/cursor-artwork.js). The
+   outline is stroked, so the visible tip is the outer *miter* point - which sits beyond the path
+   vertex - and that point, not the vertex, is what has to land on the declared hotspot. */
+const arrow = readArrowGeometry(arrowCursor);
+assert.equal(arrow.join, "miter", "the arrow outline uses a miter join so its tip stays sharp");
+assert.ok(
+  arrow.miterDrawn,
+  `the miter limit (${arrow.miterLimit}) is not exceeded by the tip (${arrow.miterRatio.toFixed(3)}), ` +
+    "so SVG paints the sharp point instead of bevelling it away"
 );
-assert.ok(Number.isFinite(outlineStrokeWidth), "the arrow outline uses a miter join so its tip stays sharp");
-
-const vertices = [...sharpPath.matchAll(/(-?[\d.]+) (-?[\d.]+)/g)].map((match) => [Number(match[1]), Number(match[2])]);
-assert.ok(vertices.length >= 3, "the arrow path has vertices");
-const tipVertex = vertices[0];
-const normalize = (v) => {
-  const length = Math.hypot(v[0], v[1]);
-  return [v[0] / length, v[1] / length];
-};
-const edgeA = normalize([vertices[1][0] - tipVertex[0], vertices[1][1] - tipVertex[1]]);
-const edgeB = normalize([
-  vertices[vertices.length - 1][0] - tipVertex[0],
-  vertices[vertices.length - 1][1] - tipVertex[1]
-]);
-const inwardBisector = normalize([edgeA[0] + edgeB[0], edgeA[1] + edgeB[1]]);
-const cosHalfAngle = edgeA[0] * inwardBisector[0] + edgeA[1] * inwardBisector[1];
-const sinHalfAngle = Math.sqrt(1 - cosHalfAngle * cosHalfAngle);
-const miterDistance = outlineStrokeWidth / 2 / sinHalfAngle;
-const paintedTip = [
-  tipVertex[0] - miterDistance * inwardBisector[0],
-  tipVertex[1] - miterDistance * inwardBisector[1]
-];
-assertClose(paintedTip[0], arrowCursor.hotspot.x, "the painted arrow tip X is the cursor hotspot", 0.01);
-assertClose(paintedTip[1], arrowCursor.hotspot.y, "the painted arrow tip Y is the cursor hotspot", 0.01);
+assert.ok(
+  arrow.outward[0] < 0 && arrow.outward[1] < 0,
+  "the arrow tip points up and to the left, the way the painted artwork reads"
+);
+assertClose(arrow.paintedTip[0], arrowCursor.hotspot.x, "the painted arrow tip X is the cursor hotspot", 0.001);
+assertClose(arrow.paintedTip[1], arrowCursor.hotspot.y, "the painted arrow tip Y is the cursor hotspot", 0.001);
+assertClose(arrow.tipVertex[0], 1.7, "the arrow path vertex X is where the artwork was authored", 1e-9);
+assertClose(arrow.tipVertex[1], 2.71, "the arrow path vertex Y is where the artwork was authored", 1e-9);
 
 /* The low-opacity halo uses a rounded join, whose tip cap stops short of the sharp tip, so
    nothing is painted beyond the hotspot either. */
-const haloStrokeWidth = Number((arrowCursor.svg.match(/stroke-width='([\d.]+)' stroke-linejoin='round'/) || [])[1]);
-assert.ok(Number.isFinite(haloStrokeWidth), "the halo path is present and rounded");
+assert.equal(arrow.haloJoin, "round", "the halo path is present and rounded");
 assert.ok(
-  miterDistance - haloStrokeWidth / 2 > 0,
+  arrow.miterDistance - arrow.haloReach > 0,
   "the halo tip stays inside the sharp tip so it never paints past the hotspot"
 );
 
 /* The painted arrow is a normal desktop-pointer size, not a large floating icon. */
-const xs = vertices.map((vertex) => vertex[0]);
-const ys = vertices.map((vertex) => vertex[1]);
-const paintedLeft = Math.min(arrowCursor.hotspot.x, Math.min(...xs) - outlineStrokeWidth / 2);
-const paintedRight = Math.max(...xs) + outlineStrokeWidth / 2;
-const paintedTop = Math.min(arrowCursor.hotspot.y, Math.min(...ys) - outlineStrokeWidth / 2);
-const paintedBottom = Math.max(...ys) + outlineStrokeWidth / 2;
+const xs = arrow.vertices.map((vertex) => vertex[0]);
+const ys = arrow.vertices.map((vertex) => vertex[1]);
+const paintedLeft = Math.min(arrowCursor.hotspot.x, Math.min(...xs) - arrow.strokeWidth / 2);
+const paintedRight = Math.max(...xs) + arrow.strokeWidth / 2;
+const paintedTop = Math.min(arrowCursor.hotspot.y, Math.min(...ys) - arrow.strokeWidth / 2);
+const paintedBottom = Math.max(...ys) + arrow.strokeWidth / 2;
 assert.ok(
   paintedBottom - paintedTop >= 14 && paintedBottom - paintedTop <= 26,
   `the painted arrow height is normal-cursor sized (got ${(paintedBottom - paintedTop).toFixed(2)}px)`
@@ -422,6 +416,30 @@ assert.ok(
   paintedRight - paintedLeft >= 9 && paintedRight - paintedLeft <= 18,
   `the painted arrow width is normal-cursor sized (got ${(paintedRight - paintedLeft).toFixed(2)}px)`
 );
+
+/* The click/grab/grabbing states are custom artwork too, carrying the arrow's skin. */
+assert.deepEqual(clickCursor.hotspot, { x: 6, y: 0 }, "the click cursor hotspot is the index fingertip");
+assert.deepEqual(grabCursor.hotspot, { x: 11, y: 11 }, "the grab cursor hotspot is the palm centre");
+assert.deepEqual(grabbingCursor.hotspot, { x: 11, y: 11 }, "the grabbing cursor hotspot is the grab point");
+for (const [name, cursor] of [["click", clickCursor], ["grab", grabCursor], ["grabbing", grabbingCursor]]) {
+  const size = Number((cursor.svg.match(/width='(\d+)'/) || [])[1]);
+  assert.ok(size >= 16 && size <= 32, `the ${name} cursor canvas is a normal pointer size (got ${size})`);
+  assert.ok(cursor.svg.includes("#0b1220") && cursor.svg.includes("#8bb7ff"), `the ${name} cursor uses the shared palette`);
+  assert.ok(/stroke-opacity='0.2'/.test(cursor.svg), `the ${name} cursor carries the arrow's soft halo`);
+  assert.ok(!cursor.svg.includes("Layer_1"), `the ${name} cursor carries no stray non-path data`);
+  assert.ok(
+    cursor.hotspot.x >= 0 && cursor.hotspot.y >= 0 && cursor.hotspot.x < size && cursor.hotspot.y < size,
+    `the ${name} hotspot is inside the canvas`
+  );
+}
+
+/* Exactly the four cursor states define artwork - no stray or leftover cursors. */
+assert.deepEqual(
+  [...polishCss.matchAll(/--sao-cursor-([a-z-]+):\s*url\(/g)].map((match) => match[1]).sort(),
+  ["arrow", "click", "grab", "grabbing"],
+  "exactly the four cursor states define custom artwork"
+);
+assert.ok(!/cursor:\s*url\(/.test(polishCss), "no cursor rule inlines custom artwork directly");
 
 /* Where each cursor state is applied. */
 assert.match(polishCss, /html\s*\{\s*cursor:\s*var\(--sao-cursor-arrow\),\s*auto;/, "the normal cursor applies site-wide");
@@ -433,8 +451,13 @@ assert.match(
 assert.match(polishCss, /html textarea,[\s\S]*?cursor:\s*text;/, "text entry keeps the text cursor");
 assert.match(
   polishCss,
-  /html #mapLayer,\s*html \.skill-tree-viewport\s*\{\s*cursor:\s*var\(--sao-cursor-grab\),\s*grab;/,
-  "draggable surfaces use the grab cursor"
+  /html #mapLayer\s*\{\s*cursor:\s*var\(--sao-cursor-arrow\),\s*auto;/,
+  "the draggable map artwork keeps the arrow cursor"
+);
+assert.match(
+  polishCss,
+  /html \.skill-tree-viewport\s*\{\s*cursor:\s*var\(--sao-cursor-grab\),\s*grab;/,
+  "the skill tree keeps the grab cursor"
 );
 assert.match(
   polishCss,
@@ -444,5 +467,70 @@ assert.match(
 assert.match(polishCss, /button:disabled,\s*select:disabled\s*\{\s*cursor:\s*not-allowed;/, "disabled controls keep not-allowed");
 assert.ok(!mapCss.includes("data:image/svg+xml"), "the obsolete Aincrad-only cursor artwork is gone");
 
+/* Rasterise the artwork at the real cursor size. The arrow is measured against the hotspot along
+   the tip's own direction - nothing may paint past the pointer - and the other states must have
+   their hotspot on painted artwork, with the pointing hand's fingertip as the topmost paint so
+   nothing floats above the hotspot. */
+(async () => {
+  const paint = (cursor, supersample) => rasterize(cursor.svg, cursor.size, supersample);
 
-console.log("Coordinate regression tests passed.");
+  /* --- the arrow: the visible tip IS the hotspot --- */
+  const nativeArrow = await paint(arrowCursor, 1);
+  /* At this resolution the only two sample centres that lie outward of the hotspot are the two
+     pixels sharing its corner; neither may carry visible paint. */
+  assert.ok(nativeArrow.alpha(0, 0) <= 8, "the arrow paints nothing outward of its hotspot corner");
+  assert.ok(nativeArrow.alpha(1, 0) <= 8, "the arrow paints nothing outward of its hotspot corner");
+  const nativeTip = outermostPaintedSample(nativeArrow, arrow.outward, arrowCursor.hotspot);
+  assert.ok(nativeTip, "the arrow paints something");
+  assert.ok(
+    nativeTip.overshoot <= 0.5,
+    `no painted arrow pixel sits more than half a pixel past the hotspot ` +
+      `(outermost ${nativeTip.overshoot.toFixed(3)}px)`
+  );
+  const nativeVisibleTip = outermostPaintedSample(nativeArrow, arrow.outward, arrowCursor.hotspot, 32);
+  assert.ok(
+    nativeVisibleTip.overshoot <= 0,
+    `no visible arrow pixel crosses the hotspot in the tip direction ` +
+      `(outermost visible ${nativeVisibleTip.overshoot.toFixed(3)}px)`
+  );
+
+  /* Supersampled, so the half-sample raster bound shrinks to a sixteenth of a pixel: the painted
+     tip must land on the hotspot, neither falling short of it nor reaching past it. */
+  const SUPERSAMPLE = 16;
+  const supersampledArrow = await paint(arrowCursor, SUPERSAMPLE);
+  const supersampledTip = outermostPaintedSample(supersampledArrow, arrow.outward, arrowCursor.hotspot);
+  assert.ok(
+    Math.abs(supersampledTip.overshoot) <= 1 / SUPERSAMPLE,
+    `at ${SUPERSAMPLE}x the painted arrow tip lands on the hotspot (` +
+      `${supersampledTip.overshoot >= 0 ? "beyond" : "short of"} by ` +
+      `${Math.abs(supersampledTip.overshoot).toFixed(4)}px)`
+  );
+
+  for (const [name, cursor] of [["click", clickCursor], ["grab", grabCursor], ["grabbing", grabbingCursor]]) {
+    const image = await paint(cursor, 1);
+    assert.ok(
+      image.alpha(cursor.hotspot.x, cursor.hotspot.y) > 100,
+      `the ${name} hotspot sits on painted artwork, not empty space`
+    );
+  }
+
+  const hand = await paint(clickCursor, 1);
+  let topRow = -1;
+  const rowXs = [];
+  for (let y = 0; y < hand.height && topRow === -1; y += 1) {
+    for (let x = 0; x < hand.width; x += 1) if (hand.alpha(x, y) > 100) rowXs.push(x);
+    if (rowXs.length) topRow = y;
+  }
+  assert.ok(topRow >= 0, "the pointing hand paints something");
+  const fingertip = (Math.min(...rowXs) + Math.max(...rowXs)) / 2;
+  assert.ok(Math.abs(fingertip - clickCursor.hotspot.x) <= 2, "the click hotspot is centred on the fingertip");
+  assert.ok(
+    Math.abs(topRow - clickCursor.hotspot.y) <= 2,
+    "the click hotspot is at the top of the fingertip; no artwork floats above it"
+  );
+
+  console.log("Coordinate regression tests passed.");
+})().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

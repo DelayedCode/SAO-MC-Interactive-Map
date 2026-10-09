@@ -1,0 +1,80 @@
+      if (drawnConnections.has(key)) return;
+      const from = layoutById.get(fromId);
+      const to = layoutById.get(toId);
+      if (!from || !to) return;
+      drawnConnections.add(key);
+      const fromSkill = skillsByNodeId.get(from.skillId);
+      const toSkill = skillsByNodeId.get(to.skillId);
+      connectionMarkup.push(
+        `<line class="skill-connection${active ? " is-active" : ""}" data-from-skill-id="${fromSkill?.id || ""}" data-to-skill-id="${toSkill?.id || ""}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`
+      );
+    };
+    (data.SKILL_TREE_CONNECTIONS || []).forEach(([fromId, toId]) => {
+      const fromPoint = layoutById.get(fromId);
+      const toPoint = layoutById.get(toId);
+      const fromSkill = fromPoint && skillsByNodeId.get(fromPoint.skillId);
+      const toSkill = toPoint && skillsByNodeId.get(toPoint.skillId);
+      const active = (fromSkill && isSkillUnlocked(fromSkill.id)) || (toSkill && isSkillUnlocked(toSkill.id));
+      addConnection(fromId, toId, active);
+    });
+    skills.forEach((node) => {
+      node.prerequisites.forEach((parentId) => {
+        const parent = skillsById.get(parentId);
+        const parentPoint = parent && layoutBySkillId.get(parent.nodeId);
+        const nodePoint = layoutBySkillId.get(node.nodeId);
+        if (parentPoint && nodePoint) addConnection(parentPoint.id, nodePoint.id, isSkillUnlocked(node.id));
+      });
+    });
+    const connections = connectionMarkup.join("");
+    const nodes = layout
+      .map((point) => {
+        const node = skillsByNodeId.get(point.skillId);
+        const position = `--node-x:${point.x}px;--node-y:${point.y}px`;
+        const status = skillNodeState(node);
+        const selected = status.name === "selected";
+        return `<button class="skill-node is-${status.name}${node.center ? " is-center" : ""}${point.isAnchor ? " is-branch-anchor" : ""}" type="button" data-skill-id="${node.id}" style="${position}" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-core" aria-hidden="true"></span></button>`;
+      })
+      .join("");
+    const selectedNode = skillsById.get(selectedNodeId) || skills.find((node) => node.center);
+    $("skillTree").innerHTML = `
+      <div class="skill-tree-toolbar">
+        <span data-skill-points>${escapeHtml(skillClassName(state.classId))} · ${availableSkillPoints()} / ${skills.reduce((sum, node) => sum + node.cost, 0)} skill points</span>
+        <button class="skill-tree-reset" type="button" data-reset-view>Reset View</button>
+      </div>
+      <div class="skill-tree-viewport" id="skillTreeViewport" aria-label="Skill tree viewport">
+        <div class="skill-tree-canvas" id="skillTreeCanvas">
+          <svg class="skill-connections" viewBox="0 0 921 923" preserveAspectRatio="none" aria-hidden="true">${connections}</svg>
+          ${nodes}
+        </div>
+      </div>
+      <div id="skillDetail" class="skill-detail" aria-live="polite"></div>
+    `;
+    renderSkillDetail(selectedNode?.id);
+    setupSkillTreeViewport();
+  }
+
+  function updateSkillTreeState(selectedNodeId) {
+    const skills = currentSkillTree();
+    const pointsBySkillId = new Map((data.SKILL_TREE_LAYOUT || []).map((point) => [point.skillId, point]));
+    document.querySelectorAll("#skillTreeCanvas [data-skill-id]").forEach((button) => {
+      const node = skills.find((skill) => skill.id === button.dataset.skillId);
+      if (!node) return;
+      const status = skillNodeState(node);
+      const point = pointsBySkillId.get(node.nodeId);
+      const isCenter = node.center;
+      button.className = `skill-node is-${status.name}${isCenter ? " is-center" : ""}${point?.isAnchor ? " is-branch-anchor" : ""}`;
+      button.setAttribute("aria-pressed", String(status.name === "selected"));
+      button.setAttribute("aria-label", `${localizeSkillName(node)}: ${status.label}`);
+    });
+    document.querySelectorAll("#skillTreeCanvas .skill-connection").forEach((line) => {
+      const fromSelected = isSkillUnlocked(line.dataset.fromSkillId);
+      const toSelected = isSkillUnlocked(line.dataset.toSkillId);
+      line.classList.toggle("is-active", fromSelected || toSelected);
+    });
+    const pointsLabel = $("skillTree").querySelector?.("[data-skill-points]");
+    if (pointsLabel) {
+      const total = skills.reduce((sum, node) => sum + node.cost, 0);
+      pointsLabel.textContent = `${skillClassName(state.classId)} · ${availableSkillPoints()} / ${total} skill points`;
+    }
+    renderSkillDetail(selectedNodeId);
+  }

@@ -117,8 +117,13 @@ for (const zoom of [0.5, 0.75, 1, 1.37, 2.4, 4.15, 6.31, 7.19, 9.3, 30]) {
 // --- shared zoom domain: Aincrad and the Fractured Underworld read one definition ---
 const { MAP_ZOOM_CONFIG } = context.window.SAOMapHelpers;
 assert.deepEqual(
-  { factor: MAP_ZOOM_CONFIG.factor, min: MAP_ZOOM_CONFIG.min, max: MAP_ZOOM_CONFIG.max },
-  { factor: 1.14, min: 0.5, max: 30.0 },
+  {
+    factor: MAP_ZOOM_CONFIG.factor,
+    maxStep: MAP_ZOOM_CONFIG.maxStep,
+    min: MAP_ZOOM_CONFIG.min,
+    max: MAP_ZOOM_CONFIG.max
+  },
+  { factor: 1.14, maxStep: 1, min: 0.5, max: 45.0 },
   "the shared zoom domain keeps the wheel step and clamp range both maps shipped"
 );
 assert.equal(Object.isFrozen(MAP_ZOOM_CONFIG), true, "the shared zoom domain cannot be mutated by a page");

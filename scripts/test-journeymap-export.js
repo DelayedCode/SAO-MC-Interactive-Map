@@ -297,4 +297,271 @@ const brokenRoot = parseJourneyMapDat(brokenBytes);
 assert.equal(brokenRoot.waypoints, undefined, "the supplied broken file lacks the root waypoints compound");
 assert.ok(brokenRoot.groups.journeymap_all.groups, "the supplied broken file nests categories under journeymap_all");
 
+/* --- Mob areas ---------------------------------------------------------- */
+
+/* Mob areas are the one category whose members are not markers: each one is a polygon held in the
+   adapter's mob-area dataset. The export reads them through the same shared centre helper the map
+   pins them with, so these checks run against the real Beta-Test and Current Data datasets. */
+const vm = require("node:vm");
+const { collectJourneyMapExportCategories } = require(exportModulePath);
+const { prepareJourneyMapImport } = require("../shared/sao-journeymap-import.js");
+
+const helperContext = vm.createContext({ document: {}, window: {}, String, Number, Boolean, Math, JSON, Error });
+helperContext.window = helperContext;
+vm.runInContext(fs.readFileSync(path.join(__dirname, "../shared/sao-map-helpers.js"), "utf8"), helperContext, {
+  filename: "shared/sao-map-helpers.js"
+});
+const { getMobAreaCenter } = helperContext.window.SAOMapHelpers;
+assert.equal(typeof getMobAreaCenter, "function", "the shared mob-area centre helper is available to the export");
+
+const aincradDataContext = vm.createContext({ window: {} });
+const loadAincradData = (file) =>
+  vm.runInContext(fs.readFileSync(path.join(__dirname, "../Aincrad/Map", file), "utf8"), aincradDataContext, {
+    filename: `Aincrad/Map/${file}`
+  });
+loadAincradData("mapData.js");
+["maps_floor1.js", "maps_floor2.js", "maps_floor3.js", "maps_current.js"].forEach(loadAincradData);
+const betaMobAreas = vm.runInContext("MOB_AREAS", aincradDataContext);
+const currentMobAreas = vm.runInContext("CURRENT_MOB_AREAS", aincradDataContext);
+assert.equal(betaMobAreas.length, 27, "Beta-Test Data ships its 27 mob areas");
+assert.equal(currentMobAreas.length, 26, "Current Data ships its 26 copied mob areas");
+
+function collectMobAreas(areas, floor) {
+  return collectJourneyMapExportCategories({
+    categories: { mobAreas: true, biomes: true },
+    markers: { "biome-1": { title: "Biome marker", category: "biomes", floor, coords: { x: 10, z: 20 } } },
+    mobAreas: areas,
+    floor,
+    world: "aincrad",
+    dimensionId: "aincrad",
+    resolveMobAreaCenter: getMobAreaCenter
+  });
+}
+
+const betaFloor1Collection = collectMobAreas(betaMobAreas, "floor1");
+const currentFloor1Collection = collectMobAreas(currentMobAreas, "floor1");
+assert.equal(betaFloor1Collection.mobAreas.length, 16, "Beta floor 1 exports its sixteen mob areas");
+assert.ok(
+  betaFloor1Collection.mobAreas.some((entry) => entry.name === "Wild Boar Meadow"),
+  "a Beta-Test export contains Wild Boar Meadow"
+);
+assert.equal(currentFloor1Collection.mobAreas.length, 15, "Current floor 1 exports its fifteen mob areas");
+assert.ok(
+  !currentFloor1Collection.mobAreas.some((entry) => entry.name === "Wild Boar Meadow"),
+  "a Current Data export contains no Wild Boar Meadow"
+);
+assert.ok(
+  currentFloor1Collection.mobAreas.some((entry) => entry.name === "Wild Boar Zone"),
+  "Current Data still exports the other Wild Boar area"
+);
+assert.equal(collectMobAreas(currentMobAreas, "floor2").mobAreas.length, 11, "Current floor 2 exports its eleven mob areas");
+assert.equal(collectMobAreas(betaMobAreas, "floor3").mobAreas, undefined, "a floor without mob areas exports none");
+assert.equal(currentFloor1Collection.biomes.length, 1, "the mob-area branch leaves the other categories alone");
+
+/* Names and coordinates come from the area itself: the polygon centre the map pins the marker to. */
+const floor1CurrentAreas = currentMobAreas.filter((area) => area.floor === "floor1");
+floor1CurrentAreas.forEach((area) => {
+  const entry = currentFloor1Collection.mobAreas.find((candidate) => candidate.uuid === area.id);
+  assert.ok(entry, `${area.id} is exported`);
+  const cornerAverage = {
+    x: Math.round(area.corners.reduce((total, corner) => total + corner.x, 0) / area.corners.length),
+    z: Math.round(area.corners.reduce((total, corner) => total + corner.z, 0) / area.corners.length)
+  };
+  assert.equal(entry.name, area.title, `${area.id} keeps its area name`);
+  assert.equal(entry.x, cornerAverage.x, `${area.id} exports the X centre of its own corners`);
+  assert.equal(entry.z, cornerAverage.z, `${area.id} exports the Z centre of its own corners`);
+  assert.equal(entry.x, getMobAreaCenter(area).x, `${area.id} agrees with the shared centre helper`);
+  assert.equal(entry.z, getMobAreaCenter(area).z, `${area.id} agrees with the shared centre helper`);
+  assert.equal(entry.group, "mobAreas", `${area.id} keeps the Mob Areas grouping`);
+  assert.equal(entry.uuid, area.id, `${area.id} keeps its dataset identity`);
+});
+
+/* The collected entries must serialize into a real JourneyMap file, not JSON in disguise. */
+const mobAreaExport = buildJourneyMapExport({
+  world: "aincrad",
+  dimensionId: "aincrad",
+  categories: currentFloor1Collection
+});
+const mobAreaBytes = mobAreaExport.toUint8Array();
+assert.ok(mobAreaBytes instanceof Uint8Array && mobAreaBytes.length > 0, "the mob-area export produces binary NBT");
+const serializedMobAreas = parseJourneyMapDat(mobAreaBytes);
+const typedMobAreas = parseTypedJourneyMapDat(mobAreaBytes);
+const mobAreaGroups = Object.values(serializedMobAreas.groups).filter((group) => group.name === "mobAreas");
+assert.equal(mobAreaGroups.length, 1, "the mob areas share exactly one JourneyMap group");
+const mobAreaGroup = mobAreaGroups[0];
+assert.equal(mobAreaGroup.color, 0xff8c00, "the Mob Areas group keeps the hardcoded category RGB");
+assert.equal(getNbtTagType(typedMobAreas.groups[mobAreaGroup.guid], "color"), 3, "the group colour is TAG_INT");
+assert.equal(getNbtTagType(typedMobAreas.groups[mobAreaGroup.guid].settings, "display"), 10);
+const mobAreaWaypoints = Object.values(serializedMobAreas.waypoints).filter(
+  (waypoint) => waypoint.groupId === mobAreaGroup.guid
+);
+assert.equal(mobAreaWaypoints.length, 15, "every Current mob area becomes a waypoint in the file");
+assert.equal(
+  new Set(mobAreaWaypoints.map((waypoint) => waypoint.guid)).size,
+  mobAreaWaypoints.length,
+  "mob-area waypoints have unique identities"
+);
+assert.equal(Object.values(serializedMobAreas.waypoints).length, 16, "the biome waypoint is serialized alongside them");
+mobAreaWaypoints.forEach((waypoint) => {
+  const typedWaypoint = typedMobAreas.waypoints[waypoint.guid];
+  assert.equal(waypoint.pos.dimension, "minecraft:overworld", "mob-area waypoints use the Aincrad dimension");
+  assert.deepEqual(waypoint.dimensions, ["minecraft:overworld"]);
+  assert.equal(waypoint.pos.y, -30, "mob-area waypoints use the same Y as every other waypoint");
+  assert.equal(waypoint.color, 0xffff8c00 | 0, "mob-area waypoints keep the opaque category ARGB");
+  assert.equal(getNbtTagType(typedWaypoint, "color"), 3, "the waypoint colour is TAG_INT");
+  assert.equal(getNbtTagType(typedWaypoint, "name"), 8, "the waypoint name is TAG_STRING");
+  assert.equal(getNbtTagType(typedWaypoint, "guid"), 8);
+  assert.equal(getNbtTagType(typedWaypoint, "groupId"), 8);
+  assert.equal(getNbtTagType(typedWaypoint.pos, "x"), 3, "the X coordinate is TAG_INT");
+  assert.equal(getNbtTagType(typedWaypoint.pos, "y"), 3);
+  assert.equal(getNbtTagType(typedWaypoint.pos, "z"), 3, "the Z coordinate is TAG_INT");
+  assert.equal(getNbtTagType(typedWaypoint.icon, "opacity"), 5, "the icon opacity stays TAG_FLOAT");
+  assert.equal(typedWaypoint.origin, "journeymap");
+  assert.equal(typedWaypoint.modId, "journeymap");
+});
+const serializedMobNames = mobAreaWaypoints.map((waypoint) => waypoint.name);
+floor1CurrentAreas.forEach((area) => {
+  const waypoint = mobAreaWaypoints.find((candidate) => candidate.name === area.title);
+  assert.ok(waypoint, `${area.title} survives serialization by name`);
+  assert.equal(waypoint.pos.x, getMobAreaCenter(area).x, `${area.title} keeps its X in the file`);
+  assert.equal(waypoint.pos.z, getMobAreaCenter(area).z, `${area.title} keeps its Z in the file`);
+});
+assert.ok(serializedMobNames.includes("Wild Boar Zone"), "the Current Data file keeps Wild Boar Zone");
+assert.ok(!serializedMobNames.includes("Wild Boar Meadow"), "the Current Data file never contains Wild Boar Meadow");
+const betaMobAreaBytes = buildJourneyMapExport({
+  world: "aincrad",
+  dimensionId: "aincrad",
+  categories: collectMobAreas(betaMobAreas, "floor1")
+}).toUint8Array();
+const serializedBetaMobNames = Object.values(parseJourneyMapDat(betaMobAreaBytes).waypoints).map(
+  (waypoint) => waypoint.name
+);
+assert.ok(serializedBetaMobNames.includes("Wild Boar Meadow"), "a Beta-Test file keeps Wild Boar Meadow");
+assert.ok(serializedBetaMobNames.includes("Skeleton Dungeon"), "Beta underground mob areas export too");
+
+/* The exported file must stay loadable by the project's own JourneyMap import workflow. */
+const aincradImportTarget = {
+  id: "aincrad",
+  journeymapDimensionId: "minecraft:overworld",
+  defaultFloor: "floor1",
+  floors: { floor1: {}, floor2: {}, floor3: {} },
+  logoIds: ["pin", "star", "flag"]
+};
+const mobAreaImportPlan = prepareJourneyMapImport(mobAreaBytes, [aincradImportTarget], "aincrad");
+assert.equal(mobAreaImportPlan.records.length, 16, "the exported file imports as sixteen records");
+const importedMobAreas = mobAreaImportPlan.records.filter((entry) => entry.record.button === "mobAreas");
+assert.equal(importedMobAreas.length, 15, "every mob-area waypoint survives the import workflow");
+assert.equal(
+  new Set(importedMobAreas.map((entry) => entry.record.name)).size,
+  importedMobAreas.length,
+  "imported mob-area names stay distinct"
+);
+assert.equal(new Set(importedMobAreas.map((entry) => entry.record.id)).size, importedMobAreas.length, "imported ids are unique");
+importedMobAreas.forEach((entry) => {
+  assert.equal(entry.world, "aincrad");
+  assert.equal(entry.record.floor, "floor1", "mob-area waypoints import onto the floor they came from");
+  assert.equal(entry.record.button, "mobAreas", "the import keeps the Mob Areas grouping");
+  assert.equal(entry.record.buttonColor, "#FF8C00", "the import keeps the mob-area category colour");
+  assert.equal(entry.record.waypointColor, "#FF8C00");
+  assert.equal(entry.record.logo, "pin");
+});
+const importedVallhat = importedMobAreas.find((entry) => entry.record.name === "Vallhat");
+const vallhatArea = currentMobAreas.find((area) => area.id === "vallhat-mobs");
+assert.equal(importedVallhat.record.x, getMobAreaCenter(vallhatArea).x, "the round trip preserves the mob-area X");
+assert.equal(importedVallhat.record.z, getMobAreaCenter(vallhatArea).z, "the round trip preserves the mob-area Z");
+
+/* Repeating an area, and mixing categories, must not multiply or recolour anything. */
+const doubledMobAreas = collectMobAreas([...floor1CurrentAreas, ...floor1CurrentAreas], "floor1");
+assert.equal(doubledMobAreas.mobAreas.length, 15, "a repeated mob area is never exported twice");
+const currentAreasSnapshot = JSON.stringify(currentMobAreas);
+collectMobAreas(currentMobAreas, "floor1");
+assert.equal(JSON.stringify(currentMobAreas), currentAreasSnapshot, "exporting mob areas does not mutate the dataset");
+
+const mixedCollection = collectJourneyMapExportCategories({
+  categories: { mobAreas: true, custom: true },
+  markers: {
+    "custom-1": {
+      title: "Festival marker",
+      category: "custom",
+      customWaypointButton: "SAO Events",
+      floor: "floor1",
+      coords: { x: 5, z: 6 },
+      color: "#00FF00"
+    }
+  },
+  mobAreas: currentMobAreas,
+  floor: "floor1",
+  world: "aincrad",
+  dimensionId: "aincrad",
+  resolveMobAreaCenter: getMobAreaCenter,
+  resolveCustomCategoryColor: () => "#00FF00"
+});
+assert.equal(mixedCollection["SAO Events"].length, 1, "custom waypoint categories still export beside mob areas");
+assert.equal(mixedCollection["SAO Events"][0].color, "#00FF00", "custom waypoint colours are untouched");
+assert.equal(mixedCollection.mobAreas.length, 15, "mob areas export beside custom categories");
+const mixedRoot = parseJourneyMapDat(
+  buildJourneyMapExport({ world: "aincrad", dimensionId: "aincrad", categories: mixedCollection }).toUint8Array()
+);
+const mixedEventGroup = Object.values(mixedRoot.groups).find((group) => group.name === "SAO Events");
+const mixedMobAreaGroup = Object.values(mixedRoot.groups).find((group) => group.name === "mobAreas");
+assert.equal(mixedEventGroup.color, 0x00ff00, "the custom category keeps its own group colour");
+assert.equal(mixedMobAreaGroup.color, 0xff8c00, "the mob areas keep their own group colour");
+assert.notEqual(mixedEventGroup.guid, mixedMobAreaGroup.guid, "mob areas and custom categories use separate groups");
+
+/* Mob Areas alone — the only enabled category — must still produce a valid, importable file. */
+const mobAreaOnlyCollection = collectJourneyMapExportCategories({
+  categories: { mobAreas: true },
+  markers: {},
+  mobAreas: currentMobAreas,
+  floor: "floor1",
+  world: "aincrad",
+  dimensionId: "aincrad",
+  resolveMobAreaCenter: getMobAreaCenter
+});
+const mobAreaOnlyBytes = buildJourneyMapExport({
+  world: "aincrad",
+  dimensionId: "aincrad",
+  categories: mobAreaOnlyCollection
+}).toUint8Array();
+const mobAreaOnlyRoot = parseJourneyMapDat(mobAreaOnlyBytes);
+assert.equal(Object.keys(mobAreaOnlyRoot.waypoints).length, 15, "a mob-areas-only export holds every area");
+assert.equal(
+  Object.values(mobAreaOnlyRoot.waypoints).every((waypoint) => waypoint.pos.dimension === "minecraft:overworld"),
+  true,
+  "a mob-areas-only export keeps the Aincrad dimension"
+);
+assert.equal(
+  Object.values(mobAreaOnlyRoot.groups).filter((group) => group.name === "mobAreas").length,
+  1,
+  "a mob-areas-only export has one Mob Areas group"
+);
+const mobAreaOnlyPlan = prepareJourneyMapImport(mobAreaOnlyBytes, [aincradImportTarget], "aincrad");
+assert.equal(mobAreaOnlyPlan.records.length, 15, "a mob-areas-only file is still importable");
+assert.equal(
+  mobAreaOnlyPlan.records.every((entry) => entry.record.button === "mobAreas"),
+  true,
+  "a mob-areas-only file imports every record into the Mob Areas category"
+);
+
+/* A page that ships no mob areas (or does not enable the category) is unaffected. */
+const withoutMobAreas = collectJourneyMapExportCategories({
+  categories: { mobAreas: true, biomes: true },
+  markers: { "biome-1": { title: "Biome marker", category: "biomes", floor: "floor1", coords: { x: 10, z: 20 } } },
+  floor: "floor1",
+  world: "underworld",
+  dimensionId: "underworld"
+});
+assert.equal(withoutMobAreas.mobAreas, undefined, "an empty mob-area dataset exports no mob-area category");
+assert.equal(withoutMobAreas.biomes.length, 1, "the other categories still export");
+const disabledMobAreas = collectJourneyMapExportCategories({
+  categories: { mobAreas: false, biomes: true },
+  markers: { "biome-1": { title: "Biome marker", category: "biomes", floor: "floor1", coords: { x: 10, z: 20 } } },
+  mobAreas: currentMobAreas,
+  floor: "floor1",
+  world: "aincrad",
+  dimensionId: "aincrad",
+  resolveMobAreaCenter: getMobAreaCenter
+});
+assert.equal(disabledMobAreas.mobAreas, undefined, "a disabled Mob Areas button exports nothing");
+
 console.log("JourneyMap export regression tests passed.");

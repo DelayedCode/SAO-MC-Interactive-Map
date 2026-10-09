@@ -1,0 +1,39 @@
+﻿ 404:     const bounds = input.getBoundingClientRect();
+ 405:     const progress = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+ 406:     input.value = String(Math.round(1 + progress * 24));
+ 407:     input.dispatchEvent(new Event("input", { bubbles: true }));
+ 408:   }
+ 409: 
+ 410:   function renderSlots() {
+ 411:     const groups = [
+ 412:       { name: "armor", container: $("armorSlots"), matches: (slot) => slot.group === "armor" },
+ 413:       {
+ 414:         name: "accessory",
+ 415:         container: $("accessorySlots"),
+ 416:         matches: (slot) => slot.group === "accessory" && !["main-weapon", "offhand"].includes(slot.id)
+ 417:       },
+ 418:       { name: "weapon", container: $("weaponSlots"), matches: (slot) => ["main-weapon", "offhand"].includes(slot.id) }
+ 419:     ];
+ 420:     groups.forEach((group) => {
+ 421:       group.container.innerHTML = data.slots
+ 422:         .filter(group.matches)
+ 423:         .map((slot) => {
+ 424:           const item = activeBuild()[slot.id];
+ 425:           const available = item && adapter.isAvailable(item, state.source, slot.id, state.classId);
+ 426:           const itemLabel = item ? displayText(item, "name") || item.name : "";
+ 427:           const rarity = item?.rarity
+ 428:             ? `<span class="slot-empty ${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>`
+ 429:             : "";
+ 430:           const runeControls =
+ 431:             group.name === "armor" && item && available
+ 432:               ? Array.from({ length: adapter.getRuneSlots(item) }, (_, index) => {
+ 433:                   const rune = canonicalRune(selectedRunesForSlot(slot.id)[index]);
+ 434:                   const slotLabel = localizeSlot(slot);
+ 435:                   const label = rune
+ 436:                     ? displayText(rune, "name") || rune.name
+ 437:                     : t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 });
+ 438:                   return `<button class="rune-button${rune ? " is-filled" : ""}" type="button" data-rune-slot="${index}" data-armor-slot="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 }))}"><span>R${index + 1}</span><strong>${escapeHtml(label)}</strong></button>`;
+ 439:                 }).join("")
+ 440:               : "";
+ 441:           const slotLabel = localizeSlot(slot);
+ 442:           return `<div class="equipment-slot-wrap"><button class="slot-button${item ? " is-filled" : ""}${item && !available ? " is-unavailable" : ""}" type="button" data-slot-id="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectSlot", { slot: slotLabel }))}"${item && !available ? ` aria-disabled="true" title="${escapeHtml(t("page.characterBuild.unavailable"))}"` : ""}>

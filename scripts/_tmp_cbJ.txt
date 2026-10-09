@@ -1,0 +1,100 @@
+      {
+        selector: "#equipmentDialog .dialog-shell",
+        title: t("page.characterBuild.walkthrough.step5Title"),
+        body: t("page.characterBuild.walkthrough.step5Body"),
+        onEnter: ensureWalkthroughDialog
+      },
+      {
+        selector: "#rarityFilter",
+        title: t("page.characterBuild.walkthrough.step6Title"),
+        body: t("page.characterBuild.walkthrough.step6Body"),
+        onEnter: ensureWalkthroughDialog,
+        onExit: closeWalkthroughDialog
+      },
+      {
+        selector: "#statsHeading",
+        title: t("page.characterBuild.walkthrough.step7Title"),
+        body: t("page.characterBuild.walkthrough.step7Body")
+      },
+      {
+        selector: "#skillsHeading",
+        title: t("page.characterBuild.walkthrough.step8Title"),
+        body: t("page.characterBuild.walkthrough.step8Body")
+      },
+      {
+        selector: "#buildSlot",
+        title: t("page.characterBuild.walkthrough.step9Title"),
+        body: t("page.characterBuild.walkthrough.step9Body")
+      },
+      {
+        selector: ".source-control",
+        title: t("page.characterBuild.walkthrough.step10Title"),
+        body: t("page.characterBuild.walkthrough.step10Body")
+      },
+      {
+        selector: ".page-header",
+        title: t("page.characterBuild.walkthrough.step11Title"),
+        body: t("page.characterBuild.walkthrough.step11Body")
+      }
+    ];
+  }
+
+  function startGuidedWalkthrough(options) {
+    return walkthroughController?.start(options) || false;
+  }
+
+  function bindEvents() {
+    const pageUtils = window.SAOPageUtils;
+    if (pageUtils && typeof pageUtils.attachSectionNavButtons === "function") {
+      pageUtils.attachSectionNavButtons(".nav", null);
+    }
+    $("armorSlots").addEventListener("click", (event) => {
+      const runeButton = event.target.closest("[data-rune-slot]");
+      if (runeButton) return openRunePicker(runeButton.dataset.armorSlot, Number(runeButton.dataset.runeSlot));
+      const button = event.target.closest("[data-slot-id]");
+      if (button) openPicker(button.dataset.slotId);
+    });
+    $("accessorySlots").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-slot-id]");
+      if (button) openPicker(button.dataset.slotId);
+    });
+    $("weaponSlots").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-slot-id]");
+      if (button) openPicker(button.dataset.slotId);
+    });
+    document.querySelectorAll("[data-source]").forEach((button) =>
+      button.addEventListener("click", () => {
+        state.source = button.dataset.source;
+        activeSkillState().source = state.source;
+        renderConfiguration();
+        ensureEquipmentDataLoaded(
+          state.source,
+          () => {
+            setFilterOptions();
+            renderConfiguration();
+            renderSlots();
+            renderStats();
+            if ($("equipmentDialog").open) renderItems();
+            saveState();
+          },
+          () => renderConfiguration()
+        );
+        saveState();
+      })
+    );
+    $("characterLevel").addEventListener("input", (event) => {
+      state.level = Number(event.target.value);
+      activeSkillState().level = state.level;
+      renderConfiguration();
+      renderStats();
+      if ($("equipmentDialog").open) renderItems();
+      saveState();
+    });
+    $("characterLevel").addEventListener("pointerdown", (event) => {
+      if (event.button === 0) setLevelFromPointer(event);
+    });
+    $("characterClass").addEventListener("change", (event) => {
+      state.classId = event.target.value;
+      activeSkillState().classId = state.classId;
+      activeSkillState().selectedSkills = {};
+      removeIncompatibleEquipment();

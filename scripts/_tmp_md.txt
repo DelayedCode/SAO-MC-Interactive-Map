@@ -1,0 +1,23 @@
+
+FullName                                                                                                                                             
+--------                                                                                                                                             
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\element-attributes.md        
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\playwright-tests.md          
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\request-mocking.md           
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\running-code.md              
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\session-management.md        
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\storage-state.md             
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\test-generation.md           
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\tracing.md                   
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\references\video-recording.md           
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-cli\SKILL.md                                
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-component-testing\references\gallery-spec.md
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-component-testing\references\migration.md   
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-component-testing\references\react.md       
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-component-testing\references\typing.md      
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-component-testing\references\vue.md         
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-component-testing\SKILL.md                  
+C:\Users\asher\Downloads\SAO MC Interactive Map\node_modules\playwright-core\lib\tools\skills\playwright-trace\SKILL.md                              
+
+
+

@@ -75,14 +75,23 @@
   const fullMarkerDataset = typeof DATA !== "undefined" ? DATA : globalObject.DATA || {};
   const fullMobAreaDataset =
     typeof MOB_AREAS !== "undefined" ? MOB_AREAS : Array.isArray(globalObject.MOB_AREAS) ? globalObject.MOB_AREAS : [];
+  /* Current Data ships its own copy of the mob areas (Aincrad/Map/maps_current.js), so each mode
+     reads its own array and the Beta-Test dataset itself is never touched. */
+  const currentMobAreaDataset =
+    typeof CURRENT_MOB_AREAS !== "undefined"
+      ? CURRENT_MOB_AREAS
+      : Array.isArray(globalObject.SAO_CURRENT_MOB_AREAS)
+        ? globalObject.SAO_CURRENT_MOB_AREAS
+        : [];
   const mobAreaMobLookup = typeof MOB_AREA_MOBS !== "undefined" ? MOB_AREA_MOBS : globalObject.MOB_AREA_MOBS || {};
 
   /* Main Quest waypoints are Current-Data-only (see shared/sao-datasets.js): Beta drops them and
-     Current keeps only them. Current also ships no Beta mob areas, so Beta keeps the full dataset. */
+     Current keeps only them. The mob areas follow the same split, so Beta keeps the full Beta
+     dataset while Current keeps its own copy. */
   const isCurrentDataset = globalObject.SAODatasets?.getDatasetFromLocation?.() === "current";
   const markerDataset =
     globalObject.SAODatasets?.filterMarkerDatasetForActiveMode?.(fullMarkerDataset) || fullMarkerDataset;
-  const mobAreaDataset = isCurrentDataset ? [] : fullMobAreaDataset;
+  const mobAreaDataset = isCurrentDataset ? currentMobAreaDataset : fullMobAreaDataset;
   const getContextData = globalObject.SAOMapRuntime.createContextDataResolver({
     markerDataset,
     mobAreaDataset,

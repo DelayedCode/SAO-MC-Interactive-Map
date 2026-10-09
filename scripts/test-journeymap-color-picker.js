@@ -43,8 +43,8 @@ async function assertPickerFlow(page) {
     await picker.evaluate((element) => {
       const rect = element.closest(".custom-waypoint-color-picker").getBoundingClientRect();
       const target = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-      /* The site-wide click cursor always ends with its "pointer" fallback. */
-      return target === element && / 4 1,\s*pointer$/.test(getComputedStyle(element).cursor);
+      /* The site-wide click cursor is the SAO-skinned hand with its tip as the hotspot. */
+      return target === element && / 6 0,\s*pointer$/.test(getComputedStyle(element).cursor);
     }),
     true,
     "the visible preview center is an obvious clickable color-input target"

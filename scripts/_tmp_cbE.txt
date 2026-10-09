@@ -1,0 +1,100 @@
+      .map(([group, entries], index) => {
+        const isOpen = hasPreviousState ? openGroups.has(String(index)) : false;
+        return `<details class="stats-group" data-stats-group="${index}"${isOpen ? " open" : ""}><summary>${escapeHtml(localizeGroup(group))}</summary><ul class="stat-list">${entries
+          .map((stat) => {
+            const total = calculated[stat];
+            const base = baseStats ? baseStats[stat] : null;
+            const modified = Boolean(base && total && (total.flat !== base.flat || total.percent !== base.percent));
+            const baseTitle = modified
+              ? ` title="${escapeHtml(t("page.characterBuild.base", { level: calculator.formatValue(base) }))}"`
+              : "";
+            return `<li><span>${escapeHtml(localizeStat(stat))}</span><strong${baseTitle}>${calculator.formatValue(total)}${modified ? " *" : ""}</strong></li>`;
+          })
+          .join("")}</ul></details>`;
+      })
+      .join("");
+  }
+
+  function skillNodeState(node) {
+    const statusLabel = (key) => t(`page.characterBuild.${key}`);
+    if (isSkillUnlocked(node.id))
+      return { name: "selected", label: statusLabel("selected"), reason: t("page.characterBuild.alreadyUnlocked") };
+    const missing = missingSkillPrerequisites(node);
+    if (missing.length) {
+      const requirementNames = missing
+        .map((id) => {
+          const prerequisite = currentSkillTree().find((item) => item.id === id);
+          return prerequisite ? localizeSkillName(prerequisite) : id;
+        })
+        .join(", ");
+      return {
+        name: "locked",
+        label: statusLabel("locked"),
+        reason: t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requiresSkills", {
+          value: requirementNames
+        })
+      };
+    }
+    if (node.cost > availableSkillPoints()) {
+      return {
+        name: "locked",
+        label: statusLabel("locked"),
+        reason: `Need ${node.cost - availableSkillPoints()} more skill point${node.cost - availableSkillPoints() === 1 ? "" : "s"}.`
+      };
+    }
+    return { name: "available", label: statusLabel("available"), reason: t("page.characterBuild.readyToUnlock") };
+  }
+
+  function formatSkillEffects(node) {
+    return node.effects.map((effect) => `${localizeStat(effect.stat)}: ${effect.value}`).join(" / ");
+  }
+
+  function renderSkillDetail(nodeId) {
+    const node = currentSkillTree().find((item) => item.id === nodeId) || currentSkillTree()[0];
+    if (!node || !$("skillDetail")) return;
+    const status = skillNodeState(node);
+    const prerequisites = node.prerequisites.length
+      ? node.prerequisites
+          .map((id) => {
+            const prerequisite = currentSkillTree().find((item) => item.id === id);
+            return prerequisite ? localizeSkillName(prerequisite) : id;
+          })
+          .join(", ")
+      : t("page.characterBuild.none");
+    const effectDetail = node.center ? "" : `<span>${escapeHtml(formatSkillEffects(node))}</span>`;
+    const prerequisiteDetail = node.center
+      ? ""
+      : `<span>${escapeHtml(t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requires", { value: prerequisites }))}</span>`;
+    const descriptionDetail = node.description
+      ? `<span>${escapeHtml(localizeSkillDescription(node))}</span>`
+      : "";
+    $("skillDetail").innerHTML =
+      `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(node.className)}</span>${descriptionDetail}${effectDetail}${prerequisiteDetail}<span>Cost: ${node.cost} skill point${node.cost === 1 ? "" : "s"}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
+  }
+
+  function renderSkills(selectedNodeId) {
+    const skills = currentSkillTree();
+    const layout = data.SKILL_TREE_LAYOUT || [];
+    const layoutById = new Map(layout.map((point) => [point.id, point]));
+    const layoutBySkillId = new Map(layout.map((point) => [point.skillId, point]));
+    const skillsById = new Map(skills.map((node) => [node.id, node]));
+    const skillsByNodeId = new Map(skills.map((node) => [node.nodeId, node]));
+    const drawnConnections = new Set();
+    const connectionMarkup = [];
+    const addConnection = (fromId, toId, active = false) => {
+      const key = [fromId, toId].sort().join(":");
+      if (drawnConnections.has(key)) return;
+      const from = layoutById.get(fromId);
+      const to = layoutById.get(toId);
+      if (!from || !to) return;
+      drawnConnections.add(key);
+      const fromSkill = skillsByNodeId.get(from.skillId);
+      const toSkill = skillsByNodeId.get(to.skillId);
+      connectionMarkup.push(
+        `<line class="skill-connection${active ? " is-active" : ""}" data-from-skill-id="${fromSkill?.id || ""}" data-to-skill-id="${toSkill?.id || ""}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`
+      );
+    };
+    (data.SKILL_TREE_CONNECTIONS || []).forEach(([fromId, toId]) => {
+      const fromPoint = layoutById.get(fromId);
+      const toPoint = layoutById.get(toId);
+      const fromSkill = fromPoint && skillsByNodeId.get(fromPoint.skillId);

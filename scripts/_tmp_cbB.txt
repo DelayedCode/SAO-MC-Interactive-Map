@@ -1,0 +1,100 @@
+  })();
+  function currentSkillTree() {
+    const classSkills = data.CLASS_SKILLS[state.classId] || data.WARRIOR_SKILLS;
+    return data.SKILL_TREE_LAYOUT.map((point) => {
+      const config = classSkills[point.skillId];
+      const center = point.skillId === "skill1";
+      const skill58 = point.skillId === "skill58";
+      const value = center ? null : config.statMode === "percent" ? `${config.amount}%` : config.amount;
+      const prerequisiteSkillIds = center
+        ? []
+        : skill58
+          ? config.prerequisites
+          : skillNeighborsById.get(point.skillId);
+      return {
+        id: skillNodeId(state.classId, point.skillId),
+        nodeId: point.skillId,
+        layoutId: point.id,
+        name: config.name,
+        description: config.description,
+        className: skillClassName(state.classId),
+        ...(center ? {} : { stat: config.stat, amount: config.amount, statMode: config.statMode }),
+        cost: center ? 0 : 1,
+        prerequisiteMode: center || !skill58 ? "any" : "all",
+        prerequisites: prerequisiteSkillIds.map((id) => skillNodeId(state.classId, id)),
+        effects: center ? [] : [{ stat: config.stat, value }],
+        x: point.x,
+        y: point.y,
+        branch: center ? "core" : "branch",
+        center
+      };
+    });
+  }
+  function isSkillUnlocked(skillId) {
+    return skillId === skillNodeId(state.classId, "skill1") || Boolean(activeSkillState().selectedSkills[skillId]);
+  }
+  function skillPrerequisitesSatisfied(node, selectedSkillIds = null) {
+    if (!node.prerequisites.length) return true;
+    const isSelected = (skillId) =>
+      skillId === skillNodeId(state.classId, "skill1") ||
+      (selectedSkillIds ? selectedSkillIds.has(skillId) : isSkillUnlocked(skillId));
+    if (node.prerequisiteMode === "any") return node.prerequisites.some(isSelected);
+    return node.prerequisites.every(isSelected);
+  }
+  function pruneInvalidSelectedSkills() {
+    const build = activeSkillState();
+    const selectedSkillIds = new Set(
+      Object.keys(build.selectedSkills || {}).filter((skillId) => build.selectedSkills[skillId])
+    );
+    let removedInvalidSkill;
+    do {
+      removedInvalidSkill = false;
+      currentSkillTree().forEach((node) => {
+        if (node.center || !selectedSkillIds.has(node.id) || skillPrerequisitesSatisfied(node, selectedSkillIds)) return;
+        selectedSkillIds.delete(node.id);
+        removedInvalidSkill = true;
+      });
+    } while (removedInvalidSkill);
+    build.selectedSkills = Object.fromEntries([...selectedSkillIds].map((skillId) => [skillId, true]));
+  }
+  function missingSkillPrerequisites(node) {
+    if (skillPrerequisitesSatisfied(node)) return [];
+    return node.prerequisites.filter((id) => !isSkillUnlocked(id));
+  }
+  function selectedSkillNodes() {
+    return currentSkillTree().filter((node) => isSkillUnlocked(node.id));
+  }
+  function availableSkillPoints() {
+    const skills = currentSkillTree();
+    const total = skills.reduce((points, node) => points + node.cost, 0);
+    const spent = skills.reduce((points, node) => points + (isSkillUnlocked(node.id) ? node.cost : 0), 0);
+    return Math.max(0, total - spent);
+  }
+  function activeItems() {
+    return adapter.getItems(state.source);
+  }
+  function activeRunes() {
+    return adapter.getRunes(state.source);
+  }
+  const characterBuildScriptCache = new Set();
+  function ensureEquipmentDataLoaded(source, onReady, onError) {
+    const runtime = window.SAORuntimeUtils;
+    if (!runtime || typeof runtime.loadTaggedScriptOnce !== "function") {
+      onReady?.();
+      return;
+    }
+
+    const dependencyMap = {
+      current: ["../eCompendium/ecompendium_current.js"],
+      beta: [
+        "../eCompendium/ecompendium_floor1.js",
+        "../eCompendium/ecompendium_floor2.js",
+        "../eCompendium/ecompendium_floor3.js"
+      ]
+    };
+
+    const scripts = dependencyMap[source] || [];
+    if (!scripts.length) {
+      onReady?.();
+      return;
+    }

@@ -39,9 +39,10 @@ assert.equal(
 );
 /* The Current dataset now ships the Ice Spirits, Ice Golem, Peaceful Deer, Shark, Little Slime,
    Spider, Iron, Copper, Nepenthes, Elite Treant, Standard Skeleton and Shadow Neophyte accessory
-   sets plus the Starting Town tools; scripts/test-current-equipment.js pins their contents in
-   detail. The audit counts the equipment categories (weapon, armor, accessory, tool). */
-assert.equal(report.currentDatasetEquipmentItems, 55);
+   sets, the Starting Town tools, the Floor 1 beginner weapons/off-hands and the beginner armor;
+   scripts/test-current-equipment.js pins their contents in detail. The audit counts the equipment
+   categories (weapon, armor, accessory, tool). */
+assert.equal(report.currentDatasetEquipmentItems, 72);
 assert.deepEqual(report.sameTierStatConflicts, []);
 assert.deepEqual(thiefBracelet, {
   name: "Thief's Bracelet",

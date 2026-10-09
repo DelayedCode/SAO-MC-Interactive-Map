@@ -485,5 +485,16 @@ assert.doesNotMatch(
   /\.mode-button:hover\s*\{[^}]*filter\s*:\s*brightness\(/,
   "Welcome Mat hover state avoids expensive filter-based repaint work"
 );
+/* The Doormat links modal exposes the guild invite as a regular external link, so it keeps the
+   shared modal-action styling and opens in a new tab. */
+const moonlitInvite = welcomeMarkup.match(
+  /<a class="modal-action" href="https:\/\/discord\.gg\/2E3Dx6afMd" target="_blank" rel="noopener noreferrer"[\s\S]*?<\/a\r?\n\s*>/
+);
+assert.ok(moonlitInvite, "Welcome Mat links modal offers the Moonlit Black Cats Discord invite");
+assert.match(
+  moonlitInvite[0],
+  /<span data-i18n="page\.index\.moonlitDiscord">🌙 Join Moonlit Black Cats<\/span>/,
+  "Welcome Mat guild invite keeps its labelled Moonlit Black Cats copy"
+);
 
 console.log("Rendering and projection regression tests passed.");

@@ -1,9 +1,10 @@
 /* Current-Data waypoint regression checks.
 
    Current Data ships the Accessory Blacksmith, Secret Accessory Blacksmith and Occult Merchant
-   waypoints on floor 1. Aincrad/Map/maps_current.js is their single source and every marker
-   carries `dataset: "current"`, which shared/sao-datasets.js uses to keep them out of Beta mode.
-   These checks pin the supplied coordinates and categories, the category buttons behind them, and
+   waypoints on floor 1, plus a copy of every Beta Biome-category waypoint. Aincrad/Map/
+   maps_current.js is their single source and every marker carries `dataset: "current"`, which
+   shared/sao-datasets.js uses to keep them out of Beta mode. These checks pin the supplied
+   coordinates and categories, the copied biome waypoints, the category buttons behind them, and
    the Beta/Current split. */
 "use strict";
 
@@ -66,6 +67,8 @@ const EXPECTED_WAYPOINTS = [
   { id: "current-loot-buyer-aragorn", title: "Aragorn's Lair - Loot Buyer", category: "lootBuyers", x: 1020, z: 1176 },
   { id: "current-starting-merchant", title: "Starting Merchant", category: "toolMerchants", x: 1787, z: 4179 },
   { id: "current-starting-town-tools", title: "F1 - Starting Town - Tools", category: "toolMerchants", x: 1787, z: 4161 },
+  { id: "current-consumables-merchant-purification-alchemist", title: "F1 - PvP Purification Alchemist", category: "consumablesMerchants", x: 1813, z: 4180 },
+  { id: "current-consumables-merchant-assistant", title: "The Assistant", category: "consumablesMerchants", x: 1772, z: 4102 },
   { id: "current-dungeon-guard-geldorack", title: "F1 - Geldorack Dungeon Guard - Starting Town", category: "keyBlacksmith", x: 4281, z: 3893 },
   { id: "current-dungeon-guard-fallen-labyrinth", title: "F1 - Fallen Labyrinth Dungeon Guard - Tolbana", category: "keyBlacksmith", x: 2378, z: 2410 },
   { id: "current-dungeon-guard-xal-zirith", title: "F1 - Xal'Zirith Dungeon Guard - Candelia", category: "keyBlacksmith", x: 1013, z: 1189 },
@@ -74,7 +77,15 @@ const EXPECTED_WAYPOINTS = [
 
 /* --- The supplied Current waypoints are shipped in full ---------------------- */
 const currentWaypoints = Object.values(data).filter((marker) => marker.dataset === "current");
-assert.equal(currentWaypoints.length, EXPECTED_WAYPOINTS.length, "only the supplied Current waypoints are added");
+const currentBiomes = currentWaypoints.filter((marker) => marker.category === "biomes");
+const betaBiomes = Object.values(data).filter(
+  (marker) => marker.category === "biomes" && marker.dataset !== "current"
+);
+assert.equal(
+  currentWaypoints.length,
+  EXPECTED_WAYPOINTS.length + currentBiomes.length,
+  "only the supplied Current waypoints and the copied biome waypoints are added"
+);
 
 EXPECTED_WAYPOINTS.forEach((expected) => {
   const marker = data[expected.id];
@@ -84,6 +95,24 @@ EXPECTED_WAYPOINTS.forEach((expected) => {
   assert.equal(marker.floor, "floor1", `${expected.id} floor`);
   assert.equal(marker.dataset, "current", `${expected.id} is Current Data`);
   assert.deepEqual({ x: marker.coords.x, z: marker.coords.z }, { x: expected.x, z: expected.z }, `${expected.id} coordinates`);
+});
+
+/* --- The Beta Biome waypoints are copied into Current Data unchanged ---------- */
+const biomeSignature = (marker) => `${marker.title}|${marker.floor}|${marker.coords.x}|${marker.coords.z}`;
+assert.equal(currentBiomes.length, 71, "the Beta Biome category supplies 71 waypoints");
+assert.equal(
+  currentBiomes.length,
+  betaBiomes.length,
+  "every Beta biome waypoint has a Current Data copy"
+);
+const betaBiomeSignatures = new Set(betaBiomes.map(biomeSignature));
+currentBiomes.forEach((marker) => {
+  assert.equal(marker.dataset, "current", `${marker.title} biome is Current Data`);
+  assert.equal(marker.type, "Biome", `${marker.title} biome keeps its type`);
+  assert.ok(
+    betaBiomeSignatures.has(biomeSignature(marker)),
+    `the Current ${marker.title} biome carries the Beta coordinates unchanged`
+  );
 });
 
 /* --- The waypoint categories exist in the map's own architecture ------------- */
@@ -170,7 +199,7 @@ assert.ok(
 );
 assert.equal(
   Object.keys(currentMode).length,
-  EXPECTED_WAYPOINTS.length + Object.values(data).filter((marker) => marker.category === "mainQuests").length,
+  EXPECTED_WAYPOINTS.length + currentBiomes.length + Object.values(data).filter((marker) => marker.category === "mainQuests").length,
   "Current mode is the Main Questline plus the supplied Current waypoints"
 );
 

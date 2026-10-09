@@ -87,9 +87,11 @@
       dataset: {
         betaLabel: "Beta-Test Data",
         currentLabel: "Current Data",
-        betaDescription: "THIS INFO IS FROM BETA TESTS. INFORMATION MAY BE OFF.",
+        betaDescription: "Experimental information from beta testing. Some details may be incomplete or inaccurate.",
         currentDescription:
-          "THIS INFO IS ACTIVELY BEING UPDATED. IF YOU CANNOT FIND SOMETHING, PLEASE CHECK 'BETA-TEST DATA' FOR IT UNTIL WE GET THE INFO FOR IT.",
+          "The actively maintained dataset. If something is missing, check Beta-Test Data until the information is available here.",
+        betaBadge: "Legacy",
+        currentBadge: "Recommended",
         chooseTitle: "Choose Data Version",
         cancel: "Cancel",
         close: "Close dataset selection"
@@ -122,6 +124,7 @@
           creatorDiscord: "Website Creator Discord",
           saoDiscord: "SAO MC Discord",
           supportWebsite: "SAO MC Support Website",
+          moonlitDiscord: "🌙 Join Moonlit Black Cats",
           ggoToast: "GGO is not out yet! No info to display."
         },
         maps: {
@@ -442,6 +445,7 @@
           creatorDiscord: "Discord del creador",
           saoDiscord: "Discord de SAO MC",
           supportWebsite: "Sitio web de soporte de SAO MC",
+          moonlitDiscord: "🌙 Únete a Moonlit Black Cats",
           ggoToast: "GGO aun no esta disponible. No hay informacion para mostrar."
         },
         patchnotes: {
@@ -530,6 +534,7 @@
           creatorDiscord: "Discord du createur",
           saoDiscord: "Discord SAO MC",
           supportWebsite: "Site web d'assistance SAO MC",
+          moonlitDiscord: "🌙 Rejoindre Moonlit Black Cats",
           ggoToast: "GGO n'est pas encore sorti. Aucune information a afficher."
         },
         patchnotes: {
@@ -2062,9 +2067,12 @@
     dataset: {
       betaLabel: "Datos de prueba beta",
       currentLabel: "Datos actuales",
-      betaDescription: "ESTA INFORMACIÓN PROVIENE DE PRUEBAS BETA. PUEDE NO SER PRECISA.",
+      betaDescription:
+        "Información experimental de las pruebas beta. Algunos detalles pueden estar incompletos o ser inexactos.",
       currentDescription:
-        "ESTA INFORMACIÓN SE ESTÁ ACTUALIZANDO. SI NO ENCUENTRAS ALGO, CONSULTA «DATOS DE PRUEBA BETA» HASTA QUE OBTENGAMOS LA INFORMACIÓN.",
+        "El conjunto de datos que se mantiene al día. Si falta algo, consulta los datos de prueba beta hasta que la información esté disponible aquí.",
+      betaBadge: "Legado",
+      currentBadge: "Recomendado",
       chooseTitle: "Elegir versión de datos",
       cancel: "Cancelar",
       close: "Cerrar selección de datos"
@@ -2163,9 +2171,12 @@
     dataset: {
       betaLabel: "Données de test bêta",
       currentLabel: "Données actuelles",
-      betaDescription: "CES INFORMATIONS PROVIENNENT DE TESTS BÊTA. ELLES PEUVENT ÊTRE INCORRECTES.",
+      betaDescription:
+        "Informations expérimentales issues des tests bêta. Certains détails peuvent être incomplets ou inexacts.",
       currentDescription:
-        "CES INFORMATIONS SONT ACTIVEMENT MISES À JOUR. SI VOUS NE TROUVEZ PAS QUELQUE CHOSE, CONSULTEZ LES « DONNÉES DE TEST BÊTA » EN ATTENDANT LES INFORMATIONS.",
+        "Le jeu de données activement maintenu. Si une information manque, consultez les données de test bêta jusqu'à ce qu'elle soit disponible ici.",
+      betaBadge: "Héritage",
+      currentBadge: "Recommandé",
       chooseTitle: "Choisir la version des données",
       cancel: "Annuler",
       close: "Fermer la sélection des données"
@@ -2474,6 +2485,12 @@
           alreadyUnlocked: "Already unlocked",
           readyToUnlock: "Ready to unlock",
           requiresSkills: "Requires {value}",
+          requiresMorePoints: "Requires {value}",
+          skillPoints: "{class} · {remaining} / {total} skill points",
+          skillPointsUnlimited: "{class} · {spent} spent · Unlimited skill points",
+          unlimitedSkillPoints: "Unlimited skill points",
+          unlimitedSkillPointsHint:
+            "Testing only: unlock skills without spending the skill points your level grants.",
           deselectDependent: "Deselect dependent skills first.",
           noMatchingItems: "No {slot} items match these filters at level {level}.",
           weaponAlreadyEquipped: "This weapon is already equipped in the other weapon slot.",
@@ -2582,6 +2599,12 @@
           alreadyUnlocked: "Ya desbloqueada",
           readyToUnlock: "Lista para desbloquear",
           requiresSkills: "Requiere {value}",
+          requiresMorePoints: "Requiere {value}",
+          skillPoints: "{class} · {remaining} / {total} puntos de habilidad",
+          skillPointsUnlimited: "{class} · {spent} gastados · Puntos de habilidad ilimitados",
+          unlimitedSkillPoints: "Puntos de habilidad ilimitados",
+          unlimitedSkillPointsHint:
+            "Solo para pruebas: desbloquea habilidades sin gastar los puntos de habilidad que otorga tu nivel.",
           deselectDependent: "Quita primero las habilidades dependientes.",
           noMatchingItems: "Ningún objeto de {slot} coincide con estos filtros en el nivel {level}.",
           weaponAlreadyEquipped: "Esta arma ya está equipada en el otro espacio de arma.",
@@ -2691,6 +2714,12 @@
           alreadyUnlocked: "Déjà débloquée",
           readyToUnlock: "Prête à débloquer",
           requiresSkills: "Nécessite {value}",
+          requiresMorePoints: "Nécessite {value}",
+          skillPoints: "{class} · {remaining} / {total} points de compétence",
+          skillPointsUnlimited: "{class} · {spent} dépensés · Points de compétence illimités",
+          unlimitedSkillPoints: "Points de compétence illimités",
+          unlimitedSkillPointsHint:
+            "Uniquement pour les tests : débloquer des compétences sans dépenser les points accordés par ton niveau.",
           deselectDependent: "Désélectionnez d'abord les compétences dépendantes.",
           noMatchingItems: "Aucun objet de {slot} ne correspond à ces filtres au niveau {level}.",
           weaponAlreadyEquipped: "Cette arme est déjà équipée dans l'autre emplacement d'arme.",
@@ -3284,6 +3313,12 @@
   Object.assign(translations.fr.page.patchnotes.entries.v020, { version: "v0.2.0 Alpha" });
 
   Object.assign(translations.en.page.patchnotes.entries, {
+    v170: {
+      version: "Character Build Skill Tree Update - v1.7",
+      title: "Character Build Skill Tree Update",
+      summary:
+        "Character Build\n• Rebuilt the skill tree from 9 to 77 skills, with updated prerequisites and branching paths.\n• Added level-based skill points, an Unlimited Skill Points toggle, and improved skill unlocking.\n• Added skill-tree dragging, zooming, and mobile layout fixes.\n• Fixed character base stats and skill stat calculations.\n\nMaps & Waypoints\n• Increased map zoom from 30x to 45x and improved map clarity when zoomed in.\n• Improved coordinate accuracy.\n• Updated JourneyMap waypoint exports to include Mob Areas.\n\nData & UI\n• Expanded and updated Current Data across Equipment, Bestiary, and map waypoints.\n• Updated the data-version selection UI and changed the Beta-Test Data badge to LEGACY.\n• Added a Moonlit Black Cats Discord link to the hub menu.\n\nLocalization & Bug Fixes\n• Fixed Spanish and French map description translations.\n• Updated translations for new equipment and renamed mobs.\n• Fixed Character Build skill prerequisites and mobile clipping."
+    },
     v160: {
       version: "Map Tools & Waypoint Update - v1.6",
       title: "Map Tools & Waypoint Update",
@@ -3298,6 +3333,12 @@
     }
   });
   Object.assign(translations.es.page.patchnotes.entries, {
+    v170: {
+      version: "Actualización del árbol de habilidades de Character Build - v1.7",
+      title: "Actualización del árbol de habilidades de Character Build",
+      summary:
+        "Character Build\n• Se reconstruyó el árbol de habilidades de 9 a 77 habilidades, con prerrequisitos y rutas ramificadas actualizados.\n• Se añadieron puntos de habilidad según el nivel, un interruptor de Puntos de habilidad ilimitados y un mejor desbloqueo de habilidades.\n• Se añadieron el arrastre y el zoom del árbol de habilidades, y correcciones de diseño para móvil.\n• Se corrigieron las estadísticas base de los personajes y el cálculo de estadísticas de las habilidades.\n\nMapas y puntos de ruta\n• El zoom del mapa subió de 30x a 45x y mejoró la claridad del mapa al acercarlo.\n• Se mejoró la precisión de las coordenadas.\n• Se actualizaron las exportaciones de puntos de JourneyMap para incluir las zonas de mobs.\n\nDatos e interfaz\n• Se ampliaron y actualizaron los datos actuales en equipo, bestiario y puntos de ruta del mapa.\n• Se actualizó la interfaz de selección de versión de datos y la etiqueta de Beta-Test Data ahora dice LEGACY.\n• Se añadió un enlace al Discord de Moonlit Black Cats en el menú del centro.\n\nLocalización y correcciones\n• Se corrigieron las traducciones de las descripciones de mapas en español y francés.\n• Se actualizaron las traducciones del equipo nuevo y de los mobs renombrados.\n• Se corrigieron los prerrequisitos de habilidades de Character Build y el recorte en móvil."
+    },
     v160: {
       version: "Actualización de herramientas del mapa y puntos de ruta - v1.6",
       title: "Actualización de herramientas del mapa y puntos de ruta",
@@ -3312,6 +3353,12 @@
     }
   });
   Object.assign(translations.fr.page.patchnotes.entries, {
+    v170: {
+      version: "Mise à jour de l'arbre de compétences de Character Build - v1.7",
+      title: "Mise à jour de l'arbre de compétences de Character Build",
+      summary:
+        "Character Build\n• Arbre de compétences reconstruit, passant de 9 à 77 compétences, avec des prérequis et des itinéraires ramifiés actualisés.\n• Ajout des points de compétence selon le niveau, d'un interrupteur Points de compétence illimités et d'un déblocage des compétences amélioré.\n• Ajout du déplacement et du zoom de l'arbre de compétences, et corrections de mise en page sur mobile.\n• Correction des statistiques de base des personnages et du calcul des statistiques des compétences.\n\nCartes et points de passage\n• Le zoom de la carte passe de 30x à 45x et la carte est plus nette en zoom rapproché.\n• Précision des coordonnées améliorée.\n• Les exportations de points JourneyMap incluent désormais les zones de mobs.\n\nDonnées et interface\n• Les données actuelles ont été élargies et mises à jour : équipement, bestiaire et points de passage de la carte.\n• L'interface de sélection de la version des données a été mise à jour et le badge de Beta-Test Data affiche maintenant LEGACY.\n• Ajout d'un lien vers le Discord de Moonlit Black Cats dans le menu du hub.\n\nLocalisation et corrections\n• Correction des traductions des descriptions de cartes en espagnol et en français.\n• Mise à jour des traductions pour le nouvel équipement et les mobs renommés.\n• Correction des prérequis de compétences de Character Build et du rognage sur mobile."
+    },
     v160: {
       version: "Mise à jour des outils de carte et des points de passage - v1.6",
       title: "Mise à jour des outils de carte et des points de passage",

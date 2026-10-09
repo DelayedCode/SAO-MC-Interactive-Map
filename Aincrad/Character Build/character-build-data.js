@@ -41,6 +41,19 @@
     { id: "main-weapon", name: "Main Weapon", icon: icons.sword, group: "accessory", type: "Main Weapon" }
   ];
 
+  /* Skill points come from the same level system the Character Build page already uses: the level
+     control runs from level 1 to level 25, level 1 is the level a character starts at, and every
+     level gained after it grants SKILL_POINTS_PER_LEVEL skill points. A build may never hold more
+     unlocked skills than its level grants, so the whole tree can only be completed with the
+     testing-only "Unlimited skill points" toggle. Change these two values to change the rate. */
+  const MAX_CHARACTER_LEVEL = 25;
+  const SKILL_POINTS_PER_LEVEL = 1;
+
+  function skillPointsForLevel(level) {
+    const clamped = Math.min(MAX_CHARACTER_LEVEL, Math.max(1, Math.floor(Number(level) || 1)));
+    return (clamped - 1) * SKILL_POINTS_PER_LEVEL;
+  }
+
   const FIXED_SKILL_IDS_BY_POINT = Object.freeze({
     n39: "skill1",
     n40: "skill2",
@@ -53,14 +66,19 @@
     n13: "skill9"
   });
   let nextSkillNumber = 10;
+  /* Every class shares this layout. Each point gets a skill ID, and the four points flagged
+     "special: true" (the four larger branch nodes, also flagged "isAnchor" for rendering) are the
+     special skills: they need all four of their surrounding skills unlocked before they can be
+     unlocked themselves. */
   const SKILL_TREE_LAYOUT = Object.freeze([
     { id: "n01", x: 460, y: 20 }, { id: "n02", x: 342, y: 138 }, { id: "n03", x: 460, y: 146 },
     { id: "n04", x: 587, y: 146 }, { id: "n05", x: 524, y: 210 }, { id: "n06", x: 587, y: 210 },
     { id: "n07", x: 334, y: 210 }, { id: "n08", x: 270, y: 210 }, { id: "n09", x: 460, y: 210 },
     { id: "n10", x: 396, y: 210 }, { id: "n11", x: 650, y: 210 }, { id: "n12", x: 334, y: 273 },
     { id: "n13", x: 587, y: 273 }, { id: "n14", x: 206, y: 273 }, { id: "n15", x: 713, y: 273 },
-    { id: "n16", x: 524, y: 273 }, { id: "n17", x: 460, y: 273 }, { id: "n18", x: 334, y: 336, isAnchor: true },
-    { id: "n19", x: 587, y: 336, isAnchor: true }, { id: "n20", x: 396, y: 337 },
+    { id: "n16", x: 524, y: 273 }, { id: "n17", x: 460, y: 273 },
+    { id: "n18", x: 334, y: 336, isAnchor: true, special: true },
+    { id: "n19", x: 587, y: 336, isAnchor: true, special: true }, { id: "n20", x: 396, y: 337 },
     { id: "n21", x: 650, y: 337 }, { id: "n22", x: 524, y: 337 }, { id: "n23", x: 270, y: 337 },
     { id: "n24", x: 713, y: 337 }, { id: "n25", x: 206, y: 337 }, { id: "n26", x: 143, y: 337 },
     { id: "n27", x: 778, y: 337 }, { id: "n28", x: 460, y: 399 }, { id: "n29", x: 270, y: 399 },
@@ -71,8 +89,10 @@
     { id: "n40", x: 396, y: 464 }, { id: "n41", x: 143, y: 464 }, { id: "n42", x: 904, y: 464 },
     { id: "n43", x: 16, y: 464 }, { id: "n44", x: 777, y: 464 }, { id: "n45", x: 334, y: 527 },
     { id: "n46", x: 206, y: 527 }, { id: "n47", x: 713, y: 527 }, { id: "n48", x: 650, y: 528 },
-    { id: "n49", x: 460, y: 528 }, { id: "n50", x: 587, y: 528 }, { id: "n51", x: 334, y: 589, isAnchor: true },
-    { id: "n52", x: 587, y: 589, isAnchor: true }, { id: "n53", x: 713, y: 590 }, { id: "n54", x: 206, y: 590 },
+    { id: "n49", x: 460, y: 528 }, { id: "n50", x: 587, y: 528 },
+    { id: "n51", x: 334, y: 589, isAnchor: true, special: true },
+    { id: "n52", x: 587, y: 589, isAnchor: true, special: true }, { id: "n53", x: 713, y: 590 },
+    { id: "n54", x: 206, y: 590 },
     { id: "n55", x: 270, y: 590 }, { id: "n56", x: 396, y: 590 }, { id: "n57", x: 650, y: 590 },
     { id: "n58", x: 524, y: 590 }, { id: "n59", x: 143, y: 590 }, { id: "n60", x: 778, y: 590 },
     { id: "n61", x: 587, y: 653 }, { id: "n62", x: 334, y: 653 }, { id: "n63", x: 206, y: 654 },
@@ -108,12 +128,26 @@
     ["n70", "n74"], ["n71", "n75"], ["n72", "n74"], ["n75", "n77"], ["n76", "n77"]
   ].map((connection) => Object.freeze(connection)));
 
+  /* A second kind of "needs all of them" node, for the one skill whose connections are wider than its
+     requirement. The four points flagged "special: true" in SKILL_TREE_LAYOUT need every skill wired
+     to them, which is what SKILL_TREE_CONNECTIONS already expresses. Skill 58 is different: the graph
+     also draws its edge to the skill 52 box, and skill 52 needs skill 58 in turn, so treating every
+     connection as a requirement would lock both nodes forever. Its real requirement is the four
+     skills every class row documents for it, so those are listed here. Entries are skill IDs, and a
+     skill listed here needs all of them; every other skill still unlocks through any one neighbour. */
+  const SKILL_TREE_ALL_PREREQUISITES = Object.freeze({
+    skill58: Object.freeze(["skill49", "skill50", "skill61", "skill66"])
+  });
+
   // EDITING GUIDE: Change rows only in the class section you want to edit.
   // Each row lists name, description, stat, amount, statMode, prerequisites, and cost.
-  // Use "flat" for points or "percent" for percentages. Prerequisites are skill IDs,
-  // such as ["skill2"]; use [] when a skill has no prerequisite.
-  // Add prerequisiteMode: "any" when any one listed prerequisite is sufficient; otherwise all are required.
-  // Keep Skill 1 cost at 0 and Skills 2-77 cost at 1.
+  // Use "flat" for points or "percent" for percentages. Keep Skill 1 cost at 0 and Skills 2-77 at 1.
+  // Which skills a skill needs is decided by SKILL_TREE_CONNECTIONS above, not by this list: a skill
+  // unlocks through any directly connected skill that is already unlocked, so a node with several
+  // routes can be reached through any of them. The four nodes flagged "special: true" in
+  // SKILL_TREE_LAYOUT need all four of their surrounding skills unlocked instead, and a skill listed
+  // in SKILL_TREE_ALL_PREREQUISITES needs all of the skills listed there. A row's "prerequisites"
+  // list only documents the routes that skill was designed with.
   // This helper only indexes the explicit rows; it does not supply skill defaults.
   function indexClassSkills(className, skills) {
     return Object.freeze(
@@ -136,7 +170,7 @@
     skill1: { name: "Archer Path", description: "The center of the tree." },
     skill2: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill3: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill2"], cost: 1 },
-    skill4: { name: "Decisive Strike", stat: "Critical Power", amount: 5, statMode: "percent", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },
+    skill4: { name: "Decisive Strike", stat: "Critical Power", amount: 5, statMode: "percent", prerequisites: ["skill25", "skill3", "skill5", "skill28"], cost: 1 },
     skill5: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill25"], cost: 1 },
     skill6: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill7: { name: "Reinforced Guard", stat: "Defense", amount: 2, statMode: "flat", prerequisites: ["skill6"], cost: 1 },
@@ -162,7 +196,7 @@
     skill27: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill33"], cost: 1 },
     skill28: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill5"], cost: 1 },
     skill29: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill22"], cost: 1 },
-    skill30: { name: "Light Step", stat: "Movement Speed", amount: 3, statMode: "Percent", prerequisites: ["skill31"], cost: 1 },
+    skill30: { name: "Light Step", stat: "Movement Speed", amount: 3, statMode: "percent", prerequisites: ["skill31"], cost: 1 },
     skill31: { name: "Reinforced Vitality", stat: "Max Health", amount: 3, statMode: "flat", prerequisites: ["skill43"], cost: 1 },
     skill32: { name: "Reinforced Vitality", stat: "Max Health", amount: 3, statMode: "flat", prerequisites: ["skill22"], cost: 1 },
     skill33: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
@@ -185,7 +219,7 @@
     skill50: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill6"], cost: 1 },
     skill51: { name: "Bloodthirst", stat: "Lifesteal", amount: 0.1, statMode: "percent", prerequisites: ["skill45"], cost: 1 },
     skill52: { name: "Decisive Strike", stat: "Critical Power", amount: 5, statMode: "percent", prerequisites: ["skill50"], cost: 1 },
-    skill53: { name: "Light Step", stat: "Movement Speed", amount: 3, statMode: "Percent", prerequisites: ["skill60"], cost: 1 },
+    skill53: { name: "Light Step", stat: "Movement Speed", amount: 3, statMode: "percent", prerequisites: ["skill60"], cost: 1 },
     skill54: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill63"], cost: 1 },
     skill55: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill45"], cost: 1 },
     skill56: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill49"], cost: 1 },
@@ -221,7 +255,7 @@
     skill1: { name: "Assassin Path", description: "The center of the tree." },
     skill2: { name: "Physical Might", stat: "Physical Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill3: { name: "Physical Might", stat: "Physical Damage", amount: 1, statMode: "percent", prerequisites: ["skill2"], cost: 1 },
-    skill4: { name: "Side Step", stat: "Dodge", amount: 2, statMode: "Percent", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },
+    skill4: { name: "Side Step", stat: "Dodge", amount: 2, statMode: "percent", prerequisites: ["skill25", "skill3", "skill5", "skill28"], cost: 1 },
     skill5: { name: "Physical Might", stat: "Physical Damage", amount: 1, statMode: "percent", prerequisites: ["skill25"], cost: 1 },
     skill6: { name: "Physical Might", stat: "Physical Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill7: { name: "Reinforced Guard", stat: "Defense", amount: 2, statMode: "flat", prerequisites: ["skill6"], cost: 1 },
@@ -306,7 +340,7 @@
     skill1: { name: "Warrior Path", description: "The center of the tree." },
     skill2: { name: "Physical Might", stat: "Physical Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill3: { name: "Physical Might", stat: "Physical Damage", amount: 1, statMode: "percent", prerequisites: ["skill2"], cost: 1 },
-    skill4: { name: "Striking Force", stat: "Attack Damage", amount: 1, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },
+    skill4: { name: "Striking Force", stat: "Attack Damage", amount: 1, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], cost: 1 },
     skill5: { name: "Physical Might", stat: "Physical Damage", amount: 1, statMode: "percent", prerequisites: ["skill25"], cost: 1 },
     skill6: { name: "Physical Might", stat: "Physical Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill7: { name: "Reinforced Guard", stat: "Defense", amount: 3, statMode: "flat", prerequisites: ["skill6"], cost: 1 },
@@ -391,7 +425,7 @@
     skill1: { name: "Mage Path", description: "Description for Skill 1." },
     skill2: { name: "Arcane Might", stat: "Magic Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill3: { name: "Arcane Might", stat: "Magic Damage", amount: 1, statMode: "percent", prerequisites: ["skill2"], cost: 1 },
-    skill4: { name: "Arcane Reserve", stat: "Max Mana", amount: 2, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },
+    skill4: { name: "Arcane Reserve", stat: "Max Mana", amount: 2, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], cost: 1 },
     skill5: { name: "Arcane Might", stat: "Magic Damage", amount: 1, statMode: "percent", prerequisites: ["skill25"], cost: 1 },
     skill6: { name: "Arcane Might", stat: "Magic Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill7: { name: "Reinforced Guard", stat: "Defense", amount: 2, statMode: "flat", prerequisites: ["skill6"], cost: 1 },
@@ -476,7 +510,7 @@
     skill1: { name: "Shaman Path", description: "The center of the tree." },
     skill2: { name: "Arcane Might", stat: "Magic Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill3: { name: "Arcane Might", stat: "Magic Damage", amount: 1, statMode: "percent", prerequisites: ["skill2"], cost: 1 },
-    skill4: { name: "Healing Art", stat: "Bonus Heal", amount: 1, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },
+    skill4: { name: "Healing Art", stat: "Bonus Heal", amount: 1, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], cost: 1 },
     skill5: { name: "Arcane Might", stat: "Magic Damage", amount: 1, statMode: "percent", prerequisites: ["skill25"], cost: 1 },
     skill6: { name: "Arcane Might", stat: "Magic Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
     skill7: { name: "Reinforced Guard", stat: "Defense", amount: 2, statMode: "flat", prerequisites: ["skill6"], cost: 1 },
@@ -563,8 +597,12 @@
   global.CharacterBuildData = Object.freeze({
     classes,
     slots,
+    MAX_CHARACTER_LEVEL,
+    SKILL_POINTS_PER_LEVEL,
+    skillPointsForLevel,
     SKILL_TREE_LAYOUT,
     SKILL_TREE_CONNECTIONS,
+    SKILL_TREE_ALL_PREREQUISITES,
     ARCHER_SKILLS,
     ASSASSIN_SKILLS,
     WARRIOR_SKILLS,

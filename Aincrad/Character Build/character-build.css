@@ -520,6 +520,24 @@ input[type="search"] {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+.skill-tree-unlimited {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.skill-tree-unlimited input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #f0d59d;
+  cursor: pointer;
+}
 .skill-tree-hint {
   margin-left: auto;
   color: var(--muted);

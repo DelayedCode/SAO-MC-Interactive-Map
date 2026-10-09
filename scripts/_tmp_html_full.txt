@@ -1,0 +1,265 @@
+﻿   1: <!doctype html>
+   2: <html lang="en">
+   3:   <head>
+   4:     <meta charset="UTF-8" />
+   5:     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   6:     <meta
+   7:       http-equiv="Content-Security-Policy"
+   8:       content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+   9:     />
+  10:     <meta name="referrer" content="strict-origin-when-cross-origin" />
+  11:     <meta name="theme-color" content="#0b121a" />
+  12:     <title data-i18n="page.characterBuild.browserTitle">Character Build Mode | SAO MC Interactive Map</title>
+  13:     <meta
+  14:       name="description"
+  15:       data-i18n-content="page.characterBuild.metaDescription"
+  16:       content="Build and preview an Aincrad character with sample equipment and skills."
+  17:     />
+  18:     <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png" />
+  19:     <link rel="stylesheet" href="character-build.css" />
+  20:     <link rel="stylesheet" href="../../shared/sao-dropdown.css" />
+  21:     <link rel="stylesheet" href="../../shared/sao-polish.css" />
+  22:     <script defer src="../../shared/sao-storage.js"></script>
+  23:     <script defer src="../../shared/sao-i18n.js"></script>
+  24:     <script defer src="../../shared/sao-page-helpers.js"></script>
+  25:     <script defer src="../../shared/sao-page-utils.js"></script>
+  26:     <script defer src="../../shared/sao-content-translations.js"></script>
+  27:     <script defer src="../../shared/sao-runtime-utils.js"></script>
+  28:     <script defer src="../../shared/sao-dropdown.js"></script>
+  29:     <script defer src="../../shared/sao-walkthrough.js"></script>
+  30:     <script defer src="character-build-icons.js"></script>
+  31:     <script defer src="character-build-data.js"></script>
+  32:     <script defer src="character-build-adapter.js"></script>
+  33:     <script defer src="character-build-calculator.js"></script>
+  34:     <script defer src="character-build.js"></script>
+  35:     <script defer src="../../shared/sao-polish.js"></script>
+  36:   </head>
+  37:   <body>
+  38:     <main class="build-page">
+  39:       <nav class="nav" data-i18n-aria-label="ui.nav.sectionAria" aria-label="Section navigation">
+  40:         <button type="button" data-nav-target="menu">
+  41:           <span class="nav-icon" aria-hidden="true"
+  42:             ><svg
+  43:               class="nav-icon-arrow"
+  44:               viewBox="0 0 12 12"
+  45:               fill="none"
+  46:               stroke="currentColor"
+  47:               stroke-width="1.5"
+  48:               stroke-linecap="round"
+  49:               stroke-linejoin="round"
+  50:             >
+  51:               <path d="M10 6H2M2 6l4-4M2 6l4 4" /></svg></span
+  52:           ><span data-i18n="page.characterBuild.navBack">Go back to Menu</span>
+  53:         </button>
+  54:       </nav>
+  55: 
+  56:       <header class="page-header">
+  57:         <div>
+  58:           <p class="eyebrow" data-i18n="page.characterBuild.eyebrow">AINCRAD / BUILD LAB</p>
+  59:           <h1 data-walkthrough="character-build-title" data-i18n="page.characterBuild.title">Character Build Mode</h1>
+  60:           <p class="subtitle" data-i18n="page.characterBuild.subtitle">
+  61:             Assemble a loadout, review its combat stats, and explore prototype skill trees.
+  62:           </p>
+  63:         </div>
+  64:         <button class="reset-button" id="resetBuild" type="button">
+  65:           <span class="control-icon" data-cb-icon="reset" aria-hidden="true"></span
+  66:           ><span data-i18n="page.characterBuild.resetBuild">Reset Build</span>
+  67:         </button>
+  68:       </header>
+  69: 
+  70:       <section
+  71:         class="control-bar panel"
+  72:         data-i18n-aria-label="page.characterBuild.configuration"
+  73:         aria-label="Build configuration"
+  74:       >
+  75:         <div class="control-group source-control">
+  76:           <span class="control-label" data-i18n="page.characterBuild.dataSource">Data source</span>
+  77:           <div
+  78:             class="segmented-control"
+  79:             role="group"
+  80:             data-i18n-aria-label="page.characterBuild.dataSource"
+  81:             aria-label="Data source"
+  82:           >
+  83:             <button type="button" class="segment is-active" data-source="current">
+  84:               <span class="control-icon" data-cb-icon="current" aria-hidden="true"></span
+  85:               ><span data-i18n="page.characterBuild.currentData">Current Data</span>
+  86:             </button>
+  87:             <button type="button" class="segment" data-source="beta">
+  88:               <span class="control-icon" data-cb-icon="beta" aria-hidden="true"></span
+  89:               ><span data-i18n="page.characterBuild.betaData">Beta-Test Data</span>
+  90:             </button>
+  91:           </div>
+  92:         </div>
+  93:         <div class="control-group">
+  94:           <label class="control-label" for="buildSlot"
+  95:             ><span class="label-icon" data-cb-icon="saved" aria-hidden="true"></span
+  96:             ><span data-i18n="page.characterBuild.buildSlot">Build slot</span></label
+  97:           >
+  98:           <div class="sao-select-wrap">
+  99:             <select id="buildSlot">
+ 100:               <option value="1"></option>
+ 101:               <option value="2"></option>
+ 102:               <option value="3"></option>
+ 103:             </select>
+ 104:             <span class="sao-select-arrow" aria-hidden="true"
+ 105:               ><svg
+ 106:                 viewBox="0 0 10 10"
+ 107:                 fill="none"
+ 108:                 stroke="currentColor"
+ 109:                 stroke-width="1.4"
+ 110:                 stroke-linecap="round"
+ 111:                 stroke-linejoin="round"
+ 112:               >
+ 113:                 <path class="arrow-closed" d="M2 6.5 5 3.5l3 3" />
+ 114:                 <path class="arrow-open" d="M2 3.5 5 6.5l3-3" /></svg
+ 115:             ></span>
+ 116:           </div>
+ 117:         </div>
+ 118:         <div class="control-group level-control">
+ 119:           <label class="control-label" for="characterLevel"
+ 120:             ><span data-i18n="page.characterBuild.level">Level</span> <output id="levelValue">1</output></label
+ 121:           >
+ 122:           <div class="level-range">
+ 123:             <span aria-hidden="true">1</span>
+ 124:             <input id="characterLevel" type="range" min="1" max="25" value="1" />
+ 125:             <span aria-hidden="true">25</span>
+ 126:           </div>
+ 127:         </div>
+ 128:         <div class="control-group">
+ 129:           <label class="control-label" for="characterClass" data-i18n="page.characterBuild.class">Class</label>
+ 130:           <div class="sao-select-wrap">
+ 131:             <select id="characterClass"></select>
+ 132:             <span class="sao-select-arrow" aria-hidden="true"
+ 133:               ><svg
+ 134:                 viewBox="0 0 10 10"
+ 135:                 fill="none"
+ 136:                 stroke="currentColor"
+ 137:                 stroke-width="1.4"
+ 138:                 stroke-linecap="round"
+ 139:                 stroke-linejoin="round"
+ 140:               >
+ 141:                 <path class="arrow-closed" d="M2 6.5 5 3.5l3 3" />
+ 142:                 <path class="arrow-open" d="M2 3.5 5 6.5l3-3" /></svg
+ 143:             ></span>
+ 144:           </div>
+ 145:         </div>
+ 146:       </section>
+ 147: 
+ 148:       <div class="workspace-grid">
+ 149:         <section class="equipment-panel panel" aria-labelledby="equipmentHeading">
+ 150:           <div class="section-heading">
+ 151:             <div>
+ 152:               <p class="section-kicker" data-i18n="page.characterBuild.loadout">LOADOUT</p>
+ 153:               <h2 id="equipmentHeading">
+ 154:                 <span class="heading-icon" data-cb-icon="equipment" aria-hidden="true"></span
+ 155:                 ><span data-i18n="page.characterBuild.equipment">Equipment</span>
+ 156:               </h2>
+ 157:             </div>
+ 158:             <span class="section-count"></span>
+ 159:           </div>
+ 160:           <div class="equipment-layout">
+ 161:             <div class="slot-group">
+ 162:               <h3 data-i18n="page.characterBuild.armor">Armor</h3>
+ 163:               <div id="armorSlots" class="slot-grid"></div>
+ 164:             </div>
+ 165:             <div class="slot-group">
+ 166:               <h3 data-i18n="page.characterBuild.accessories">Accessories</h3>
+ 167:               <div id="accessorySlots" class="slot-grid accessory-grid"></div>
+ 168:             </div>
+ 169:             <div class="slot-group weapon-group">
+ 170:               <h3 data-i18n="page.characterBuild.weaponsOffhand">Weapons / Offhand</h3>
+ 171:               <div id="weaponSlots" class="slot-grid weapon-grid"></div>
+ 172:             </div>
+ 173:           </div>
+ 174:         </section>
+ 175: 
+ 176:         <aside class="stats-panel panel" aria-labelledby="statsHeading">
+ 177:           <div class="section-heading">
+ 178:             <div>
+ 179:               <p class="section-kicker" data-i18n="page.characterBuild.characterSheet">CHARACTER SHEET</p>
+ 180:               <h2 id="statsHeading">
+ 181:                 <span class="heading-icon" data-cb-icon="stats" aria-hidden="true"></span
+ 182:                 ><span data-i18n="page.characterBuild.stats">Stats</span>
+ 183:               </h2>
+ 184:             </div>
+ 185:             <span class="base-value"></span>
+ 186:           </div>
+ 187:           <div id="statsGroups" class="stats-groups"></div>
+ 188:         </aside>
+ 189:       </div>
+ 190: 
+ 191:       <section class="skills-panel panel" aria-labelledby="skillsHeading">
+ 192:         <div class="section-heading">
+ 193:           <div>
+ 194:             <p class="section-kicker" data-i18n="page.characterBuild.placeholderPreview">PROTOTYPE PREVIEW</p>
+ 195:             <h2 id="skillsHeading">
+ 196:               <span class="heading-icon" data-cb-icon="skills" aria-hidden="true"></span
+ 197:               ><span data-i18n="page.characterBuild.skillTree">Skill Tree</span> <span id="skillClassLabel"></span>
+ 198:             </h2>
+ 199:           </div>
+ 200:           <span class="preview-badge" data-i18n="page.characterBuild.sampleSkills">Prototype skills</span>
+ 201:         </div>
+ 202:         <div
+ 203:           id="skillTree"
+ 204:           class="skill-tree"
+ 205:           data-i18n-aria-label="page.characterBuild.sampleSkillTree"
+ 206:           aria-label="Prototype skill tree"
+ 207:         ></div>
+ 208:         <p class="placeholder-note" data-i18n="page.characterBuild.placeholderNote">
+ 209:           These prototype nodes demonstrate a possible class progression; they are not final skill data.
+ 210:         </p>
+ 211:       </section>
+ 212:     </main>
+ 213: 
+ 214:     <dialog id="equipmentDialog" class="equipment-dialog" aria-labelledby="dialogTitle">
+ 215:       <div class="dialog-shell">
+ 216:         <div class="dialog-header">
+ 217:           <div>
+ 218:             <p class="section-kicker" data-i18n="page.characterBuild.equipmentSelector">EQUIPMENT SELECTOR</p>
+ 219:             <h2 id="dialogTitle" data-i18n="page.characterBuild.selectEquipment">Select equipment</h2>
+ 220:           </div>
+ 221:           <button
+ 222:             class="icon-button"
+ 223:             id="closeDialog"
+ 224:             type="button"
+ 225:             data-i18n-aria-label="page.characterBuild.closeEquipmentSelector"
+ 226:             aria-label="Close equipment selector"
+ 227:           >
+ 228:             <span class="close-icon" data-cb-icon="close" aria-hidden="true"></span>
+ 229:           </button>
+ 230:         </div>
+ 231:         <div class="dialog-controls">
+ 232:           <label class="search-field"
+ 233:             ><span data-i18n="page.characterBuild.searchItems">Search items</span
+ 234:             ><input
+ 235:               id="itemSearch"
+ 236:               type="search"
+ 237:               data-i18n-placeholder="page.characterBuild.searchPlaceholder"
+ 238:               placeholder="Search by name or effect..."
+ 239:               autocomplete="off"
+ 240:           /></label>
+ 241:           <label
+ 242:             ><span data-i18n="page.characterBuild.rarity">Rarity</span>
+ 243:             <div class="sao-select-wrap">
+ 244:               <select id="rarityFilter">
+ 245:                 <option value="" data-i18n="page.characterBuild.allRarities">All rarities</option></select
+ 246:               ><span class="sao-select-arrow" aria-hidden="true"
+ 247:                 ><svg
+ 248:                   viewBox="0 0 10 10"
+ 249:                   fill="none"
+ 250:                   stroke="currentColor"
+ 251:                   stroke-width="1.4"
+ 252:                   stroke-linecap="round"
+ 253:                   stroke-linejoin="round"
+ 254:                 >
+ 255:                   <path class="arrow-closed" d="M2 6.5 5 3.5l3 3" />
+ 256:                   <path class="arrow-open" d="M2 3.5 5 6.5l3-3" /></svg
+ 257:               ></span></div
+ 258:           ></label>
+ 259:         </div>
+ 260:         <p id="pickerNotice" class="picker-notice" role="status" aria-live="polite"></p>
+ 261:         <div id="itemList" class="item-list" aria-live="polite"></div>
+ 262:       </div>
+ 263:     </dialog>
+ 264:   </body>
+ 265: </html>

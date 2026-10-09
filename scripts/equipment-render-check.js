@@ -381,20 +381,28 @@ async function verifyOccultBonusRows(page, language) {
       await verifyOccultBonusRows(page, language);
     }
 
-    /* The Current dataset ships accessories only: the other categories are still empty states, and
-       the accessory tab renders every supplied Current accessory. The Compendium restores the last
-       category and search it stored, so both are set explicitly before asserting. */
+    /* The Current dataset ships its own floor 1 equipment (accessories, the beginner weapons and
+       armour, the Starting Town tools, consumables, dungeon keys and materials), and
+       verifyCurrentDataset below renders every supplied category. A category the dataset still
+       leaves out keeps its localized empty state. The Compendium restores the last category and
+       search it stored, so both are set explicitly before asserting. */
     await page.goto(`${rootUrl}/Aincrad/eCompendium/ecompendium.html?floor=floor1&dataset=current`, {
       waitUntil: "networkidle",
       timeout: 120000
     });
     await page.locator("#ecompendiumSearch").fill("");
-    await page.locator('.list-tab[data-category="weapon"]').click();
+    const currentEmptyCategory = await page.evaluate(() => {
+      const floor = window.SAO_CURRENT_EQUIPMENT_DATA?.floor1 || {};
+      const categories = [...document.querySelectorAll(".list-tab")].map((tab) => tab.dataset.category);
+      return categories.find((category) => !Array.isArray(floor[category]) || floor[category].length === 0) || null;
+    });
+    assert.ok(currentEmptyCategory, "the Current dataset still leaves at least one category without records");
+    await page.locator(`.list-tab[data-category="${currentEmptyCategory}"]`).click();
     await page.locator(".empty-state").waitFor();
     assert.equal(
       await page.locator(".ecompendium-card").count(),
       0,
-      "Current Data ships no weapon records"
+      `Current Data ships no ${currentEmptyCategory} records`
     );
     await page.evaluate(() => window.SAOI18n.setLanguage("es"));
     assert.equal(

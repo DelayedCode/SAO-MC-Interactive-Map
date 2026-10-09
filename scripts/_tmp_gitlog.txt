@@ -1,0 +1,14 @@
+7b7bd5a Expand the map cursor into a site-wide cursor system
+06bfd4f Add a purpose-built map cursor whose tip is the exact cursor hotspot
+c13342d Redesign the map coordinate system as an authoritative per-floor calibration
+897080d snapshot: full working-tree WIP before authoritative coordinate-system redesign (recoverable backup)
+5a2f573 Map Tools & Waypoint Update - v1.6
+df873cc Maps, Character Build & Site Improvements - v1.5
+d175b35 v1.4
+abc4879 Language and Compatibility Update - v1.3
+f326e96 Very Small Bug Fix - v1.2
+4152c0f Final Touches Till Full Release - v1.1
+fc38325 Full Release v1.0
+01e6d86 Completed everything on Floor 1 and Floor 2, at least from what I currently know. That said, changes will almost certainly come to both floors at some point, so don't get too attached to the current information.
+387af04 v0.1.0 Alpha
+f8e68e8 Initial commit

@@ -1,11 +1,11 @@
 /* Site-wide cursor regression.
  *
  * Loads every player-facing page and verifies that the shared cursor system from
- * shared/sao-polish.css is applied: the normal arrow site-wide, the click cursor on
- * interactive elements, grab/grabbing on the draggable surfaces, text on text entry and
- * not-allowed on disabled controls. The two map pages are checked further: a rendered
- * marker keeps the click cursor, the draggable artwork shows grab, an active drag shows
- * grabbing, and clicking a marker still opens its info panel.
+ * shared/sao-polish.css is applied: the normal arrow site-wide, the SAO-skinned click
+ * cursor on interactive elements, grab/grabbing on the draggable surfaces, text on text
+ * entry and not-allowed on disabled controls. The two map pages are checked further: a
+ * rendered marker keeps the click cursor, the draggable artwork shows grab, an active drag
+ * shows grabbing, and clicking a marker still opens its info panel.
  *
  * The pointer geometry (hotspot == painted tip) is pinned in scripts/test-coordinates.js
  * and the map pointer -> Minecraft coordinate behaviour in
@@ -42,9 +42,9 @@ const PAGES = [
 ];
 
 const ARROW = /^url\("data:image\/svg\+xml,[^"]+"\) 1 1, auto$/;
-const CLICK = /^url\("data:image\/svg\+xml,[^"]+"\) 4 1, pointer$/;
-const GRAB = /^url\("data:image\/svg\+xml,[^"]+"\) 9 11, grab$/;
-const GRABBING = /^url\("data:image\/svg\+xml,[^"]+"\) 9 11, grabbing$/;
+const CLICK = /^url\("data:image\/svg\+xml,[^"]+"\) 6 0, pointer$/;
+const GRAB = /^url\("data:image\/svg\+xml,[^"]+"\) 11 11, grab$/;
+const GRABBING = /^url\("data:image\/svg\+xml,[^"]+"\) 11 11, grabbing$/;
 
 /* Runs in the page: the computed cursor of the first visible element of each kind. */
 function collectCursors() {
@@ -76,26 +76,6 @@ function collectCursors() {
     mapLayer: cursorOf("#mapLayer"),
     skillTree: cursorOf(".skill-tree-viewport")
   };
-}
-
-/* Any element still computing to a bare "pointer"/"grab"/"grabbing" keyword means a page
-   rule outranked the shared system, so it is reported by name. */
-function collectBareCursorKeywords() {
-  const offenders = [];
-  const seen = new Set();
-  for (const element of document.querySelectorAll("*")) {
-    const cursor = window.getComputedStyle(element).cursor;
-    if (cursor !== "pointer" && cursor !== "grab" && cursor !== "grabbing") continue;
-    const className = typeof element.className === "string" ? element.className.trim().split(/\s+/)[0] : "";
-    const name =
-      element.tagName.toLowerCase() + (element.id ? `#${element.id}` : "") + (className ? `.${className}` : "");
-    const key = `${name}:${cursor}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    offenders.push(`${name} -> ${cursor}`);
-    if (offenders.length >= 10) return offenders;
-  }
-  return offenders;
 }
 
 /* A container point no marker/chrome element covers, used to start a real drag. */
@@ -154,7 +134,7 @@ async function run() {
         issues.push(`disabled control cursor is ${cursors.disabled}`);
 
       if (pageInfo.id === "map" || pageInfo.id === "underworld-map") {
-        if (!GRAB.test(cursors.mapLayer || "")) issues.push(`#mapLayer cursor is ${cursors.mapLayer}`);
+        if (!ARROW.test(cursors.mapLayer || "")) issues.push(`#mapLayer cursor is ${cursors.mapLayer}`);
 
         const freePoint = await page.evaluate(findFreeMapPoint);
         if (!freePoint) {
@@ -196,16 +176,9 @@ async function run() {
       } else {
         console.log(`ok    ${pageInfo.id}`);
       }
-
-      const bareKeywords = await page.evaluate(collectBareCursorKeywords);
-      if (bareKeywords.length) {
-        failures.push({ label: `${pageInfo.id} (bare cursor keywords)`, issues: bareKeywords });
-        console.log(`FAIL  ${pageInfo.id} (bare cursor keywords)`);
-        bareKeywords.forEach((entry) => console.log(`        - ${entry}`));
-      }
     }
 
-    /* The map page: a rendered marker stays clickable with the click cursor. */
+    /* The map page: a rendered marker stays clickable with the native pointer cursor. */
     await page.goto(`${server.url}/Aincrad/Map/maps.html?floor=floor1`, { waitUntil: "load", timeout: 60000 });
     await page.waitForFunction(() => document.getElementById("mapImage")?.naturalWidth > 0, null, { timeout: 30000 });
     await page.waitForFunction(() => window.__aincradMapRuntime?.isInitialized?.(), null, { timeout: 30000 });

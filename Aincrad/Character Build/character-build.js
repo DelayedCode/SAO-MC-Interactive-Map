@@ -17,7 +17,13 @@
     "page.characterBuild.readyToUnlock": "Ready to unlock",
     "page.characterBuild.none": "None",
     "page.characterBuild.prototypeTree": "Prototype tree",
-    "page.characterBuild.prototypeDataOnly": "Prototype data only"
+    "page.characterBuild.prototypeDataOnly": "Prototype data only",
+    "page.characterBuild.skillPoints": "{class} · {remaining} / {total} skill points",
+    "page.characterBuild.skillPointsUnlimited": "{class} · {spent} spent · Unlimited skill points",
+    "page.characterBuild.unlimitedSkillPoints": "Unlimited skill points",
+    "page.characterBuild.unlimitedSkillPointsHint":
+      "Testing only: unlock skills without spending the skill points your level grants.",
+    "page.characterBuild.requiresMorePoints": "Requires {value}"
   };
   const t = (key, params) => {
     const template = i18n ? i18n.t(key, params) : fallbackLabels[key] || key;
@@ -145,7 +151,7 @@
   function restoreBuildState(target, saved) {
     if (!saved || typeof saved !== "object") return;
     target.source = saved.source === "current" ? "current" : DEFAULT_SOURCE;
-    target.level = Math.min(25, Math.max(1, Number(saved.level) || 1));
+    target.level = Math.min(data.MAX_CHARACTER_LEVEL || 25, Math.max(1, Number(saved.level) || 1));
     target.classId = data.classes.some((item) => item.id === saved.classId) ? saved.classId : target.classId;
     target.equipment = saved.equipment && typeof saved.equipment === "object" ? saved.equipment : {};
     target.runes = saved.runes && typeof saved.runes === "object" ? saved.runes : {};
@@ -179,13 +185,18 @@
     return data.SKILL_TREE_LAYOUT.map((point) => {
       const config = classSkills[point.skillId];
       const center = point.skillId === "skill1";
-      const skill58 = point.skillId === "skill58";
+      /* The four special nodes need all four of their surrounding skills unlocked, and any skill the
+         data lists in SKILL_TREE_ALL_PREREQUISITES needs exactly the skills listed there. Every other
+         node unlocks through any one directly connected skill that is already unlocked, so a node with
+         several legitimate routes can be reached through any of them. */
+      const special = Boolean(point.special);
+      const requiredSkillIds = data.SKILL_TREE_ALL_PREREQUISITES?.[point.skillId];
       const value = center ? null : config.statMode === "percent" ? `${config.amount}%` : config.amount;
       const prerequisiteSkillIds = center
         ? []
-        : skill58
-          ? config.prerequisites
-          : skillNeighborsById.get(point.skillId);
+        : requiredSkillIds
+          ? [...requiredSkillIds]
+          : skillNeighborsById.get(point.skillId) || [];
       return {
         id: skillNodeId(state.classId, point.skillId),
         nodeId: point.skillId,
@@ -195,13 +206,14 @@
         className: skillClassName(state.classId),
         ...(center ? {} : { stat: config.stat, amount: config.amount, statMode: config.statMode }),
         cost: center ? 0 : 1,
-        prerequisiteMode: center || !skill58 ? "any" : "all",
+        prerequisiteMode: special || requiredSkillIds ? "all" : "any",
         prerequisites: prerequisiteSkillIds.map((id) => skillNodeId(state.classId, id)),
         effects: center ? [] : [{ stat: config.stat, value }],
         x: point.x,
         y: point.y,
         branch: center ? "core" : "branch",
-        center
+        center,
+        special
       };
     });
   }
@@ -221,15 +233,25 @@
     const selectedSkillIds = new Set(
       Object.keys(build.selectedSkills || {}).filter((skillId) => build.selectedSkills[skillId])
     );
-    let removedInvalidSkill;
-    do {
-      removedInvalidSkill = false;
+    const costsById = new Map(currentSkillTree().map((node) => [node.id, node.cost]));
+    /* Repeat until the build is stable: dropping a skill invalidates the skills that were unlocked
+       through it, and a build spending more points than its level grants (for example after lowering
+       the level) drops its most recently unlocked skills until it fits the pool again. */
+    let changed = true;
+    while (changed) {
+      changed = false;
       currentSkillTree().forEach((node) => {
         if (node.center || !selectedSkillIds.has(node.id) || skillPrerequisitesSatisfied(node, selectedSkillIds)) return;
         selectedSkillIds.delete(node.id);
-        removedInvalidSkill = true;
+        changed = true;
       });
-    } while (removedInvalidSkill);
+      if (changed || unlimitedSkillPoints()) continue;
+      const unlockedSkillIds = [...selectedSkillIds].filter((skillId) => costsById.has(skillId));
+      const spent = unlockedSkillIds.reduce((points, skillId) => points + costsById.get(skillId), 0);
+      if (spent <= skillPointPool()) continue;
+      selectedSkillIds.delete(unlockedSkillIds[unlockedSkillIds.length - 1]);
+      changed = true;
+    }
     build.selectedSkills = Object.fromEntries([...selectedSkillIds].map((skillId) => [skillId, true]));
   }
   function missingSkillPrerequisites(node) {
@@ -239,11 +261,51 @@
   function selectedSkillNodes() {
     return currentSkillTree().filter((node) => isSkillUnlocked(node.id));
   }
+  /* Skill points: the character level grants a pool (see character-build-data.js) and every unlocked
+     skill spends its own cost from that pool, so a build can never hold more skills than its level
+     allows. The testing-only "Unlimited skill points" setting ignores the pool without touching the
+     level itself, so the level-based restrictions come straight back when it is switched off. */
+  function skillPointPool() {
+    return typeof data.skillPointsForLevel === "function" ? data.skillPointsForLevel(state.level) : 0;
+  }
+  function spentSkillPoints() {
+    return currentSkillTree().reduce((points, node) => points + (isSkillUnlocked(node.id) ? node.cost : 0), 0);
+  }
+  let unlimitedSkillPointsEnabled = false;
+  function unlimitedSkillPoints() {
+    return unlimitedSkillPointsEnabled;
+  }
+  function syncUnlimitedSkillPointsSetting() {
+    const settingsApi = window.SAOI18n;
+    const settings = settingsApi && typeof settingsApi.getSettings === "function" ? settingsApi.getSettings() : null;
+    unlimitedSkillPointsEnabled = Boolean(settings && settings.unlimitedSkillPoints);
+  }
   function availableSkillPoints() {
-    const skills = currentSkillTree();
-    const total = skills.reduce((points, node) => points + node.cost, 0);
-    const spent = skills.reduce((points, node) => points + (isSkillUnlocked(node.id) ? node.cost : 0), 0);
-    return Math.max(0, total - spent);
+    if (unlimitedSkillPoints()) return Number.POSITIVE_INFINITY;
+    return Math.max(0, skillPointPool() - spentSkillPoints());
+  }
+  function skillPointsLabel() {
+    const className = skillClassName(state.classId);
+    if (unlimitedSkillPoints()) {
+      return t("page.characterBuild.skillPointsUnlimited", { class: className, spent: spentSkillPoints() });
+    }
+    return t("page.characterBuild.skillPoints", {
+      class: className,
+      remaining: availableSkillPoints(),
+      total: skillPointPool()
+    });
+  }
+  function setUnlimitedSkillPoints(enabled) {
+    const settingsApi = window.SAOI18n;
+    if (settingsApi && typeof settingsApi.updateSettings === "function") {
+      settingsApi.updateSettings({ unlimitedSkillPoints: Boolean(enabled) });
+    }
+    syncUnlimitedSkillPointsSetting();
+    /* Switching the limit back on can leave a build spending more points than its level grants. */
+    pruneInvalidSelectedSkills();
+    saveState();
+    updateSkillTreeState();
+    renderStats();
   }
   function activeItems() {
     return adapter.getItems(state.source);
@@ -510,11 +572,14 @@
         })
       };
     }
-    if (node.cost > availableSkillPoints()) {
+    const missingPoints = unlimitedSkillPoints() ? 0 : node.cost - availableSkillPoints();
+    if (missingPoints > 0) {
       return {
         name: "locked",
         label: statusLabel("locked"),
-        reason: `Need ${node.cost - availableSkillPoints()} more skill point${node.cost - availableSkillPoints() === 1 ? "" : "s"}.`
+        reason: t("page.characterBuild.requiresMorePoints", {
+          value: `${missingPoints} more skill point${missingPoints === 1 ? "" : "s"}`
+        })
       };
     }
     return { name: "available", label: statusLabel("available"), reason: t("page.characterBuild.readyToUnlock") };
@@ -545,6 +610,10 @@
       : "";
     $("skillDetail").innerHTML =
       `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(node.className)}</span>${descriptionDetail}${effectDetail}${prerequisiteDetail}<span>Cost: ${node.cost} skill point${node.cost === 1 ? "" : "s"}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
+    /* Remembered so a re-render that is not about a specific node (a level or toggle change) keeps
+       showing the skill the visitor is reading instead of jumping back to the centre. */
+    const detailPanel = $("skillDetail");
+    if (detailPanel.dataset) detailPanel.dataset.skillDetailId = node.id;
   }
 
   function renderSkills(selectedNodeId) {
@@ -598,7 +667,11 @@
     const selectedNode = skillsById.get(selectedNodeId) || skills.find((node) => node.center);
     $("skillTree").innerHTML = `
       <div class="skill-tree-toolbar">
-        <span data-skill-points>${escapeHtml(skillClassName(state.classId))} · ${availableSkillPoints()} / ${skills.reduce((sum, node) => sum + node.cost, 0)} skill points</span>
+        <span data-skill-points>${escapeHtml(skillPointsLabel())}</span>
+        <label class="skill-tree-unlimited" title="${escapeHtml(t("page.characterBuild.unlimitedSkillPointsHint"))}">
+          <input type="checkbox" data-unlimited-skill-points${unlimitedSkillPoints() ? " checked" : ""} />
+          <span>${escapeHtml(t("page.characterBuild.unlimitedSkillPoints"))}</span>
+        </label>
         <button class="skill-tree-reset" type="button" data-reset-view>Reset View</button>
       </div>
       <div class="skill-tree-viewport" id="skillTreeViewport" aria-label="Skill tree viewport">
@@ -632,11 +705,10 @@
       line.classList.toggle("is-active", fromSelected || toSelected);
     });
     const pointsLabel = $("skillTree").querySelector?.("[data-skill-points]");
-    if (pointsLabel) {
-      const total = skills.reduce((sum, node) => sum + node.cost, 0);
-      pointsLabel.textContent = `${skillClassName(state.classId)} · ${availableSkillPoints()} / ${total} skill points`;
-    }
-    renderSkillDetail(selectedNodeId);
+    if (pointsLabel) pointsLabel.textContent = skillPointsLabel();
+    const unlimitedToggle = $("skillTree").querySelector?.("[data-unlimited-skill-points]");
+    if (unlimitedToggle) unlimitedToggle.checked = unlimitedSkillPoints();
+    renderSkillDetail(selectedNodeId || $("skillDetail")?.dataset?.skillDetailId);
   }
 
   const skillTreeViewState = {
@@ -651,15 +723,33 @@
     userInteracted: false,
     resizeListenerBound: false,
     dragging: false,
+    suppressClick: false,
     pointerId: null
   };
+
+  /* How far the pointer must travel before a press becomes a pan instead of a click on a skill. */
+  const SKILL_TREE_DRAG_THRESHOLD = 4;
+  /* The interactive zoom limits. The fitted view is the smallest the tree gets on wide screens; on
+     screens narrower than the tree, the fitted scale drops below the interactive minimum so the whole
+     tree still fits its frame instead of spilling out of the clipped viewport. */
+  const SKILL_TREE_MAX_SCALE = 2;
+  const SKILL_TREE_MIN_SCALE = 0.4;
+
+  function skillTreeFitScale(viewport = $("skillTreeViewport")) {
+    const width = (viewport && viewport.clientWidth) || 921;
+    const height = (viewport && viewport.clientHeight) || 923;
+    return Math.max(0.1, Math.min(0.94, (width - 24) / 921, (height - 24) / 923));
+  }
+
+  function skillTreeMinScale() {
+    return Math.min(SKILL_TREE_MIN_SCALE, skillTreeFitScale());
+  }
 
   function resetSkillTreeViewport(viewport) {
     if (!viewport) return;
     const width = viewport.clientWidth || 921;
     const height = viewport.clientHeight || 923;
-    const scale = Math.min(0.94, (width - 24) / 921, (height - 24) / 923);
-    skillTreeViewState.scale = Math.max(0.4, scale);
+    skillTreeViewState.scale = skillTreeFitScale(viewport);
     skillTreeViewState.offsetX = (width - 921 * skillTreeViewState.scale) / 2;
     skillTreeViewState.offsetY = (height - 923 * skillTreeViewState.scale) / 2;
     skillTreeViewState.userInteracted = false;
@@ -670,7 +760,7 @@
     const viewport = $("skillTreeViewport");
     const canvas = $("skillTreeCanvas");
     if (!viewport || !canvas) return;
-    const clamped = Math.min(2, Math.max(0.4, skillTreeViewState.scale));
+    const clamped = Math.min(SKILL_TREE_MAX_SCALE, Math.max(skillTreeMinScale(), skillTreeViewState.scale));
     skillTreeViewState.scale = clamped;
     if (canvas.style) canvas.style.transform = `translate(${skillTreeViewState.offsetX}px, ${skillTreeViewState.offsetY}px) scale(${clamped})`;
     if (viewport.classList && typeof viewport.classList.toggle === "function") {
@@ -701,10 +791,15 @@
     }
 
     const clampOffset = () => {
-      const minX = Math.min(0, viewport.clientWidth - 921 * skillTreeViewState.scale);
-      const minY = Math.min(0, viewport.clientHeight - 923 * skillTreeViewState.scale);
-      const maxX = Math.max(0, viewport.clientWidth - 921 * skillTreeViewState.scale);
-      const maxY = Math.max(0, viewport.clientHeight - 923 * skillTreeViewState.scale);
+      /* The tree may be dragged until a large part of the viewport is empty on either side, which is
+         far more room than the old fixed box allowed, while it always keeps a visible part on screen
+         and Reset View restores the fitted view, so it can never be lost. */
+      const marginX = Math.max(48, viewport.clientWidth * 0.35);
+      const marginY = Math.max(48, viewport.clientHeight * 0.35);
+      const minX = Math.min(0, viewport.clientWidth - 921 * skillTreeViewState.scale) - marginX;
+      const minY = Math.min(0, viewport.clientHeight - 923 * skillTreeViewState.scale) - marginY;
+      const maxX = Math.max(0, viewport.clientWidth - 921 * skillTreeViewState.scale) + marginX;
+      const maxY = Math.max(0, viewport.clientHeight - 923 * skillTreeViewState.scale) + marginY;
       skillTreeViewState.offsetX = Math.max(minX, Math.min(maxX, skillTreeViewState.offsetX));
       skillTreeViewState.offsetY = Math.max(minY, Math.min(maxY, skillTreeViewState.offsetY));
     };
@@ -715,7 +810,10 @@
       const pointerX = event.clientX - rect.left;
       const pointerY = event.clientY - rect.top;
       const previousScale = skillTreeViewState.scale;
-      const nextScale = Math.min(2, Math.max(0.4, previousScale * (event.deltaY < 0 ? 1.12 : 0.89)));
+      const nextScale = Math.min(
+        SKILL_TREE_MAX_SCALE,
+        Math.max(skillTreeMinScale(), previousScale * (event.deltaY < 0 ? 1.12 : 0.89))
+      );
       const worldX = (pointerX - skillTreeViewState.offsetX) / previousScale;
       const worldY = (pointerY - skillTreeViewState.offsetY) / previousScale;
       skillTreeViewState.scale = nextScale;
@@ -727,30 +825,33 @@
     }, { passive: false });
 
     viewport.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0 || !event.isPrimary || skillTreeViewState.dragging) return;
-      if (event.target.closest("[data-skill-id]")) return;
-      event.preventDefault();
-      skillTreeViewState.dragging = true;
+      if (event.button !== 0 || !event.isPrimary || skillTreeViewState.pointerId !== null) return;
+      /* The press is only remembered here. The tree starts moving once the pointer travels past the
+         click threshold, and the pointer is captured at that point: capturing on every press would
+         retarget the click that follows, so a plain press could no longer unlock a skill. */
       skillTreeViewState.pointerId = event.pointerId;
       skillTreeViewState.pointerStartX = event.clientX;
       skillTreeViewState.pointerStartY = event.clientY;
       skillTreeViewState.originX = skillTreeViewState.offsetX;
       skillTreeViewState.originY = skillTreeViewState.offsetY;
-      skillTreeViewState.userInteracted = true;
-      try {
-        viewport.setPointerCapture?.(event.pointerId);
-      } catch {
-        skillTreeViewState.dragging = false;
-        skillTreeViewState.pointerId = null;
-        applySkillTreeTransform();
-      }
-      if (skillTreeViewState.dragging) applySkillTreeTransform();
+      skillTreeViewState.dragging = false;
+      skillTreeViewState.suppressClick = false;
     });
 
     viewport.addEventListener("pointermove", (event) => {
-      if (!skillTreeViewState.dragging || event.pointerId !== skillTreeViewState.pointerId) return;
+      if (event.pointerId !== skillTreeViewState.pointerId) return;
       const deltaX = event.clientX - skillTreeViewState.pointerStartX;
       const deltaY = event.clientY - skillTreeViewState.pointerStartY;
+      if (!skillTreeViewState.dragging) {
+        if (Math.hypot(deltaX, deltaY) < SKILL_TREE_DRAG_THRESHOLD) return;
+        skillTreeViewState.dragging = true;
+        skillTreeViewState.userInteracted = true;
+        try {
+          viewport.setPointerCapture?.(event.pointerId);
+        } catch {
+          /* Pointer capture is only an optimisation: dragging still works without it. */
+        }
+      }
       skillTreeViewState.offsetX = skillTreeViewState.originX + deltaX;
       skillTreeViewState.offsetY = skillTreeViewState.originY + deltaY;
       clampOffset();
@@ -758,11 +859,14 @@
     });
 
     const stopDrag = (event) => {
-      if (!skillTreeViewState.dragging) return;
       if (event && event.pointerId !== skillTreeViewState.pointerId) return;
       const pointerId = skillTreeViewState.pointerId;
+      const wasDragging = skillTreeViewState.dragging;
       skillTreeViewState.dragging = false;
       skillTreeViewState.pointerId = null;
+      /* A pointer that moved was a pan, not a click, so the click the browser delivers next is
+         ignored instead of unlocking the skill under the pointer. */
+      skillTreeViewState.suppressClick = wasDragging;
       if (pointerId !== null && viewport.hasPointerCapture?.(pointerId)) {
         viewport.releasePointerCapture(pointerId);
       }
@@ -777,6 +881,9 @@
       $("skillTree").querySelector("[data-reset-view]")?.addEventListener("click", (event) => {
         event.stopPropagation();
         resetSkillTreeViewport($("skillTreeViewport"));
+      });
+      $("skillTree").querySelector("[data-unlimited-skill-points]")?.addEventListener("change", (event) => {
+        setUnlimitedSkillPoints(event.target.checked);
       });
     }
   }
@@ -1060,8 +1167,12 @@
     $("characterLevel").addEventListener("input", (event) => {
       state.level = Number(event.target.value);
       activeSkillState().level = state.level;
+      /* The level decides how many skill points the build may spend, so lowering it drops the skills
+         that no longer fit and refreshes the tree with the new pool. */
+      pruneInvalidSelectedSkills();
       renderConfiguration();
       renderStats();
+      updateSkillTreeState();
       if ($("equipmentDialog").open) renderItems();
       saveState();
     });
@@ -1119,6 +1230,11 @@
       if (button) equipItem(button.dataset.itemId);
     });
     $("skillTree").addEventListener("click", (event) => {
+      /* A pan that ended over a skill node must not unlock it. */
+      if (skillTreeViewState.suppressClick) {
+        skillTreeViewState.suppressClick = false;
+        return;
+      }
       const button = event.target.closest("[data-skill-id]");
       if (button) unlockSkill(button.dataset.skillId);
     });
@@ -1129,6 +1245,12 @@
     $("skillTree").addEventListener("focusin", (event) => {
       const button = event.target.closest("[data-skill-id]");
       if (button) renderSkillDetail(button.dataset.skillId);
+    });
+    /* The testing toggle lives with the site settings, so keep the tree in step if the setting is
+       changed from anywhere else. */
+    window.SAOI18n?.onSettingsChange?.(() => {
+      syncUnlimitedSkillPointsSetting();
+      updateSkillTreeState();
     });
   }
 
@@ -1151,6 +1273,7 @@
     mountIcons();
     registerCharacterBuildTranslations();
     loadState();
+    syncUnlimitedSkillPointsSetting();
     renderConfiguration();
     renderSlots();
     renderStats();

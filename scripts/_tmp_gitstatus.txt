@@ -1,0 +1,60 @@
+ M Aincrad/Bestiary/bestiary.js
+ M Aincrad/Bestiary/bestiary_current.js
+ M Aincrad/Bestiary/bestiary_floor1.js
+ M Aincrad/Map/maps.js
+ M Aincrad/Map/maps_current.js
+ M Aincrad/eCompendium/ecompendium_current.js
+ M "Fractured Underworld/Main UI/mainui.js"
+ M package.json
+ M scripts/run-browser-tests.js
+ M scripts/test-clustering.js
+ M scripts/test-coordinate-lifecycle-browser.js
+ M scripts/test-coordinates.js
+ M scripts/test-current-equipment.js
+ M scripts/test-current-waypoints.js
+ M scripts/test-cursor-site-wide.js
+ M scripts/test-data-mode-pages-browser.js
+ M scripts/test-equipment-data-quality.js
+ M scripts/test-journeymap-color-picker.js
+ M shared/sao-content-translations.js
+ M shared/sao-map-helpers.js
+ M shared/sao-polish.css
+?? scripts/_hub_disclaimer.png
+?? scripts/_inspect_hub.js
+?? scripts/_inspect_hub2.js
+?? scripts/_tmp_cbA.txt
+?? scripts/_tmp_cbB.txt
+?? scripts/_tmp_cbC.txt
+?? scripts/_tmp_cbD.txt
+?? scripts/_tmp_cbE.txt
+?? scripts/_tmp_cbF.txt
+?? scripts/_tmp_cbG.txt
+?? scripts/_tmp_cbH.txt
+?? scripts/_tmp_cbI.txt
+?? scripts/_tmp_cbJ.txt
+?? scripts/_tmp_cbK.txt
+?? scripts/_tmp_cb_0_139.txt
+?? scripts/_tmp_cb_1.txt
+?? scripts/_tmp_cb_1080_end.txt
+?? scripts/_tmp_cb_140_245.txt
+?? scripts/_tmp_cb_2.txt
+?? scripts/_tmp_cb_245_495.txt
+?? scripts/_tmp_cb_3.txt
+?? scripts/_tmp_cb_4.txt
+?? scripts/_tmp_cb_560_639.txt
+?? scripts/_tmp_cb_640_800.txt
+?? scripts/_tmp_cb_800_1079.txt
+?? scripts/_tmp_dataA.txt
+?? scripts/_tmp_data_0_135.txt
+?? scripts/_tmp_data_480_end.txt
+?? scripts/_tmp_gitlog.txt
+?? scripts/_tmp_pnglist.txt
+?? scripts/_tmp_test1.txt
+?? scripts/cursor-artwork.js
+?? scripts/test-cursor-hotspot-browser.js
+?? scripts/test-map-zoom-browser.js
+?? scripts/test-map-zoom.js
+?? skill-tree-four-condition.png
+?? skill-tree-incorrect-route.png
+?? skill-tree-route.png
+?? stats-current.png

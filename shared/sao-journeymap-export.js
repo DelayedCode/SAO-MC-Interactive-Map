@@ -27,6 +27,11 @@
     resourceLocation: "journeymap:textures/waypoint/icon/waypoint-icon.png"
   });
 
+  /* The website category that owns mob areas. Mob-area members live beside the marker dataset
+     because each one is a polygon rather than a point, so the collector reads them from their own
+     input; the name matches the category button, the colour table and the adapter declaration. */
+  const MOB_AREA_CATEGORY = "mobAreas";
+
   const colorUtils =
     (typeof require === "function" && typeof module !== "undefined" && module.exports)
       ? require("./sao-color-utils.js")
@@ -444,12 +449,25 @@
     const options = config || {};
     const categories = options.categories || {};
     const markers = options.markers || {};
+    const mobAreas = Array.isArray(options.mobAreas) ? options.mobAreas : [];
     const floor = String(options.floor || "");
     const world = String(options.world || "");
     const dimensionId = String(options.dimensionId || "");
     const resolveCustomCategoryColor =
       typeof options.resolveCustomCategoryColor === "function" ? options.resolveCustomCategoryColor : () => null;
+    /* Mob areas are polygons rather than points, so their export position is the same centre the
+       map pins them to. The map pages hand in the shared helper; the global lookup keeps the
+       collector usable on its own. */
+    const resolveMobAreaCenter =
+      typeof options.resolveMobAreaCenter === "function"
+        ? options.resolveMobAreaCenter
+        : typeof global.SAOMapHelpers?.getMobAreaCenter === "function"
+          ? global.SAOMapHelpers.getMobAreaCenter
+          : null;
     const result = {};
+    /* One waypoint per source identity: markers and mob areas feed the same export, so an id is
+       claimed once and a duplicate can never reach the file. */
+    const exportedIds = new Set();
 
     Object.entries(categories).forEach(([category, isEnabled]) => {
       if (!isEnabled) return;
@@ -486,8 +504,45 @@
           id: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`)
         };
         if (!result[exportCategory]) result[exportCategory] = [];
+        exportedIds.add(entry.uuid);
         result[exportCategory].push(entry);
       });
+
+      /* Mob areas are the one website category whose members are not markers: every area is a
+         polygon that exports as a single waypoint at its centre, keeping the category's own group,
+         colour and name so the exported file reads like the map. */
+      if (category === MOB_AREA_CATEGORY && resolveMobAreaCenter) {
+        mobAreas.forEach((area) => {
+          if (!area || area.floor !== floor) return;
+          const center = resolveMobAreaCenter(area);
+          if (!center || !Number.isFinite(center.x) || !Number.isFinite(center.z)) return;
+          const areaId = String(area.id || `${MOB_AREA_CATEGORY}:${floor}:${center.x}:${center.z}`);
+          if (exportedIds.has(areaId)) return;
+          exportedIds.add(areaId);
+
+          const categoryColor =
+            colorUtils?.getHardcodedCategoryColor?.(MOB_AREA_CATEGORY) ||
+            colorUtils?.getJourneyMapColorValue?.(MOB_AREA_CATEGORY, { world });
+
+          const entry = {
+            name: String(area.title || area.id || MOB_AREA_CATEGORY).trim() || MOB_AREA_CATEGORY,
+            x: Math.round(center.x),
+            y: -30,
+            z: Math.round(center.z),
+            dim: dimensionId,
+            icon: area.icon || "pin",
+            color: categoryColor,
+            categoryColor,
+            enabled: 1,
+            visible: 1,
+            group: MOB_AREA_CATEGORY,
+            uuid: areaId,
+            id: areaId
+          };
+          if (!result[MOB_AREA_CATEGORY]) result[MOB_AREA_CATEGORY] = [];
+          result[MOB_AREA_CATEGORY].push(entry);
+        });
+      }
     });
 
     return result;
