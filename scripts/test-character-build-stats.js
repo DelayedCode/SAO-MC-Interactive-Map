@@ -270,19 +270,58 @@ assert.strictEqual(calculator.normalizeStatName("Bonus Attack Speed"), "Attack S
 assert.strictEqual(calculator.normalizeStatName("Critical Damage"), "Critical Hit Damage");
 assert.strictEqual(calculator.normalizeStatName("ability damage"), "Skill Damage");
 assert.strictEqual(calculator.normalizeStatName("Bonus Movement Speed"), "Movement Speed");
-const baseStats = calculator.createBaseStats();
+/* Level 1 class base stats: the values a character actually starts with. They are starting values,
+   not a bonus applied after the calculation, so they are present at every level and the per-level
+   gains stack on top of them. */
+const expectedBaseStats = {
+  guerrier: {
+    flat: { Health: 28, Damage: 1, Mana: 20, Evasion: 5 },
+    percent: { "Attack Speed": 12.5, "Critical Hit Chance": 1, "Critical Hit Damage": 200, "Movement Speed": 10 }
+  },
+  mage: {
+    flat: { Health: 20, Damage: 1, Mana: 20, Evasion: 5 },
+    percent: { "Attack Speed": 12.5, "Critical Hit Chance": 1, "Critical Hit Damage": 200, "Movement Speed": 10 }
+  },
+  shaman: {
+    flat: { Health: 20, Damage: 1, Mana: 20, Evasion: 5 },
+    percent: { "Attack Speed": 12.5, "Critical Hit Chance": 1, "Critical Hit Damage": 200, "Movement Speed": 10 }
+  },
+  archer: {
+    flat: { Health: 20, Damage: 1, Mana: 20, Evasion: 5 },
+    percent: { "Attack Speed": 12.5, "Critical Hit Chance": 1, "Critical Hit Damage": 200, "Movement Speed": 16 }
+  },
+  assassin: {
+    flat: { Health: 24, Damage: 1, Mana: 20, Evasion: 5 },
+    percent: { "Attack Speed": 12.5, "Critical Hit Chance": 1, "Critical Hit Damage": 200, "Movement Speed": -68 }
+  }
+};
+const baseStats = calculator.createBaseStats("archer");
 assert.deepStrictEqual(Object.keys(baseStats).sort(), [...expectedSupportedStats].sort());
-Object.entries(baseStats).forEach(([stat, value]) => {
-  assert.strictEqual(value.flat, 0, `${stat} base flat value`);
-  assert.strictEqual(value.percent, 0, `${stat} base percent value`);
+assert.deepStrictEqual(Object.keys(calculator.classBaseStats).sort(), Object.keys(expectedBaseStats).sort());
+Object.entries(expectedBaseStats).forEach(([classId, expected]) => {
+  const base = calculator.createBaseStats(classId);
+  calculator.supportedStats.forEach((stat) => {
+    assert.ok(
+      Math.abs(base[stat].flat - (Number(expected.flat[stat]) || 0)) < 1e-9,
+      `${classId} level 1 base: ${stat} flat`
+    );
+    assert.ok(
+      Math.abs(base[stat].percent - (Number(expected.percent[stat]) || 0)) < 1e-9,
+      `${classId} level 1 base: ${stat} percent`
+    );
+  });
+  assert.deepStrictEqual(
+    calculator.calculateBuildStats({ level: 1, classId, equipment: {}, isAvailable: () => true }),
+    base,
+    `${classId} level 1 build equals its base stats`
+  );
 });
-const zeroBuild = calculator.calculateBuildStats({
-  level: 1,
-  classId: "archer",
-  equipment: {},
-  isAvailable: () => true
+/* A class with no supplied Level 1 base stats keeps the zero base. */
+const martialArtistBase = calculator.createBaseStats("martial-artist");
+calculator.supportedStats.forEach((stat) => {
+  assert.strictEqual(martialArtistBase[stat].flat, 0, `martial-artist level 1 base: ${stat} flat`);
+  assert.strictEqual(martialArtistBase[stat].percent, 0, `martial-artist level 1 base: ${stat} percent`);
 });
-assert.deepStrictEqual(zeroBuild, baseStats);
 
 /* Per-level class gains: level 1 is the base, so a build receives (level - 1) increments. */
 const expectedClassBonuses = {
@@ -317,13 +356,17 @@ assert.deepStrictEqual(
 function assertLevelScaling(classId, level, increments) {
   const result = calculator.calculateBuildStats({ level, classId, equipment: {}, isAvailable: () => true });
   const expected = expectedClassBonuses[classId];
+  const base = expectedBaseStats[classId] || { flat: {}, percent: {} };
   calculator.supportedStats.forEach((stat) => {
     assert.ok(
-      Math.abs(result[stat].flat - (Number(expected.flat[stat]) || 0) * increments) < 1e-9,
+      Math.abs(result[stat].flat - ((Number(base.flat[stat]) || 0) + (Number(expected.flat[stat]) || 0) * increments)) <
+        1e-9,
       `${classId} level ${level}: ${stat} flat`
     );
     assert.ok(
-      Math.abs(result[stat].percent - (Number(expected.percent[stat]) || 0) * increments) < 1e-9,
+      Math.abs(
+        result[stat].percent - ((Number(base.percent[stat]) || 0) + (Number(expected.percent[stat]) || 0) * increments)
+      ) < 1e-9,
       `${classId} level ${level}: ${stat} percent`
     );
   });
@@ -336,12 +379,12 @@ Object.keys(expectedClassBonuses).forEach((classId) => {
 });
 assert.strictEqual(
   calculator.calculateBuildStats({ level: 25, classId: "archer", equipment: {}, isAvailable: () => true }).Health.flat,
-  30
+  50
 );
 assert.strictEqual(
   calculator.calculateBuildStats({ level: 25, classId: "guerrier", equipment: {}, isAvailable: () => true }).Health
     .flat,
-  36
+  64
 );
 
 /* The data's Dodge set bonus flows through the normal calculation path. */
@@ -462,6 +505,105 @@ for (const [setName, expectedCount] of [
   );
 }
 
+const characterBuildData = context.CharacterBuildData;
+const skillClassIds = ["archer", "assassin", "guerrier", "mage", "shaman"];
+const expectedSkillIds = Array.from({ length: 77 }, (_, index) => `skill${index + 1}`);
+assert.strictEqual(characterBuildData.SKILL_TREE_LAYOUT.length, 77);
+assert.strictEqual(new Set(characterBuildData.SKILL_TREE_LAYOUT.map((node) => node.skillId)).size, 77);
+assert.deepStrictEqual(
+  { id: characterBuildData.SKILL_TREE_LAYOUT.find((node) => node.skillId === "skill1").id, x: characterBuildData.SKILL_TREE_LAYOUT.find((node) => node.skillId === "skill1").x, y: characterBuildData.SKILL_TREE_LAYOUT.find((node) => node.skillId === "skill1").y },
+  { id: "n39", x: 460, y: 464 },
+  "the free starting skill remains at the existing visual center"
+);
+for (const classId of skillClassIds) {
+  const skills = characterBuildData.CLASS_SKILLS[classId];
+  const pointBySkillId = new Map(characterBuildData.SKILL_TREE_LAYOUT.map((point) => [point.skillId, point.id]));
+  const visualConnections = new Set(
+    characterBuildData.SKILL_TREE_CONNECTIONS.map(([from, to]) => [from, to].sort().join(":"))
+  );
+  assert.deepStrictEqual(Object.keys(skills).sort(), [...expectedSkillIds].sort(), `${classId}: complete skill set`);
+  assert(skills.skill1.name && skills.skill1.description, `${classId}: center skill name and description`);
+  assert.strictEqual(skills.skill1.className, classId === "guerrier" ? "Warrior" : classId[0].toUpperCase() + classId.slice(1));
+  assert.deepStrictEqual(Object.keys(skills.skill1).sort(), ["className", "description", "id", "name"]);
+  assert.strictEqual(skills.skill2.cost, 1);
+  assert.strictEqual(skills.skill77.cost, 1);
+  for (const skillId of expectedSkillIds) {
+    const skill = skills[skillId];
+    assert.strictEqual(skill.id, skillId, `${classId} ${skillId}: stable skill ID`);
+    assert.strictEqual(Object.hasOwn(skill, "description"), skillId === "skill1", `${classId} ${skillId}: center-only description`);
+    if (skillId === "skill1") continue;
+    assert(skill.name && skill.className && skill.stat, `${classId} ${skillId}: editable fields`);
+    assert(Number.isFinite(skill.amount), `${classId} ${skillId}: numeric amount`);
+    assert.strictEqual(skill.cost, skillId === "skill1" ? 0 : 1, `${classId} ${skillId}: skill point cost`);
+    assert(["flat", "percent"].includes(skill.statMode), `${classId} ${skillId}: stat mode`);
+    assert(Array.isArray(skill.prerequisites), `${classId} ${skillId}: prerequisites`);
+    Array.from(skill.prerequisites).forEach((prerequisite) => {
+      assert(skills[prerequisite], `${classId} ${skillId}: prerequisite ${prerequisite} exists`)
+      const connection = [pointBySkillId.get(skillId), pointBySkillId.get(prerequisite)].sort().join(":");
+      assert(visualConnections.has(connection), `${classId} ${skillId}: prerequisite connection exists`);
+    });
+  }
+}
+
+const sampleSkill = characterBuildData.ARCHER_SKILLS.skill2;
+const sampleSkillValue = sampleSkill.statMode === "percent" ? `${sampleSkill.amount}%` : sampleSkill.amount;
+const statsWithSkill = calculator.calculateBuildStats({
+  level: 1,
+  classId: "archer",
+  equipment: {},
+  selectedSkills: [{ effects: [{ stat: sampleSkill.stat, value: sampleSkillValue }] }]
+});
+const statsWithoutSkill = calculator.calculateBuildStats({ level: 1, classId: "archer", equipment: {} });
+const sampleSkillStat = calculator.normalizeStatName(sampleSkill.stat);
+const sampleSkillEffect = calculator.parseValue(sampleSkillValue);
+assert(sampleSkillStat && sampleSkillEffect, "the configured skill effect is supported by the calculator");
+assert.strictEqual(
+  statsWithSkill[sampleSkillStat].flat - statsWithoutSkill[sampleSkillStat].flat,
+  sampleSkillEffect.flat,
+  "a skill applies its configured flat stat through the existing calculator"
+);
+assert.strictEqual(
+  statsWithSkill[sampleSkillStat].percent - statsWithoutSkill[sampleSkillStat].percent,
+  sampleSkillEffect.percent,
+  "a skill applies its configured percentage stat through the existing calculator"
+);
+const expectedStackedStats = calculator.calculateBuildStats({ level: 1, classId: "archer", equipment: {} });
+const stackedSkills = [characterBuildData.ARCHER_SKILLS.skill2, characterBuildData.ARCHER_SKILLS.skill6];
+stackedSkills.forEach((skill) => {
+  const stat = calculator.normalizeStatName(skill.stat);
+  const effect = calculator.parseValue(skill.statMode === "percent" ? `${skill.amount}%` : skill.amount);
+  assert(stat && effect, `${skill.id}: stacked skill effect is supported`);
+  expectedStackedStats[stat].flat += effect.flat;
+  expectedStackedStats[stat].percent += effect.percent;
+});
+const statsWithStackedSkills = calculator.calculateBuildStats({
+  level: 1,
+  classId: "archer",
+  equipment: {},
+  selectedSkills: [characterBuildData.ARCHER_SKILLS.skill2, characterBuildData.ARCHER_SKILLS.skill6].map((skill) => ({
+    effects: [{ stat: skill.stat, value: skill.statMode === "percent" ? `${skill.amount}%` : skill.amount }]
+  }))
+});
+for (const stat of calculator.supportedStats) {
+  assert.deepStrictEqual(statsWithStackedSkills[stat], expectedStackedStats[stat], `${stat}: configured skill effects stack`);
+}
+const percentageBuff = calculator.calculateBuildStats({
+  level: 1,
+  classId: "archer",
+  equipment: {},
+  selectedSkills: [{ effects: [{ stat: "Critical Hit Chance", value: "5%" }] }]
+});
+assert.strictEqual(
+  percentageBuff["Critical Hit Chance"].percent - statsWithoutSkill["Critical Hit Chance"].percent,
+  5,
+  "percentage skill effects remain percentages"
+);
+assert.strictEqual(
+  calculator.calculateBuildStats({ level: 1, classId: "archer", equipment: {}, selectedSkills: [] }).Damage.flat,
+  statsWithoutSkill.Damage.flat,
+  "removing selected skills removes their stat effect"
+);
+
 console.log(
   JSON.stringify(
     {
@@ -472,6 +614,8 @@ console.log(
       calculatedStatistics: audit.calculatedStatistics,
       preservedButUnsupportedStatistics: audit.preservedButUnsupportedStatistics,
       unrestrictedCombatRecords: unrestrictedCombat.length,
+      skillTree: "passed",
+      skillEffects: "passed",
       setTests: {
         titanThree: "passed",
         titanFourCumulative: "passed",

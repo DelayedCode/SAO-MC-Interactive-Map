@@ -22,6 +22,10 @@
     ["attack damage", "Damage"],
     ["bonus attack speed", "Attack Speed"],
     ["critical chance skill", "Skill Critical Hit Chance"],
+    ["max mana", "Mana"],
+    ["max health", "Health"],
+    ["skill critical chance", "Skill Critical Hit Chance"],
+    ["skill critical power", "Skill Critical Hit Damage"],
     ["critical damage", "Critical Hit Damage"],
     ["critical damage skill", "Skill Critical Hit Damage"],
     ["skill critical damage", "Skill Critical Hit Damage"],
@@ -74,10 +78,72 @@
     return { flat: text.includes("%") ? 0 : number, percent: text.includes("%") ? number : 0 };
   }
 
-  /* Every character starts from these values; the class level progression and every equipment, rune
-     and skill contribution are added on top of them. */
-  function createBaseStats() {
-    return Object.fromEntries([...supportedStats].map((stat) => [stat, { flat: 0, percent: 0 }]));
+  /* Level 1 class base stats: the values a character actually starts the game with. They are the
+     starting values, not a bonus applied after the calculation, so they are applied once at every
+     level and the per-level gains below are added on top of them. Entries use the same shape as the
+     level gains, so both run through applyEffect() and the same stat-name normalization. A stat a
+     class does not list (including every stat the model does not carry, such as the game's
+     "Projectile Number", "Ability Delay", "Ability Cooldown", "Bonus Heal" or "Ability Damage")
+     keeps its 0 base value. */
+  const classBaseStats = Object.freeze({
+    assassin: Object.freeze([
+      { stat: "Health", value: "24" },
+      { stat: "Damage", value: "1" },
+      { stat: "Mana", value: "20" },
+      { stat: "Attack Speed", value: "12.5%" },
+      { stat: "Critical Hit Chance", value: "1%" },
+      { stat: "Critical Hit Damage", value: "200%" },
+      { stat: "Movement Speed", value: "-68%" },
+      { stat: "Evasion", value: "5" }
+    ]),
+    archer: Object.freeze([
+      { stat: "Health", value: "20" },
+      { stat: "Damage", value: "1" },
+      { stat: "Mana", value: "20" },
+      { stat: "Attack Speed", value: "12.5%" },
+      { stat: "Critical Hit Chance", value: "1%" },
+      { stat: "Critical Hit Damage", value: "200%" },
+      { stat: "Movement Speed", value: "16%" },
+      { stat: "Evasion", value: "5" }
+    ]),
+    guerrier: Object.freeze([
+      { stat: "Health", value: "28" },
+      { stat: "Damage", value: "1" },
+      { stat: "Mana", value: "20" },
+      { stat: "Attack Speed", value: "12.5%" },
+      { stat: "Critical Hit Chance", value: "1%" },
+      { stat: "Critical Hit Damage", value: "200%" },
+      { stat: "Movement Speed", value: "10%" },
+      { stat: "Evasion", value: "5" }
+    ]),
+    mage: Object.freeze([
+      { stat: "Health", value: "20" },
+      { stat: "Damage", value: "1" },
+      { stat: "Mana", value: "20" },
+      { stat: "Attack Speed", value: "12.5%" },
+      { stat: "Critical Hit Chance", value: "1%" },
+      { stat: "Critical Hit Damage", value: "200%" },
+      { stat: "Movement Speed", value: "10%" },
+      { stat: "Evasion", value: "5" }
+    ]),
+    shaman: Object.freeze([
+      { stat: "Health", value: "20" },
+      { stat: "Damage", value: "1" },
+      { stat: "Mana", value: "20" },
+      { stat: "Attack Speed", value: "12.5%" },
+      { stat: "Critical Hit Chance", value: "1%" },
+      { stat: "Critical Hit Damage", value: "200%" },
+      { stat: "Movement Speed", value: "10%" },
+      { stat: "Evasion", value: "5" }
+    ])
+  });
+
+  /* Every character starts from its class' Level 1 base values; the class level progression and
+     every equipment, rune and skill contribution are added on top of them. */
+  function createBaseStats(classId) {
+    const result = Object.fromEntries([...supportedStats].map((stat) => [stat, { flat: 0, percent: 0 }]));
+    (classBaseStats[classId] || []).forEach((entry) => applyEffect(result, entry.stat, entry.value));
+    return result;
   }
 
   /* Per-level class gains. The level control runs from 1 to 25 and level 1 is the base (the stats
@@ -163,7 +229,7 @@
   }
 
   function calculateBuildStats(buildState) {
-    const result = createBaseStats();
+    const result = createBaseStats(buildState?.classId);
     applyClassLevelBonuses(result, buildState?.classId, buildState?.level);
     const equipment = buildState?.equipment || {};
     const isAvailable = typeof buildState?.isAvailable === "function" ? buildState.isAvailable : () => true;
@@ -202,6 +268,7 @@
   global.CharacterBuildCalculator = Object.freeze({
     groups,
     supportedStats,
+    classBaseStats,
     classLevelBonuses,
     metadataStats,
     conditionalStats,

@@ -88,11 +88,59 @@
 
   const formatZoomLabel = (zoom) => `${zoom.toFixed(1).replace(/\.0$/, "")}x`;
 
-  /* Zoom domain shared by both interactive maps: the wheel/keyboard step (factor) and the
-     clamp range applied by setZoom(). Aincrad and the Fractured Underworld both declared
-     this object verbatim, so a zoom-limit change had to be made twice; the maps now share
-     one definition and cannot drift apart on it. Frozen: every read site only reads. */
-  const MAP_ZOOM_CONFIG = Object.freeze({ factor: 1.14, min: 0.5, max: 30.0 });
+  /* Zoom domain shared by both interactive maps: the step curve and the clamp range applied by
+     setZoom(). Aincrad and the Fractured Underworld both declared this object verbatim, so a
+     zoom-limit change had to be made twice; the maps now share one definition and cannot drift
+     apart on it. Frozen: every read site only reads.
+
+     factor  - multiplicative step used while zoomed out, where a percentage step keeps the
+               control fast (a few clicks from the fit view to a block-level view).
+     maxStep - absolute ceiling for a single step. Past the crossover (zoom * (factor - 1) ==
+               maxStep) the step turns additive, so the displayed zoom advances in whole units
+               instead of the multi-unit jumps a pure 1.14x step produces near the top of the
+               range (26.5 -> 30 was one click before).
+     max     - 45x. floor1.png carries ~1 source pixel per Minecraft block, so on a typical
+               desktop viewport (map content fitted to ~0.16 screen px per source px) 45x puts
+               one block at ~7 screen px - large enough to aim at - while the old 30x ceiling
+               left each block a ~5 px blur. */
+  const MAP_ZOOM_CONFIG = Object.freeze({ factor: 1.14, maxStep: 1, min: 0.5, max: 45.0 });
+
+  /* One zoom step from `zoom` in the given direction (+1 = in, anything else = out). See
+     MAP_ZOOM_CONFIG for the curve; the result is clamped to the domain. Both the zoom buttons
+     and the wheel go through this, so the two controls cannot disagree about the step. */
+  function getNextZoom(zoom, direction, config = MAP_ZOOM_CONFIG) {
+    const current = Number.isFinite(zoom) && zoom > 0 ? zoom : 1;
+    const step = Math.min(current * (config.factor - 1), config.maxStep);
+    const next = direction > 0 ? current + step : current - step;
+    return Math.min(config.max, Math.max(config.min, next));
+  }
+
+  /* Screen pixels per source image pixel at 1x, from an <img>'s layout size and its natural size.
+     The map image is laid out at the layer's size and keeps its aspect ratio inside it
+     (object-fit: contain), so only part of the element box is real map content; this is the
+     scale of that content. */
+  function getMapContentScale(imageElement) {
+    if (!imageElement) return 0;
+    const naturalWidth = Number(imageElement.naturalWidth) || 0;
+    const naturalHeight = Number(imageElement.naturalHeight) || 0;
+    const width = Number(imageElement.offsetWidth) || 0;
+    const height = Number(imageElement.offsetHeight) || 0;
+    if (!naturalWidth || !naturalHeight || !width || !height) return 0;
+    return Math.min(width / naturalWidth, height / naturalHeight);
+  }
+
+  /* Which image-rendering the map <img> should use. The artwork is ~1 source pixel per Minecraft
+     block, so once the displayed scale reaches 1:1 the map is being upscaled: smooth
+     interpolation blurs the block grid into mush, while nearest-neighbour keeps each block a
+     crisp square that can be aimed at. Below 1:1 the map is downscaled, where smooth
+     interpolation is the correct, alias-free choice - so the switch is adaptive, never a blanket
+     "pixelated" that would make the whole map look blocky. */
+  function getMapImageRendering(zoom, contentScale) {
+    const value = Number(zoom);
+    const scale = Number(contentScale);
+    if (!Number.isFinite(value) || value <= 0 || !Number.isFinite(scale) || scale <= 0) return "auto";
+    return scale * value >= 1 ? "pixelated" : "auto";
+  }
 
   /* Base checker/grid square size (px) at 1x. The viewport grid scales with the map zoom so the
      squares stay proportional to the map content, while the grid itself never moves with the map
@@ -272,6 +320,7 @@
     "ingotBlacksmith",
     "keyBlacksmith",
     "accessoriesBlacksmith",
+    "secretAccessoryBlacksmith",
     "runeCraftsmen",
     "refaire"
   ]);
@@ -373,6 +422,14 @@
       <circle cx="12" cy="12.2" r="5.7" fill="#ffe1b9" stroke="#8f622a" stroke-width="1.1"/>
       <circle cx="12" cy="12.2" r="2.5" fill="#26324e"/>
       <path d="M12 4.8v1.8M12 17.8v1.4M4.6 12.2h1.8M17.6 12.2h1.8" stroke="#fff6de" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+  `,
+    secretAccessoryBlacksmith: `
+    <svg class="craftsman-icon secret-accessory-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="13.6" r="5.3" fill="#e6d6ff" stroke="#5b3f86" stroke-width="1.1"/>
+      <circle cx="12" cy="13.6" r="2.3" fill="#2b2140"/>
+      <path d="M12 5.1v2.3M5.5 7.2l1.7 1.7M18.5 7.2l-1.7 1.7" stroke="#f2e8ff" stroke-width="1.1" stroke-linecap="round"/>
+      <circle cx="12" cy="4.4" r="1.4" fill="#ffe9a3" stroke="#8d6a24" stroke-width="0.9"/>
     </svg>
   `,
     runeCraftsmen: `
@@ -736,6 +793,9 @@
     getMobAreaCenter,
     formatZoomLabel,
     MAP_ZOOM_CONFIG,
+    getNextZoom,
+    getMapContentScale,
+    getMapImageRendering,
     GRID_SQUARE_BASE_PX,
     getGridSquareSize,
     clearTextSelection,

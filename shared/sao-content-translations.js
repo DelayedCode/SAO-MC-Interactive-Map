@@ -79,6 +79,17 @@ const equipmentTerminology = {
   "Training Dagger": ["Daga de entrenamiento", "Dague d'entraînement"],
   "Training Sword": ["Espada de entrenamiento", "Épée d'entraînement"],
   "Unbound Grimoire": ["Grimorio desatado", "Grimoire délié"],
+  "Training Bow": ["Arco de entrenamiento", "Arc d'entraînement"],
+  "Training Crossbow": ["Ballesta de entrenamiento", "Arbalète d'entraînement"],
+  "Training Scythe": ["Guadaña de entrenamiento", "Faux d'entraînement"],
+  "Katana Training": ["Katana de entrenamiento", "Katana d'entraînement"],
+  "Training Magic Staff": ["Bastón mágico de entrenamiento", "Bâton magique d'entraînement"],
+  "Training Lantern": ["Linterna de entrenamiento", "Lanterne d'entraînement"],
+  "Training Quiver": ["Carcaj de entrenamiento", "Carquois d'entraînement"],
+  "Training Buckler": ["Rodela de entrenamiento", "Bouclier d'entraînement"],
+  "Skill Critical Chance": ["Probabilidad de crítico de habilidad", "Chance de critique de compétence"],
+  "Critical Chance": ["Probabilidad de crítico", "Chance de critique"],
+  "Guard Durability": ["Durabilidad de guardia", "Durabilité de garde"],
   "Double Iron Axe": ["Hacha doble de hierro", "Hache double en fer"],
   "Pointed Wooden Shield": ["Escudo de madera puntiagudo", "Bouclier en bois pointu"],
   "Mage Skeleton Staff": ["Bastón de esqueleto mago", "Bâton de squelette mage"],
@@ -1052,9 +1063,11 @@ const curatedTerminology = {
   "Effect: Repair": ["Efecto: reparación", "Effet : réparation"],
   "Effect: Spirit Increase": ["Efecto: aumento de espíritu", "Effet : augmentation de l'esprit"],
   "Effect: Stamina": ["Efecto: resistencia", "Effet : endurance"],
+  "Dodge": ["Esquiva", "Esquive"],
   "Falls Reduction": ["Reducción de caídas", "Réduction des chutes"],
   "Health Regeneration": ["Regeneración de salud", "Régénération de santé"],
   "Health Restored": ["Salud restaurada", "Santé restaurée"],
+  "Life Steal": ["Robo de vida", "Vol de vie"],
   "Max Health": ["Salud máxima", "Santé maximale"],
   "Max Health Boost": ["Aumento de salud máxima", "Augmentation de santé maximale"],
   "Max Stamina": ["Resistencia máxima", "Endurance maximale"],
@@ -1063,6 +1076,7 @@ const curatedTerminology = {
   "Projectile Damage": ["Daño de proyectil", "Dégâts de projectile"],
   "Skill Critical Damage": ["Daño crítico de habilidad", "Dégâts critiques de compétence"],
   "Skill Damage": ["Daño de habilidad", "Dégâts de compétence"],
+  "Spell Vampirism": ["Vampirismo de hechizos", "Vampirisme de sorts"],
   "Stamina Regeneration": ["Regeneración de resistencia", "Régénération d'endurance"],
   "Stamina Restored": ["Resistencia restaurada", "Endurance restaurée"],
   "Weapon Damage": ["Daño de arma", "Dégâts d'arme"],
@@ -1743,7 +1757,24 @@ const curatedTerminology = {
   "Orichalcum Ingot": ["Lingote de oricalco", "Lingot d'orichalque"],
   "Ring Without Name": ["Anillo sin nombre", "Anneau sans nom"],
   "Scots Bark": ["Corteza de pino silvestre", "Écorce de pin sylvestre"],
-  Sharkfish: ["Pez tiburón", "Poisson-requin"]
+  Sharkfish: ["Pez tiburón", "Poisson-requin"],
+  /* --- Current-Data accessory materials (the Ice Spirits, Ice Golem, Peaceful Deer and Shark
+     sets). "Hard Glacial Hide" and "Shark Carapace" name the same materials the glossary already
+     curates as "Glacial Hardhide" and "Shark Shell", so they reuse those translations --- */
+  "Birch String": ["Cuerda de abedul", "Corde de bouleau"],
+  "Hard Glacial Hide": ["Cuero duro glacial", "Cuir glacé"],
+  "Mountain Stag Hide": ["Piel de ciervo montañés", "Peau de cerf des montagnes"],
+  "Oak String": ["Cuerda de roble", "Corde de chêne"],
+  "Shark Carapace": ["Caparazón de tiburón", "Carapace de requin"],
+  /* --- Current-Data accessory materials added with the Iron, Copper, Nepenthes, Elite Treant,
+     secret and Shadow Neophyte sets. "Sylve Sprout" is the same material the glossary already
+     curates as "Sylve shoot" --- */
+  "Copper String": ["Cuerda de cobre", "Corde de cuivre"],
+  "Fragment of the Bear's Soul": ["Fragmento del alma del oso", "Fragment de l'âme de l'ours"],
+  "Iron String": ["Cuerda de hierro", "Corde de fer"],
+  "Leaf Fragments": ["Fragmentos de hojas", "Fragments de feuilles"],
+  "Spider Venom": ["Veneno de araña", "Venin d'araignée"],
+  "Sylve Sprout": ["Brote de Sylve", "Pousse de Sylve"]
   /* end curated terminology */
 };
 Object.assign(equipmentTerminology, curatedTerminology);
@@ -5466,9 +5497,9 @@ const curatedMapDescriptionTranslations = {
   ],
   "Bee Armor Blacksmith": ["Herrero de armaduras de abeja", "Forgeron d'armures d'abeille"],
   "Bees Weapon Blacksmith": ["Herrero de armas de abejas", "Forgeron d'armes d'abeilles"],
-  "Birch Forest — Coordinates X: 1786 Z: 1184. Gather Birch Wood.": [
-    "Bosque de abedules — Coordenadas X: 1786 Z: 1184. Reúne madera de abedul.",
-    "Forêt de bouleaux — Coordonnées X : 1786 Z : 1184. Récoltez du bois de bouleau."
+  "Birch Forest — Coordinates X: 1788 Z: 1196. Gather Birch Wood.": [
+    "Bosque de abedules — Coordenadas X: 1788 Z: 1196. Reúne madera de abedul.",
+    "Forêt de bouleaux — Coordonnées X : 1788 Z : 1196. Récoltez du bois de bouleau."
   ],
   "Black Market (Biome) — Coordinates X: 1121 Z: 811": [
     "Mercado negro (bioma) — Coordenadas X: 1121 Z: 811",
@@ -5737,9 +5768,9 @@ const curatedMapDescriptionTranslations = {
   ],
   "Crushed Harpy Ring Blacksmith.": ["Herrero de anillos de arpía aplastada.", "Forgeron d'anneaux de harpie écrasée."],
   "Drowned Harpy Ring Blacksmith.": ["Herrero de anillos de arpía ahogada.", "Forgeron d'anneaux de harpie noyée."],
-  "Farm — Coordinates X: 2349 Z: 3650. Gather Allium and Wheat.": [
-    "Granja — Coordenadas X: 2349 Z: 3650. Reúne allium y trigo.",
-    "Ferme — Coordonnées X : 2349 Z : 3650. Récoltez de l'allium et du blé."
+  "Farm — Coordinates X: 2351 Z: 3662. Gather Allium and Wheat.": [
+    "Granja — Coordenadas X: 2351 Z: 3662. Reúne allium y trigo.",
+    "Ferme — Coordonnées X : 2351 Z : 3662. Récoltez de l'allium et du blé."
   ],
   "Fierce Talisman Blacksmith.": ["Herrero de talismanes feroces.", "Forgeron de talismans féroces."],
   "Flaming Harpy Ring Blacksmith.": [
@@ -6345,7 +6376,7 @@ function translateCharacterBuildText(value, language) {
   return translated;
 }
 
-window.SAOContentTranslations.registerCharacterBuildNode = function registerCharacterBuildNode(node, classId, branch) {
+window.SAOContentTranslations.registerCharacterBuildNode = function registerCharacterBuildNode(node) {
   const baseKey = `characterBuild.skill.${node.id}`;
   window.SAOContentTranslations.register(
     baseKey + ".name",
@@ -6355,9 +6386,9 @@ window.SAOContentTranslations.registerCharacterBuildNode = function registerChar
   );
   window.SAOContentTranslations.register(
     baseKey + ".description",
-    `Prototype {branch} node for {classId}.`,
-    `Nodo de prototipo {branch} para {classId}.`,
-    `Nœud prototype {branch} pour {classId}.`
+    node.description,
+    translateCharacterBuildText(node.description, "es"),
+    translateCharacterBuildText(node.description, "fr")
   );
 };
 
@@ -6726,8 +6757,10 @@ const bestiaryGlossary = {
   "Shark Fish": ["Pez tiburón", "Poisson-requin"],
   "Forest Spider": ["Araña del bosque", "Araignée forestière"],
   "Ice Spiritist": ["Espiritista de hielo", "Spiritualiste de glace"],
+  "Ice Spirit": ["Espíritu de hielo", "Esprit de glace"],
   "Ice Golem": ["Gólem de hielo", "Golem de glace"],
   Deer: ["Ciervo", "Cerf"],
+  "Mountain Deer": ["Ciervo montañés", "Cerf des montagnes"],
   Nephentes: ["Néphentes", "Néphentès"],
   "Bandit Archer": ["Arquero bandido", "Archer bandit"],
   "Bandit Assassin": ["Asesino bandido", "Assassin bandit"],

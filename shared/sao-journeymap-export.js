@@ -27,6 +27,11 @@
     resourceLocation: "journeymap:textures/waypoint/icon/waypoint-icon.png"
   });
 
+  /* The website category that owns mob areas. Mob-area members live beside the marker dataset
+     because each one is a polygon rather than a point, so the collector reads them from their own
+     input; the name matches the category button, the colour table and the adapter declaration. */
+  const MOB_AREA_CATEGORY = "mobAreas";
+
   const colorUtils =
     (typeof require === "function" && typeof module !== "undefined" && module.exports)
       ? require("./sao-color-utils.js")
@@ -433,6 +438,116 @@
     return new Uint8Array(bytes);
   }
 
+  /* Prepares the JourneyMap export categories from a page's enabled website waypoint categories.
+
+     Export flow: enabled website category -> enabled markers in that category -> JourneyMap group
+     -> one JourneyMap waypoint per marker. Both map pages build this identical structure, so the
+     transformation lives here; each page supplies only its own enabled-category state, marker
+     dataset, ids and the custom-category colour resolver. Non-custom category colours come from the
+     shared colour utilities, so only custom categories need the page callback. */
+  function collectJourneyMapExportCategories(config) {
+    const options = config || {};
+    const categories = options.categories || {};
+    const markers = options.markers || {};
+    const mobAreas = Array.isArray(options.mobAreas) ? options.mobAreas : [];
+    const floor = String(options.floor || "");
+    const world = String(options.world || "");
+    const dimensionId = String(options.dimensionId || "");
+    const resolveCustomCategoryColor =
+      typeof options.resolveCustomCategoryColor === "function" ? options.resolveCustomCategoryColor : () => null;
+    /* Mob areas are polygons rather than points, so their export position is the same centre the
+       map pins them to. The map pages hand in the shared helper; the global lookup keeps the
+       collector usable on its own. */
+    const resolveMobAreaCenter =
+      typeof options.resolveMobAreaCenter === "function"
+        ? options.resolveMobAreaCenter
+        : typeof global.SAOMapHelpers?.getMobAreaCenter === "function"
+          ? global.SAOMapHelpers.getMobAreaCenter
+          : null;
+    const result = {};
+    /* One waypoint per source identity: markers and mob areas feed the same export, so an id is
+       claimed once and a duplicate can never reach the file. */
+    const exportedIds = new Set();
+
+    Object.entries(categories).forEach(([category, isEnabled]) => {
+      if (!isEnabled) return;
+
+      Object.values(markers).forEach((marker) => {
+        if (!marker || marker.floor !== floor || marker.category !== category) return;
+
+        const x = Number(marker.coords && marker.coords.x !== undefined ? marker.coords.x : marker.x ?? 0);
+        const y = Number(marker.coords && marker.coords.y !== undefined ? marker.coords.y : marker.y ?? -30);
+        const z = Number(marker.coords && marker.coords.z !== undefined ? marker.coords.z : marker.z ?? 0);
+        const isCustom = marker.category === "custom";
+        const exportCategory = isCustom
+          ? String(marker.customWaypointButton || "Custom").trim() || "Custom"
+          : category;
+        const categoryColor = isCustom
+          ? resolveCustomCategoryColor(exportCategory, floor)
+          : colorUtils?.getHardcodedCategoryColor?.(exportCategory) ||
+            colorUtils?.getJourneyMapColorValue?.(exportCategory, { world });
+        const waypointColor = isCustom ? marker.color ?? categoryColor : categoryColor;
+
+        const entry = {
+          name: String(marker.title || marker.id || category).trim() || category,
+          x: Number.isFinite(x) ? x : 0,
+          y: Number.isFinite(y) ? y : -30,
+          z: Number.isFinite(z) ? z : 0,
+          dim: dimensionId,
+          icon: marker.icon || marker.customLogo || marker.logo || "pin",
+          color: waypointColor,
+          categoryColor,
+          enabled: 1,
+          visible: 1,
+          group: exportCategory,
+          uuid: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`),
+          id: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`)
+        };
+        if (!result[exportCategory]) result[exportCategory] = [];
+        exportedIds.add(entry.uuid);
+        result[exportCategory].push(entry);
+      });
+
+      /* Mob areas are the one website category whose members are not markers: every area is a
+         polygon that exports as a single waypoint at its centre, keeping the category's own group,
+         colour and name so the exported file reads like the map. */
+      if (category === MOB_AREA_CATEGORY && resolveMobAreaCenter) {
+        mobAreas.forEach((area) => {
+          if (!area || area.floor !== floor) return;
+          const center = resolveMobAreaCenter(area);
+          if (!center || !Number.isFinite(center.x) || !Number.isFinite(center.z)) return;
+          const areaId = String(area.id || `${MOB_AREA_CATEGORY}:${floor}:${center.x}:${center.z}`);
+          if (exportedIds.has(areaId)) return;
+          exportedIds.add(areaId);
+
+          const categoryColor =
+            colorUtils?.getHardcodedCategoryColor?.(MOB_AREA_CATEGORY) ||
+            colorUtils?.getJourneyMapColorValue?.(MOB_AREA_CATEGORY, { world });
+
+          const entry = {
+            name: String(area.title || area.id || MOB_AREA_CATEGORY).trim() || MOB_AREA_CATEGORY,
+            x: Math.round(center.x),
+            y: -30,
+            z: Math.round(center.z),
+            dim: dimensionId,
+            icon: area.icon || "pin",
+            color: categoryColor,
+            categoryColor,
+            enabled: 1,
+            visible: 1,
+            group: MOB_AREA_CATEGORY,
+            uuid: areaId,
+            id: areaId
+          };
+          if (!result[MOB_AREA_CATEGORY]) result[MOB_AREA_CATEGORY] = [];
+          result[MOB_AREA_CATEGORY].push(entry);
+        });
+      }
+    });
+
+    return result;
+  }
+
   function buildJourneyMapExport(config) {
     const worldName = String(config && config.world ? config.world : "");
     const dimensionId = normalizeDimensionId(worldName, config && config.dimensionId ? config.dimensionId : null);
@@ -628,6 +743,7 @@
   const api = {
     JOURNEYMAP_DIMENSION_CONFIG,
     normalizeDimensionId,
+    collectJourneyMapExportCategories,
     buildJourneyMapExport,
     parseJourneyMapDat,
     serializeJourneyMapNbt

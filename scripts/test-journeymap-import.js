@@ -459,4 +459,33 @@ assertCode(
   "unsupported stable identity field types are invalid"
 );
 
+/* The JourneyMap import copies a file's Minecraft coordinates straight into the waypoint store, so a
+   coordinate that leaves through the export comes back unchanged: no drift in either direction. */
+const coordinateRoundTripCases = [
+  { x: 1798, z: 4178 },
+  { x: 1797, z: 3974 }
+];
+const coordinateRoundTrip = prepareJourneyMapImport(
+  bytesFor({
+    LootBuyers: coordinateRoundTripCases.map((entry, index) => ({
+      name: `Round trip ${index + 1}`,
+      x: entry.x,
+      y: -30,
+      z: entry.z,
+      dim: "aincrad",
+      uuid: `round-trip-${index + 1}`
+    }))
+  }),
+  [targets[0]]
+);
+coordinateRoundTripCases.forEach((entry, index) => {
+  const record = coordinateRoundTrip.records.find((candidate) => candidate.record.name === `Round trip ${index + 1}`);
+  assert.ok(record, `round-trip example ${index + 1} imports`);
+  assert.deepEqual(
+    { x: record.record.x, z: record.record.z },
+    { x: entry.x, z: entry.z },
+    `Minecraft ${entry.x},${entry.z} survives an export/import round trip unchanged`
+  );
+});
+
 console.log("JourneyMap import regression tests passed.");

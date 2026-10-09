@@ -1,0 +1,100 @@
+    if ($("skillTree").querySelector) {
+      $("skillTree").querySelector("[data-reset-view]")?.addEventListener("click", (event) => {
+        event.stopPropagation();
+        resetSkillTreeViewport($("skillTreeViewport"));
+      });
+    }
+  }
+
+  function setFilterOptions() {
+    const sourceItems = state.pickerMode === "rune" ? activeRunes() : activeItems();
+    const rarities = [...new Set(sourceItems.map((item) => item.rarity).filter(Boolean))];
+    $("rarityFilter").innerHTML =
+      `<option value="">${t("page.characterBuild.allRarities")}</option>${rarities.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+    $("rarityFilter").value = state.rarity;
+  }
+
+  function matchingItems() {
+    const query = normalize(state.search);
+    const sourceItems = state.pickerMode === "rune" ? activeRunes() : slotItems();
+    return sourceItems.filter((item) => {
+      const textMatch = !query || item.searchText.includes(query);
+      const rarityMatch = !state.rarity || item.rarity === state.rarity;
+      const levelMatch = item.levelRequirement === null || item.levelRequirement <= state.level;
+      return textMatch && rarityMatch && levelMatch;
+    });
+  }
+
+  function renderItems() {
+    const items = matchingItems();
+    const slot = state.pickerMode === "rune" ? slotById(state.pickerArmorSlot) : slotById(state.pickerSlot);
+    $("itemList").innerHTML = items.length
+      ? items
+          .map((item) => {
+            const effects = item.effects.length
+              ? `<p class="item-effect">${escapeHtml(item.effects.map(localizeItemEffect).join(" / "))}</p>`
+              : "";
+            const level =
+              item.levelRequirement === null
+                ? ""
+                : `<span>${escapeHtml(t("page.characterBuild.itemLevel", { level: item.levelRequirement }))}</span>`;
+            const classes = item.classLabel ? `<span>${escapeHtml(localizeClassLabel(item.classLabel))}</span>` : "";
+            const set = item.set
+              ? `<span>${escapeHtml(t("page.ecompendium.labels.set"))}: ${escapeHtml(window.SAOContentTranslations?.translateKnownTerms?.(item.set, i18n?.getLanguage?.()) || item.set)}</span>`
+              : "";
+            return `<article class="item-card"><div class="item-icon" aria-hidden="true">${item.type ? iconForType(item.type) : window.CharacterBuildIcons.markup("rune")}</div><div><h3>${escapeHtml(displayText(item, "name") || item.name)}</h3><div class="item-meta"><span>${state.pickerMode === "rune" ? t("page.characterBuild.rune") : escapeHtml(item.type)}</span>${item.rarity ? `<span class="${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>` : ""}${level}${classes}${set}</div>${effects}${item.description ? `<p class="item-description">${escapeHtml(displayText(item, "description") || item.description)}</p>` : ""}</div><button class="equip-button" type="button" data-${state.pickerMode === "rune" ? "rune" : "item"}-id="${item.id}">${t("page.characterBuild.select")}</button></article>`;
+          })
+          .join("")
+      : `<div class="empty-state">${escapeHtml(t("page.characterBuild.noMatchingItems", { slot: slot?.name || "rune", level: state.level }))}</div>`;
+  }
+
+  function openPicker(slotId) {
+    state.pickerMode = "equipment";
+    state.pickerSlot = slotId;
+    state.pickerArmorSlot = null;
+    state.pickerRuneIndex = null;
+    const slot = slotById(slotId);
+    state.search = "";
+    state.rarity = "";
+    $("dialogTitle").textContent = t("page.characterBuild.selectSlot", { slot: localizeSlot(slot) });
+    $("itemSearch").value = "";
+    $("pickerNotice").textContent = "";
+    setFilterOptions();
+    renderItems();
+    $("equipmentDialog").showModal();
+    requestAnimationFrame(() => $("itemSearch").focus());
+  }
+
+  function openRunePicker(armorSlotId, runeIndex) {
+    const armor = activeBuild()[armorSlotId];
+    if (!armor || runeIndex >= adapter.getRuneSlots(armor)) return;
+    state.pickerMode = "rune";
+    state.pickerSlot = null;
+    state.pickerArmorSlot = armorSlotId;
+    state.pickerRuneIndex = runeIndex;
+    state.search = "";
+    state.rarity = "";
+    $("dialogTitle").textContent = t("page.characterBuild.selectRuneFor", {
+      number: runeIndex + 1,
+      slot: localizeSlot(slotById(armorSlotId))
+    });
+    $("itemSearch").value = "";
+    $("pickerNotice").textContent = "";
+    setFilterOptions();
+    renderItems();
+    $("equipmentDialog").showModal();
+    requestAnimationFrame(() => $("itemSearch").focus());
+  }
+
+  function equipItem(itemId) {
+    const item = slotItems().find((entry) => entry.id === itemId);
+    if (!item || !state.pickerSlot || !itemIsClassCompatible(item, state.classId)) return;
+    const weaponSlot = item.type === "Main Weapon" || item.type === "Offhand";
+    const otherSlot = state.pickerSlot === "main-weapon" ? "offhand" : "main-weapon";
+    if (weaponSlot && activeBuild()[otherSlot]?.equipmentKey === item.equipmentKey) {
+      $("pickerNotice").textContent = t("page.characterBuild.weaponAlreadyEquipped");
+      return;
+    }
+    activeBuild()[state.pickerSlot] = item;
+    saveState();
+    renderSlots();

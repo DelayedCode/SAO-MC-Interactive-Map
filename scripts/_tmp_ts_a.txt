@@ -1,0 +1,161 @@
+﻿  76:     nodes.map((node) => ({
+  77:       id: node.dataset.skillId.replace(`${node.dataset.skillId.split("-")[0]}-`, ""),
+  78:       selected: node.classList.contains("is-selected"),
+  79:       available: node.classList.contains("is-available"),
+  80:       locked: node.classList.contains("is-locked")
+  81:     }))
+  82:   );
+  83:   const selectedWithRoot = new Set(selected);
+  84:   selectedWithRoot.add("skill1");
+  85:   for (const node of actual) {
+  86:     const isSelected = selectedWithRoot.has(node.id);
+  87:     const isAvailable = node.id === "skill58"
+  88:       ? screenshotThreePrerequisites.every((id) => selectedWithRoot.has(id))
+  89:       : adjacency[node.id].some((id) => selectedWithRoot.has(id));
+  90:     assert.equal(node.selected, isSelected, `${classId} ${node.id}: selected state matches the model`);
+  91:     assert.equal(node.available, !isSelected && isAvailable, `${classId} ${node.id}: availability matches the model`);
+  92:     assert.equal(node.locked, !isSelected && !isAvailable, `${classId} ${node.id}: lock state matches the model`);
+  93:   }
+  94: }
+  95: 
+  96: async function assertCurrentModel(page, classId, adjacency) {
+  97:   const selected = new Set(
+  98:     await page.locator("#skillTreeCanvas .skill-node.is-selected").evaluateAll((nodes) =>
+  99:       nodes.map((node) => node.dataset.skillId.replace(/^[^-]+-/, ""))
+ 100:     )
+ 101:   );
+ 102:   const normalized = pruneExpectedSelection(selected, adjacency);
+ 103:   assert.deepEqual(sorted([...selected]), sorted([...normalized]), `${classId}: no invalid selections remain`);
+ 104:   await assertRenderedStates(page, classId, selected, adjacency);
+ 105: }
+ 106: 
+ 107: async function deselectSkill(page, classId, skillId, adjacency) {
+ 108:   const button = page.locator(`[data-skill-id="${classId}-${skillId}"]`);
+ 109:   assert.equal(await button.getAttribute("aria-pressed"), "true", `${classId} ${skillId} is selected`);
+ 110:   await button.click();
+ 111:   await assertCurrentModel(page, classId, adjacency);
+ 112: }
+ 113: 
+ 114: (async () => {
+ 115:   await ensureStaticServer();
+ 116:   const browser = await chromium.launch({ headless: true });
+ 117:   let session;
+ 118:   try {
+ 119:     session = await openBuilder(browser);
+ 120:     const { page } = session;
+ 121:     const audit = await page.evaluate((classes) => {
+ 122:       const data = window.CharacterBuildData;
+ 123:       const skillByPoint = new Map(data.SKILL_TREE_LAYOUT.map((point) => [point.id, point.skillId]));
+ 124:       const neighbors = new Map(data.SKILL_TREE_LAYOUT.map((point) => [point.skillId, new Set()]));
+ 125:       data.SKILL_TREE_CONNECTIONS.forEach(([from, to]) => {
+ 126:         const first = skillByPoint.get(from);
+ 127:         const second = skillByPoint.get(to);
+ 128:         neighbors.get(first).add(second);
+ 129:         neighbors.get(second).add(first);
+ 130:       });
+ 131:       const errors = [];
+ 132:       const skill58Requirements = {};
+ 133: 
+ 134:       for (const classId of classes) {
+ 135:         const skills = data.CLASS_SKILLS[classId];
+ 136:         const keys = Object.keys(skills).sort();
+ 137:         if (keys.length !== 77) errors.push(`${classId}: expected 77 skills, found ${keys.length}`);
+ 138:         skill58Requirements[classId] = [...(skills.skill58.prerequisites || [])].sort();
+ 139:         if (skill58Requirements[classId].some((id) => !skills[id])) {
+ 140:           errors.push(`${classId}: Skill 58 references a nonexistent required skill`);
+ 141:         }
+ 142:         if (skill58Requirements[classId].includes("skill58")) errors.push(`${classId}: Skill 58 requires itself`);
+ 143:         if ((skills.skill61.prerequisites || []).includes("skill58")) {
+ 144:           errors.push(`${classId}: Skill 61 must not require Skill 58`);
+ 145:         }
+ 146:       }
+ 147:       return {
+ 148:         nodeCount: data.SKILL_TREE_LAYOUT.length,
+ 149:         connectionCount: data.SKILL_TREE_CONNECTIONS.length,
+ 150:         adjacency: Object.fromEntries([...neighbors].map(([skillId, adjacent]) => [skillId, [...adjacent]])),
+ 151:         skill58Requirements,
+ 152:         layout: data.SKILL_TREE_LAYOUT.map((point) => ({
+ 153:           skillId: point.skillId,
+ 154:           x: `${point.x}px`,
+ 155:           y: `${point.y}px`
+ 156:         })),
+ 157:         errors
+ 158:       };
+ 159:     }, classIds);
+ 160: 
+ 161:     assert.equal(audit.nodeCount, 77);
+ 162:     assert.equal(audit.connectionCount, 100);
+ 163:     assert.equal(audit.adjacency.skill1.length, 4, "root adjacency comes from the visual connections");
+ 164:     assert.deepEqual(sorted(audit.adjacency.skill4), sorted(screenshotTwoPrerequisites), "Skill 4 uses the four screenshot-marked visual alternatives");
+ 165:     classIds.forEach((classId) =>
+ 166:       assert.deepEqual(audit.skill58Requirements[classId], sorted(screenshotThreePrerequisites), `${classId}: Skill 58 ALL inputs`)
+ 167:     );
+ 168:     assert.deepEqual(audit.errors, [], "special Skill 58 requirements are valid and Skill 61 does not require it");
+ 169: 
+ 170:     let sharedRenderedLayout;
+ 171:     for (const classId of classIds) {
+ 172:       const renderedLayout = await switchToClass(page, classId);
+ 173:       assert.deepEqual(renderedLayout, audit.layout, `${classId}: rendered coordinates match the shared layout`);
+ 174:       if (sharedRenderedLayout) assert.deepEqual(renderedLayout, sharedRenderedLayout, `${classId}: same rendered layout`);
+ 175:       sharedRenderedLayout = renderedLayout;
+ 176:       await assertCurrentModel(page, classId, audit.adjacency);
+ 177:       const skill8DataPrerequisites = await page.evaluate(
+ 178:         (selectedClassId) => window.CharacterBuildData.CLASS_SKILLS[selectedClassId].skill8.prerequisites,
+ 179:         classId
+ 180:       );
+ 181:       assert(!skill8DataPrerequisites.includes("skill7"), `${classId}: test distinguishes visual adjacency from stored skill data`);
+ 182:       await unlock(page, classId, "skill6", audit.adjacency);
+ 183:       await unlock(page, classId, "skill7", audit.adjacency);
+ 184:       assert(audit.adjacency.skill8.includes("skill7"), "Skill 7 is directly adjacent to Skill 8");
+ 185:       assert((await page.locator(`[data-skill-id="${classId}-skill8"]`).getAttribute("class")).includes("is-available"));
+ 186:       await unlock(page, classId, "skill8", audit.adjacency);
+ 187:       await deselectSkill(page, classId, "skill7", audit.adjacency);
+ 188:       assert.equal(await page.locator(`[data-skill-id="${classId}-skill8"]`).getAttribute("aria-pressed"), "false");
+ 189:       await assertCurrentModel(page, classId, audit.adjacency);
+ 190:       await page.locator("#resetBuild").click();
+ 191:       if (classId !== "archer") await switchToClass(page, classId);
+ 192:       await assertCurrentModel(page, classId, audit.adjacency);
+ 193:       const skill4 = page.locator(`[data-skill-id="${classId}-skill4"]`);
+ 194:       const skill3 = page.locator(`[data-skill-id="${classId}-skill3"]`);
+ 195:       const skill25 = page.locator(`[data-skill-id="${classId}-skill25"]`);
+ 196: 
+ 197:       assert((await skill4.getAttribute("class")).includes("is-locked"), `${classId}: Skill 4 starts locked`);
+ 198:       await skill4.click();
+ 199:       assert.equal(await skill4.getAttribute("aria-pressed"), "false", `${classId}: locked Skill 4 cannot unlock`);
+ 200:       await assertCurrentModel(page, classId, audit.adjacency);
+ 201:       await unlock(page, classId, "skill2", audit.adjacency);
+ 202:       await unlock(page, classId, "skill3", audit.adjacency);
+ 203:       assert((await skill4.getAttribute("class")).includes("is-available"), `${classId}: Skill 3 opens an alternative path to Skill 4`);
+ 204:       await skill4.click();
+ 205:       await assertCurrentModel(page, classId, audit.adjacency);
+ 206:       assert.equal(await skill4.getAttribute("aria-pressed"), "true", `${classId}: Skill 4 unlocks from the Skill 3 path`);
+ 207:       await unlock(page, classId, "skill33", audit.adjacency);
+ 208:       await unlock(page, classId, "skill25", audit.adjacency);
+ 209:       await unlock(page, classId, "skill5", audit.adjacency);
+ 210:       await unlock(page, classId, "skill28", audit.adjacency);
+ 211:       await deselectSkill(page, classId, "skill3", audit.adjacency);
+ 212:       assert.equal(await skill3.getAttribute("aria-pressed"), "false", `${classId}: one OR prerequisite can be removed while another remains`);
+ 213:       assert.equal(await skill4.getAttribute("aria-pressed"), "true", `${classId}: Skill 4 stays valid through the remaining alternative`);
+ 214:       await deselectSkill(page, classId, "skill28", audit.adjacency);
+ 215:       assert.equal(await skill4.getAttribute("aria-pressed"), "true", `${classId}: Skill 4 remains valid through Skill 25 after Skill 28 is removed`);
+ 216:       await deselectSkill(page, classId, "skill5", audit.adjacency);
+ 217:       assert.equal(await skill4.getAttribute("aria-pressed"), "true", `${classId}: Skill 4 remains valid through Skill 25 after Skill 5 is removed`);
+ 218:       await deselectSkill(page, classId, "skill25", audit.adjacency);
+ 219:       assert.equal(await skill25.getAttribute("aria-pressed"), "false", `${classId}: prerequisite can be removed`);
+ 220:       assert.equal(await skill4.getAttribute("aria-pressed"), "false", `${classId}: Skill 4 is pruned when its last adjacent skill is removed`);
+ 221: 
+ 222:       const alternateClass = classId === "archer" ? "assassin" : "archer";
+ 223:       await switchToClass(page, alternateClass);
+ 224:       await switchToClass(page, classId);
+ 225:       await assertCurrentModel(page, classId, audit.adjacency);
+ 226: 
+ 227:       for (const skillId of ["skill49", "skill6", "skill50", "skill52", "skill56", "skill66"]) {
+ 228:         await unlock(page, classId, skillId, audit.adjacency);
+ 229:       }
+ 230:       const skill58 = page.locator(`[data-skill-id="${classId}-skill58"]`);
+ 231:       assert((await skill58.getAttribute("class")).includes("is-locked"), `${classId}: Skill 58 waits for Skill 61`);
+ 232:       await skill58.click();
+ 233:       await assertCurrentModel(page, classId, audit.adjacency);
+ 234:       assert.equal(await skill58.getAttribute("aria-pressed"), "false", `${classId}: Skill 58 cannot unlock with one required skill missing`);
+ 235:       await unlock(page, classId, "skill61", audit.adjacency);
+ 236:       assert((await skill58.getAttribute("class")).includes("is-available"), `${classId}: Skill 58 opens after all four requirements`);

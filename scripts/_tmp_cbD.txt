@@ -1,0 +1,100 @@
+  function renderConfiguration() {
+    $("buildSlot").innerHTML = Object.keys(buildSlots)
+      .map(
+        (slotId) =>
+          `<option value="${slotId}">${escapeHtml(t("page.characterBuild.buildNumber", { number: slotId }))}</option>`
+      )
+      .join("");
+    $("buildSlot").value = state.activeSlot;
+    $("characterLevel").value = state.level;
+    $("levelValue").value = state.level;
+    $("levelValue").textContent = state.level;
+    const baseValue = document.querySelector(".base-value");
+    if (baseValue) baseValue.textContent = t("page.characterBuild.base", { level: state.level });
+    const slotCount = document.querySelector(".section-count");
+    if (slotCount) slotCount.textContent = t("page.characterBuild.slots", { count: 14 });
+    $("characterLevel").style.setProperty("--level-progress", `${((state.level - 1) / 24) * 100}%`);
+    $("characterClass").innerHTML = data.classes
+      .map((item) => `<option value="${item.id}">${escapeHtml(localizeClass(item.id, item.name))}</option>`)
+      .join("");
+    $("characterClass").value = state.classId;
+    document
+      .querySelectorAll("[data-source]")
+      .forEach((button) => button.classList.toggle("is-active", button.dataset.source === state.source));
+    $("skillClassLabel").textContent = `/ ${className(state.classId)}`;
+  }
+
+  function setLevelFromPointer(event) {
+    const input = $("characterLevel");
+    const bounds = input.getBoundingClientRect();
+    const progress = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+    input.value = String(Math.round(1 + progress * 24));
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function renderSlots() {
+    const groups = [
+      { name: "armor", container: $("armorSlots"), matches: (slot) => slot.group === "armor" },
+      {
+        name: "accessory",
+        container: $("accessorySlots"),
+        matches: (slot) => slot.group === "accessory" && !["main-weapon", "offhand"].includes(slot.id)
+      },
+      { name: "weapon", container: $("weaponSlots"), matches: (slot) => ["main-weapon", "offhand"].includes(slot.id) }
+    ];
+    groups.forEach((group) => {
+      group.container.innerHTML = data.slots
+        .filter(group.matches)
+        .map((slot) => {
+          const item = activeBuild()[slot.id];
+          const available = item && adapter.isAvailable(item, state.source, slot.id, state.classId);
+          const itemLabel = item ? displayText(item, "name") || item.name : "";
+          const rarity = item?.rarity
+            ? `<span class="slot-empty ${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>`
+            : "";
+          const runeControls =
+            group.name === "armor" && item && available
+              ? Array.from({ length: adapter.getRuneSlots(item) }, (_, index) => {
+                  const rune = canonicalRune(selectedRunesForSlot(slot.id)[index]);
+                  const slotLabel = localizeSlot(slot);
+                  const label = rune
+                    ? displayText(rune, "name") || rune.name
+                    : t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 });
+                  return `<button class="rune-button${rune ? " is-filled" : ""}" type="button" data-rune-slot="${index}" data-armor-slot="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 }))}"><span>R${index + 1}</span><strong>${escapeHtml(label)}</strong></button>`;
+                }).join("")
+              : "";
+          const slotLabel = localizeSlot(slot);
+          return `<div class="equipment-slot-wrap"><button class="slot-button${item ? " is-filled" : ""}${item && !available ? " is-unavailable" : ""}" type="button" data-slot-id="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectSlot", { slot: slotLabel }))}"${item && !available ? ` aria-disabled="true" title="${escapeHtml(t("page.characterBuild.unavailable"))}"` : ""}>
+          <span class="slot-icon" aria-hidden="true">${slot.icon}</span>
+          <span class="slot-name">${escapeHtml(slotLabel)}</span>
+          ${item ? `<span class="slot-item">${escapeHtml(itemLabel)}</span>${rarity}<span class="slot-empty">${available ? t("page.characterBuild.equipped") : t("page.characterBuild.unavailable")}</span>` : `<span class="slot-empty">${t("page.characterBuild.emptySlot")}</span>`}
+        </button>${runeControls ? `<div class="rune-controls" aria-label="${escapeHtml(t("page.characterBuild.runeSlots", { slot: slotLabel }))}">${runeControls}</div>` : ""}</div>`;
+        })
+        .join("");
+    });
+  }
+
+  function renderStats() {
+    const statsGroups = $("statsGroups");
+    const previousGroups = [...statsGroups.querySelectorAll(".stats-group")];
+    const openGroups = new Set(previousGroups.filter((group) => group.open).map((group) => group.dataset.statsGroup));
+    const calculated = calculator.calculateBuildStats({
+      equipment: calculationEquipment(),
+      source: state.source,
+      level: state.level,
+      classId: state.classId,
+      selectedSkills: selectedSkillNodes(),
+      isAvailable: isCalculationItemAvailable
+    });
+    const hasPreviousState = previousGroups.length > 0;
+    const baseStats = calculator.createBaseStats ? calculator.createBaseStats(state.classId) : null;
+    const equippedCount = Object.values(calculationEquipment()).filter(Boolean).length;
+    const summary = statsGroups && document.querySelector(".stats-panel .base-value");
+    if (summary) {
+      summary.textContent = [
+        `${t("page.characterBuild.level")} ${state.level}`,
+        localizeClass(state.classId, state.classId),
+        `${equippedCount} ${t("page.characterBuild.equipped")}`
+      ].join(" · ");
+    }
+    statsGroups.innerHTML = Object.entries(calculator.groups)

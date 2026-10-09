@@ -27,15 +27,6 @@ async function assertLanguageIntegrity(page, label) {
   return state.lang;
 }
 
-async function clickThroughDataset(page, expectedPathname) {
-  await page.waitForSelector(".sao-dataset-dialog", { timeout: 6000 });
-  await Promise.all([
-    page.waitForURL((url) => decodeURIComponent(url.pathname) === expectedPathname, { timeout: 8000 }),
-    page.locator(".sao-dataset-choice").first().click()
-  ]);
-  await page.waitForTimeout(250);
-}
-
 (async () => {
   await ensureStaticServer();
   const browser = await chromium.launch({ headless: true });
@@ -59,10 +50,14 @@ async function clickThroughDataset(page, expectedPathname) {
       results.push({ island, target: "menu", url: `${menuLanding.pathname}${menuLanding.search}` });
       await menuSession.context.close();
 
-      // --- compendium -> dataset dialog -> beta, floor preserved -----------
+      // --- compendium -> direct navigation, island preserved, no re-prompt --
       const compSession = await openPage(browser, `${mainuiUrl}?floor=${island}`);
       await compSession.page.locator('button[data-nav-target="compendium"]').click();
-      await clickThroughDataset(compSession.page, "/Fractured Underworld/Compendium/compendium.html");
+      await compSession.page.waitForURL(
+        (url) => decodeURIComponent(url.pathname) === "/Fractured Underworld/Compendium/compendium.html",
+        { timeout: 8000 }
+      );
+      await compSession.page.waitForTimeout(250);
       const compLanding = describeUrl(compSession.page.url());
       assert.equal(
         compLanding.pathname,
@@ -70,16 +65,24 @@ async function clickThroughDataset(page, expectedPathname) {
         `${island}: compendium landing`
       );
       assert.equal(compLanding.floor, island, `${island}: compendium preserves the island`);
-      assert.equal(compLanding.dataset, "beta", `${island}: compendium carries dataset=beta`);
+      assert.equal(
+        await compSession.page.locator(".sao-dataset-dialog").count(),
+        0,
+        `${island}: compendium does not re-ask for the data mode`
+      );
       assert.deepEqual(compSession.errors, [], `${island}/compendium: no console errors`);
       assert.deepEqual(compSession.failedRequests, [], `${island}/compendium: no failed requests`);
       results.push({ island, target: "compendium", url: `${compLanding.pathname}${compLanding.search}` });
       await compSession.context.close();
 
-      // --- towerDefense -> dataset dialog -> beta, floor preserved ---------
+      // --- towerDefense -> direct navigation, island preserved, no re-prompt -
       const tdSession = await openPage(browser, `${mainuiUrl}?floor=${island}`);
       await tdSession.page.locator('button[data-nav-target="towerDefense"]').click();
-      await clickThroughDataset(tdSession.page, "/Fractured Underworld/Tower Defense/towerdefense.html");
+      await tdSession.page.waitForURL(
+        (url) => decodeURIComponent(url.pathname) === "/Fractured Underworld/Tower Defense/towerdefense.html",
+        { timeout: 8000 }
+      );
+      await tdSession.page.waitForTimeout(250);
       const tdLanding = describeUrl(tdSession.page.url());
       assert.equal(
         tdLanding.pathname,
@@ -87,7 +90,11 @@ async function clickThroughDataset(page, expectedPathname) {
         `${island}: tower defense landing`
       );
       assert.equal(tdLanding.floor, island, `${island}: tower defense preserves the island`);
-      assert.equal(tdLanding.dataset, "beta", `${island}: tower defense carries dataset=beta`);
+      assert.equal(
+        await tdSession.page.locator(".sao-dataset-dialog").count(),
+        0,
+        `${island}: tower defense does not re-ask for the data mode`
+      );
       assert.deepEqual(tdSession.errors, [], `${island}/towerDefense: no console errors`);
       assert.deepEqual(tdSession.failedRequests, [], `${island}/towerDefense: no failed requests`);
       results.push({ island, target: "towerDefense", url: `${tdLanding.pathname}${tdLanding.search}` });

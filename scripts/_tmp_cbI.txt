@@ -1,0 +1,100 @@
+    renderStats();
+    $("equipmentDialog").close();
+  }
+
+  function equipRune(runeId) {
+    const armor = activeBuild()[state.pickerArmorSlot];
+    const rune = activeRunes().find((item) => item.id === runeId);
+    if (!armor || !rune || state.pickerRuneIndex === null || state.pickerRuneIndex >= adapter.getRuneSlots(armor))
+      return;
+    if (!activeSkillState().runes || typeof activeSkillState().runes !== "object") activeSkillState().runes = {};
+    const selected = Array.isArray(activeSkillState().runes[state.pickerArmorSlot])
+      ? [...activeSkillState().runes[state.pickerArmorSlot]]
+      : [];
+    selected[state.pickerRuneIndex] = rune;
+    activeSkillState().runes[state.pickerArmorSlot] = selected;
+    saveState();
+    renderSlots();
+    renderStats();
+    $("equipmentDialog").close();
+  }
+
+  function removeIncompatibleEquipment() {
+    const equipment = activeBuild();
+    Object.keys(equipment).forEach((slotId) => {
+      if (!itemIsClassCompatible(equipment[slotId], state.classId)) delete equipment[slotId];
+    });
+  }
+
+  function unlockSkill(skillId) {
+    const node = currentSkillTree().find((item) => item.id === skillId);
+    if (!node) return;
+    if (node.center) {
+      renderSkillDetail(skillId);
+      return;
+    }
+    const status = skillNodeState(node);
+    if (status.name === "selected") {
+      delete activeSkillState().selectedSkills[node.id];
+      pruneInvalidSelectedSkills();
+    } else if (status.name === "available") {
+      activeSkillState().selectedSkills[node.id] = true;
+      pruneInvalidSelectedSkills();
+    } else {
+      renderSkillDetail(skillId);
+      return;
+    }
+    saveState();
+    updateSkillTreeState(skillId);
+    renderStats();
+  }
+
+  function resetBuild() {
+    const active = activeSkillState();
+    resetBuildState(active);
+    syncActiveConfiguration();
+    saveState();
+    renderConfiguration();
+    renderSlots();
+    renderStats();
+    renderSkills();
+    if ($("equipmentDialog").open) $("equipmentDialog").close();
+  }
+
+  function ensureWalkthroughDialog() {
+    const dialog = $("equipmentDialog");
+    if (dialog?.open) return;
+    const firstSlot = document.querySelector(
+      "#armorSlots [data-slot-id], #accessorySlots [data-slot-id], #weaponSlots [data-slot-id]"
+    );
+    firstSlot?.click();
+    walkthroughOpenedDialog = Boolean(dialog?.open);
+  }
+
+  function closeWalkthroughDialog() {
+    if (walkthroughOpenedDialog && $("equipmentDialog")?.open) $("equipmentDialog").close();
+  }
+
+  function buildWalkthroughSteps() {
+    return [
+      {
+        selector: "[data-walkthrough='character-build-title']",
+        title: t("page.characterBuild.walkthrough.step1Title"),
+        body: t("page.characterBuild.walkthrough.step1Body")
+      },
+      {
+        /* The whole level section: the level bar plus its label and the level numbers. */
+        selector: ".level-control",
+        title: t("page.characterBuild.walkthrough.step2Title"),
+        body: t("page.characterBuild.walkthrough.step2Body")
+      },
+      {
+        selector: "#equipmentHeading",
+        title: t("page.characterBuild.walkthrough.step3Title"),
+        body: t("page.characterBuild.walkthrough.step3Body")
+      },
+      {
+        selector: "#armorSlots",
+        title: t("page.characterBuild.walkthrough.step4Title"),
+        body: t("page.characterBuild.walkthrough.step4Body")
+      },

@@ -70,10 +70,10 @@
     return buildQueryUrl(path, { floor });
   }
 
-  // Resolves and performs navigation for one section nav button.
-  // Returns "navigate" when the location was reassigned, "dataset" when the
-  // dataset selector was opened instead (callers should preventDefault), and
-  // null when the target is unknown or unsafe.
+  // Resolves and performs navigation for one section nav button. The active data mode travels
+  // with the stored world state (see shared/sao-datasets.js), so sections no longer prompt for
+  // it here. Returns "navigate" when the location was reassigned and null when the target is
+  // unknown or unsafe.
   function navigateToSection(button, options) {
     const config = options || {};
     const section = button && button.dataset && button.dataset.navTarget;
@@ -85,17 +85,6 @@
       buildSectionUrl(section, floor, config.sectionPaths, config.floorAwareSections)
     );
     if (!nextHref) return null;
-
-    const datasets = global.SAODatasets;
-    if (datasets && datasets.affectedSections.has(section)) {
-      datasets.installStyles();
-      datasets.navigate({
-        section,
-        url: nextHref,
-        title: button.textContent.trim()
-      });
-      return "dataset";
-    }
 
     window.location.href = nextHref;
     return "navigate";
@@ -110,12 +99,11 @@
       const button = event.target.closest("button[data-nav-target]");
       if (!button) return;
 
-      const outcome = navigateToSection(button, {
+      navigateToSection(button, {
         sectionPaths: config.sectionPaths,
         floorAwareSections: config.floorAwareSections,
         floorProvider
       });
-      if (outcome === "dataset") event.preventDefault();
     });
   }
 

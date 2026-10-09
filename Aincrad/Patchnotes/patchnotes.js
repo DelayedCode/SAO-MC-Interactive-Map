@@ -1,5 +1,13 @@
 const PATCH_NOTES = [
   {
+    version: "Character Build Skill Tree Update - v1.7",
+    date: "2026-10-08",
+    title: "Character Build Skill Tree Update",
+    summary:
+      "Character Build\n• Rebuilt the skill tree from 9 to 77 skills, with updated prerequisites and branching paths.\n• Added level-based skill points, an Unlimited Skill Points toggle, and improved skill unlocking.\n• Added skill-tree dragging, zooming, and mobile layout fixes.\n• Fixed character base stats and skill stat calculations.\n\nMaps & Waypoints\n• Increased map zoom from 30x to 45x and improved map clarity when zoomed in.\n• Improved coordinate accuracy.\n• Updated JourneyMap waypoint exports to include Mob Areas.\n\nData & UI\n• Expanded and updated Current Data across Equipment, Bestiary, and map waypoints.\n• Updated the data-version selection UI and changed the Beta-Test Data badge to LEGACY.\n• Added a Moonlit Black Cats Discord link to the hub menu.\n\nLocalization & Bug Fixes\n• Fixed Spanish and French map description translations.\n• Updated translations for new equipment and renamed mobs.\n• Fixed Character Build skill prerequisites and mobile clipping.",
+    tags: ["Character Build", "Maps", "Waypoints", "Equipment", "Bestiary", "Localization", "UI", "Bug Fixes"]
+  },
+  {
     version: "Map Tools & Waypoint Update - v1.6",
     date: "2026-10-03",
     title: "Map Tools & Waypoint Update",
@@ -92,6 +100,7 @@ function getPatchNoteId(entry) {
   const version = entry.version.match(/v\d+(?:\.\d+)?(?:\.\d+)?/i)?.[0].toLowerCase();
   return (
     {
+      "v1.7": "v170",
       "v1.6": "v160",
       "v1.5": "v150",
       "v1.4": "v140",

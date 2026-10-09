@@ -1,0 +1,12 @@
+
+LineNumber Line                                                                                                                                                                                         
+---------- ----                                                                                                                                                                                         
+       115   // Add prerequisiteMode: "any" when any one listed prerequisite is sufficient; otherwise all are required.                                                                                 
+       139     skill4: { name: "Decisive Strike", stat: "Critical Power", amount: 5, statMode: "percent", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },
+       224     skill4: { name: "Side Step", stat: "Dodge", amount: 2, statMode: "Percent", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },               
+       309     skill4: { name: "Striking Force", stat: "Attack Damage", amount: 1, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },     
+       394     skill4: { name: "Arcane Reserve", stat: "Max Mana", amount: 2, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },          
+       479     skill4: { name: "Healing Art", stat: "Bonus Heal", amount: 1, statMode: "flat", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },           
+
+
+

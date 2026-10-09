@@ -26,6 +26,7 @@
     ingotBlacksmith: "#7D3C98",
     keyBlacksmith: "#1ABC9C",
     accessoriesBlacksmith: "#E74C3C",
+    secretAccessoryBlacksmith: "#8E44AD",
     runeCraftsmen: "#3498DB",
     npc: "#F39C12",
     rulid: "#27AE60",
@@ -81,17 +82,6 @@
     }
 
     return `#${normalized.toUpperCase()}`;
-  }
-
-  function hexToRgb(hex) {
-    const normalized = normalizeHexColor(hex);
-    if (!normalized) return null;
-    const value = normalized.slice(1);
-    return {
-      r: Number.parseInt(value.slice(0, 2), 16),
-      g: Number.parseInt(value.slice(2, 4), 16),
-      b: Number.parseInt(value.slice(4, 6), 16)
-    };
   }
 
   function rgbToJourneyMapInt(hex) {
@@ -204,8 +194,6 @@
     HARDCODED_CATEGORY_COLORS,
     getHardcodedCategoryColor,
     normalizeHexColor,
-    isValidHexColor: (value) => Boolean(normalizeHexColor(value)),
-    hexToRgb,
     rgbToJourneyMapInt,
     randomHexColor,
     getStoredCategoryJourneyMapColor,

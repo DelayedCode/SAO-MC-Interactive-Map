@@ -1,0 +1,117 @@
+﻿  64:     { id: "n21", x: 650, y: 337 }, { id: "n22", x: 524, y: 337 }, { id: "n23", x: 270, y: 337 },
+  65:     { id: "n24", x: 713, y: 337 }, { id: "n25", x: 206, y: 337 }, { id: "n26", x: 143, y: 337 },
+  66:     { id: "n27", x: 778, y: 337 }, { id: "n28", x: 460, y: 399 }, { id: "n29", x: 270, y: 399 },
+  67:     { id: "n30", x: 334, y: 399 }, { id: "n31", x: 587, y: 399 },
+  68:     { id: "n32", x: 206, y: 400 }, { id: "n33", x: 713, y: 400 }, { id: "n34", x: 206, y: 463 },
+  69:     { id: "n35", x: 713, y: 463 }, { id: "n36", x: 524, y: 463 }, { id: "n37", x: 270, y: 464 },
+  70:     { id: "n38", x: 650, y: 464 }, { id: "n39", x: 460, y: 464 },
+  71:     { id: "n40", x: 396, y: 464 }, { id: "n41", x: 143, y: 464 }, { id: "n42", x: 904, y: 464 },
+  72:     { id: "n43", x: 16, y: 464 }, { id: "n44", x: 777, y: 464 }, { id: "n45", x: 334, y: 527 },
+  73:     { id: "n46", x: 206, y: 527 }, { id: "n47", x: 713, y: 527 }, { id: "n48", x: 650, y: 528 },
+  74:     { id: "n49", x: 460, y: 528 }, { id: "n50", x: 587, y: 528 }, { id: "n51", x: 334, y: 589, isAnchor: true },
+  75:     { id: "n52", x: 587, y: 589, isAnchor: true }, { id: "n53", x: 713, y: 590 }, { id: "n54", x: 206, y: 590 },
+  76:     { id: "n55", x: 270, y: 590 }, { id: "n56", x: 396, y: 590 }, { id: "n57", x: 650, y: 590 },
+  77:     { id: "n58", x: 524, y: 590 }, { id: "n59", x: 143, y: 590 }, { id: "n60", x: 778, y: 590 },
+  78:     { id: "n61", x: 587, y: 653 }, { id: "n62", x: 334, y: 653 }, { id: "n63", x: 206, y: 654 },
+  79:     { id: "n64", x: 713, y: 654 }, { id: "n65", x: 396, y: 654 }, { id: "n66", x: 460, y: 654 },
+  80:     { id: "n67", x: 334, y: 717 }, { id: "n68", x: 460, y: 717 }, { id: "n69", x: 587, y: 717 },
+  81:     { id: "n70", x: 396, y: 717 }, { id: "n71", x: 650, y: 717 }, { id: "n72", x: 524, y: 717 },
+  82:     { id: "n73", x: 270, y: 717 }, { id: "n74", x: 460, y: 781 }, { id: "n75", x: 587, y: 781 },
+  83:     { id: "n76", x: 334, y: 783 }, { id: "n77", x: 460, y: 908 }
+  84:   ].map((node) =>
+  85:     Object.freeze({ ...node, skillId: FIXED_SKILL_IDS_BY_POINT[node.id] || `skill${nextSkillNumber++}` })
+  86:   ));
+  87: 
+  88:   const SKILL_TREE_CONNECTIONS = Object.freeze([
+  89:     ["n01", "n02"], ["n01", "n04"], ["n02", "n08"], ["n03", "n05"], ["n03", "n10"],
+  90:     ["n04", "n06"], ["n07", "n08"], ["n07", "n10"], ["n08", "n14"], ["n09", "n17"],
+  91:     ["n11", "n13"], ["n11", "n15"], ["n12", "n18"], ["n12", "n20"], ["n12", "n23"],
+  92:     ["n13", "n16"], ["n13", "n19"], ["n13", "n21"], ["n14", "n23"], ["n15", "n24"],
+  93:     ["n15", "n27"], ["n16", "n22"], ["n17", "n20"], ["n17", "n22"], ["n18", "n20"],
+  94:     ["n18", "n23"], ["n18", "n30"], ["n19", "n21"], ["n19", "n22"], ["n19", "n31"],
+  95:     ["n20", "n28"], ["n20", "n30"], ["n21", "n31"], ["n22", "n28"], ["n22", "n31"],
+  96:     ["n23", "n29"], ["n24", "n33"], ["n25", "n26"], ["n26", "n43"], ["n27", "n42"],
+  97:     ["n28", "n39"], ["n29", "n30"], ["n30", "n37"], ["n30", "n40"], ["n31", "n36"],
+  98:     ["n31", "n38"], ["n32", "n41"], ["n33", "n44"], ["n34", "n37"], ["n35", "n38"],
+  99:     ["n36", "n39"], ["n36", "n50"], ["n37", "n45"], ["n38", "n50"], ["n39", "n40"],
+ 100:     ["n39", "n49"], ["n40", "n45"], ["n41", "n46"], ["n42", "n60"], ["n43", "n59"],
+ 101:     ["n44", "n47"], ["n45", "n51"], ["n45", "n55"], ["n45", "n56"], ["n46", "n54"],
+ 102:     ["n48", "n50"], ["n48", "n57"], ["n49", "n56"], ["n49", "n58"], ["n50", "n52"],
+ 103:     ["n50", "n58"], ["n51", "n55"], ["n51", "n56"], ["n51", "n62"], ["n52", "n57"],
+ 104:     ["n52", "n58"], ["n52", "n61"], ["n53", "n60"], ["n54", "n63"], ["n55", "n62"],
+ 105:     ["n56", "n65"], ["n56", "n66"], ["n57", "n61"], ["n57", "n64"], ["n58", "n61"],
+ 106:     ["n58", "n66"], ["n59", "n63"], ["n62", "n65"], ["n62", "n73"], ["n63", "n73"],
+ 107:     ["n64", "n71"], ["n66", "n68"], ["n67", "n76"], ["n69", "n71"], ["n69", "n72"],
+ 108:     ["n70", "n74"], ["n71", "n75"], ["n72", "n74"], ["n75", "n77"], ["n76", "n77"]
+ 109:   ].map((connection) => Object.freeze(connection)));
+ 110: 
+ 111:   // EDITING GUIDE: Change rows only in the class section you want to edit.
+ 112:   // Each row lists name, description, stat, amount, statMode, prerequisites, and cost.
+ 113:   // Use "flat" for points or "percent" for percentages. Prerequisites are skill IDs,
+ 114:   // such as ["skill2"]; use [] when a skill has no prerequisite.
+ 115:   // Add prerequisiteMode: "any" when any one listed prerequisite is sufficient; otherwise all are required.
+ 116:   // Keep Skill 1 cost at 0 and Skills 2-77 cost at 1.
+ 117:   // This helper only indexes the explicit rows; it does not supply skill defaults.
+ 118:   function indexClassSkills(className, skills) {
+ 119:     return Object.freeze(
+ 120:       Object.fromEntries(
+ 121:         Object.entries(skills).map(([skillId, skill]) => {
+ 122:           const indexedSkill = { ...skill, id: skillId, className };
+ 123:           if (skillId !== "skill1") indexedSkill.prerequisites = Object.freeze([...skill.prerequisites]);
+ 124:           return [skillId, Object.freeze(indexedSkill)];
+ 125:         })
+ 126:       )
+ 127:     );
+ 128:   }
+ 129: 
+ 130:   // ============================================================
+ 131:   // ARCHER SKILLS
+ 132:   // Edit the values inside each skill entry. All 77 skills are listed here.
+ 133:   // statMode must be "flat" or "percent"; prerequisites use skill IDs such as ["skill2"].
+ 134:   // ============================================================
+ 135:   const ARCHER_SKILLS = indexClassSkills("Archer", {
+ 136:     skill1: { name: "Archer Path", description: "The center of the tree." },
+ 137:     skill2: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
+ 138:     skill3: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill2"], cost: 1 },
+ 139:     skill4: { name: "Decisive Strike", stat: "Critical Power", amount: 5, statMode: "percent", prerequisites: ["skill25", "skill3", "skill5", "skill28"], prerequisiteMode: "any", cost: 1 },
+ 140:     skill5: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill25"], cost: 1 },
+ 141:     skill6: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
+ 142:     skill7: { name: "Reinforced Guard", stat: "Defense", amount: 2, statMode: "flat", prerequisites: ["skill6"], cost: 1 },
+ 143:     skill8: { name: "Bloodthirst", stat: "Lifesteal", amount: 0.1, statMode: "percent", prerequisites: ["skill27"], cost: 1 },
+ 144:     skill9: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill23"], cost: 1 },
+ 145:     skill10: { name: "Deep Breath", stat: "Stamina", amount: 2, statMode: "flat", prerequisites: ["skill11"], cost: 1 },
+ 146:     skill11: { name: "Reinforced Vitality", stat: "Max Health", amount: 3, statMode: "flat", prerequisites: ["skill17"], cost: 1 },
+ 147:     skill12: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill19"], cost: 1 },
+ 148:     skill13: { name: "Reinforced Vitality", stat: "Max Health", amount: 3, statMode: "flat", prerequisites: ["skill10"], cost: 1 },
+ 149:     skill14: { name: "Striking Force", stat: "Attack Damage", amount: 2, statMode: "flat", prerequisites: ["skill12"], cost: 1 },
+ 150:     skill15: { name: "Decisive Strike", stat: "Critical Power", amount: 5, statMode: "percent", prerequisites: ["skill13"], cost: 1 },
+ 151:     skill16: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill17"], cost: 1 },
+ 152:     skill17: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill21"], cost: 1 },
+ 153:     skill18: { name: "Decisive Strike", stat: "Critical Power", amount: 5, statMode: "percent", prerequisites: ["skill24"], cost: 1 },
+ 154:     skill19: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill16"], cost: 1 },
+ 155:     skill20: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill9"], cost: 1 },
+ 156:     skill21: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill28"], cost: 1 },
+ 157:     skill22: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill20"], cost: 1 },
+ 158:     skill23: { name: "Reinforced Vitality", stat: "Max Health", amount: 3, statMode: "flat", prerequisites: ["skill27"], cost: 1 },
+ 159:     skill24: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill25"], cost: 1 },
+ 160:     skill25: { name: "Reinforced Vitality", stat: "Max Health", amount: 3, statMode: "flat", prerequisites: ["skill33"], cost: 1 },
+ 161:     skill26: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill7"], cost: 1 },
+ 162:     skill27: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill33"], cost: 1 },
+ 163:     skill28: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill5"], cost: 1 },
+ 164:     skill29: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill22"], cost: 1 },
+ 165:     skill30: { name: "Light Step", stat: "Movement Speed", amount: 3, statMode: "Percent", prerequisites: ["skill31"], cost: 1 },
+ 166:     skill31: { name: "Reinforced Vitality", stat: "Max Health", amount: 3, statMode: "flat", prerequisites: ["skill43"], cost: 1 },
+ 167:     skill32: { name: "Reinforced Vitality", stat: "Max Health", amount: 3, statMode: "flat", prerequisites: ["skill22"], cost: 1 },
+ 168:     skill33: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill1"], cost: 1 },
+ 169:     skill34: { name: "Deep Breath", stat: "Stamina", amount: 2, statMode: "flat", prerequisites: ["skill3"], cost: 1 },
+ 170:     skill35: { name: "Swiftness", stat: "Attack Speed", amount: 0.05, statMode: "flat", prerequisites: ["skill41"], cost: 1 },
+ 171:     skill36: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill29"], cost: 1 },
+ 172:     skill37: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill39"], cost: 1 },
+ 173:     skill38: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill40"], cost: 1 },
+ 174:     skill39: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill3"], cost: 1 },
+ 175:     skill40: { name: "Marksmanship", stat: "Projectile Damage", amount: 1, statMode: "percent", prerequisites: ["skill7"], cost: 1 },
+ 176:     skill41: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill46"], cost: 1 },
+ 177:     skill42: { name: "Deep Breath", stat: "Stamina", amount: 2, statMode: "flat", prerequisites: ["skill32"], cost: 1 },
+ 178:     skill43: { name: "Deep Breath", stat: "Stamina", amount: 2, statMode: "flat", prerequisites: ["skill59"], cost: 1 },
+ 179:     skill44: { name: "Critical Instinct", stat: "Critical Chance", amount: 0.5, statMode: "percent", prerequisites: ["skill36"], cost: 1 },
+ 180:     skill45: { name: "Reinforced Guard", stat: "Defense", amount: 2, statMode: "flat", prerequisites: ["skill2"], cost: 1 },

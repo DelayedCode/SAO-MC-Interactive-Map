@@ -1,0 +1,1172 @@
+﻿   1: (function () {
+   2:   "use strict";
+   3: 
+   4:   const data = window.CharacterBuildData;
+   5:   const adapter = window.CharacterBuildAdapter;
+   6:   const calculator = window.CharacterBuildCalculator;
+   7:   const i18n = window.SAOI18n || null;
+   8:   const walkthroughStorageKey = "sao.walkthrough.characterBuild.completed";
+   9:   let walkthroughController = null;
+  10:   let walkthroughOpenedDialog = false;
+  11:   const fallbackLabels = {
+  12:     "page.characterBuild.emptySlot": "Empty slot",
+  13:     "page.characterBuild.allRarities": "All rarities",
+  14:     "page.characterBuild.select": "Select",
+  15:     "page.characterBuild.rune": "Rune",
+  16:     "page.characterBuild.alreadyUnlocked": "Already unlocked",
+  17:     "page.characterBuild.readyToUnlock": "Ready to unlock",
+  18:     "page.characterBuild.none": "None",
+  19:     "page.characterBuild.prototypeTree": "Prototype tree",
+  20:     "page.characterBuild.prototypeDataOnly": "Prototype data only"
+  21:   };
+  22:   const t = (key, params) => {
+  23:     const template = i18n ? i18n.t(key, params) : fallbackLabels[key] || key;
+  24:     return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_match, token) =>
+  25:       params && Object.prototype.hasOwnProperty.call(params, token) ? String(params[token]) : `{${token}}`
+  26:     );
+  27:   };
+  28:   const content = (key, fallback, params) =>
+  29:     i18n && typeof i18n.content === "function" ? i18n.content(key, fallback, params) : fallback;
+  30:   function dataKey(value) {
+  31:     const key = String(value || "")
+  32:       .replace(/[^a-zA-Z0-9]+(.)/g, (_match, character) => character.toUpperCase())
+  33:       .replace(/[^a-zA-Z0-9]/g, "");
+  34:     return key ? key.charAt(0).toLowerCase() + key.slice(1) : "";
+  35:   }
+  36:   function localizeClass(classId, fallback) {
+  37:     return t(`page.characterBuild.classes.${classId}`, null) === `page.characterBuild.classes.${classId}`
+  38:       ? fallback
+  39:       : t(`page.characterBuild.classes.${classId}`);
+  40:   }
+  41:   function localizeSlot(slot) {
+  42:     const key = `page.characterBuild.slotNames.${slot.id}`;
+  43:     return t(key, null) === key ? slot.name : t(key);
+  44:   }
+  45:   function localizeStat(stat) {
+  46:     const key = `page.characterBuild.statNames.${dataKey(stat)}`;
+  47:     return t(key, null) === key ? stat : t(key);
+  48:   }
+  49:   function localizeGroup(group) {
+  50:     const key = `page.characterBuild.groupNames.${dataKey(group)}`;
+  51:     return t(key, null) === key ? group : t(key);
+  52:   }
+  53:   function localizeClassLabel(label) {
+  54:     const normalized = String(label || "").toLowerCase();
+  55:     const classId = normalized === "warrior" || normalized === "guerrier" ? "guerrier" : normalized;
+  56:     return t(`page.characterBuild.classes.${classId}`, null) === `page.characterBuild.classes.${classId}`
+  57:       ? label
+  58:       : localizeClass(classId, label).split(" /")[0];
+  59:   }
+  60:   function localizeRarity(rarity) {
+  61:     return window.SAOContentTranslations?.translateKnownTerms?.(rarity, i18n?.getLanguage?.()) || rarity;
+  62:   }
+  63:   function localizeItemEffect(effect) {
+  64:     const match = String(effect || "").match(/^([^:]+):\s*(.*)$/);
+  65:     if (!match) return String(effect || "");
+  66:     const language = i18n?.getLanguage?.() || "en";
+  67:     const translate = (value) => window.SAOContentTranslations?.translateKnownTerms?.(value, language) || value;
+  68:     const statLabel = localizeStat(match[1]);
+  69:     return `${statLabel === match[1] ? translate(match[1]) : statLabel}: ${translate(match[2])}`;
+  70:   }
+  71:   function registerCharacterBuildTranslations() {
+  72:     Object.entries(data.CLASS_SKILLS).forEach(([classId, skills]) => {
+  73:       Object.entries(skills).forEach(([skillId, skill]) => {
+  74:         window.SAOContentTranslations?.registerCharacterBuildNode?.(
+  75:           { ...skill, id: `${classId}-${skillId}`, branch: skillId === "skill1" ? "core" : "branch" },
+  76:           classId,
+  77:           skillId === "skill1" ? "core" : "branch"
+  78:         );
+  79:       });
+  80:     });
+  81:   }
+  82:   function localizeSkillName(node) {
+  83:     return content(`characterBuild.skill.${node.id}.name`, node.name);
+  84:   }
+  85:   function localizeSkillDescription(node) {
+  86:     return content(`characterBuild.skill.${node.id}.description`, node.description, { className: node.className });
+  87:   }
+  88:   const storage = window.SAOStorage || { getJSON: (_key, fallback) => fallback, setJSON() {} };
+  89:   /* The site-wide dataset default is "beta" (shared/sao-datasets.js getDataset falls back to it
+  90:      for a missing or invalid dataset). The "current" equipment dataset ships as an empty stub,
+  91:      so defaulting the builder to it left every slot picker with nothing to list on a first
+  92:      visit. Defaulting to the same dataset the rest of the site uses keeps the picker usable;
+  93:      the Source toggle still offers "current" for when that dataset is filled in. */
+  94:   const DEFAULT_SOURCE = "beta";
+  95:   const state = {
+  96:     source: DEFAULT_SOURCE,
+  97:     activeSlot: "1",
+  98:     level: 1,
+  99:     classId: data.classes[0].id,
+ 100:     pickerSlot: null,
+ 101:     pickerMode: "equipment",
+ 102:     pickerArmorSlot: null,
+ 103:     pickerRuneIndex: null,
+ 104:     search: "",
+ 105:     rarity: ""
+ 106:   };
+ 107:   const buildSlots = {
+ 108:     1: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} },
+ 109:     2: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} },
+ 110:     3: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} }
+ 111:   };
+ 112:   const buildStateKey = "sao.characterBuild.foundation";
+ 113: 
+ 114:   function $(id) {
+ 115:     return document.getElementById(id);
+ 116:   }
+ 117:   function mountIcons() {
+ 118:     document.querySelectorAll("[data-cb-icon]").forEach((element) => {
+ 119:       element.innerHTML = window.CharacterBuildIcons.markup(element.dataset.cbIcon);
+ 120:     });
+ 121:   }
+ 122:   const { escapeHtml } = window.SAOPageHelpers;
+ 123:   function normalize(value) {
+ 124:     return String(value || "").toLowerCase();
+ 125:   }
+ 126:   function activeBuild() {
+ 127:     return buildSlots[state.activeSlot].equipment;
+ 128:   }
+ 129:   function activeSkillState() {
+ 130:     return buildSlots[state.activeSlot];
+ 131:   }
+ 132:   function syncActiveConfiguration() {
+ 133:     const active = activeSkillState();
+ 134:     state.source = active.source;
+ 135:     state.level = active.level;
+ 136:     state.classId = active.classId;
+ 137:   }
+ 138:   function resetBuildState(build) {
+ 139:     build.level = 1;
+ 140:     build.classId = data.classes[0].id;
+ 141:     build.equipment = {};
+ 142:     build.runes = {};
+ 143:     build.selectedSkills = {};
+ 144:   }
+ 145:   function restoreBuildState(target, saved) {
+ 146:     if (!saved || typeof saved !== "object") return;
+ 147:     target.source = saved.source === "current" ? "current" : DEFAULT_SOURCE;
+ 148:     target.level = Math.min(25, Math.max(1, Number(saved.level) || 1));
+ 149:     target.classId = data.classes.some((item) => item.id === saved.classId) ? saved.classId : target.classId;
+ 150:     target.equipment = saved.equipment && typeof saved.equipment === "object" ? saved.equipment : {};
+ 151:     target.runes = saved.runes && typeof saved.runes === "object" ? saved.runes : {};
+ 152:     target.selectedSkills =
+ 153:       saved.selectedSkills && typeof saved.selectedSkills === "object" ? saved.selectedSkills : {};
+ 154:   }
+ 155:   function slotById(slotId) {
+ 156:     return data.slots.find((slot) => slot.id === slotId);
+ 157:   }
+ 158:   function skillNodeId(classId, skillId) {
+ 159:     return `${classId}-${skillId}`;
+ 160:   }
+ 161:   function skillClassName(classId) {
+ 162:     if (classId === "guerrier") return "Warrior";
+ 163:     const selectedClass = data.classes.find((item) => item.id === classId);
+ 164:     return selectedClass ? selectedClass.name.split(" /")[0].trim() : classId;
+ 165:   }
+ 166:   const skillNeighborsById = (() => {
+ 167:     const skillByPointId = new Map(data.SKILL_TREE_LAYOUT.map((point) => [point.id, point.skillId]));
+ 168:     const neighbors = new Map(data.SKILL_TREE_LAYOUT.map((point) => [point.skillId, new Set()]));
+ 169:     data.SKILL_TREE_CONNECTIONS.forEach(([firstPointId, secondPointId]) => {
+ 170:       const firstSkillId = skillByPointId.get(firstPointId);
+ 171:       const secondSkillId = skillByPointId.get(secondPointId);
+ 172:       neighbors.get(firstSkillId).add(secondSkillId);
+ 173:       neighbors.get(secondSkillId).add(firstSkillId);
+ 174:     });
+ 175:     return new Map([...neighbors].map(([skillId, adjacentSkillIds]) => [skillId, [...adjacentSkillIds]]));
+ 176:   })();
+ 177:   function currentSkillTree() {
+ 178:     const classSkills = data.CLASS_SKILLS[state.classId] || data.WARRIOR_SKILLS;
+ 179:     return data.SKILL_TREE_LAYOUT.map((point) => {
+ 180:       const config = classSkills[point.skillId];
+ 181:       const center = point.skillId === "skill1";
+ 182:       const skill58 = point.skillId === "skill58";
+ 183:       const value = center ? null : config.statMode === "percent" ? `${config.amount}%` : config.amount;
+ 184:       const prerequisiteSkillIds = center
+ 185:         ? []
+ 186:         : skill58
+ 187:           ? config.prerequisites
+ 188:           : skillNeighborsById.get(point.skillId);
+ 189:       return {
+ 190:         id: skillNodeId(state.classId, point.skillId),
+ 191:         nodeId: point.skillId,
+ 192:         layoutId: point.id,
+ 193:         name: config.name,
+ 194:         description: config.description,
+ 195:         className: skillClassName(state.classId),
+ 196:         ...(center ? {} : { stat: config.stat, amount: config.amount, statMode: config.statMode }),
+ 197:         cost: center ? 0 : 1,
+ 198:         prerequisiteMode: center || !skill58 ? "any" : "all",
+ 199:         prerequisites: prerequisiteSkillIds.map((id) => skillNodeId(state.classId, id)),
+ 200:         effects: center ? [] : [{ stat: config.stat, value }],
+ 201:         x: point.x,
+ 202:         y: point.y,
+ 203:         branch: center ? "core" : "branch",
+ 204:         center
+ 205:       };
+ 206:     });
+ 207:   }
+ 208:   function isSkillUnlocked(skillId) {
+ 209:     return skillId === skillNodeId(state.classId, "skill1") || Boolean(activeSkillState().selectedSkills[skillId]);
+ 210:   }
+ 211:   function skillPrerequisitesSatisfied(node, selectedSkillIds = null) {
+ 212:     if (!node.prerequisites.length) return true;
+ 213:     const isSelected = (skillId) =>
+ 214:       skillId === skillNodeId(state.classId, "skill1") ||
+ 215:       (selectedSkillIds ? selectedSkillIds.has(skillId) : isSkillUnlocked(skillId));
+ 216:     if (node.prerequisiteMode === "any") return node.prerequisites.some(isSelected);
+ 217:     return node.prerequisites.every(isSelected);
+ 218:   }
+ 219:   function pruneInvalidSelectedSkills() {
+ 220:     const build = activeSkillState();
+ 221:     const selectedSkillIds = new Set(
+ 222:       Object.keys(build.selectedSkills || {}).filter((skillId) => build.selectedSkills[skillId])
+ 223:     );
+ 224:     let removedInvalidSkill;
+ 225:     do {
+ 226:       removedInvalidSkill = false;
+ 227:       currentSkillTree().forEach((node) => {
+ 228:         if (node.center || !selectedSkillIds.has(node.id) || skillPrerequisitesSatisfied(node, selectedSkillIds)) return;
+ 229:         selectedSkillIds.delete(node.id);
+ 230:         removedInvalidSkill = true;
+ 231:       });
+ 232:     } while (removedInvalidSkill);
+ 233:     build.selectedSkills = Object.fromEntries([...selectedSkillIds].map((skillId) => [skillId, true]));
+ 234:   }
+ 235:   function missingSkillPrerequisites(node) {
+ 236:     if (skillPrerequisitesSatisfied(node)) return [];
+ 237:     return node.prerequisites.filter((id) => !isSkillUnlocked(id));
+ 238:   }
+ 239:   function selectedSkillNodes() {
+ 240:     return currentSkillTree().filter((node) => isSkillUnlocked(node.id));
+ 241:   }
+ 242:   function availableSkillPoints() {
+ 243:     const skills = currentSkillTree();
+ 244:     const total = skills.reduce((points, node) => points + node.cost, 0);
+ 245:     const spent = skills.reduce((points, node) => points + (isSkillUnlocked(node.id) ? node.cost : 0), 0);
+ 246:     return Math.max(0, total - spent);
+ 247:   }
+ 248:   function activeItems() {
+ 249:     return adapter.getItems(state.source);
+ 250:   }
+ 251:   function activeRunes() {
+ 252:     return adapter.getRunes(state.source);
+ 253:   }
+ 254:   const characterBuildScriptCache = new Set();
+ 255:   function ensureEquipmentDataLoaded(source, onReady, onError) {
+ 256:     const runtime = window.SAORuntimeUtils;
+ 257:     if (!runtime || typeof runtime.loadTaggedScriptOnce !== "function") {
+ 258:       onReady?.();
+ 259:       return;
+ 260:     }
+ 261: 
+ 262:     const dependencyMap = {
+ 263:       current: ["../eCompendium/ecompendium_current.js"],
+ 264:       beta: [
+ 265:         "../eCompendium/ecompendium_floor1.js",
+ 266:         "../eCompendium/ecompendium_floor2.js",
+ 267:         "../eCompendium/ecompendium_floor3.js"
+ 268:       ]
+ 269:     };
+ 270: 
+ 271:     const scripts = dependencyMap[source] || [];
+ 272:     if (!scripts.length) {
+ 273:       onReady?.();
+ 274:       return;
+ 275:     }
+ 276: 
+ 277:     let remaining = scripts.length;
+ 278:     let failed = false;
+ 279:     if (remaining === 0) {
+ 280:       onReady?.();
+ 281:       return;
+ 282:     }
+ 283: 
+ 284:     const finalize = (success) => {
+ 285:       if (!success) failed = true;
+ 286:       remaining -= 1;
+ 287:       if (remaining <= 0) {
+ 288:         if (failed) onError?.();
+ 289:         else onReady?.();
+ 290:       }
+ 291:     };
+ 292: 
+ 293:     scripts.forEach((src) => {
+ 294:       runtime.loadTaggedScriptOnce({
+ 295:         cache: characterBuildScriptCache,
+ 296:         cacheKey: src,
+ 297:         tagAttribute: "data-character-build-dependency",
+ 298:         src,
+ 299:         onReady: () => finalize(true),
+ 300:         onError: () => finalize(false)
+ 301:       });
+ 302:     });
+ 303:   }
+ 304:   function itemIsClassCompatible(item, classId = state.classId) {
+ 305:     return adapter.isItemCompatibleWithClass(item, classId);
+ 306:   }
+ 307:   function slotItems() {
+ 308:     return adapter.getItemsForSlot(state.source, state.pickerSlot, state.classId);
+ 309:   }
+ 310:   function iconForType(type) {
+ 311:     return data.slots.find((slot) => slot.type === type)?.icon || data.slots[0].icon;
+ 312:   }
+ 313:   function displayText(item, field) {
+ 314:     return adapter.getText(item, field) || "";
+ 315:   }
+ 316:   function rarityClass(rarity) {
+ 317:     return rarity ? `rarity-${normalize(rarity).replace(/[^a-z0-9]+/g, "-")}` : "";
+ 318:   }
+ 319:   function className(classId) {
+ 320:     const item = data.classes.find((candidate) => candidate.id === classId);
+ 321:     return item ? localizeClass(classId, item.name).split(" /")[0] : classId;
+ 322:   }
+ 323: 
+ 324:   function selectedRunesForSlot(slotId) {
+ 325:     const runes = activeSkillState().runes || {};
+ 326:     return Array.isArray(runes[slotId]) ? runes[slotId] : [];
+ 327:   }
+ 328: 
+ 329:   function canonicalRune(rune) {
+ 330:     if (!rune) return null;
+ 331:     return activeRunes().find((candidate) => candidate.runeKey === rune.runeKey || candidate.id === rune.id) || null;
+ 332:   }
+ 333: 
+ 334:   function calculationEquipment() {
+ 335:     const equipment = { ...activeBuild() };
+ 336:     Object.entries(activeBuild()).forEach(([slotId, item]) => {
+ 337:       const capacity = adapter.getRuneSlots(item);
+ 338:       if (!capacity) return;
+ 339:       selectedRunesForSlot(slotId)
+ 340:         .slice(0, capacity)
+ 341:         .forEach((selected, index) => {
+ 342:           const rune = canonicalRune(selected);
+ 343:           if (!rune) return;
+ 344:           equipment[`rune:${slotId}:${index}`] = Object.freeze({ ...rune, isBuildRune: true });
+ 345:         });
+ 346:     });
+ 347:     return equipment;
+ 348:   }
+ 349: 
+ 350:   function isCalculationItemAvailable(item, source, slotId) {
+ 351:     if (item?.isBuildRune) return true;
+ 352:     return adapter.isAvailable(item, source, slotId, state.classId);
+ 353:   }
+ 354: 
+ 355:   function loadState() {
+ 356:     const saved = storage.getJSON(buildStateKey, null);
+ 357:     if (!saved || typeof saved !== "object") return;
+ 358:     if (saved.builds && typeof saved.builds === "object") {
+ 359:       Object.keys(buildSlots).forEach((slotId) => restoreBuildState(buildSlots[slotId], saved.builds[slotId]));
+ 360:       state.activeSlot = Object.prototype.hasOwnProperty.call(buildSlots, saved.activeSlot) ? saved.activeSlot : "1";
+ 361:     } else {
+ 362:       restoreBuildState(buildSlots["1"], saved);
+ 363:       state.activeSlot = "1";
+ 364:     }
+ 365:     syncActiveConfiguration();
+ 366:     pruneInvalidSelectedSkills();
+ 367:   }
+ 368: 
+ 369:   function saveState() {
+ 370:     storage.setJSON(buildStateKey, {
+ 371:       activeSlot: state.activeSlot,
+ 372:       builds: buildSlots
+ 373:     });
+ 374:   }
+ 375: 
+ 376:   function renderConfiguration() {
+ 377:     $("buildSlot").innerHTML = Object.keys(buildSlots)
+ 378:       .map(
+ 379:         (slotId) =>
+ 380:           `<option value="${slotId}">${escapeHtml(t("page.characterBuild.buildNumber", { number: slotId }))}</option>`
+ 381:       )
+ 382:       .join("");
+ 383:     $("buildSlot").value = state.activeSlot;
+ 384:     $("characterLevel").value = state.level;
+ 385:     $("levelValue").value = state.level;
+ 386:     $("levelValue").textContent = state.level;
+ 387:     const baseValue = document.querySelector(".base-value");
+ 388:     if (baseValue) baseValue.textContent = t("page.characterBuild.base", { level: state.level });
+ 389:     const slotCount = document.querySelector(".section-count");
+ 390:     if (slotCount) slotCount.textContent = t("page.characterBuild.slots", { count: 14 });
+ 391:     $("characterLevel").style.setProperty("--level-progress", `${((state.level - 1) / 24) * 100}%`);
+ 392:     $("characterClass").innerHTML = data.classes
+ 393:       .map((item) => `<option value="${item.id}">${escapeHtml(localizeClass(item.id, item.name))}</option>`)
+ 394:       .join("");
+ 395:     $("characterClass").value = state.classId;
+ 396:     document
+ 397:       .querySelectorAll("[data-source]")
+ 398:       .forEach((button) => button.classList.toggle("is-active", button.dataset.source === state.source));
+ 399:     $("skillClassLabel").textContent = `/ ${className(state.classId)}`;
+ 400:   }
+ 401: 
+ 402:   function setLevelFromPointer(event) {
+ 403:     const input = $("characterLevel");
+ 404:     const bounds = input.getBoundingClientRect();
+ 405:     const progress = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+ 406:     input.value = String(Math.round(1 + progress * 24));
+ 407:     input.dispatchEvent(new Event("input", { bubbles: true }));
+ 408:   }
+ 409: 
+ 410:   function renderSlots() {
+ 411:     const groups = [
+ 412:       { name: "armor", container: $("armorSlots"), matches: (slot) => slot.group === "armor" },
+ 413:       {
+ 414:         name: "accessory",
+ 415:         container: $("accessorySlots"),
+ 416:         matches: (slot) => slot.group === "accessory" && !["main-weapon", "offhand"].includes(slot.id)
+ 417:       },
+ 418:       { name: "weapon", container: $("weaponSlots"), matches: (slot) => ["main-weapon", "offhand"].includes(slot.id) }
+ 419:     ];
+ 420:     groups.forEach((group) => {
+ 421:       group.container.innerHTML = data.slots
+ 422:         .filter(group.matches)
+ 423:         .map((slot) => {
+ 424:           const item = activeBuild()[slot.id];
+ 425:           const available = item && adapter.isAvailable(item, state.source, slot.id, state.classId);
+ 426:           const itemLabel = item ? displayText(item, "name") || item.name : "";
+ 427:           const rarity = item?.rarity
+ 428:             ? `<span class="slot-empty ${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>`
+ 429:             : "";
+ 430:           const runeControls =
+ 431:             group.name === "armor" && item && available
+ 432:               ? Array.from({ length: adapter.getRuneSlots(item) }, (_, index) => {
+ 433:                   const rune = canonicalRune(selectedRunesForSlot(slot.id)[index]);
+ 434:                   const slotLabel = localizeSlot(slot);
+ 435:                   const label = rune
+ 436:                     ? displayText(rune, "name") || rune.name
+ 437:                     : t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 });
+ 438:                   return `<button class="rune-button${rune ? " is-filled" : ""}" type="button" data-rune-slot="${index}" data-armor-slot="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 }))}"><span>R${index + 1}</span><strong>${escapeHtml(label)}</strong></button>`;
+ 439:                 }).join("")
+ 440:               : "";
+ 441:           const slotLabel = localizeSlot(slot);
+ 442:           return `<div class="equipment-slot-wrap"><button class="slot-button${item ? " is-filled" : ""}${item && !available ? " is-unavailable" : ""}" type="button" data-slot-id="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectSlot", { slot: slotLabel }))}"${item && !available ? ` aria-disabled="true" title="${escapeHtml(t("page.characterBuild.unavailable"))}"` : ""}>
+ 443:           <span class="slot-icon" aria-hidden="true">${slot.icon}</span>
+ 444:           <span class="slot-name">${escapeHtml(slotLabel)}</span>
+ 445:           ${item ? `<span class="slot-item">${escapeHtml(itemLabel)}</span>${rarity}<span class="slot-empty">${available ? t("page.characterBuild.equipped") : t("page.characterBuild.unavailable")}</span>` : `<span class="slot-empty">${t("page.characterBuild.emptySlot")}</span>`}
+ 446:         </button>${runeControls ? `<div class="rune-controls" aria-label="${escapeHtml(t("page.characterBuild.runeSlots", { slot: slotLabel }))}">${runeControls}</div>` : ""}</div>`;
+ 447:         })
+ 448:         .join("");
+ 449:     });
+ 450:   }
+ 451: 
+ 452:   function renderStats() {
+ 453:     const statsGroups = $("statsGroups");
+ 454:     const previousGroups = [...statsGroups.querySelectorAll(".stats-group")];
+ 455:     const openGroups = new Set(previousGroups.filter((group) => group.open).map((group) => group.dataset.statsGroup));
+ 456:     const calculated = calculator.calculateBuildStats({
+ 457:       equipment: calculationEquipment(),
+ 458:       source: state.source,
+ 459:       level: state.level,
+ 460:       classId: state.classId,
+ 461:       selectedSkills: selectedSkillNodes(),
+ 462:       isAvailable: isCalculationItemAvailable
+ 463:     });
+ 464:     const hasPreviousState = previousGroups.length > 0;
+ 465:     const baseStats = calculator.createBaseStats ? calculator.createBaseStats(state.classId) : null;
+ 466:     const equippedCount = Object.values(calculationEquipment()).filter(Boolean).length;
+ 467:     const summary = statsGroups && document.querySelector(".stats-panel .base-value");
+ 468:     if (summary) {
+ 469:       summary.textContent = [
+ 470:         `${t("page.characterBuild.level")} ${state.level}`,
+ 471:         localizeClass(state.classId, state.classId),
+ 472:         `${equippedCount} ${t("page.characterBuild.equipped")}`
+ 473:       ].join(" Â· ");
+ 474:     }
+ 475:     statsGroups.innerHTML = Object.entries(calculator.groups)
+ 476:       .map(([group, entries], index) => {
+ 477:         const isOpen = hasPreviousState ? openGroups.has(String(index)) : false;
+ 478:         return `<details class="stats-group" data-stats-group="${index}"${isOpen ? " open" : ""}><summary>${escapeHtml(localizeGroup(group))}</summary><ul class="stat-list">${entries
+ 479:           .map((stat) => {
+ 480:             const total = calculated[stat];
+ 481:             const base = baseStats ? baseStats[stat] : null;
+ 482:             const modified = Boolean(base && total && (total.flat !== base.flat || total.percent !== base.percent));
+ 483:             const baseTitle = modified
+ 484:               ? ` title="${escapeHtml(t("page.characterBuild.base", { level: calculator.formatValue(base) }))}"`
+ 485:               : "";
+ 486:             return `<li><span>${escapeHtml(localizeStat(stat))}</span><strong${baseTitle}>${calculator.formatValue(total)}${modified ? " *" : ""}</strong></li>`;
+ 487:           })
+ 488:           .join("")}</ul></details>`;
+ 489:       })
+ 490:       .join("");
+ 491:   }
+ 492: 
+ 493:   function skillNodeState(node) {
+ 494:     const statusLabel = (key) => t(`page.characterBuild.${key}`);
+ 495:     if (isSkillUnlocked(node.id))
+ 496:       return { name: "selected", label: statusLabel("selected"), reason: t("page.characterBuild.alreadyUnlocked") };
+ 497:     const missing = missingSkillPrerequisites(node);
+ 498:     if (missing.length) {
+ 499:       const requirementNames = missing
+ 500:         .map((id) => {
+ 501:           const prerequisite = currentSkillTree().find((item) => item.id === id);
+ 502:           return prerequisite ? localizeSkillName(prerequisite) : id;
+ 503:         })
+ 504:         .join(", ");
+ 505:       return {
+ 506:         name: "locked",
+ 507:         label: statusLabel("locked"),
+ 508:         reason: t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requiresSkills", {
+ 509:           value: requirementNames
+ 510:         })
+ 511:       };
+ 512:     }
+ 513:     if (node.cost > availableSkillPoints()) {
+ 514:       return {
+ 515:         name: "locked",
+ 516:         label: statusLabel("locked"),
+ 517:         reason: `Need ${node.cost - availableSkillPoints()} more skill point${node.cost - availableSkillPoints() === 1 ? "" : "s"}.`
+ 518:       };
+ 519:     }
+ 520:     return { name: "available", label: statusLabel("available"), reason: t("page.characterBuild.readyToUnlock") };
+ 521:   }
+ 522: 
+ 523:   function formatSkillEffects(node) {
+ 524:     return node.effects.map((effect) => `${localizeStat(effect.stat)}: ${effect.value}`).join(" / ");
+ 525:   }
+ 526: 
+ 527:   function renderSkillDetail(nodeId) {
+ 528:     const node = currentSkillTree().find((item) => item.id === nodeId) || currentSkillTree()[0];
+ 529:     if (!node || !$("skillDetail")) return;
+ 530:     const status = skillNodeState(node);
+ 531:     const prerequisites = node.prerequisites.length
+ 532:       ? node.prerequisites
+ 533:           .map((id) => {
+ 534:             const prerequisite = currentSkillTree().find((item) => item.id === id);
+ 535:             return prerequisite ? localizeSkillName(prerequisite) : id;
+ 536:           })
+ 537:           .join(", ")
+ 538:       : t("page.characterBuild.none");
+ 539:     const effectDetail = node.center ? "" : `<span>${escapeHtml(formatSkillEffects(node))}</span>`;
+ 540:     const prerequisiteDetail = node.center
+ 541:       ? ""
+ 542:       : `<span>${escapeHtml(t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requires", { value: prerequisites }))}</span>`;
+ 543:     const descriptionDetail = node.description
+ 544:       ? `<span>${escapeHtml(localizeSkillDescription(node))}</span>`
+ 545:       : "";
+ 546:     $("skillDetail").innerHTML =
+ 547:       `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(node.className)}</span>${descriptionDetail}${effectDetail}${prerequisiteDetail}<span>Cost: ${node.cost} skill point${node.cost === 1 ? "" : "s"}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
+ 548:   }
+ 549: 
+ 550:   function renderSkills(selectedNodeId) {
+ 551:     const skills = currentSkillTree();
+ 552:     const layout = data.SKILL_TREE_LAYOUT || [];
+ 553:     const layoutById = new Map(layout.map((point) => [point.id, point]));
+ 554:     const layoutBySkillId = new Map(layout.map((point) => [point.skillId, point]));
+ 555:     const skillsById = new Map(skills.map((node) => [node.id, node]));
+ 556:     const skillsByNodeId = new Map(skills.map((node) => [node.nodeId, node]));
+ 557:     const drawnConnections = new Set();
+ 558:     const connectionMarkup = [];
+ 559:     const addConnection = (fromId, toId, active = false) => {
+ 560:       const key = [fromId, toId].sort().join(":");
+ 561:       if (drawnConnections.has(key)) return;
+ 562:       const from = layoutById.get(fromId);
+ 563:       const to = layoutById.get(toId);
+ 564:       if (!from || !to) return;
+ 565:       drawnConnections.add(key);
+ 566:       const fromSkill = skillsByNodeId.get(from.skillId);
+ 567:       const toSkill = skillsByNodeId.get(to.skillId);
+ 568:       connectionMarkup.push(
+ 569:         `<line class="skill-connection${active ? " is-active" : ""}" data-from-skill-id="${fromSkill?.id || ""}" data-to-skill-id="${toSkill?.id || ""}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`
+ 570:       );
+ 571:     };
+ 572:     (data.SKILL_TREE_CONNECTIONS || []).forEach(([fromId, toId]) => {
+ 573:       const fromPoint = layoutById.get(fromId);
+ 574:       const toPoint = layoutById.get(toId);
+ 575:       const fromSkill = fromPoint && skillsByNodeId.get(fromPoint.skillId);
+ 576:       const toSkill = toPoint && skillsByNodeId.get(toPoint.skillId);
+ 577:       const active = (fromSkill && isSkillUnlocked(fromSkill.id)) || (toSkill && isSkillUnlocked(toSkill.id));
+ 578:       addConnection(fromId, toId, active);
+ 579:     });
+ 580:     skills.forEach((node) => {
+ 581:       node.prerequisites.forEach((parentId) => {
+ 582:         const parent = skillsById.get(parentId);
+ 583:         const parentPoint = parent && layoutBySkillId.get(parent.nodeId);
+ 584:         const nodePoint = layoutBySkillId.get(node.nodeId);
+ 585:         if (parentPoint && nodePoint) addConnection(parentPoint.id, nodePoint.id, isSkillUnlocked(node.id));
+ 586:       });
+ 587:     });
+ 588:     const connections = connectionMarkup.join("");
+ 589:     const nodes = layout
+ 590:       .map((point) => {
+ 591:         const node = skillsByNodeId.get(point.skillId);
+ 592:         const position = `--node-x:${point.x}px;--node-y:${point.y}px`;
+ 593:         const status = skillNodeState(node);
+ 594:         const selected = status.name === "selected";
+ 595:         return `<button class="skill-node is-${status.name}${node.center ? " is-center" : ""}${point.isAnchor ? " is-branch-anchor" : ""}" type="button" data-skill-id="${node.id}" style="${position}" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-core" aria-hidden="true"></span></button>`;
+ 596:       })
+ 597:       .join("");
+ 598:     const selectedNode = skillsById.get(selectedNodeId) || skills.find((node) => node.center);
+ 599:     $("skillTree").innerHTML = `
+ 600:       <div class="skill-tree-toolbar">
+ 601:         <span data-skill-points>${escapeHtml(skillClassName(state.classId))} Â· ${availableSkillPoints()} / ${skills.reduce((sum, node) => sum + node.cost, 0)} skill points</span>
+ 602:         <button class="skill-tree-reset" type="button" data-reset-view>Reset View</button>
+ 603:       </div>
+ 604:       <div class="skill-tree-viewport" id="skillTreeViewport" aria-label="Skill tree viewport">
+ 605:         <div class="skill-tree-canvas" id="skillTreeCanvas">
+ 606:           <svg class="skill-connections" viewBox="0 0 921 923" preserveAspectRatio="none" aria-hidden="true">${connections}</svg>
+ 607:           ${nodes}
+ 608:         </div>
+ 609:       </div>
+ 610:       <div id="skillDetail" class="skill-detail" aria-live="polite"></div>
+ 611:     `;
+ 612:     renderSkillDetail(selectedNode?.id);
+ 613:     setupSkillTreeViewport();
+ 614:   }
+ 615: 
+ 616:   function updateSkillTreeState(selectedNodeId) {
+ 617:     const skills = currentSkillTree();
+ 618:     const pointsBySkillId = new Map((data.SKILL_TREE_LAYOUT || []).map((point) => [point.skillId, point]));
+ 619:     document.querySelectorAll("#skillTreeCanvas [data-skill-id]").forEach((button) => {
+ 620:       const node = skills.find((skill) => skill.id === button.dataset.skillId);
+ 621:       if (!node) return;
+ 622:       const status = skillNodeState(node);
+ 623:       const point = pointsBySkillId.get(node.nodeId);
+ 624:       const isCenter = node.center;
+ 625:       button.className = `skill-node is-${status.name}${isCenter ? " is-center" : ""}${point?.isAnchor ? " is-branch-anchor" : ""}`;
+ 626:       button.setAttribute("aria-pressed", String(status.name === "selected"));
+ 627:       button.setAttribute("aria-label", `${localizeSkillName(node)}: ${status.label}`);
+ 628:     });
+ 629:     document.querySelectorAll("#skillTreeCanvas .skill-connection").forEach((line) => {
+ 630:       const fromSelected = isSkillUnlocked(line.dataset.fromSkillId);
+ 631:       const toSelected = isSkillUnlocked(line.dataset.toSkillId);
+ 632:       line.classList.toggle("is-active", fromSelected || toSelected);
+ 633:     });
+ 634:     const pointsLabel = $("skillTree").querySelector?.("[data-skill-points]");
+ 635:     if (pointsLabel) {
+ 636:       const total = skills.reduce((sum, node) => sum + node.cost, 0);
+ 637:       pointsLabel.textContent = `${skillClassName(state.classId)} Â· ${availableSkillPoints()} / ${total} skill points`;
+ 638:     }
+ 639:     renderSkillDetail(selectedNodeId);
+ 640:   }
+ 641: 
+ 642:   const skillTreeViewState = {
+ 643:     scale: 1,
+ 644:     offsetX: 0,
+ 645:     offsetY: 0,
+ 646:     pointerStartX: 0,
+ 647:     pointerStartY: 0,
+ 648:     originX: 0,
+ 649:     originY: 0,
+ 650:     initialized: false,
+ 651:     userInteracted: false,
+ 652:     resizeListenerBound: false,
+ 653:     dragging: false,
+ 654:     pointerId: null
+ 655:   };
+ 656: 
+ 657:   function resetSkillTreeViewport(viewport) {
+ 658:     if (!viewport) return;
+ 659:     const width = viewport.clientWidth || 921;
+ 660:     const height = viewport.clientHeight || 923;
+ 661:     const scale = Math.min(0.94, (width - 24) / 921, (height - 24) / 923);
+ 662:     skillTreeViewState.scale = Math.max(0.4, scale);
+ 663:     skillTreeViewState.offsetX = (width - 921 * skillTreeViewState.scale) / 2;
+ 664:     skillTreeViewState.offsetY = (height - 923 * skillTreeViewState.scale) / 2;
+ 665:     skillTreeViewState.userInteracted = false;
+ 666:     applySkillTreeTransform();
+ 667:   }
+ 668: 
+ 669:   function applySkillTreeTransform() {
+ 670:     const viewport = $("skillTreeViewport");
+ 671:     const canvas = $("skillTreeCanvas");
+ 672:     if (!viewport || !canvas) return;
+ 673:     const clamped = Math.min(2, Math.max(0.4, skillTreeViewState.scale));
+ 674:     skillTreeViewState.scale = clamped;
+ 675:     if (canvas.style) canvas.style.transform = `translate(${skillTreeViewState.offsetX}px, ${skillTreeViewState.offsetY}px) scale(${clamped})`;
+ 676:     if (viewport.classList && typeof viewport.classList.toggle === "function") {
+ 677:       viewport.classList.toggle("is-dragging", skillTreeViewState.dragging);
+ 678:     } else if (viewport.setAttribute) {
+ 679:       viewport.setAttribute("data-dragging", skillTreeViewState.dragging ? "true" : "false");
+ 680:     }
+ 681:   }
+ 682: 
+ 683:   function setupSkillTreeViewport() {
+ 684:     const viewport = $("skillTreeViewport");
+ 685:     const canvas = $("skillTreeCanvas");
+ 686:     if (!viewport || !canvas) return;
+ 687: 
+ 688:     if (!viewport.addEventListener || !canvas.style) return;
+ 689: 
+ 690:     if (!skillTreeViewState.initialized) {
+ 691:       resetSkillTreeViewport(viewport);
+ 692:       skillTreeViewState.initialized = true;
+ 693:     } else {
+ 694:       applySkillTreeTransform();
+ 695:     }
+ 696:     if (!skillTreeViewState.resizeListenerBound && window.addEventListener) {
+ 697:       window.addEventListener("resize", () => {
+ 698:         if (!skillTreeViewState.userInteracted) resetSkillTreeViewport($("skillTreeViewport"));
+ 699:       });
+ 700:       skillTreeViewState.resizeListenerBound = true;
+ 701:     }
+ 702: 
+ 703:     const clampOffset = () => {
+ 704:       const minX = Math.min(0, viewport.clientWidth - 921 * skillTreeViewState.scale);
+ 705:       const minY = Math.min(0, viewport.clientHeight - 923 * skillTreeViewState.scale);
+ 706:       const maxX = Math.max(0, viewport.clientWidth - 921 * skillTreeViewState.scale);
+ 707:       const maxY = Math.max(0, viewport.clientHeight - 923 * skillTreeViewState.scale);
+ 708:       skillTreeViewState.offsetX = Math.max(minX, Math.min(maxX, skillTreeViewState.offsetX));
+ 709:       skillTreeViewState.offsetY = Math.max(minY, Math.min(maxY, skillTreeViewState.offsetY));
+ 710:     };
+ 711: 
+ 712:     viewport.addEventListener("wheel", (event) => {
+ 713:       event.preventDefault();
+ 714:       const rect = viewport.getBoundingClientRect();
+ 715:       const pointerX = event.clientX - rect.left;
+ 716:       const pointerY = event.clientY - rect.top;
+ 717:       const previousScale = skillTreeViewState.scale;
+ 718:       const nextScale = Math.min(2, Math.max(0.4, previousScale * (event.deltaY < 0 ? 1.12 : 0.89)));
+ 719:       const worldX = (pointerX - skillTreeViewState.offsetX) / previousScale;
+ 720:       const worldY = (pointerY - skillTreeViewState.offsetY) / previousScale;
+ 721:       skillTreeViewState.scale = nextScale;
+ 722:       skillTreeViewState.offsetX = pointerX - worldX * nextScale;
+ 723:       skillTreeViewState.offsetY = pointerY - worldY * nextScale;
+ 724:       skillTreeViewState.userInteracted = true;
+ 725:       clampOffset();
+ 726:       applySkillTreeTransform();
+ 727:     }, { passive: false });
+ 728: 
+ 729:     viewport.addEventListener("pointerdown", (event) => {
+ 730:       if (event.button !== 0 || !event.isPrimary || skillTreeViewState.dragging) return;
+ 731:       if (event.target.closest("[data-skill-id]")) return;
+ 732:       event.preventDefault();
+ 733:       skillTreeViewState.dragging = true;
+ 734:       skillTreeViewState.pointerId = event.pointerId;
+ 735:       skillTreeViewState.pointerStartX = event.clientX;
+ 736:       skillTreeViewState.pointerStartY = event.clientY;
+ 737:       skillTreeViewState.originX = skillTreeViewState.offsetX;
+ 738:       skillTreeViewState.originY = skillTreeViewState.offsetY;
+ 739:       skillTreeViewState.userInteracted = true;
+ 740:       try {
+ 741:         viewport.setPointerCapture?.(event.pointerId);
+ 742:       } catch {
+ 743:         skillTreeViewState.dragging = false;
+ 744:         skillTreeViewState.pointerId = null;
+ 745:         applySkillTreeTransform();
+ 746:       }
+ 747:       if (skillTreeViewState.dragging) applySkillTreeTransform();
+ 748:     });
+ 749: 
+ 750:     viewport.addEventListener("pointermove", (event) => {
+ 751:       if (!skillTreeViewState.dragging || event.pointerId !== skillTreeViewState.pointerId) return;
+ 752:       const deltaX = event.clientX - skillTreeViewState.pointerStartX;
+ 753:       const deltaY = event.clientY - skillTreeViewState.pointerStartY;
+ 754:       skillTreeViewState.offsetX = skillTreeViewState.originX + deltaX;
+ 755:       skillTreeViewState.offsetY = skillTreeViewState.originY + deltaY;
+ 756:       clampOffset();
+ 757:       applySkillTreeTransform();
+ 758:     });
+ 759: 
+ 760:     const stopDrag = (event) => {
+ 761:       if (!skillTreeViewState.dragging) return;
+ 762:       if (event && event.pointerId !== skillTreeViewState.pointerId) return;
+ 763:       const pointerId = skillTreeViewState.pointerId;
+ 764:       skillTreeViewState.dragging = false;
+ 765:       skillTreeViewState.pointerId = null;
+ 766:       if (pointerId !== null && viewport.hasPointerCapture?.(pointerId)) {
+ 767:         viewport.releasePointerCapture(pointerId);
+ 768:       }
+ 769:       applySkillTreeTransform();
+ 770:     };
+ 771: 
+ 772:     viewport.addEventListener("pointerup", stopDrag);
+ 773:     viewport.addEventListener("pointercancel", stopDrag);
+ 774:     viewport.addEventListener("lostpointercapture", stopDrag);
+ 775: 
+ 776:     if ($("skillTree").querySelector) {
+ 777:       $("skillTree").querySelector("[data-reset-view]")?.addEventListener("click", (event) => {
+ 778:         event.stopPropagation();
+ 779:         resetSkillTreeViewport($("skillTreeViewport"));
+ 780:       });
+ 781:     }
+ 782:   }
+ 783: 
+ 784:   function setFilterOptions() {
+ 785:     const sourceItems = state.pickerMode === "rune" ? activeRunes() : activeItems();
+ 786:     const rarities = [...new Set(sourceItems.map((item) => item.rarity).filter(Boolean))];
+ 787:     $("rarityFilter").innerHTML =
+ 788:       `<option value="">${t("page.characterBuild.allRarities")}</option>${rarities.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+ 789:     $("rarityFilter").value = state.rarity;
+ 790:   }
+ 791: 
+ 792:   function matchingItems() {
+ 793:     const query = normalize(state.search);
+ 794:     const sourceItems = state.pickerMode === "rune" ? activeRunes() : slotItems();
+ 795:     return sourceItems.filter((item) => {
+ 796:       const textMatch = !query || item.searchText.includes(query);
+ 797:       const rarityMatch = !state.rarity || item.rarity === state.rarity;
+ 798:       const levelMatch = item.levelRequirement === null || item.levelRequirement <= state.level;
+ 799:       return textMatch && rarityMatch && levelMatch;
+ 800:     });
+ 801:   }
+ 802: 
+ 803:   function renderItems() {
+ 804:     const items = matchingItems();
+ 805:     const slot = state.pickerMode === "rune" ? slotById(state.pickerArmorSlot) : slotById(state.pickerSlot);
+ 806:     $("itemList").innerHTML = items.length
+ 807:       ? items
+ 808:           .map((item) => {
+ 809:             const effects = item.effects.length
+ 810:               ? `<p class="item-effect">${escapeHtml(item.effects.map(localizeItemEffect).join(" / "))}</p>`
+ 811:               : "";
+ 812:             const level =
+ 813:               item.levelRequirement === null
+ 814:                 ? ""
+ 815:                 : `<span>${escapeHtml(t("page.characterBuild.itemLevel", { level: item.levelRequirement }))}</span>`;
+ 816:             const classes = item.classLabel ? `<span>${escapeHtml(localizeClassLabel(item.classLabel))}</span>` : "";
+ 817:             const set = item.set
+ 818:               ? `<span>${escapeHtml(t("page.ecompendium.labels.set"))}: ${escapeHtml(window.SAOContentTranslations?.translateKnownTerms?.(item.set, i18n?.getLanguage?.()) || item.set)}</span>`
+ 819:               : "";
+ 820:             return `<article class="item-card"><div class="item-icon" aria-hidden="true">${item.type ? iconForType(item.type) : window.CharacterBuildIcons.markup("rune")}</div><div><h3>${escapeHtml(displayText(item, "name") || item.name)}</h3><div class="item-meta"><span>${state.pickerMode === "rune" ? t("page.characterBuild.rune") : escapeHtml(item.type)}</span>${item.rarity ? `<span class="${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>` : ""}${level}${classes}${set}</div>${effects}${item.description ? `<p class="item-description">${escapeHtml(displayText(item, "description") || item.description)}</p>` : ""}</div><button class="equip-button" type="button" data-${state.pickerMode === "rune" ? "rune" : "item"}-id="${item.id}">${t("page.characterBuild.select")}</button></article>`;
+ 821:           })
+ 822:           .join("")
+ 823:       : `<div class="empty-state">${escapeHtml(t("page.characterBuild.noMatchingItems", { slot: slot?.name || "rune", level: state.level }))}</div>`;
+ 824:   }
+ 825: 
+ 826:   function openPicker(slotId) {
+ 827:     state.pickerMode = "equipment";
+ 828:     state.pickerSlot = slotId;
+ 829:     state.pickerArmorSlot = null;
+ 830:     state.pickerRuneIndex = null;
+ 831:     const slot = slotById(slotId);
+ 832:     state.search = "";
+ 833:     state.rarity = "";
+ 834:     $("dialogTitle").textContent = t("page.characterBuild.selectSlot", { slot: localizeSlot(slot) });
+ 835:     $("itemSearch").value = "";
+ 836:     $("pickerNotice").textContent = "";
+ 837:     setFilterOptions();
+ 838:     renderItems();
+ 839:     $("equipmentDialog").showModal();
+ 840:     requestAnimationFrame(() => $("itemSearch").focus());
+ 841:   }
+ 842: 
+ 843:   function openRunePicker(armorSlotId, runeIndex) {
+ 844:     const armor = activeBuild()[armorSlotId];
+ 845:     if (!armor || runeIndex >= adapter.getRuneSlots(armor)) return;
+ 846:     state.pickerMode = "rune";
+ 847:     state.pickerSlot = null;
+ 848:     state.pickerArmorSlot = armorSlotId;
+ 849:     state.pickerRuneIndex = runeIndex;
+ 850:     state.search = "";
+ 851:     state.rarity = "";
+ 852:     $("dialogTitle").textContent = t("page.characterBuild.selectRuneFor", {
+ 853:       number: runeIndex + 1,
+ 854:       slot: localizeSlot(slotById(armorSlotId))
+ 855:     });
+ 856:     $("itemSearch").value = "";
+ 857:     $("pickerNotice").textContent = "";
+ 858:     setFilterOptions();
+ 859:     renderItems();
+ 860:     $("equipmentDialog").showModal();
+ 861:     requestAnimationFrame(() => $("itemSearch").focus());
+ 862:   }
+ 863: 
+ 864:   function equipItem(itemId) {
+ 865:     const item = slotItems().find((entry) => entry.id === itemId);
+ 866:     if (!item || !state.pickerSlot || !itemIsClassCompatible(item, state.classId)) return;
+ 867:     const weaponSlot = item.type === "Main Weapon" || item.type === "Offhand";
+ 868:     const otherSlot = state.pickerSlot === "main-weapon" ? "offhand" : "main-weapon";
+ 869:     if (weaponSlot && activeBuild()[otherSlot]?.equipmentKey === item.equipmentKey) {
+ 870:       $("pickerNotice").textContent = t("page.characterBuild.weaponAlreadyEquipped");
+ 871:       return;
+ 872:     }
+ 873:     activeBuild()[state.pickerSlot] = item;
+ 874:     saveState();
+ 875:     renderSlots();
+ 876:     renderStats();
+ 877:     $("equipmentDialog").close();
+ 878:   }
+ 879: 
+ 880:   function equipRune(runeId) {
+ 881:     const armor = activeBuild()[state.pickerArmorSlot];
+ 882:     const rune = activeRunes().find((item) => item.id === runeId);
+ 883:     if (!armor || !rune || state.pickerRuneIndex === null || state.pickerRuneIndex >= adapter.getRuneSlots(armor))
+ 884:       return;
+ 885:     if (!activeSkillState().runes || typeof activeSkillState().runes !== "object") activeSkillState().runes = {};
+ 886:     const selected = Array.isArray(activeSkillState().runes[state.pickerArmorSlot])
+ 887:       ? [...activeSkillState().runes[state.pickerArmorSlot]]
+ 888:       : [];
+ 889:     selected[state.pickerRuneIndex] = rune;
+ 890:     activeSkillState().runes[state.pickerArmorSlot] = selected;
+ 891:     saveState();
+ 892:     renderSlots();
+ 893:     renderStats();
+ 894:     $("equipmentDialog").close();
+ 895:   }
+ 896: 
+ 897:   function removeIncompatibleEquipment() {
+ 898:     const equipment = activeBuild();
+ 899:     Object.keys(equipment).forEach((slotId) => {
+ 900:       if (!itemIsClassCompatible(equipment[slotId], state.classId)) delete equipment[slotId];
+ 901:     });
+ 902:   }
+ 903: 
+ 904:   function unlockSkill(skillId) {
+ 905:     const node = currentSkillTree().find((item) => item.id === skillId);
+ 906:     if (!node) return;
+ 907:     if (node.center) {
+ 908:       renderSkillDetail(skillId);
+ 909:       return;
+ 910:     }
+ 911:     const status = skillNodeState(node);
+ 912:     if (status.name === "selected") {
+ 913:       delete activeSkillState().selectedSkills[node.id];
+ 914:       pruneInvalidSelectedSkills();
+ 915:     } else if (status.name === "available") {
+ 916:       activeSkillState().selectedSkills[node.id] = true;
+ 917:       pruneInvalidSelectedSkills();
+ 918:     } else {
+ 919:       renderSkillDetail(skillId);
+ 920:       return;
+ 921:     }
+ 922:     saveState();
+ 923:     updateSkillTreeState(skillId);
+ 924:     renderStats();
+ 925:   }
+ 926: 
+ 927:   function resetBuild() {
+ 928:     const active = activeSkillState();
+ 929:     resetBuildState(active);
+ 930:     syncActiveConfiguration();
+ 931:     saveState();
+ 932:     renderConfiguration();
+ 933:     renderSlots();
+ 934:     renderStats();
+ 935:     renderSkills();
+ 936:     if ($("equipmentDialog").open) $("equipmentDialog").close();
+ 937:   }
+ 938: 
+ 939:   function ensureWalkthroughDialog() {
+ 940:     const dialog = $("equipmentDialog");
+ 941:     if (dialog?.open) return;
+ 942:     const firstSlot = document.querySelector(
+ 943:       "#armorSlots [data-slot-id], #accessorySlots [data-slot-id], #weaponSlots [data-slot-id]"
+ 944:     );
+ 945:     firstSlot?.click();
+ 946:     walkthroughOpenedDialog = Boolean(dialog?.open);
+ 947:   }
+ 948: 
+ 949:   function closeWalkthroughDialog() {
+ 950:     if (walkthroughOpenedDialog && $("equipmentDialog")?.open) $("equipmentDialog").close();
+ 951:   }
+ 952: 
+ 953:   function buildWalkthroughSteps() {
+ 954:     return [
+ 955:       {
+ 956:         selector: "[data-walkthrough='character-build-title']",
+ 957:         title: t("page.characterBuild.walkthrough.step1Title"),
+ 958:         body: t("page.characterBuild.walkthrough.step1Body")
+ 959:       },
+ 960:       {
+ 961:         /* The whole level section: the level bar plus its label and the level numbers. */
+ 962:         selector: ".level-control",
+ 963:         title: t("page.characterBuild.walkthrough.step2Title"),
+ 964:         body: t("page.characterBuild.walkthrough.step2Body")
+ 965:       },
+ 966:       {
+ 967:         selector: "#equipmentHeading",
+ 968:         title: t("page.characterBuild.walkthrough.step3Title"),
+ 969:         body: t("page.characterBuild.walkthrough.step3Body")
+ 970:       },
+ 971:       {
+ 972:         selector: "#armorSlots",
+ 973:         title: t("page.characterBuild.walkthrough.step4Title"),
+ 974:         body: t("page.characterBuild.walkthrough.step4Body")
+ 975:       },
+ 976:       {
+ 977:         selector: "#equipmentDialog .dialog-shell",
+ 978:         title: t("page.characterBuild.walkthrough.step5Title"),
+ 979:         body: t("page.characterBuild.walkthrough.step5Body"),
+ 980:         onEnter: ensureWalkthroughDialog
+ 981:       },
+ 982:       {
+ 983:         selector: "#rarityFilter",
+ 984:         title: t("page.characterBuild.walkthrough.step6Title"),
+ 985:         body: t("page.characterBuild.walkthrough.step6Body"),
+ 986:         onEnter: ensureWalkthroughDialog,
+ 987:         onExit: closeWalkthroughDialog
+ 988:       },
+ 989:       {
+ 990:         selector: "#statsHeading",
+ 991:         title: t("page.characterBuild.walkthrough.step7Title"),
+ 992:         body: t("page.characterBuild.walkthrough.step7Body")
+ 993:       },
+ 994:       {
+ 995:         selector: "#skillsHeading",
+ 996:         title: t("page.characterBuild.walkthrough.step8Title"),
+ 997:         body: t("page.characterBuild.walkthrough.step8Body")
+ 998:       },
+ 999:       {
+1000:         selector: "#buildSlot",
+1001:         title: t("page.characterBuild.walkthrough.step9Title"),
+1002:         body: t("page.characterBuild.walkthrough.step9Body")
+1003:       },
+1004:       {
+1005:         selector: ".source-control",
+1006:         title: t("page.characterBuild.walkthrough.step10Title"),
+1007:         body: t("page.characterBuild.walkthrough.step10Body")
+1008:       },
+1009:       {
+1010:         selector: ".page-header",
+1011:         title: t("page.characterBuild.walkthrough.step11Title"),
+1012:         body: t("page.characterBuild.walkthrough.step11Body")
+1013:       }
+1014:     ];
+1015:   }
+1016: 
+1017:   function startGuidedWalkthrough(options) {
+1018:     return walkthroughController?.start(options) || false;
+1019:   }
+1020: 
+1021:   function bindEvents() {
+1022:     const pageUtils = window.SAOPageUtils;
+1023:     if (pageUtils && typeof pageUtils.attachSectionNavButtons === "function") {
+1024:       pageUtils.attachSectionNavButtons(".nav", null);
+1025:     }
+1026:     $("armorSlots").addEventListener("click", (event) => {
+1027:       const runeButton = event.target.closest("[data-rune-slot]");
+1028:       if (runeButton) return openRunePicker(runeButton.dataset.armorSlot, Number(runeButton.dataset.runeSlot));
+1029:       const button = event.target.closest("[data-slot-id]");
+1030:       if (button) openPicker(button.dataset.slotId);
+1031:     });
+1032:     $("accessorySlots").addEventListener("click", (event) => {
+1033:       const button = event.target.closest("[data-slot-id]");
+1034:       if (button) openPicker(button.dataset.slotId);
+1035:     });
+1036:     $("weaponSlots").addEventListener("click", (event) => {
+1037:       const button = event.target.closest("[data-slot-id]");
+1038:       if (button) openPicker(button.dataset.slotId);
+1039:     });
+1040:     document.querySelectorAll("[data-source]").forEach((button) =>
+1041:       button.addEventListener("click", () => {
+1042:         state.source = button.dataset.source;
+1043:         activeSkillState().source = state.source;
+1044:         renderConfiguration();
+1045:         ensureEquipmentDataLoaded(
+1046:           state.source,
+1047:           () => {
+1048:             setFilterOptions();
+1049:             renderConfiguration();
+1050:             renderSlots();
+1051:             renderStats();
+1052:             if ($("equipmentDialog").open) renderItems();
+1053:             saveState();
+1054:           },
+1055:           () => renderConfiguration()
+1056:         );
+1057:         saveState();
+1058:       })
+1059:     );
+1060:     $("characterLevel").addEventListener("input", (event) => {
+1061:       state.level = Number(event.target.value);
+1062:       activeSkillState().level = state.level;
+1063:       renderConfiguration();
+1064:       renderStats();
+1065:       if ($("equipmentDialog").open) renderItems();
+1066:       saveState();
+1067:     });
+1068:     $("characterLevel").addEventListener("pointerdown", (event) => {
+1069:       if (event.button === 0) setLevelFromPointer(event);
+1070:     });
+1071:     $("characterClass").addEventListener("change", (event) => {
+1072:       state.classId = event.target.value;
+1073:       activeSkillState().classId = state.classId;
+1074:       activeSkillState().selectedSkills = {};
+1075:       removeIncompatibleEquipment();
+1076:       renderConfiguration();
+1077:       renderSlots();
+1078:       renderStats();
+1079:       renderSkills();
+1080:       if ($("equipmentDialog").open) renderItems();
+1081:       saveState();
+1082:     });
+1083:     $("buildSlot").addEventListener("change", (event) => {
+1084:       if (!Object.prototype.hasOwnProperty.call(buildSlots, event.target.value)) return;
+1085:       state.activeSlot = event.target.value;
+1086:       syncActiveConfiguration();
+1087:       pruneInvalidSelectedSkills();
+1088:       setFilterOptions();
+1089:       renderConfiguration();
+1090:       renderSlots();
+1091:       renderStats();
+1092:       renderSkills();
+1093:       saveState();
+1094:     });
+1095:     document.addEventListener("sao:languagechange", () => {
+1096:       renderConfiguration();
+1097:       renderSlots();
+1098:       renderStats();
+1099:       renderSkills();
+1100:       if ($("equipmentDialog").open) renderItems();
+1101:     });
+1102:     $("resetBuild").addEventListener("click", resetBuild);
+1103:     $("closeDialog").addEventListener("click", () => $("equipmentDialog").close());
+1104:     $("equipmentDialog").addEventListener("click", (event) => {
+1105:       if (event.target === $("equipmentDialog")) $("equipmentDialog").close();
+1106:     });
+1107:     $("itemSearch").addEventListener("input", (event) => {
+1108:       state.search = event.target.value;
+1109:       renderItems();
+1110:     });
+1111:     $("rarityFilter").addEventListener("change", (event) => {
+1112:       state.rarity = event.target.value;
+1113:       renderItems();
+1114:     });
+1115:     $("itemList").addEventListener("click", (event) => {
+1116:       const runeButton = event.target.closest("[data-rune-id]");
+1117:       if (runeButton) return equipRune(runeButton.dataset.runeId);
+1118:       const button = event.target.closest("[data-item-id]");
+1119:       if (button) equipItem(button.dataset.itemId);
+1120:     });
+1121:     $("skillTree").addEventListener("click", (event) => {
+1122:       const button = event.target.closest("[data-skill-id]");
+1123:       if (button) unlockSkill(button.dataset.skillId);
+1124:     });
+1125:     $("skillTree").addEventListener("pointerover", (event) => {
+1126:       const button = event.target.closest("[data-skill-id]");
+1127:       if (button) renderSkillDetail(button.dataset.skillId);
+1128:     });
+1129:     $("skillTree").addEventListener("focusin", (event) => {
+1130:       const button = event.target.closest("[data-skill-id]");
+1131:       if (button) renderSkillDetail(button.dataset.skillId);
+1132:     });
+1133:   }
+1134: 
+1135:   document.addEventListener("DOMContentLoaded", () => {
+1136:     if (typeof window.createWalkthroughController === "function") {
+1137:       walkthroughController = window.createWalkthroughController({
+1138:         document,
+1139:         window,
+1140:         storage: window.SAOStorage,
+1141:         storageKey: walkthroughStorageKey,
+1142:         getSteps: buildWalkthroughSteps,
+1143:         translate: t,
+1144:         onClose: () => {
+1145:           if (walkthroughOpenedDialog && $("equipmentDialog")?.open) $("equipmentDialog").close();
+1146:           walkthroughOpenedDialog = false;
+1147:         }
+1148:       });
+1149:       document.addEventListener("sao:walkthroughrestart", () => startGuidedWalkthrough({ force: true }));
+1150:     }
+1151:     mountIcons();
+1152:     registerCharacterBuildTranslations();
+1153:     loadState();
+1154:     renderConfiguration();
+1155:     renderSlots();
+1156:     renderStats();
+1157:     renderSkills();
+1158:     bindEvents();
+1159:     ensureEquipmentDataLoaded(
+1160:       state.source,
+1161:       () => {
+1162:         setFilterOptions();
+1163:         renderConfiguration();
+1164:         renderSlots();
+1165:         renderStats();
+1166:         renderSkills();
+1167:       },
+1168:       () => renderConfiguration()
+1169:     );
+1170:     if (walkthroughController) startGuidedWalkthrough();
+1171:   });
+1172: })();

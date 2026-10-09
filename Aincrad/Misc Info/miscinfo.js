@@ -16,9 +16,20 @@
     );
   }
 
+  /* Current Data ships no Misc. Info entries yet, so the page shows its empty state instead of the
+     Beta reference table rather than silently falling back to Beta information. */
+  function isCurrentDataset() {
+    return window.SAODatasets?.getDatasetFromLocation() === "current";
+  }
+
   function renderProgression() {
     const root = document.getElementById("progressionTableRoot");
     if (!root) return;
+
+    if (isCurrentDataset()) {
+      root.innerHTML = `<p class="empty-state">${t("page.miscinfo.noCurrentData")}</p>`;
+      return;
+    }
 
     const source = progressionTableSource();
     const entries = String(source)

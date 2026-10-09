@@ -148,6 +148,7 @@ function getStatusKey(category) {
 }
 
 const AGGRESSIVENESS_BY_NAME = {
+  "Corrupted Boar": "Aggressive",
   "Corrupted Pumba": "Neutral",
   Albal: "Neutral",
   "Colossal Guardian": "Aggressive",
@@ -178,9 +179,9 @@ const AGGRESSIVENESS_BY_NAME = {
   Nephentes: "Aggressive",
   "Shark Fish": "Aggressive",
   "Forest Spider": "Aggressive",
-  "Ice Spiritist": "Aggressive",
+  "Ice Spirit": "Aggressive",
   "Ice Golem": "Aggressive",
-  Deer: "Aggressive",
+  "Mountain Deer": "Aggressive",
   Ika: "Aggressive",
   "Small Kobold": "Aggressive",
   "The Mischievous Archer": "Aggressive",

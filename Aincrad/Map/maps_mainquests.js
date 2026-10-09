@@ -13,9 +13,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 1,
-    coords: { x: 0, z: 5 },
+    coords: { x: 2, z: 17 },
     drops: ["N/A"],
-    description: "Talk to the Mysterious Character (0, 200, 5)"
+    description: "Talk to the Mysterious Character (2, 200, 17)"
   },
   "mq-2": {
     title: "A Decisive Choice",
@@ -23,9 +23,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 2,
-    coords: { x: 1008, z: 8 },
+    coords: { x: 1010, z: 20 },
     drops: ["N/A"],
-    description: "Talk to the Master Swordsman (1008, 200, 8)"
+    description: "Talk to the Master Swordsman (1010, 200, 20)"
   },
   "mq-3": {
     title: "A New Horizon",
@@ -33,9 +33,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 3,
-    coords: { x: 1089, z: 4289 },
+    coords: { x: 1091, z: 4301 },
     drops: ["N/A"],
-    description: "Talk to the Swordmaster (1089, 19, 4289)"
+    description: "Talk to the Swordmaster (1091, 19, 4301)"
   },
   "mq-4": {
     title: "Show Me",
@@ -43,9 +43,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 4,
-    coords: { x: 1816, z: 4136 },
+    coords: { x: 1818, z: 4148 },
     drops: ["N/A"],
-    description: "Take the teleporter Facing the Forge (1816, 17, 4136)"
+    description: "Take the teleporter Facing the Forge (1818, 17, 4148)"
   },
   "mq-5": {
     title: "The Essentials",
@@ -53,9 +53,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 5,
-    coords: { x: 1772, z: 4096 },
+    coords: { x: 1774, z: 4108 },
     drops: ["N/A"],
-    description: "Find the Alchemist in his workshop (1772, 16, 4096)"
+    description: "Find the Alchemist in his workshop (1774, 16, 4108)"
   },
   "mq-6": {
     title: "What No One Will Touch",
@@ -63,9 +63,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 6,
-    coords: { x: 1772, z: 4096 },
+    coords: { x: 1774, z: 4108 },
     drops: ["N/A"],
-    description: "Tell him about the shard (1772, 16, 4096)"
+    description: "Tell him about the shard (1774, 16, 4108)"
   },
   "mq-20": {
     title: "What No One Will Touch",
@@ -73,9 +73,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 20,
-    coords: { x: 1089, z: 4289 },
+    coords: { x: 1091, z: 4301 },
     drops: ["N/A"],
-    description: "Go see the Swordmaster (1089, 19, 4289)"
+    description: "Go see the Swordmaster (1091, 19, 4301)"
   },
   "mq-21": {
     title: "The Assault",
@@ -83,9 +83,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 21,
-    coords: { x: 1358, z: 3539 },
+    coords: { x: 1360, z: 3551 },
     drops: ["N/A"],
-    description: "Repel the first wave. Shared quest-start location with Main Quest 22 (1358, 26, 3539)."
+    description: "Repel the first wave. Shared quest-start location with Main Quest 22 (1360, 26, 3551)."
   },
   "mq-22": {
     title: "The Forest of Small Webs",
@@ -93,9 +93,9 @@ Object.assign(DATA, {
     category: "mainQuests",
     floor: "floor1",
     questNumber: 22,
-    coords: { x: 1358, z: 3539 },
+    coords: { x: 1360, z: 3551 },
     drops: ["N/A"],
-    description: "Travel to the Forest of Small Webs (1358, 26, 3539)"
+    description: "Travel to the Forest of Small Webs (1360, 26, 3551)"
   }
 });
 
@@ -104,92 +104,92 @@ Object.assign(DATA, {
     id: "mq-23",
     title: "Bury Them",
     number: 23,
-    coords: { x: 1341, z: 3521 },
-    description: "Carry the First body on your back (1341, 28, 3521)"
+    coords: { x: 1343, z: 3533 },
+    description: "Carry the First body on your back (1343, 28, 3533)"
   },
   {
     id: "mq-24",
     title: "The Trader",
     number: 24,
-    coords: { x: 1564, z: 3428 },
-    description: "Meet the Mayor's Trader (1564, 36, 3428)"
+    coords: { x: 1566, z: 3440 },
+    description: "Meet the Mayor's Trader (1566, 36, 3440)"
   },
   {
     id: "mq-25",
     title: "The Slime Marsh",
     number: 25,
-    coords: { x: 499, z: 3043 },
-    description: "Talk to Ceyla (499, 24, 3043)"
+    coords: { x: 501, z: 3055 },
+    description: "Talk to Ceyla (501, 24, 3055)"
   },
   {
     id: "mq-26",
     title: "The Foot of the Island",
     number: 26,
-    coords: { x: 507, z: 3044 },
-    description: "Talk to Baldim (507, 24, 3044)"
+    coords: { x: 509, z: 3056 },
+    description: "Talk to Baldim (509, 24, 3056)"
   },
   {
     id: "mq-27",
     title: "By the Branches of the Ancients",
     number: 27,
-    coords: { x: 286, z: 2448 },
-    description: "Collect 3 bark from the old oak ~(286, 161, 2448)"
+    coords: { x: 288, z: 2460 },
+    description: "Collect 3 bark from the old oak ~(288, 161, 2460)"
   },
   {
     id: "mq-28",
     title: "The Broken Knot",
     number: 28,
-    coords: { x: 498, z: 3047 },
-    description: "Join Zebulgarath at the teleporter ~(498, 24, 3047)"
+    coords: { x: 500, z: 3059 },
+    description: "Join Zebulgarath at the teleporter ~(500, 24, 3059)"
   },
   {
     id: "mq-29",
     title: "The Suspended City",
     number: 29,
-    coords: { x: 466, z: 2999 },
-    description: "Find 3 clues in the village of Vallhat (466, 87, 2999)"
+    coords: { x: 468, z: 3011 },
+    description: "Find 3 clues in the village of Vallhat (468, 87, 3011)"
   },
   {
     id: "mq-30",
     title: "What Emanates From You",
     number: 30,
-    coords: { x: 484, z: 3058 },
-    description: "Talk to Baldim before leaving Vallhat (484, 86, 3058)"
+    coords: { x: 486, z: 3070 },
+    description: "Talk to Baldim before leaving Vallhat (486, 86, 3070)"
   },
   {
     id: "mq-31",
     title: "He Came",
     number: 31,
-    coords: { x: 1089, z: 4289 },
-    description: "Talk to the Master Swordsman (1089, 19, 4289)"
+    coords: { x: 1091, z: 4301 },
+    description: "Talk to the Master Swordsman (1091, 19, 4301)"
   },
   {
     id: "mq-32",
     title: "At Elma's",
     number: 32,
-    coords: { x: 3136, z: 3668 },
-    description: "Talk with Elma 3 Times (3136, 27, 3668)"
+    coords: { x: 3138, z: 3680 },
+    description: "Talk with Elma 3 Times (3138, 27, 3680)"
   },
   {
     id: "mq-33",
     title: "What Harrold Saw",
     number: 33,
-    coords: { x: 4301, z: 3704 },
-    description: "Go to the well, on the eastern road ~(4301, 178, 3704)"
+    coords: { x: 4303, z: 3716 },
+    description: "Go to the well, on the eastern road ~(4303, 178, 3716)"
   },
   {
     id: "mq-34",
     title: "The Chamber Beneath the Fields",
     number: 34,
-    coords: { x: 4281, z: 3710 },
-    description: "Explore the tunnels ~(4281, 44, 3710)"
+    coords: { x: 4283, z: 3722 },
+    description: "Explore the tunnels ~(4283, 44, 3722)"
   },
   {
     id: "mq-35",
     title: "The Geldorack Mine",
     number: 35,
-    coords: { x: 4287, z: 3890 },
-    description: "Talk to Bob (4287, 159, 3890)"
+    coords: { x: 4289, z: 3902 },
+    description: "Talk to Bob (4289, 159, 3902)"
   }
 ].forEach((quest) => {
   DATA[quest.id] = {

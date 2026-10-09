@@ -1,0 +1,14 @@
+
+Path                                                                       LineNumber Line                                                                                                                      
+----                                                                       ---------- ----                                                                                                                      
+C:\Users\asher\Downloads\SAO MC Interactive Map\shared\map-runtime.js             242         const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);                            
+C:\Users\asher\Downloads\SAO MC Interactive Map\shared\map-runtime.js             267         const params = new URLSearchParams();                                                                             
+C:\Users\asher\Downloads\SAO MC Interactive Map\shared\sao-datasets.js             55     const params = new URLSearchParams(search === undefined ? (global.location && global.location.search) || "" : search);
+C:\Users\asher\Downloads\SAO MC Interactive Map\shared\sao-datasets.js             93     const candidate = value instanceof URLSearchParams ? value.get(DATASET_PARAM) : value;                                
+C:\Users\asher\Downloads\SAO MC Interactive Map\shared\sao-datasets.js            100       resolved.searchParams.set(DATASET_PARAM, dataset);                                                                  
+C:\Users\asher\Downloads\SAO MC Interactive Map\shared\sao-datasets.js            102       resolved.searchParams.delete(DATASET_PARAM);                                                                        
+C:\Users\asher\Downloads\SAO MC Interactive Map\shared\sao-page-helpers.js         49     const requestedFloor = new URLSearchParams(global.location.search).get("floor");                                      
+C:\Users\asher\Downloads\SAO MC Interactive Map\shared\sao-page-utils.js           55     const query = new URLSearchParams();                                                                                  
+
+
+

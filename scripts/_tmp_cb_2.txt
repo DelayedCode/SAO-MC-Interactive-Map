@@ -1,0 +1,300 @@
+      });
+    });
+  }
+  function itemIsClassCompatible(item, classId = state.classId) {
+    return adapter.isItemCompatibleWithClass(item, classId);
+  }
+  function slotItems() {
+    return adapter.getItemsForSlot(state.source, state.pickerSlot, state.classId);
+  }
+  function iconForType(type) {
+    return data.slots.find((slot) => slot.type === type)?.icon || data.slots[0].icon;
+  }
+  function displayText(item, field) {
+    return adapter.getText(item, field) || "";
+  }
+  function rarityClass(rarity) {
+    return rarity ? `rarity-${normalize(rarity).replace(/[^a-z0-9]+/g, "-")}` : "";
+  }
+  function className(classId) {
+    const item = data.classes.find((candidate) => candidate.id === classId);
+    return item ? localizeClass(classId, item.name).split(" /")[0] : classId;
+  }
+
+  function selectedRunesForSlot(slotId) {
+    const runes = activeSkillState().runes || {};
+    return Array.isArray(runes[slotId]) ? runes[slotId] : [];
+  }
+
+  function canonicalRune(rune) {
+    if (!rune) return null;
+    return activeRunes().find((candidate) => candidate.runeKey === rune.runeKey || candidate.id === rune.id) || null;
+  }
+
+  function calculationEquipment() {
+    const equipment = { ...activeBuild() };
+    Object.entries(activeBuild()).forEach(([slotId, item]) => {
+      const capacity = adapter.getRuneSlots(item);
+      if (!capacity) return;
+      selectedRunesForSlot(slotId)
+        .slice(0, capacity)
+        .forEach((selected, index) => {
+          const rune = canonicalRune(selected);
+          if (!rune) return;
+          equipment[`rune:${slotId}:${index}`] = Object.freeze({ ...rune, isBuildRune: true });
+        });
+    });
+    return equipment;
+  }
+
+  function isCalculationItemAvailable(item, source, slotId) {
+    if (item?.isBuildRune) return true;
+    return adapter.isAvailable(item, source, slotId, state.classId);
+  }
+
+  function loadState() {
+    const saved = storage.getJSON(buildStateKey, null);
+    if (!saved || typeof saved !== "object") return;
+    if (saved.builds && typeof saved.builds === "object") {
+      Object.keys(buildSlots).forEach((slotId) => restoreBuildState(buildSlots[slotId], saved.builds[slotId]));
+      state.activeSlot = Object.prototype.hasOwnProperty.call(buildSlots, saved.activeSlot) ? saved.activeSlot : "1";
+    } else {
+      restoreBuildState(buildSlots["1"], saved);
+      state.activeSlot = "1";
+    }
+    syncActiveConfiguration();
+    pruneInvalidSelectedSkills();
+  }
+
+  function saveState() {
+    storage.setJSON(buildStateKey, {
+      activeSlot: state.activeSlot,
+      builds: buildSlots
+    });
+  }
+
+  function renderConfiguration() {
+    $("buildSlot").innerHTML = Object.keys(buildSlots)
+      .map(
+        (slotId) =>
+          `<option value="${slotId}">${escapeHtml(t("page.characterBuild.buildNumber", { number: slotId }))}</option>`
+      )
+      .join("");
+    $("buildSlot").value = state.activeSlot;
+    $("characterLevel").value = state.level;
+    $("levelValue").value = state.level;
+    $("levelValue").textContent = state.level;
+    const baseValue = document.querySelector(".base-value");
+    if (baseValue) baseValue.textContent = t("page.characterBuild.base", { level: state.level });
+    const slotCount = document.querySelector(".section-count");
+    if (slotCount) slotCount.textContent = t("page.characterBuild.slots", { count: 14 });
+    $("characterLevel").style.setProperty("--level-progress", `${((state.level - 1) / 24) * 100}%`);
+    $("characterClass").innerHTML = data.classes
+      .map((item) => `<option value="${item.id}">${escapeHtml(localizeClass(item.id, item.name))}</option>`)
+      .join("");
+    $("characterClass").value = state.classId;
+    document
+      .querySelectorAll("[data-source]")
+      .forEach((button) => button.classList.toggle("is-active", button.dataset.source === state.source));
+    $("skillClassLabel").textContent = `/ ${className(state.classId)}`;
+  }
+
+  function setLevelFromPointer(event) {
+    const input = $("characterLevel");
+    const bounds = input.getBoundingClientRect();
+    const progress = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+    input.value = String(Math.round(1 + progress * 24));
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function renderSlots() {
+    const groups = [
+      { name: "armor", container: $("armorSlots"), matches: (slot) => slot.group === "armor" },
+      {
+        name: "accessory",
+        container: $("accessorySlots"),
+        matches: (slot) => slot.group === "accessory" && !["main-weapon", "offhand"].includes(slot.id)
+      },
+      { name: "weapon", container: $("weaponSlots"), matches: (slot) => ["main-weapon", "offhand"].includes(slot.id) }
+    ];
+    groups.forEach((group) => {
+      group.container.innerHTML = data.slots
+        .filter(group.matches)
+        .map((slot) => {
+          const item = activeBuild()[slot.id];
+          const available = item && adapter.isAvailable(item, state.source, slot.id, state.classId);
+          const itemLabel = item ? displayText(item, "name") || item.name : "";
+          const rarity = item?.rarity
+            ? `<span class="slot-empty ${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>`
+            : "";
+          const runeControls =
+            group.name === "armor" && item && available
+              ? Array.from({ length: adapter.getRuneSlots(item) }, (_, index) => {
+                  const rune = canonicalRune(selectedRunesForSlot(slot.id)[index]);
+                  const slotLabel = localizeSlot(slot);
+                  const label = rune
+                    ? displayText(rune, "name") || rune.name
+                    : t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 });
+                  return `<button class="rune-button${rune ? " is-filled" : ""}" type="button" data-rune-slot="${index}" data-armor-slot="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectRune", { slot: slotLabel, number: index + 1 }))}"><span>R${index + 1}</span><strong>${escapeHtml(label)}</strong></button>`;
+                }).join("")
+              : "";
+          const slotLabel = localizeSlot(slot);
+          return `<div class="equipment-slot-wrap"><button class="slot-button${item ? " is-filled" : ""}${item && !available ? " is-unavailable" : ""}" type="button" data-slot-id="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectSlot", { slot: slotLabel }))}"${item && !available ? ` aria-disabled="true" title="${escapeHtml(t("page.characterBuild.unavailable"))}"` : ""}>
+          <span class="slot-icon" aria-hidden="true">${slot.icon}</span>
+          <span class="slot-name">${escapeHtml(slotLabel)}</span>
+          ${item ? `<span class="slot-item">${escapeHtml(itemLabel)}</span>${rarity}<span class="slot-empty">${available ? t("page.characterBuild.equipped") : t("page.characterBuild.unavailable")}</span>` : `<span class="slot-empty">${t("page.characterBuild.emptySlot")}</span>`}
+        </button>${runeControls ? `<div class="rune-controls" aria-label="${escapeHtml(t("page.characterBuild.runeSlots", { slot: slotLabel }))}">${runeControls}</div>` : ""}</div>`;
+        })
+        .join("");
+    });
+  }
+
+  function renderStats() {
+    const statsGroups = $("statsGroups");
+    const previousGroups = [...statsGroups.querySelectorAll(".stats-group")];
+    const openGroups = new Set(previousGroups.filter((group) => group.open).map((group) => group.dataset.statsGroup));
+    const calculated = calculator.calculateBuildStats({
+      equipment: calculationEquipment(),
+      source: state.source,
+      level: state.level,
+      classId: state.classId,
+      selectedSkills: selectedSkillNodes(),
+      isAvailable: isCalculationItemAvailable
+    });
+    const hasPreviousState = previousGroups.length > 0;
+    const baseStats = calculator.createBaseStats ? calculator.createBaseStats(state.classId) : null;
+    const equippedCount = Object.values(calculationEquipment()).filter(Boolean).length;
+    const summary = statsGroups && document.querySelector(".stats-panel .base-value");
+    if (summary) {
+      summary.textContent = [
+        `${t("page.characterBuild.level")} ${state.level}`,
+        localizeClass(state.classId, state.classId),
+        `${equippedCount} ${t("page.characterBuild.equipped")}`
+      ].join(" · ");
+    }
+    statsGroups.innerHTML = Object.entries(calculator.groups)
+      .map(([group, entries], index) => {
+        const isOpen = hasPreviousState ? openGroups.has(String(index)) : false;
+        return `<details class="stats-group" data-stats-group="${index}"${isOpen ? " open" : ""}><summary>${escapeHtml(localizeGroup(group))}</summary><ul class="stat-list">${entries
+          .map((stat) => {
+            const total = calculated[stat];
+            const base = baseStats ? baseStats[stat] : null;
+            const modified = Boolean(base && total && (total.flat !== base.flat || total.percent !== base.percent));
+            const baseTitle = modified
+              ? ` title="${escapeHtml(t("page.characterBuild.base", { level: calculator.formatValue(base) }))}"`
+              : "";
+            return `<li><span>${escapeHtml(localizeStat(stat))}</span><strong${baseTitle}>${calculator.formatValue(total)}${modified ? " *" : ""}</strong></li>`;
+          })
+          .join("")}</ul></details>`;
+      })
+      .join("");
+  }
+
+  function skillNodeState(node) {
+    const statusLabel = (key) => t(`page.characterBuild.${key}`);
+    if (isSkillUnlocked(node.id))
+      return { name: "selected", label: statusLabel("selected"), reason: t("page.characterBuild.alreadyUnlocked") };
+    const missing = missingSkillPrerequisites(node);
+    if (missing.length) {
+      const requirementNames = missing
+        .map((id) => {
+          const prerequisite = currentSkillTree().find((item) => item.id === id);
+          return prerequisite ? localizeSkillName(prerequisite) : id;
+        })
+        .join(", ");
+      return {
+        name: "locked",
+        label: statusLabel("locked"),
+        reason: t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requiresSkills", {
+          value: requirementNames
+        })
+      };
+    }
+    if (node.cost > availableSkillPoints()) {
+      return {
+        name: "locked",
+        label: statusLabel("locked"),
+        reason: `Need ${node.cost - availableSkillPoints()} more skill point${node.cost - availableSkillPoints() === 1 ? "" : "s"}.`
+      };
+    }
+    return { name: "available", label: statusLabel("available"), reason: t("page.characterBuild.readyToUnlock") };
+  }
+
+  function formatSkillEffects(node) {
+    return node.effects.map((effect) => `${localizeStat(effect.stat)}: ${effect.value}`).join(" / ");
+  }
+
+  function renderSkillDetail(nodeId) {
+    const node = currentSkillTree().find((item) => item.id === nodeId) || currentSkillTree()[0];
+    if (!node || !$("skillDetail")) return;
+    const status = skillNodeState(node);
+    const prerequisites = node.prerequisites.length
+      ? node.prerequisites
+          .map((id) => {
+            const prerequisite = currentSkillTree().find((item) => item.id === id);
+            return prerequisite ? localizeSkillName(prerequisite) : id;
+          })
+          .join(", ")
+      : t("page.characterBuild.none");
+    const effectDetail = node.center ? "" : `<span>${escapeHtml(formatSkillEffects(node))}</span>`;
+    const prerequisiteDetail = node.center
+      ? ""
+      : `<span>${escapeHtml(t(node.prerequisiteMode === "any" ? "page.characterBuild.requiresAny" : "page.characterBuild.requires", { value: prerequisites }))}</span>`;
+    const descriptionDetail = node.description
+      ? `<span>${escapeHtml(localizeSkillDescription(node))}</span>`
+      : "";
+    $("skillDetail").innerHTML =
+      `<strong>${escapeHtml(localizeSkillName(node))}</strong><span>${escapeHtml(node.className)}</span>${descriptionDetail}${effectDetail}${prerequisiteDetail}<span>Cost: ${node.cost} skill point${node.cost === 1 ? "" : "s"}</span><span>${escapeHtml(t("page.characterBuild.state", { value: status.label }))}${status.reason ? ` - ${escapeHtml(status.reason)}` : ""}</span>`;
+  }
+
+  function renderSkills(selectedNodeId) {
+    const skills = currentSkillTree();
+    const layout = data.SKILL_TREE_LAYOUT || [];
+    const layoutById = new Map(layout.map((point) => [point.id, point]));
+    const layoutBySkillId = new Map(layout.map((point) => [point.skillId, point]));
+    const skillsById = new Map(skills.map((node) => [node.id, node]));
+    const skillsByNodeId = new Map(skills.map((node) => [node.nodeId, node]));
+    const drawnConnections = new Set();
+    const connectionMarkup = [];
+    const addConnection = (fromId, toId, active = false) => {
+      const key = [fromId, toId].sort().join(":");
+      if (drawnConnections.has(key)) return;
+      const from = layoutById.get(fromId);
+      const to = layoutById.get(toId);
+      if (!from || !to) return;
+      drawnConnections.add(key);
+      const fromSkill = skillsByNodeId.get(from.skillId);
+      const toSkill = skillsByNodeId.get(to.skillId);
+      connectionMarkup.push(
+        `<line class="skill-connection${active ? " is-active" : ""}" data-from-skill-id="${fromSkill?.id || ""}" data-to-skill-id="${toSkill?.id || ""}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`
+      );
+    };
+    (data.SKILL_TREE_CONNECTIONS || []).forEach(([fromId, toId]) => {
+      const fromPoint = layoutById.get(fromId);
+      const toPoint = layoutById.get(toId);
+      const fromSkill = fromPoint && skillsByNodeId.get(fromPoint.skillId);
+      const toSkill = toPoint && skillsByNodeId.get(toPoint.skillId);
+      const active = (fromSkill && isSkillUnlocked(fromSkill.id)) || (toSkill && isSkillUnlocked(toSkill.id));
+      addConnection(fromId, toId, active);
+    });
+    skills.forEach((node) => {
+      node.prerequisites.forEach((parentId) => {
+        const parent = skillsById.get(parentId);
+        const parentPoint = parent && layoutBySkillId.get(parent.nodeId);
+        const nodePoint = layoutBySkillId.get(node.nodeId);
+        if (parentPoint && nodePoint) addConnection(parentPoint.id, nodePoint.id, isSkillUnlocked(node.id));
+      });
+    });
+    const connections = connectionMarkup.join("");
+    const nodes = layout
+      .map((point) => {
+        const node = skillsByNodeId.get(point.skillId);
+        const position = `--node-x:${point.x}px;--node-y:${point.y}px`;
+        const status = skillNodeState(node);
+        const selected = status.name === "selected";
+        return `<button class="skill-node is-${status.name}${node.center ? " is-center" : ""}${point.isAnchor ? " is-branch-anchor" : ""}" type="button" data-skill-id="${node.id}" style="${position}" aria-label="${escapeHtml(localizeSkillName(node))}: ${escapeHtml(status.label)}" aria-pressed="${selected}"><span class="skill-node-core" aria-hidden="true"></span></button>`;
+      })
+      .join("");
+    const selectedNode = skillsById.get(selectedNodeId) || skills.find((node) => node.center);
+    $("skillTree").innerHTML = `
+      <div class="skill-tree-toolbar">

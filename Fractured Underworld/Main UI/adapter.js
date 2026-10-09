@@ -38,10 +38,16 @@
     rulid: { surface: null, underground: null, placeholder: true },
     fishingIsland: { surface: null, underground: null, placeholder: true }
   });
-  const markerDataset = globalObject.DATA && typeof globalObject.DATA === "object" ? globalObject.DATA : {};
+  const fullMarkerDataset = globalObject.DATA && typeof globalObject.DATA === "object" ? globalObject.DATA : {};
   const mobAreaDataset = Array.isArray(globalObject.MOB_AREAS) ? globalObject.MOB_AREAS : [];
   const mobAreaMobLookup =
     globalObject.MOB_AREA_MOBS && typeof globalObject.MOB_AREA_MOBS === "object" ? globalObject.MOB_AREA_MOBS : {};
+
+  /* The Fractured Underworld markers are its Main Questline, so the shared Current-only rule
+     (shared/sao-datasets.js) applies here exactly as it does on Aincrad: Beta drops them and
+     Current keeps only them. */
+  const markerDataset =
+    globalObject.SAODatasets?.filterMarkerDatasetForActiveMode?.(fullMarkerDataset) || fullMarkerDataset;
   const getContextData = globalObject.SAOMapRuntime.createContextDataResolver({
     markerDataset,
     mobAreaDataset,

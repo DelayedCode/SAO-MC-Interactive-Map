@@ -1,0 +1,100 @@
+          classId,
+          skillId === "skill1" ? "core" : "branch"
+        );
+      });
+    });
+  }
+  function localizeSkillName(node) {
+    return content(`characterBuild.skill.${node.id}.name`, node.name);
+  }
+  function localizeSkillDescription(node) {
+    return content(`characterBuild.skill.${node.id}.description`, node.description, { className: node.className });
+  }
+  const storage = window.SAOStorage || { getJSON: (_key, fallback) => fallback, setJSON() {} };
+  /* The site-wide dataset default is "beta" (shared/sao-datasets.js getDataset falls back to it
+     for a missing or invalid dataset). The "current" equipment dataset ships as an empty stub,
+     so defaulting the builder to it left every slot picker with nothing to list on a first
+     visit. Defaulting to the same dataset the rest of the site uses keeps the picker usable;
+     the Source toggle still offers "current" for when that dataset is filled in. */
+  const DEFAULT_SOURCE = "beta";
+  const state = {
+    source: DEFAULT_SOURCE,
+    activeSlot: "1",
+    level: 1,
+    classId: data.classes[0].id,
+    pickerSlot: null,
+    pickerMode: "equipment",
+    pickerArmorSlot: null,
+    pickerRuneIndex: null,
+    search: "",
+    rarity: ""
+  };
+  const buildSlots = {
+    1: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} },
+    2: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} },
+    3: { source: DEFAULT_SOURCE, level: 1, classId: data.classes[0].id, equipment: {}, runes: {}, selectedSkills: {} }
+  };
+  const buildStateKey = "sao.characterBuild.foundation";
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+  function mountIcons() {
+    document.querySelectorAll("[data-cb-icon]").forEach((element) => {
+      element.innerHTML = window.CharacterBuildIcons.markup(element.dataset.cbIcon);
+    });
+  }
+  const { escapeHtml } = window.SAOPageHelpers;
+  function normalize(value) {
+    return String(value || "").toLowerCase();
+  }
+  function activeBuild() {
+    return buildSlots[state.activeSlot].equipment;
+  }
+  function activeSkillState() {
+    return buildSlots[state.activeSlot];
+  }
+  function syncActiveConfiguration() {
+    const active = activeSkillState();
+    state.source = active.source;
+    state.level = active.level;
+    state.classId = active.classId;
+  }
+  function resetBuildState(build) {
+    build.level = 1;
+    build.classId = data.classes[0].id;
+    build.equipment = {};
+    build.runes = {};
+    build.selectedSkills = {};
+  }
+  function restoreBuildState(target, saved) {
+    if (!saved || typeof saved !== "object") return;
+    target.source = saved.source === "current" ? "current" : DEFAULT_SOURCE;
+    target.level = Math.min(25, Math.max(1, Number(saved.level) || 1));
+    target.classId = data.classes.some((item) => item.id === saved.classId) ? saved.classId : target.classId;
+    target.equipment = saved.equipment && typeof saved.equipment === "object" ? saved.equipment : {};
+    target.runes = saved.runes && typeof saved.runes === "object" ? saved.runes : {};
+    target.selectedSkills =
+      saved.selectedSkills && typeof saved.selectedSkills === "object" ? saved.selectedSkills : {};
+  }
+  function slotById(slotId) {
+    return data.slots.find((slot) => slot.id === slotId);
+  }
+  function skillNodeId(classId, skillId) {
+    return `${classId}-${skillId}`;
+  }
+  function skillClassName(classId) {
+    if (classId === "guerrier") return "Warrior";
+    const selectedClass = data.classes.find((item) => item.id === classId);
+    return selectedClass ? selectedClass.name.split(" /")[0].trim() : classId;
+  }
+  const skillNeighborsById = (() => {
+    const skillByPointId = new Map(data.SKILL_TREE_LAYOUT.map((point) => [point.id, point.skillId]));
+    const neighbors = new Map(data.SKILL_TREE_LAYOUT.map((point) => [point.skillId, new Set()]));
+    data.SKILL_TREE_CONNECTIONS.forEach(([firstPointId, secondPointId]) => {
+      const firstSkillId = skillByPointId.get(firstPointId);
+      const secondSkillId = skillByPointId.get(secondPointId);
+      neighbors.get(firstSkillId).add(secondSkillId);
+      neighbors.get(secondSkillId).add(firstSkillId);
+    });
+    return new Map([...neighbors].map(([skillId, adjacentSkillIds]) => [skillId, [...adjacentSkillIds]]));

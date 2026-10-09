@@ -30,7 +30,6 @@ header {
   border-radius: 7px;
   background: rgba(15, 21, 34, 0.96);
   color: var(--text);
-  cursor: pointer;
   font-size: 0.78rem;
 }
 
@@ -536,7 +535,6 @@ main {
 #content .cluster-entry summary {
   padding: 7px 9px;
   color: #dcebfc;
-  cursor: pointer;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -662,7 +660,6 @@ main {
   background: rgba(12, 20, 31, 0.96);
   box-sizing: border-box;
   position: relative;
-  cursor: pointer;
   transition:
     border-color 0.2s ease,
     background 0.2s ease;

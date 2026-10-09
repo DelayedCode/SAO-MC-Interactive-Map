@@ -1,0 +1,100 @@
+
+    let remaining = scripts.length;
+    let failed = false;
+    if (remaining === 0) {
+      onReady?.();
+      return;
+    }
+
+    const finalize = (success) => {
+      if (!success) failed = true;
+      remaining -= 1;
+      if (remaining <= 0) {
+        if (failed) onError?.();
+        else onReady?.();
+      }
+    };
+
+    scripts.forEach((src) => {
+      runtime.loadTaggedScriptOnce({
+        cache: characterBuildScriptCache,
+        cacheKey: src,
+        tagAttribute: "data-character-build-dependency",
+        src,
+        onReady: () => finalize(true),
+        onError: () => finalize(false)
+      });
+    });
+  }
+  function itemIsClassCompatible(item, classId = state.classId) {
+    return adapter.isItemCompatibleWithClass(item, classId);
+  }
+  function slotItems() {
+    return adapter.getItemsForSlot(state.source, state.pickerSlot, state.classId);
+  }
+  function iconForType(type) {
+    return data.slots.find((slot) => slot.type === type)?.icon || data.slots[0].icon;
+  }
+  function displayText(item, field) {
+    return adapter.getText(item, field) || "";
+  }
+  function rarityClass(rarity) {
+    return rarity ? `rarity-${normalize(rarity).replace(/[^a-z0-9]+/g, "-")}` : "";
+  }
+  function className(classId) {
+    const item = data.classes.find((candidate) => candidate.id === classId);
+    return item ? localizeClass(classId, item.name).split(" /")[0] : classId;
+  }
+
+  function selectedRunesForSlot(slotId) {
+    const runes = activeSkillState().runes || {};
+    return Array.isArray(runes[slotId]) ? runes[slotId] : [];
+  }
+
+  function canonicalRune(rune) {
+    if (!rune) return null;
+    return activeRunes().find((candidate) => candidate.runeKey === rune.runeKey || candidate.id === rune.id) || null;
+  }
+
+  function calculationEquipment() {
+    const equipment = { ...activeBuild() };
+    Object.entries(activeBuild()).forEach(([slotId, item]) => {
+      const capacity = adapter.getRuneSlots(item);
+      if (!capacity) return;
+      selectedRunesForSlot(slotId)
+        .slice(0, capacity)
+        .forEach((selected, index) => {
+          const rune = canonicalRune(selected);
+          if (!rune) return;
+          equipment[`rune:${slotId}:${index}`] = Object.freeze({ ...rune, isBuildRune: true });
+        });
+    });
+    return equipment;
+  }
+
+  function isCalculationItemAvailable(item, source, slotId) {
+    if (item?.isBuildRune) return true;
+    return adapter.isAvailable(item, source, slotId, state.classId);
+  }
+
+  function loadState() {
+    const saved = storage.getJSON(buildStateKey, null);
+    if (!saved || typeof saved !== "object") return;
+    if (saved.builds && typeof saved.builds === "object") {
+      Object.keys(buildSlots).forEach((slotId) => restoreBuildState(buildSlots[slotId], saved.builds[slotId]));
+      state.activeSlot = Object.prototype.hasOwnProperty.call(buildSlots, saved.activeSlot) ? saved.activeSlot : "1";
+    } else {
+      restoreBuildState(buildSlots["1"], saved);
+      state.activeSlot = "1";
+    }
+    syncActiveConfiguration();
+    pruneInvalidSelectedSkills();
+  }
+
+  function saveState() {
+    storage.setJSON(buildStateKey, {
+      activeSlot: state.activeSlot,
+      builds: buildSlots
+    });
+  }
+

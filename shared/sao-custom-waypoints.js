@@ -7,6 +7,11 @@
       : (global.SAOColorUtils || global.SAOJourneyMapColors || {});
 
   const DEFAULT_CUSTOM_BUTTON = "Default";
+  /* Records created by the JourneyMap import keep the id the importer gave them. They already hold
+     Minecraft coordinates, while records created on the map were stored in the floor's own grid, so
+     the id prefix is how the one-time coordinate migration tells the two apart. */
+  const JOURNEYMAP_IMPORT_ID_PREFIX = "journeymap-import-";
+  const COORDINATE_MIGRATION_VERSION = 2;
   const LOGO_IDS = Object.freeze([
     "pin",
     "star",
@@ -45,7 +50,7 @@
     }
   };
 
-  function normalizeRecord(record, world, floorIds) {
+  function normalizeRecord(record, world) {
     const buttonName = normalizeCustomButtonName(record && record.button, DEFAULT_CUSTOM_BUTTON);
     return {
       id: record.id,
@@ -77,6 +82,17 @@
     const storageKey = `sao.customWaypoints.${world}`;
     const colorStorageKey = `sao.customWaypoints.colors.${world}`;
     const buttonEnabledStorageKey = `sao.customWaypoints.enabled.${world}`;
+    const coordinateVersionKey = `sao.customWaypoints.coordinateVersion.${world}`;
+    /* Per-floor one-time migration deltas for stored records that still live in a legacy
+       coordinate grid. Keys are floor ids, values are { x, z } block deltas. Floors without
+       an entry are never moved. */
+    const storedCoordinateMigrations = Object.create(null);
+    if (config.storedCoordinateMigrations && typeof config.storedCoordinateMigrations === "object") {
+      Object.entries(config.storedCoordinateMigrations).forEach(([floor, delta]) => {
+        if (!delta || !Number.isFinite(Number(delta.x)) || !Number.isFinite(Number(delta.z))) return;
+        storedCoordinateMigrations[String(floor)] = { x: Number(delta.x), z: Number(delta.z) };
+      });
+    }
     const storedRecords = storage.getJSON(storageKey, []);
     const storedButtonStates = storage.getJSON(buttonEnabledStorageKey, null);
     let buttonEnabledStates =
@@ -100,7 +116,7 @@
               Number.isFinite(Number(record.x)) &&
               Number.isFinite(Number(record.z))
           )
-          .map((record) => normalizeRecord(record, world, floorIds))
+          .map((record) => normalizeRecord(record, world))
       : [];
     const markerDatasets = new Map();
     const recordsByFloor = new Map();
@@ -109,6 +125,30 @@
     function persist() {
       storage.setJSON(storageKey, records);
     }
+
+    /* One-time move of already-stored records from a floor's legacy coordinate grid to the
+       floor's current grid. Only floors listed in storedCoordinateMigrations move, records
+       that came from a JourneyMap import already hold Minecraft coordinates and are left
+       alone, and the version key makes sure the shift can never run twice. */
+    function migrateStoredCoordinateSystem() {
+      if (Object.keys(storedCoordinateMigrations).length === 0) return 0;
+      const storedVersion = Number(storage.getJSON(coordinateVersionKey, 0)) || 0;
+      if (storedVersion >= COORDINATE_MIGRATION_VERSION) return 0;
+      let migratedCount = 0;
+      records.forEach((record) => {
+        if (String(record.id).startsWith(JOURNEYMAP_IMPORT_ID_PREFIX)) return;
+        const migration = storedCoordinateMigrations[String(record.floor)];
+        if (!migration) return;
+        record.x = Number(record.x) + migration.x;
+        record.z = Number(record.z) + migration.z;
+        migratedCount += 1;
+      });
+      storage.setJSON(coordinateVersionKey, COORDINATE_MIGRATION_VERSION);
+      if (migratedCount > 0) persist();
+      return migratedCount;
+    }
+
+    migrateStoredCoordinateSystem();
 
     function invalidate(floor) {
       if (!floor) {
@@ -302,8 +342,12 @@
 
     return Object.freeze({
       storageKey,
+      coordinateVersionKey,
       world,
       logoIds: LOGO_IDS,
+      getCoordinateMigrationVersion() {
+        return Number(storage.getJSON(coordinateVersionKey, 0)) || 0;
+      },
       getRecords() {
         return records.slice();
       },
