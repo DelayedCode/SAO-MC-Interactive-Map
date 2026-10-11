@@ -8,8 +8,10 @@
    Set bonuses use the same "N Piece Set Bonus" stat keys as Beta; the effects of one tier are
    comma-separated inside that single value (matching Beta, e.g. "+5% Magic Damage, +15 Mana").
 
-   Rarity and craftingLocation are omitted because the supplied Current data does not provide them;
-   no value is invented here. Beta Data is untouched and still lives in ecompendium_floor*.js. */
+   Rarity is omitted because the supplied Current data does not provide it, and no value is invented
+   here. The one craftingLocation the requested change supplies - the Secret Accessory Blacksmith
+   that forges the Gloves of the Wolves - is carried exactly as given. Beta Data is untouched and
+   still lives in ecompendium_floor*.js. */
 window.SAO_CURRENT_EQUIPMENT_DATA = {
   floor1: {
     weapon: [
@@ -946,6 +948,27 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
           "2 Piece Set Bonus": "+5% Ability Haste",
           "3 Piece Set Bonus": "+3 Health",
           "4 Piece Set Bonus": "+3% Physical Damage"
+        }
+      },
+      /* The Gloves of the Wolves, forged by the Secret Accessory Blacksmith. The supplied category
+         (Gloves [Evolving] [F1]) maps onto the existing schema as the floor 1 accessory bucket and
+         the Glove slot the name derives - the schema carries no separate "evolving" flag, so none
+         is invented. Only the supplied values are carried: the item stats, the set bonuses of every
+         tier and the blacksmith the item names as its crafting location. No resource cost, drop
+         source or extra bonus is invented for it. */
+      {
+        name: "Gloves of the Wolves",
+        level: 5,
+        description: "A pair of gloves in wolf hide, with a baleful aura that inspires bloodlust",
+        set: "Weakling Wolf Set",
+        craftingLocation: "Secret Accessory Blacksmith",
+        stats: {
+          "Critical Chance": "+1%",
+          "Life Steal": "+2.5%",
+          "Movement Speed": "+5%",
+          "2 Piece Set Bonus": "+0.5% Critical Power",
+          "3 Piece Set Bonus": "+5% Movement Speed",
+          "4 Piece Set Bonus": "+0.25 Attack Damage"
         }
       },
       {

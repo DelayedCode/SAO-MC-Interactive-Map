@@ -26,7 +26,7 @@ Object.assign(DATA, {
     category: "accessoriesBlacksmith",
     dataset: "current",
     floor: "floor1",
-    coords: { x: 1773, z: 345 },
+    coords: { x: 1771, z: 4131 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -47,6 +47,79 @@ Object.assign(DATA, {
     dataset: "current",
     floor: "floor1",
     coords: { x: 1491, z: 3419 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  /* The accessory blacksmiths this Current-Data update supplies, one per accessory set, in exactly
+     the shape of the four above: the map's existing Accessories Blacksmith category, Current Data
+     only, floor 1, and precisely the coordinates supplied for them. Nothing here is guessed. */
+  "current-accessories-blacksmith-spider": {
+    title: "Spider Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1996, z: 811 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  "current-accessories-blacksmith-slime": {
+    title: "Slime Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 394, z: 3084 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  "current-accessories-blacksmith-shark": {
+    title: "Shark Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1570, z: 1994 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  "current-accessories-blacksmith-deer": {
+    title: "Deer Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 3232, z: 1474 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  "current-accessories-blacksmith-ice-golem": {
+    title: "Ice Golem Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 3238, z: 1477 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  "current-accessories-blacksmith-ice-spirit": {
+    title: "Ice Spirit Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 3228, z: 1488 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  "current-accessories-blacksmith-skeleton": {
+    title: "Skeleton Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1226, z: 3601 },
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
@@ -107,6 +180,19 @@ Object.assign(DATA, {
     dataset: "current",
     floor: "floor1",
     coords: { x: 1316, z: 2096 },
+    drops: ["N/A"],
+    description: "Secret Accessory Blacksmith"
+  },
+  /* The Secret Accessory Blacksmith that forges the Gloves of the Wolves. It keeps the category,
+     the dataset, the floor and the description the six secret accessory markers above already use,
+     and carries exactly the supplied coordinates and name. */
+  "current-secret-accessory-blacksmith-gloves-of-the-wolves": {
+    title: "Secret Accessory Blacksmith",
+    type: "NPC",
+    category: "secretAccessoryBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2494, z: 3700 },
     drops: ["N/A"],
     description: "Secret Accessory Blacksmith"
   },

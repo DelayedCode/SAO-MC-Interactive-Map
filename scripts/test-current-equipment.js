@@ -96,6 +96,9 @@ const EXPECTED_ACCESSORIES = [
   { name: "Skeleton Skull", level: 8, set: "Standard Skeleton Set", cols: 35, stats: { "Skill Damage": "+1%", Health: "+5", "Max Mana": "+1", "Max Stamina": "+1", "Health Regeneration": "+0.05/s" }, resources: [["Reinforced Skeleton Bone", 20]] },
   { name: "Belt of the Stags", level: 7, set: "Peaceful Deer Set", cols: null, note: "N/A", stats: { "Ability Haste": "+5%", Health: "+2", "Bonus Healing": "+0.5" }, resources: [] },
   { name: "Ring of the Leviathan", level: 7, set: "Shark Set", cols: 55, stats: { "Attack Damage": "+1", Defense: "+3", Health: "+5" }, resources: [["Shark Carapace", 24], ["Heart of Nymbrea", 3], ["Iron Ingot", 1]] },
+  /* Forged by the Secret Accessory Blacksmith: no resource cost or Col price was supplied, so none
+     is invented and the crafting resources stay empty. */
+  { name: "Gloves of the Wolves", level: 5, set: "Weakling Wolf Set", cols: null, stats: { "Critical Chance": "+1%", "Life Steal": "+2.5%", "Movement Speed": "+5%" }, resources: [] },
   { name: "Occult Gloves", level: 10, set: "Shadow Neophyte Set", cols: 5000, stats: { "Life Steal": "+2%", "Spell Vampirism": "+2%", Health: "+3", "Mana Regeneration": "+0.1/s", "Stamina Regeneration": "+0.1/s" }, resources: [] },
   { name: "Occult Bracelet", level: 10, set: "Shadow Neophyte Set", cols: 5000, stats: { Defense: "+2", Health: "+10" }, resources: [] },
   { name: "Occult Ring", level: 10, set: "Shadow Neophyte Set", cols: 5000, stats: { "Physical Damage": "+5%", "Magic Damage": "+5%", "Projectile Damage": "+5%", Health: "+3" }, resources: [] },
@@ -119,6 +122,7 @@ const EXPECTED_SET_BONUSES = {
   "Nepenthes Set": { 2: "+1% Skill Critical Hit Chance", 3: "+0.5 Max Mana", 4: "+2.5% Magic Damage" },
   "Elite Treant Set": { 2: "+0.5% Critical Hit Chance", 3: "+2% Movement Speed", 4: "+5% Projectile Damage" },
   "Standard Skeleton Set": { 2: "+5% Ability Haste", 3: "+0.05/s Health Regeneration", 4: "-2% Damage Reduction" },
+  "Weakling Wolf Set": { 2: "+0.5% Critical Power", 3: "+5% Movement Speed", 4: "+0.25 Attack Damage" },
   "Shadow Neophyte Set": {
     2: "-0.6/s Health Regeneration, -50% Healing Received",
     3: "-0.6/s Health Regeneration",
@@ -150,6 +154,15 @@ EXPECTED_ACCESSORIES.forEach((expected) => {
   );
   assert.equal(item.craftingNote ?? null, expected.note ?? null, `${expected.name} crafting note`);
 });
+
+/* The Gloves of the Wolves name the Secret Accessory Blacksmith as their crafting location - the
+   same field the Beta schema and the other Current items use - so the item is tied to the map
+   marker that forges it. */
+assert.equal(
+  byName.get("Gloves of the Wolves").craftingLocation,
+  "Secret Accessory Blacksmith",
+  "Gloves of the Wolves names its Secret Accessory Blacksmith"
+);
 
 /* --- The other supplied Current items --------------------------------------- */
 EXPECTED_OTHER_ITEMS.forEach((expected) => {
@@ -247,7 +260,7 @@ const EXPECTED_TYPES = {
   "Ring of the Nepenthes": "Ring", "Bracelet of the Nepenthes": "Bracelet", "Amulet of the Nepenthes": "Amulet",
   "Elite Gloves": "Glove", "Elite Amulet": "Amulet", "Elite Bracelet": "Bracelet", "Elite Carapace": "Artifact",
   "Bracelet of Ice": "Bracelet", "Necklace of Aragorn": "Amulet", "Sticky Ring": "Ring", "Skeleton Skull": "Artifact",
-  "Belt of the Stags": "Artifact", "Ring of the Leviathan": "Ring",
+  "Belt of the Stags": "Artifact", "Ring of the Leviathan": "Ring", "Gloves of the Wolves": "Glove",
   "Occult Gloves": "Glove", "Occult Bracelet": "Bracelet", "Occult Ring": "Ring", "Occult Amulet": "Amulet",
   "Occult Skull": "Artifact", "Occult Robe": "Artifact", "Occult Hood": "Artifact"
 };
@@ -352,6 +365,7 @@ assert.equal(percentGain(nepenthesTwo, "Skill Critical Hit Chance"), 1, "the Nep
 const UNMODELLED_ITEM_STATS = [
   "Ability Haste",
   "Bonus Healing",
+  "Critical Chance",
   "Fall Damage Reduction",
   "Life Steal",
   "Max Stamina",

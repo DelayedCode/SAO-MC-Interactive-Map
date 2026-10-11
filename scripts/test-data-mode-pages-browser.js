@@ -212,8 +212,28 @@ async function run() {
        map: the regular Accessories Blacksmith, the Secret Accessory Blacksmith and the Occult
        Merchant. Each one is enabled on its own and renders exactly its own Current waypoints. */
     const currentWaypointCategories = {
-      accessoriesBlacksmith: ["Iron Accessories", "Copper Accessories", "Nepenthes Accessories", "Elite Treant Accessories"],
-      secretAccessoryBlacksmith: ["Bracelet of Ice", "Necklace of Aragorn", "Sticky Ring", "Skeleton Skull", "Belt of the Stags", "Ring of the Leviathan"],
+      accessoriesBlacksmith: [
+        "Iron Accessories",
+        "Copper Accessories",
+        "Nepenthes Accessories",
+        "Elite Treant Accessories",
+        "Spider Accessories",
+        "Slime Accessories",
+        "Shark Accessories",
+        "Deer Accessories",
+        "Ice Golem Accessories",
+        "Ice Spirit Accessories",
+        "Skeleton Accessories"
+      ],
+      secretAccessoryBlacksmith: [
+        "Bracelet of Ice",
+        "Necklace of Aragorn",
+        "Sticky Ring",
+        "Skeleton Skull",
+        "Belt of the Stags",
+        "Ring of the Leviathan",
+        "Secret Accessory Blacksmith"
+      ],
       occultMerchants: [
         "Occult Merchant - Gloves",
         "Occult Merchant - Bracelet",

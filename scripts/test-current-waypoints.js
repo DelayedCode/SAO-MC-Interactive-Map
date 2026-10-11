@@ -1,6 +1,7 @@
 /* Current-Data waypoint regression checks.
 
-   Current Data ships the Accessory Blacksmith, Secret Accessory Blacksmith and Occult Merchant
+   Current Data ships the Accessory Blacksmith (one smith per accessory set), the Secret Accessory
+   Blacksmith and Occult Merchant
    waypoints on floor 1, plus a copy of every Beta Biome-category waypoint. Aincrad/Map/
    maps_current.js is their single source and every marker carries `dataset: "current"`, which
    shared/sao-datasets.js uses to keep them out of Beta mode. These checks pin the supplied
@@ -38,15 +39,23 @@ const data = dataContext.__data;
 /* Exactly the waypoints Current Data supplies, with the coordinates and categories as given. */
 const EXPECTED_WAYPOINTS = [
   { id: "current-accessories-blacksmith-iron", title: "Iron Accessories", category: "accessoriesBlacksmith", x: 1764, z: 4144 },
-  { id: "current-accessories-blacksmith-copper", title: "Copper Accessories", category: "accessoriesBlacksmith", x: 1773, z: 345 },
+  { id: "current-accessories-blacksmith-copper", title: "Copper Accessories", category: "accessoriesBlacksmith", x: 1771, z: 4131 },
   { id: "current-accessories-blacksmith-nepenthes", title: "Nepenthes Accessories", category: "accessoriesBlacksmith", x: 3151, z: 3701 },
   { id: "current-accessories-blacksmith-elite-treant", title: "Elite Treant Accessories", category: "accessoriesBlacksmith", x: 1491, z: 3419 },
+  { id: "current-accessories-blacksmith-spider", title: "Spider Accessories", category: "accessoriesBlacksmith", x: 1996, z: 811 },
+  { id: "current-accessories-blacksmith-slime", title: "Slime Accessories", category: "accessoriesBlacksmith", x: 394, z: 3084 },
+  { id: "current-accessories-blacksmith-shark", title: "Shark Accessories", category: "accessoriesBlacksmith", x: 1570, z: 1994 },
+  { id: "current-accessories-blacksmith-deer", title: "Deer Accessories", category: "accessoriesBlacksmith", x: 3232, z: 1474 },
+  { id: "current-accessories-blacksmith-ice-golem", title: "Ice Golem Accessories", category: "accessoriesBlacksmith", x: 3238, z: 1477 },
+  { id: "current-accessories-blacksmith-ice-spirit", title: "Ice Spirit Accessories", category: "accessoriesBlacksmith", x: 3228, z: 1488 },
+  { id: "current-accessories-blacksmith-skeleton", title: "Skeleton Accessories", category: "accessoriesBlacksmith", x: 1226, z: 3601 },
   { id: "current-secret-accessory-blacksmith-ice-bracelet", title: "Bracelet of Ice", category: "secretAccessoryBlacksmith", x: 2416, z: 1800 },
   { id: "current-secret-accessory-blacksmith-aragorn-necklace", title: "Necklace of Aragorn", category: "secretAccessoryBlacksmith", x: 1114, z: 1172 },
   { id: "current-secret-accessory-blacksmith-sticky-ring", title: "Sticky Ring", category: "secretAccessoryBlacksmith", x: 390, z: 3064 },
   { id: "current-secret-accessory-blacksmith-skeleton-skull", title: "Skeleton Skull", category: "secretAccessoryBlacksmith", x: 1163, z: 3546 },
   { id: "current-secret-accessory-blacksmith-deer-belt", title: "Belt of the Stags", category: "secretAccessoryBlacksmith", x: 3650, z: 1331 },
   { id: "current-secret-accessory-blacksmith-leviathan-ring", title: "Ring of the Leviathan", category: "secretAccessoryBlacksmith", x: 1316, z: 2096 },
+  { id: "current-secret-accessory-blacksmith-gloves-of-the-wolves", title: "Secret Accessory Blacksmith", category: "secretAccessoryBlacksmith", x: 2494, z: 3700 },
   { id: "current-occult-merchant-gloves", title: "Occult Merchant - Gloves", category: "occultMerchants", x: 3371, z: 1698 },
   { id: "current-occult-merchant-bracelet", title: "Occult Merchant - Bracelet", category: "occultMerchants", x: 3348, z: 1634 },
   { id: "current-occult-merchant-ring", title: "Occult Merchant - Ring", category: "occultMerchants", x: 3319, z: 1722 },
