@@ -925,7 +925,8 @@
             floor2: "Floor 2",
             poi: "POI",
             waypoints: "Waypoints",
-            mainMenu: "Main Menu"
+            mainMenu: "Main Menu",
+            compendium: "Compendium"
           }
         },
         towerdefense: {
@@ -1454,7 +1455,8 @@
             floor2: "Piso 2",
             poi: "POI",
             waypoints: "Waypoints",
-            mainMenu: "Menú principal"
+            mainMenu: "Menú principal",
+            compendium: "Compendio"
           }
         },
         towerdefense: {
@@ -1986,7 +1988,8 @@
             floor2: "Étage 2",
             poi: "POI",
             waypoints: "Waypoints",
-            mainMenu: "Menu principal"
+            mainMenu: "Menu principal",
+            compendium: "Compendium"
           }
         },
         towerdefense: {
@@ -2451,6 +2454,9 @@
           weaponsOffhand: "Weapons / Offhand",
           characterSheet: "CHARACTER SHEET",
           stats: "Stats",
+          statGroups: {
+            itemStats: "Item Stats"
+          },
           base: "Stat Base: {level}",
           placeholderPreview: "PROTOTYPE PREVIEW",
           skillTree: "Skill Tree",
@@ -2494,6 +2500,10 @@
           deselectDependent: "Deselect dependent skills first.",
           noMatchingItems: "No {slot} items match these filters at level {level}.",
           weaponAlreadyEquipped: "This weapon is already equipped in the other weapon slot.",
+          twoHanded: "Two-Handed",
+          removeItem: "Remove",
+          offhandLocked: "Two-handed weapon equipped",
+          removeOffhandFirst: "Remove the equipped Offhand item first.",
           selectRuneFor: "Select Rune {number} for {slot}",
           itemLevel: "Level {level}",
           branchCore: "core",
@@ -2565,6 +2575,9 @@
           weaponsOffhand: "Armas / Mano secundaria",
           characterSheet: "HOJA DEL PERSONAJE",
           stats: "Estadísticas",
+          statGroups: {
+            itemStats: "Estadísticas del objeto"
+          },
           base: "Nivel {level} Base",
           placeholderPreview: "VISTA PREVIA DEL PROTOTIPO",
           skillTree: "Árbol de habilidades",
@@ -2608,6 +2621,10 @@
           deselectDependent: "Quita primero las habilidades dependientes.",
           noMatchingItems: "Ningún objeto de {slot} coincide con estos filtros en el nivel {level}.",
           weaponAlreadyEquipped: "Esta arma ya está equipada en el otro espacio de arma.",
+          twoHanded: "A dos manos",
+          removeItem: "Quitar",
+          offhandLocked: "Arma a dos manos equipada",
+          removeOffhandFirst: "Quita primero el objeto de mano secundaria equipado.",
           selectRuneFor: "Seleccionar runa {number} para {slot}",
           itemLevel: "Nivel {level}",
           branchCore: "núcleo",
@@ -2680,6 +2697,9 @@
           weaponsOffhand: "Armes / Main secondaire",
           characterSheet: "FICHE DU PERSONNAGE",
           stats: "Statistiques",
+          statGroups: {
+            itemStats: "Statistiques de l'objet"
+          },
           base: "Niveau {level} Base",
           placeholderPreview: "APERÇU DU PROTOTYPE",
           skillTree: "Arbre de compétences",
@@ -2723,6 +2743,10 @@
           deselectDependent: "Désélectionnez d'abord les compétences dépendantes.",
           noMatchingItems: "Aucun objet de {slot} ne correspond à ces filtres au niveau {level}.",
           weaponAlreadyEquipped: "Cette arme est déjà équipée dans l'autre emplacement d'arme.",
+          twoHanded: "À deux mains",
+          removeItem: "Retirer",
+          offhandLocked: "Arme à deux mains équipée",
+          removeOffhandFirst: "Retirez d'abord l'objet de main secondaire équipé.",
           selectRuneFor: "Sélectionner la rune {number} pour {slot}",
           itemLevel: "Niveau {level}",
           branchCore: "noyau",
@@ -3313,6 +3337,12 @@
   Object.assign(translations.fr.page.patchnotes.entries.v020, { version: "v0.2.0 Alpha" });
 
   Object.assign(translations.en.page.patchnotes.entries, {
+    v180: {
+      version: "Character Build Equipment Update - v1.8",
+      title: "Character Build Equipment Update",
+      summary:
+        "Character Build\n• Added a large collection of new weapons and armor for all five classes.\n• Expanded the available equipment in Character Build and the Equipment Compendium.\n• Updated the formatting and icons used for item stats, buffs, and bonuses.\n• Improved the presentation of equipment effects and stat bonuses to make them easier to read."
+    },
     v170: {
       version: "Character Build Skill Tree Update - v1.7",
       title: "Character Build Skill Tree Update",
@@ -3333,6 +3363,12 @@
     }
   });
   Object.assign(translations.es.page.patchnotes.entries, {
+    v180: {
+      version: "Actualización del equipamiento del personaje - v1.8",
+      title: "Actualización del equipamiento del personaje",
+      summary:
+        "Configuración del personaje\n• Se añadieron numerosas armas y piezas de armadura nuevas para las cinco clases.\n• Se amplió el equipamiento disponible en la configuración del personaje y en el Compendio de equipo.\n• Se actualizaron el formato y los iconos de las estadísticas, mejoras y bonificaciones de los objetos.\n• Se mejoró la presentación de los efectos y las bonificaciones del equipamiento para facilitar su lectura."
+    },
     v170: {
       version: "Actualización del árbol de habilidades de Character Build - v1.7",
       title: "Actualización del árbol de habilidades de Character Build",
@@ -3353,6 +3389,12 @@
     }
   });
   Object.assign(translations.fr.page.patchnotes.entries, {
+    v180: {
+      version: "Mise à jour de l'équipement du personnage - v1.8",
+      title: "Mise à jour de l'équipement du personnage",
+      summary:
+        "Configuration du personnage\n• Ajout de nombreuses nouvelles armes et pièces d'armure pour les cinq classes.\n• Extension de l'équipement disponible dans la configuration du personnage et le Compendium d'équipement.\n• Mise à jour du formatage et des icônes des statistiques, bonus et effets des objets.\n• Amélioration de la présentation des effets et des bonus d'équipement pour faciliter leur lecture."
+    },
     v170: {
       version: "Mise à jour de l'arbre de compétences de Character Build - v1.7",
       title: "Mise à jour de l'arbre de compétences de Character Build",

@@ -62,6 +62,26 @@
     );
   }
 
+  /* The source spells two of the supplied sets inconsistently: the Assassin Herald set is
+     "Stealth Herald Set" on the helmet and "Stealthy Herald Set" on the other three pieces, and the
+     Archer's is written both "Hunter Herald Set" and "Hunter's Herald Set". An item keeps the label
+     the source gave it (the pages show the item's own wording), while the set-bonus engine groups
+     the pieces by the canonical label below, so a spelling variant can never split one set into two
+     groups. A set without a variant keeps its own label, which is what a build saved before this
+     helper existed already carries in its items - the two therefore keep grouping together. */
+  const canonicalSetNames = new Map([
+    ["stealth herald set", "Stealthy Herald Set"],
+    ["stealthy herald set", "Stealthy Herald Set"],
+    ["hunter herald set", "Hunter Herald Set"],
+    ["hunter's herald set", "Hunter Herald Set"]
+  ]);
+
+  function getSetKey(set) {
+    if (!set) return null;
+    const label = String(set).trim();
+    return canonicalSetNames.get(label.toLowerCase()) || label;
+  }
+
   function getSourceRecords(source) {
     if (source === "current") {
       return global.SAO_CURRENT_EQUIPMENT_DATA || {};
@@ -74,10 +94,14 @@
     };
   }
 
+  /* Head armour keeps its canonical item name (a Mask, Hat, Hood or Helm is still a Helmet slot),
+     which is why the wording is matched here instead of the data carrying a slot field. A
+     Breastplate and a Chestplate are the same slot, as are a Tunic and a Robe, and the names stay
+     exactly as the source supplies them. */
   function classifyArmor(name) {
     const normalizedName = String(name || "").toLowerCase();
-    if (/\b(?:helm(?:et)?s?|mask)\b/.test(normalizedName)) return "Helmet";
-    if (/\b(tunics?|robes?|breastplates?)\b/.test(normalizedName)) return "Chestplate";
+    if (/\b(?:helm(?:et)?s?|hats?|hoods?|mask)\b/.test(normalizedName)) return "Helmet";
+    if (/\b(?:tunics?|robes?|breastplates?|chestplates?)\b/.test(normalizedName)) return "Chestplate";
     if (/\b(leggings?|trousers?|pants?)\b/.test(normalizedName)) return "Leggings";
     if (/\b(boots?|sandals?)\b/.test(normalizedName)) return "Boots";
     return null;
@@ -92,14 +116,20 @@
     return "Artifact";
   }
 
-  function classifyWeapon(name) {
+  /* The source category decides the slot whenever it names one: "Second Hand [P1]" and
+     "Off-Hand [P1]" are both Offhand equipment, which is how the off-hand shields, daggers,
+     quivers, lanterns and grimoires are told apart from the main-hand weapons that share their
+     names. The name is only a fallback, so the datasets that carry no category keep the
+     shield/buckler behaviour. */
+  function classifyWeapon(name, sourceCategory) {
+    if (/^(?:second\s*hand|off[\s-]*hand)\b/i.test(String(sourceCategory || "").trim())) return "Offhand";
     return /\b(shield|buckler)\b/i.test(String(name || "")) ? "Offhand" : "Main Weapon";
   }
 
-  function getSlotType(category, name) {
+  function getSlotType(category, name, stats) {
     if (category === "armor") return classifyArmor(name);
     if (category === "accessory") return classifyAccessory(name);
-    if (category === "weapon") return classifyWeapon(name);
+    if (category === "weapon") return classifyWeapon(name, stats?.["Weapon Category"]);
     if (category === "tool") return toolSlotMap[name] || null;
     return null;
   }
@@ -138,6 +168,18 @@
     });
   }
 
+  /* Two-handed status comes from the data's own "Two-Handed" flag and is never inferred from the
+     item's wording, so a Greatsword, Katana or Staff is only two-handed when it says so. */
+  function statsAreTwoHanded(stats) {
+    const value = stats?.["Two-Handed"];
+    if (value === undefined || value === null || value === "") return false;
+    return !/^(?:no|false|0)$/i.test(String(value).trim());
+  }
+
+  function isTwoHanded(item) {
+    return statsAreTwoHanded(item?.stats);
+  }
+
   function normalizeClasses(stats) {
     const rawClass = stats?.Class;
     if (!rawClass || /^any$/i.test(String(rawClass).trim())) return [];
@@ -152,6 +194,14 @@
         if (mapped) classNames.add(mapped);
       });
     return [...classNames];
+  }
+
+  /* True once the page has actually loaded this source's equipment scripts. An empty result before
+     that means "not loaded yet", not "no equipment". */
+  function isSourceDataLoaded(source) {
+    return Object.values(getSourceRecords(source)).some(
+      (categories) => categories && Object.keys(categories).length > 0
+    );
   }
 
   function getSourceEntries(source) {
@@ -223,7 +273,7 @@
 
   function normalizeEntry(entry, source, floor, category, index) {
     const stats = entry.stats && typeof entry.stats === "object" ? { ...entry.stats } : {};
-    const slotType = getSlotType(category, entry.name);
+    const slotType = getSlotType(category, entry.name, stats);
     const setBonuses = parseSetBonuses(stats);
     const id = entry.id || `${source}-${floor}-${category}-${index}-${slugify(entry.name)}`;
     const uniqueEffects = new Map();
@@ -248,6 +298,11 @@
       originalCategory: category,
       slot: slotType,
       set: entry.set || null,
+      /* The canonical set label the bonus engine groups by, so the source's spelling variants of
+         one set (see canonicalSetNames) still activate their tiers together. A set without a
+         variant keeps its own label, so a build saved before this field existed keeps grouping its
+         items with the ones equipped now. */
+      setKey: getSetKey(entry.set),
       setBonuses: Object.freeze(
         setBonuses.map((bonus) =>
           Object.freeze({
@@ -262,6 +317,8 @@
       levelRequirement: Number.isFinite(Number(entry.level)) ? Number(entry.level) : null,
       classes: normalizeClasses(stats),
       classLabel: stats.Class || null,
+      twoHanded: statsAreTwoHanded(stats),
+      weaponCategory: stats["Weapon Category"] || null,
       stats: Object.freeze(stats),
       effects: Object.freeze(effects),
       searchText,
@@ -340,7 +397,12 @@
           return cachedItems;
         }
       }
-      const items = Object.freeze(getSourceEntries(normalizedSource));
+      const entries = getSourceEntries(normalizedSource);
+      const items = Object.freeze(entries);
+      /* Caching an empty list for a source whose scripts have not loaded yet would freeze the
+         pickers at "no equipment" for the rest of the session and leave every restored item
+         flagged unavailable, so only cache once the source's data is actually present. */
+      if (items.length === 0 && !isSourceDataLoaded(normalizedSource)) return items;
       normalizedCache.set(normalizedSource, items);
       if (normalizedSource === "beta") saveBetaCache(items);
     }
@@ -382,7 +444,7 @@
 
           const stats = entry.stats && typeof entry.stats === "object" ? { ...entry.stats } : {};
           const normalizedClass = normalizeClasses(stats);
-          const slotType = getSlotType(category, entry.name);
+          const slotType = getSlotType(category, entry.name, stats);
           const setBonuses = parseSetBonuses(stats);
           let hasStats = hasUsableStats(stats, category);
           if (intentionalNoStatItems.has(entry.name)) {
@@ -633,6 +695,8 @@
     getMaxRuneSlots,
     getItemsForSlot,
     isItemCompatibleWithClass,
+    getSetKey,
+    isTwoHanded,
     isAvailable,
     getText,
     toolSlotMap,

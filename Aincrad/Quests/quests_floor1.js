@@ -34,7 +34,7 @@ window.QUEST_ENTRIES_BY_FLOOR.floor1 = [
   },
   {
     npcName: "Corentin",
-    city: "CastleMist",
+    city: "Castlebrume",
     coordinates: "3291 / 2908 (PB)",
     requirements: "64 Oak Log",
     questName: "Request from Corentin of the Grand Regiment",
@@ -74,7 +74,7 @@ window.QUEST_ENTRIES_BY_FLOOR.floor1 = [
   },
   {
     npcName: "Fira",
-    city: "CastleMist",
+    city: "Castlebrume",
     coordinates: "3395 / 2948 (PB)",
     requirements: "1 Icy Magic Radiance + 3 Bone Dust",
     questName: "N/A",
@@ -154,7 +154,7 @@ window.QUEST_ENTRIES_BY_FLOOR.floor1 = [
   },
   {
     npcName: "John",
-    city: "CastleMist",
+    city: "Castlebrume",
     coordinates: "3224 / 2891 (PB)",
     requirements: "20 Iron Ore + 40 Oak Log",
     questName: "Request from Jean of the Grand Regiment",

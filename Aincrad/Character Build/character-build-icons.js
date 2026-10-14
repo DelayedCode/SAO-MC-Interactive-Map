@@ -55,6 +55,124 @@
     branchB: '<path d="M12 3v18M5 8h14M7 16h10"/><path d="m5 8 2-3 2 3m8 0 2-3 2 3"/>'
   };
 
+  /* Equipment stat presentation. Each stat type maps to one category, and every category owns a
+     single icon so the same stat looks the same in the equipment selector, the item details and the
+     set-bonus blocks. The matching colours live in character-build.css (.stat-entry--<category>),
+     keyed by these same category names. */
+  const statIcons = Object.freeze({
+    health: '<path d="M12 20.3S4 15.3 4 9.9a4.2 4.2 0 0 1 8-1.9 4.2 4.2 0 0 1 8 1.9c0 5.4-8 10.4-8 10.4Z"/>',
+    healthRegeneration:
+      '<path d="M12 20.3S4 15.3 4 9.9a4.2 4.2 0 0 1 8-1.9 4.2 4.2 0 0 1 8 1.9c0 5.4-8 10.4-8 10.4Z"/><path d="M12 10.4v3.6M10.2 12.2h3.6"/>',
+    stamina: '<path d="M4.6 16.4a7.4 7.4 0 1 1 14.8 0"/><path d="m12 16.4 3.9-4.6"/><path d="M12 16.4h.01"/>',
+    staminaRegeneration: '<path d="M4.6 16.4a7.4 7.4 0 1 1 14.8 0"/><path d="M12 12.6v4.6M9.7 14.9h4.6"/>',
+    mana: '<path d="M12 3.6S6.4 9.7 6.4 13.7a5.6 5.6 0 0 0 11.2 0C17.6 9.7 12 3.6 12 3.6Z"/>',
+    manaRegeneration:
+      '<path d="M12 3.6S6.4 9.7 6.4 13.7a5.6 5.6 0 0 0 11.2 0C17.6 9.7 12 3.6 12 3.6Z"/><path d="M12 11.4v3.6M10.2 13.2h3.6"/>',
+    attackDamage: paths.weapons,
+    projectileDamage: '<path d="M4 12h14"/><path d="m13 7 5 5-5 5"/>',
+    attackSpeed: '<path d="M13 2 5.5 13H11l-1 9 8-11.5h-5.5Z"/>',
+    criticalChance:
+      '<circle cx="12" cy="12" r="7.2"/><path d="M12 2.5v3.4M12 18.1v3.4M2.5 12h3.4M18.1 12h3.4"/><circle cx="12" cy="12" r="1.4"/>',
+    criticalDamage:
+      '<path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4M5.3 5.3l2.8 2.8M15.9 15.9l2.8 2.8M18.7 5.3l-2.8 2.8M8.1 15.9l-2.8 2.8"/><circle cx="12" cy="12" r="2.4"/>',
+    skillDamage: '<path d="m12 3 2.3 6.7L21 12l-6.7 2.3L12 21l-2.3-6.7L3 12l6.7-2.3Z"/>',
+    cooldownReduction: '<circle cx="12" cy="12" r="8"/><path d="M12 7.4V12l3.2 2"/>',
+    lifeSteal:
+      '<path d="M12 3.6S6.4 9.7 6.4 13.7a5.6 5.6 0 0 0 11.2 0C17.6 9.7 12 3.6 12 3.6Z"/><path d="M12 9.6v4.6M9.8 12l2.2 2.2 2.2-2.2"/>',
+    defense: '<path d="M12 3 19.5 6.1v5.2c0 4.7-3 8.4-7.5 10.4-4.5-2-7.5-5.7-7.5-10.4V6.1Z"/>',
+    damageReduction:
+      '<path d="M12 3 19.5 6.1v5.2c0 4.7-3 8.4-7.5 10.4-4.5-2-7.5-5.7-7.5-10.4V6.1Z"/><path d="M9 11.6h6"/>',
+    dodge: '<path d="M4 9h9.5a2.5 2.5 0 1 0-2.5-2.5"/><path d="M4 15h13.5a2.5 2.5 0 1 1-2.5 2.5"/><path d="M4 12h7"/>',
+    tenacity:
+      '<circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V20"/><path d="M5.2 13.4a6.8 6.8 0 0 0 13.6 0"/><path d="M3.4 13.4h3.6M17 13.4h3.6"/>',
+    movementSpeed: '<path d="m5 6 6 6-6 6"/><path d="m12 6 6 6-6 6"/>',
+    bonusHealing: '<circle cx="12" cy="12" r="8"/><path d="M12 8.2v7.6M8.2 12h7.6"/>',
+    toolEffect:
+      '<path d="M15.4 4.2a4.6 4.6 0 0 0-5.9 5.9L4 15.6V20h4.4l5.5-5.5a4.6 4.6 0 0 0 5.9-5.9l-2.9 2.9-2.6-2.6Z"/>',
+    requirement:
+      '<rect x="5" y="4.5" width="14" height="16" rx="2.2"/><path d="M9 4.5V3.2h6v1.3"/><path d="M9 10h6M9 14h4"/>',
+    metadata: '<circle cx="12" cy="12" r="8"/><path d="M12 11.2v5"/><path d="M12 8.1h.01"/>',
+    unknown: '<path d="m12 4.5 7 7.5-7 7.5-7-7.5Z"/>'
+  });
+
+  const statCategoryNames = Object.freeze({
+    health: ["health", "max health", "hp"],
+    healthRegeneration: ["health regeneration", "health regen"],
+    stamina: ["stamina", "max stamina"],
+    staminaRegeneration: ["stamina regeneration", "stamina regen"],
+    mana: ["mana", "max mana"],
+    manaRegeneration: ["mana regeneration", "mana regen"],
+    attackDamage: ["damage", "attack damage", "weapon damage", "physical damage", "melee damage"],
+    projectileDamage: ["projectile damage"],
+    attackSpeed: ["attack speed"],
+    criticalChance: [
+      "critical hit chance",
+      "critical chance",
+      "critical chance skill",
+      "skill critical hit chance",
+      "skill critical chance",
+      "critical skill hit chance",
+      "crit chance"
+    ],
+    criticalDamage: [
+      "critical hit damage",
+      "critical damage",
+      "damage critical hits",
+      "critical damage skill",
+      "skill critical hit damage",
+      "skill critical damage",
+      "critical skill hit damage",
+      "crit damage"
+    ],
+    skillDamage: ["skill damage", "ability damage", "magic damage", "spell damage"],
+    cooldownReduction: ["cooldown reduction", "ability haste", "haste"],
+    lifeSteal: ["life steal", "lifesteal", "omnivamp", "omnivampirism", "spell vampirism", "flight of life"],
+    defense: [
+      "defense",
+      "defence",
+      "blocking power",
+      "block power",
+      "blocking mastery",
+      "block mastery",
+      "block proficiency",
+      "guard durability"
+    ],
+    damageReduction: ["damage reduction", "fall damage reduction", "falls reduction"],
+    dodge: ["dodge", "evasion"],
+    tenacity: ["tenacity", "knockback resistance", "parry chance"],
+    movementSpeed: ["movement speed", "crouch speed", "crouching speed"],
+    bonusHealing: ["bonus healing", "healing bonus", "healing power", "heal power"],
+    toolEffect: ["effect: harvest power", "effect: sustainability", "harvest power", "sustainability"],
+    metadata: ["class", "rune slots", "two-handed", "unique", "weapon category"]
+  });
+
+  /* Resolves any stat name the equipment data uses onto a single presentation category, so one stat
+     always renders with one icon and one colour. Unknown names fall back to a neutral category
+     instead of being hidden. */
+  function statCategory(name) {
+    const normalized = String(name || "")
+      .trim()
+      .toLowerCase();
+    if (!normalized) return "unknown";
+    if (normalized.startsWith("requirement:")) return "requirement";
+    if (normalized.startsWith("effect:")) return "toolEffect";
+    const match = (value) =>
+      Object.keys(statCategoryNames).find((category) => statCategoryNames[category].includes(value));
+    const direct = match(normalized);
+    if (direct) return direct;
+    const stripped = normalized.replace(/^(?:bonus|max|total|increased|extra)\s+/, "");
+    if (stripped !== normalized) {
+      const indirect = match(stripped);
+      if (indirect) return indirect;
+    }
+    return "unknown";
+  }
+
+  function stat(category) {
+    const content = statIcons[category] || statIcons.unknown;
+    return `<svg class="cb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${content}</svg>`;
+  }
+
   function markup(name, options = {}) {
     if (imagePaths[name]) {
       return `<img class="cb-icon cb-icon-image ${imageClasses[name]}" src="${imagePaths[name]}" alt="" aria-hidden="true">`;
@@ -71,5 +189,12 @@
     return `<svg class="cb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${skillPaths[name] || skillPaths.root}</svg>`;
   }
 
-  global.CharacterBuildIcons = Object.freeze({ markup, skill, names: Object.freeze(Object.keys(paths)) });
+  global.CharacterBuildIcons = Object.freeze({
+    markup,
+    skill,
+    stat,
+    statCategory,
+    statCategories: Object.freeze(Object.keys(statIcons)),
+    names: Object.freeze(Object.keys(paths))
+  });
 })(window);

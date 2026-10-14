@@ -1515,3 +1515,217 @@ output {
     overflow: hidden;
   }
 }
+
+/* ------------------------------------------------------------------
+   Equipment stat rows.
+   Every item stat and every set-bonus tier is its own labelled block with
+   one row per stat: an icon, the localized stat name and its value. Colour is
+   keyed to the stat type (see the --stat-color map below) so a stat always
+   looks the same in the selector, in item details and in set-bonus blocks.
+   ------------------------------------------------------------------ */
+.item-effect {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.stat-group {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.stat-group-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #9cc7e7;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.stat-group-title::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(164, 198, 230, 0.3), transparent);
+}
+.stat-group--bonus .stat-group-title {
+  color: var(--gold);
+}
+.stat-group--bonus .stat-group-title::after {
+  background: linear-gradient(90deg, rgba(232, 196, 124, 0.34), transparent);
+}
+.stat-entries {
+  display: grid;
+  /* min() keeps the row from forcing a wider column than the card has, so the
+     stats stay inside the card at narrow/mobile widths instead of overflowing. */
+  grid-template-columns: repeat(auto-fit, minmax(min(148px, 100%), 1fr));
+  gap: 3px 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stat-entry {
+  display: grid;
+  grid-template-columns: 15px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 2px 6px 2px 4px;
+  border: 1px solid rgba(164, 198, 230, 0.1);
+  border-radius: 6px;
+  background: rgba(6, 14, 22, 0.5);
+}
+.stat-group--bonus .stat-entry {
+  border-color: rgba(232, 196, 124, 0.16);
+  background: rgba(34, 27, 17, 0.34);
+}
+.stat-entry-icon {
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  color: var(--stat-color, var(--muted));
+}
+.stat-entry-icon .cb-icon {
+  width: 14px;
+  height: 14px;
+}
+.stat-entry-name {
+  min-width: 0;
+  color: #c3d4e4;
+  overflow-wrap: anywhere;
+}
+.stat-entry-value {
+  color: var(--stat-color, var(--text));
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+
+/* Stat type → colour. One class per CharacterBuildIcons.statCategory() category, so the same
+   stat type is always the same colour wherever the stat renderer is used. Text keeps the stat
+   name and value next to the colour, so colour is never the only signal. */
+.stat-entry--health {
+  --stat-color: #6fe0a6;
+}
+.stat-entry--healthRegeneration {
+  --stat-color: #86e9bb;
+}
+.stat-entry--stamina {
+  --stat-color: #f0c05a;
+}
+.stat-entry--staminaRegeneration {
+  --stat-color: #e9d08a;
+}
+.stat-entry--mana {
+  --stat-color: #6fb8ff;
+}
+.stat-entry--manaRegeneration {
+  --stat-color: #93cbff;
+}
+.stat-entry--attackDamage {
+  --stat-color: #f5a35c;
+}
+.stat-entry--projectileDamage {
+  --stat-color: #ffb066;
+}
+.stat-entry--attackSpeed {
+  --stat-color: #f2d16b;
+}
+.stat-entry--criticalChance {
+  --stat-color: #ffd479;
+}
+.stat-entry--criticalDamage {
+  --stat-color: #ffab5e;
+}
+.stat-entry--skillDamage {
+  --stat-color: #c79bff;
+}
+.stat-entry--cooldownReduction {
+  --stat-color: #b79bff;
+}
+.stat-entry--lifeSteal {
+  --stat-color: #ff7a8a;
+}
+.stat-entry--defense {
+  --stat-color: #7aa7ff;
+}
+.stat-entry--damageReduction {
+  --stat-color: #8fb3ff;
+}
+.stat-entry--dodge {
+  --stat-color: #5fe0e0;
+}
+.stat-entry--tenacity {
+  --stat-color: #ffa94d;
+}
+.stat-entry--movementSpeed {
+  --stat-color: #7fe08a;
+}
+.stat-entry--bonusHealing {
+  --stat-color: #6ee7c7;
+}
+.stat-entry--toolEffect {
+  --stat-color: #9fd3c7;
+}
+.stat-entry--requirement {
+  --stat-color: #9fb3c8;
+}
+.stat-entry--metadata {
+  --stat-color: #9fb3c8;
+}
+.stat-entry--unknown {
+  --stat-color: #c8d4e0;
+}
+
+/* ------------------------------------------------------------------
+   Two-handed weapons and the equipment selector's Remove action.
+   A two-handed Main Hand weapon locks the Offhand slot; the selector can
+   empty the slot it was opened for so the lock is always reversible.
+   ------------------------------------------------------------------ */
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.remove-button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid rgba(240, 144, 144, 0.42);
+  border-radius: 8px;
+  background: rgba(48, 24, 30, 0.5);
+  color: #ffc7c7;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.remove-button:hover {
+  border-color: #f09a9a;
+  background: rgba(73, 31, 39, 0.66);
+}
+.slot-button.is-locked {
+  border-style: dashed;
+  border-color: rgba(232, 196, 124, 0.5);
+  background: linear-gradient(150deg, rgba(28, 32, 42, 0.9), rgba(8, 15, 23, 0.96));
+  cursor: not-allowed;
+}
+.slot-button.is-locked .slot-icon {
+  color: var(--muted);
+  opacity: 0.6;
+}
+.item-badge {
+  padding: 1px 6px;
+  border: 1px solid rgba(232, 196, 124, 0.45);
+  border-radius: 999px;
+  background: rgba(232, 196, 124, 0.12);
+  color: var(--gold);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+

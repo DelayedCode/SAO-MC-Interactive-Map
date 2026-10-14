@@ -4,6 +4,8 @@
 // Quests whose objectives contain no coordinates are intentionally omitted rather than guessed
 // (Main Quest 10 lives in the Fractured Underworld and has no supplied location).
 // Main Quest 19 is a menu action with no physical location, so it has no marker anywhere.
+// Main Quest 39 supplies no coordinates and Main Quest 46 is the Floor 2 transition, so neither
+// has a marker either.
 // Main Quest 21 shares its quest-start location with Main Quest 22 as specified.
 
 Object.assign(DATA, {
@@ -190,6 +192,69 @@ Object.assign(DATA, {
     number: 35,
     coords: { x: 4289, z: 3902 },
     description: "Talk to Bob (4289, 159, 3902)"
+  },
+  {
+    id: "mq-36",
+    title: "Velka, and the Ruins of the Dream",
+    number: 36,
+    coords: { x: 2922, z: 3006 },
+    description: "Talk to Velka (2922, 162, 3006)"
+  },
+  {
+    id: "mq-37",
+    title: "The Archivist Specter",
+    number: 37,
+    coords: { x: 2849, z: 4342 },
+    description: "Speak with the Archivist Specter to continue the main story (2849, -28, 4342)"
+  },
+  {
+    id: "mq-38",
+    title: "Behind the Great Door",
+    number: 38,
+    coords: { x: 2848, z: 4254 },
+    description: "Cross the unsealed door ~(2848, -34, 4254)"
+  },
+  {
+    id: "mq-40",
+    title: "The Calamity",
+    number: 40,
+    coords: { x: 1809, z: 4289 },
+    description: "Speak with the Master Swordsman to continue the main story (1809, 4289)"
+  },
+  {
+    id: "mq-41",
+    title: "Mephisto",
+    number: 41,
+    coords: { x: 3260, z: 1403 },
+    description: "Speak with Mephisto to continue the main story (3260, 1403)"
+  },
+  {
+    id: "mq-42",
+    title: "Request an Audience with King Harald",
+    number: 42,
+    coords: { x: 3199, z: 1510 },
+    description: "Go to the Harald palace (3199, 1510)"
+  },
+  {
+    id: "mq-43",
+    title: "The Trials of the Heralds",
+    number: 43,
+    coords: { x: 3681, z: 1648 },
+    description: "Find the tomb of the ancestors (3681, 1648)"
+  },
+  {
+    id: "mq-44",
+    title: "Find a Way to Remake the Scroll",
+    number: 44,
+    coords: { x: 3227, z: 1495 },
+    description: "Find Emy in the Tolbana Forge (3227, 1495)"
+  },
+  {
+    id: "mq-45",
+    title: "The Crystal of Tolbana",
+    number: 45,
+    coords: { x: 3260, z: 1403 },
+    description: "Return to Mephisto (3260, 1403)"
   }
 ].forEach((quest) => {
   DATA[quest.id] = {

@@ -1130,6 +1130,10 @@ const curatedTerminology = {
     "Herrero de accesorios de hierro en la Ciudad de los Comienzos",
     "Forgeron d'accessoires en fer dans la Ville des Commencements"
   ],
+  /* The generic Key Blacksmith label the map's key blacksmith markers and the equipment crafting
+     locations use. The same wording the map description dictionary already curates, so a marker
+     titled "Key Blacksmith" and an item crafted at one read the same in every language. */
+  "Key Blacksmith": ["Herrero de llaves", "Forgeron de clés"],
   "Keymaker in front of the Labyrinth of the Fallen": [
     "Fabricante de llaves frente al Laberinto de los Caídos",
     "Fabricant de clés devant le Labyrinthe des Déchus"
@@ -1774,7 +1778,54 @@ const curatedTerminology = {
   "Iron String": ["Cuerda de hierro", "Corde de fer"],
   "Leaf Fragments": ["Fragmentos de hojas", "Fragments de feuilles"],
   "Spider Venom": ["Veneno de araña", "Venin d'araignée"],
-  "Sylve Sprout": ["Brote de Sylve", "Pousse de Sylve"]
+  "Sylve Sprout": ["Brote de Sylve", "Pousse de Sylve"],
+  /* --- Current-Data normal armor (levels 3, 7 and 9 for the Warrior, Assassin, Archer, Mage and
+     Shaman). The names keep the class qualifier the source supplies, translated like the existing
+     parenthesised names ("Witch's Potion (Intelligence)"), and reuse the glossary's own armor
+     vocabulary: Breastplate/Chestplate -> Coraza/Plastron, Leggings -> Calzas/Jambières, Boots ->
+     Botas/Bottes, Tunic -> Túnica/Tunique, Robe -> Túnica/Robe, Sandals -> Sandalias/Sandales,
+     Helmet -> Casco/Casque. "Ika Leggings", "Ika Boots", "Tactical Leggings", "Tactical Boots",
+     "Spectral Leggings" and "Spectral Boots" already carry a curated translation above, so they are
+     not repeated here --- */
+  "Guardian's Boots (Warrior)": ["Botas del guardián (Guerrero)", "Bottes du gardien (Guerrier)"],
+  "Guardian's Chestplate (Warrior)": ["Coraza del guardián (Guerrero)", "Plastron du gardien (Guerrier)"],
+  "Guardian's Helmet (Warrior)": ["Casco del guardián (Guerrero)", "Casque du gardien (Guerrier)"],
+  "Guardian's Leggings (Warrior)": ["Calzas del guardián (Guerrero)", "Jambières du gardien (Guerrier)"],
+  "Herald's Boots (Archer)": ["Botas del heraldo (Arquero)", "Bottes du héraut (Archer)"],
+  "Herald's Boots (Assassin)": ["Botas del heraldo (Asesino)", "Bottes du héraut (Assassin)"],
+  "Herald's Helmet (Archer)": ["Casco del heraldo (Arquero)", "Casque du héraut (Archer)"],
+  "Herald's Helmet (Assassin)": ["Casco del heraldo (Asesino)", "Casque du héraut (Assassin)"],
+  "Herald's Leggings (Archer)": ["Calzas del heraldo (Arquero)", "Jambières du héraut (Archer)"],
+  "Herald's Leggings (Assassin)": ["Calzas del heraldo (Asesino)", "Jambières du héraut (Assassin)"],
+  "Herald's Tunic (Archer)": ["Túnica del heraldo (Arquero)", "Tunique du héraut (Archer)"],
+  "Herald's Tunic (Assassin)": ["Túnica del heraldo (Asesino)", "Tunique du héraut (Assassin)"],
+  "Hunter's Boots (Archer)": ["Botas del cazador (Arquero)", "Bottes du chasseur (Archer)"],
+  "Hunter's Leggings (Archer)": ["Calzas del cazador (Arquero)", "Jambières du chasseur (Archer)"],
+  "Hunter's Tunic (Archer)": ["Túnica del cazador (Arquero)", "Tunique du chasseur (Archer)"],
+  "Ika Breastplate": ["Coraza de Ika", "Plastron d'Ika"],
+  "Magician's Leggings (Shaman)": ["Calzas de mago (Chamán)", "Jambières de mage (Chaman)"],
+  "Magician's Robe (Shaman)": ["Túnica del mago (Chamán)", "Robe du mage (Chaman)"],
+  "Magician's Sandals (Shaman)": ["Sandalias de mago (Chamán)", "Sandales de mage (Chaman)"],
+  "Ninja Boots (Assassin)": ["Botas ninja (Asesino)", "Bottes ninja (Assassin)"],
+  "Ninja Leggings (Assassin)": ["Calzas ninja (Asesino)", "Jambières ninja (Assassin)"],
+  "Ninja Tunic (Assassin)": ["Túnica ninja (Asesino)", "Tunique ninja (Assassin)"],
+  "Protector's Boots (Warrior)": ["Botas del protector (Guerrero)", "Bottes du protecteur (Guerrier)"],
+  "Protector's Breastplate (Warrior)": ["Coraza del protector (Guerrero)", "Plastron du protecteur (Guerrier)"],
+  "Protector's Helmet (Warrior)": ["Casco del protector (Guerrero)", "Casque du protecteur (Guerrier)"],
+  "Protector's Leggings (Warrior)": ["Calzas del protector (Guerrero)", "Jambières du protecteur (Guerrier)"],
+  "Reaper's Boots (Mage)": ["Botas del segador (Mago)", "Bottes du faucheur (Mage)"],
+  "Reaper's Boots (Shaman)": ["Botas del segador (Chamán)", "Bottes du faucheur (Chaman)"],
+  "Reaper's Chestplate (Mage)": ["Coraza del segador (Mago)", "Plastron du faucheur (Mage)"],
+  "Reaper's Chestplate (Shaman)": ["Coraza del segador (Chamán)", "Plastron du faucheur (Chaman)"],
+  "Reaper's Helmet (Mage)": ["Casco del segador (Mago)", "Casque du faucheur (Mage)"],
+  "Reaper's Helmet (Shaman)": ["Casco del segador (Chamán)", "Casque du faucheur (Chaman)"],
+  "Reaper's Leggings (Mage)": ["Calzas del segador (Mago)", "Jambières du faucheur (Mage)"],
+  "Reaper's Leggings (Shaman)": ["Calzas del segador (Chamán)", "Jambières du faucheur (Chaman)"],
+  "Sorcerer's Leggings (Mage)": ["Calzas de hechicero (Mago)", "Jambières de sorcier (Mage)"],
+  "Sorcerer's Robe (Mage)": ["Túnica de hechicero (Mago)", "Robe de sorcier (Mage)"],
+  "Sorcerer's Sandals (Mage)": ["Sandalias de hechicero (Mago)", "Sandales de sorcier (Mage)"],
+  "Spectral Breastplate": ["Coraza espectral", "Plastron spectral"],
+  "Tactical Chestplate": ["Coraza táctica", "Plastron tactique"]
   /* end curated terminology */
 };
 Object.assign(equipmentTerminology, curatedTerminology);
@@ -4911,6 +4962,96 @@ const curatedProseTranslations = {
   "Good accounts make good friends (Side Quest) — Coordinates X: 526 Z: 1409": [
     "Las buenas cuentas hacen buenos amigos (misión secundaria) — Coordenadas X: 526 Z: 1409",
     "Les bons comptes font les bons amis (quête secondaire) — Coordonnées X : 526 Z : 1409"
+  ],
+  /* --- Current-Data normal armor descriptions (levels 3, 7 and 9). One entry per distinct
+     sentence the source supplies: a piece whose source text differs by a single word (the Ika
+     Breastplate's "it" against the Ika Leggings' "they", the Stealth pieces' "to approach" against
+     "for approaching", the Sorcerer's "it amplifies" against the Sandals' "they amplify", the
+     Shaman Reaper's "floods ... with mana" against the Leggings' "grants ... mana") keeps its own
+     wording and therefore its own translation --- */
+  "Carved from the shell of the ancient Ika turtles, it absorbs the initial blows.": [
+    "Tallada en el caparazón de las antiguas tortugas Ika, absorbe los primeros golpes.",
+    "Taillée dans la carapace des anciennes tortues Ika, elle absorbe les premiers coups."
+  ],
+  "Carved from the shell of the ancient Ika turtles, they absorb the initial blows.": [
+    "Talladas en el caparazón de las antiguas tortugas Ika, absorben los primeros golpes.",
+    "Taillées dans la carapace des anciennes tortues Ika, elles absorbent les premiers coups."
+  ],
+  "Forged in Tolbana's forge, it makes the warrior an impenetrable wall.": [
+    "Forjada en la fragua de Tolbana, convierte al guerrero en un muro impenetrable.",
+    "Forgée dans la forge de Tolbana, elle fait du guerrier un mur impénétrable."
+  ],
+  "Replica of the Guardian's Armor. Fallen: Heavy and unshakeable, it defies death itself.": [
+    "Réplica de la Armadura del Guardián. Caído: Pesada e inquebrantable, desafía a la muerte misma.",
+    "Réplique de l'Armure du Gardien. Déchu : Lourde et inébranlable, elle défie la mort elle-même."
+  ],
+  "Dark leather and silent soles, designed to approach silently and strike from behind.": [
+    "Cuero oscuro y suelas silenciosas, diseñados para acercarse en silencio y golpear por la espalda.",
+    "Cuir sombre et semelles silencieuses, conçus pour approcher en silence et frapper dans le dos."
+  ],
+  "Dark leather and silent soles, designed for approaching silently and striking from behind.": [
+    "Cuero oscuro y suelas silenciosas, diseñados para aproximarse en silencio y atacar por la espalda.",
+    "Cuir sombre et semelles silencieuses, conçus pour s'approcher en silence et frapper dans le dos."
+  ],
+  "Light as a shadow, it embraces the assassin and steals him from death.": [
+    "Ligera como una sombra, abraza al asesino y lo arrebata de la muerte.",
+    "Léger comme une ombre, il enveloppe l'assassin et le soustrait à la mort."
+  ],
+  "Inherited from the Fallen Herald, it becomes shadow and dagger in the hands of the assassin.": [
+    "Heredada del Heraldo Caído, se convierte en sombra y daga en manos del asesino.",
+    "Héritée du Héraut déchu, elle devient ombre et dague entre les mains de l'assassin."
+  ],
+  "Soft leather and fitted straps, designed to strike quickly and disappear before the counterattack.": [
+    "Cuero suave y correas ajustadas, diseñados para golpear rápido y desaparecer antes del contraataque.",
+    "Cuir souple et sangles ajustées, conçus pour frapper rapidement et disparaître avant la riposte."
+  ],
+  "Soft leather and fitted straps, designed to strike fast and disappear before the counterattack.": [
+    "Cuero suave y correas ajustadas, diseñados para atacar velozmente y desaparecer antes del contraataque.",
+    "Cuir souple et sangles ajustées, conçus pour frapper vite et disparaître avant la riposte."
+  ],
+  "Designed for the hunt, it sharpens the archer's eye and guides their shots to the heart.": [
+    "Diseñada para la caza, agudiza el ojo del arquero y guía sus disparos al corazón.",
+    "Conçue pour la chasse, elle aiguise l'œil de l'archer et guide ses tirs vers le cœur."
+  ],
+  "Inherited from the Fallen Herald, light and faithful, it follows the archer into every ambush.": [
+    "Heredada del Heraldo Caído, ligera y fiel, sigue al arquero en cada emboscada.",
+    "Héritée du Héraut déchu, légère et fidèle, elle suit l'archer dans chaque embuscade."
+  ],
+  "Woven from a spectral veil, it channels the nascent magic of Aincrad's apprentices.": [
+    "Tejida con un velo espectral, canaliza la magia naciente de los aprendices de Aincrad.",
+    "Tissée d'un voile spectral, elle canalise la magie naissante des apprentis d'Aincrad."
+  ],
+  "Embroidered with enchanted threads, it amplifies the mage's spells like a sorcerer of old.": [
+    "Bordada con hilos encantados, amplifica los hechizos del mago como un hechicero de antaño.",
+    "Brodée de fils enchantés, elle amplifie les sorts du mage comme un sorcier d'autrefois."
+  ],
+  "Embroidered with enchanted threads, they amplify the mage's spells like those of a sorcerer of old.": [
+    "Bordadas con hilos encantados, amplifican los hechizos del mago como los de un hechicero de antaño.",
+    "Brodées de fils enchantés, elles amplifient les sorts du mage comme ceux d'un sorcier d'autrefois."
+  ],
+  "A replica of the Fallen Reaper, it amplifies spell power tenfold and reaps the enemy from afar.": [
+    "Una réplica del Segador Caído, multiplica por diez el poder mágico y siega al enemigo desde lejos.",
+    "Une réplique du Faucheur déchu, elle décuple la puissance magique et fauche l'ennemi de loin."
+  ],
+  "Woven in the breath of spirits, it connects its wearer to the beasts and ancient woods of Aincrad.": [
+    "Tejida con el aliento de los espíritus, conecta a quien la lleva con las bestias y los bosques ancestrales de Aincrad.",
+    "Tissée du souffle des esprits, elle relie celui qui la porte aux bêtes et aux forêts anciennes d'Aincrad."
+  ],
+  "Woven from the breath of spirits, it connects its wearer to the beasts and ancient woods of Aincrad.": [
+    "Tejida del aliento de los espíritus, conecta a quien la lleva con las bestias y los bosques ancestrales de Aincrad.",
+    "Tissée à partir du souffle des esprits, elle relie celui qui la porte aux bêtes et aux forêts anciennes d'Aincrad."
+  ],
+  "Imbued with ancient rituals, it nourishes the shaman's mana and prolongs their incantations.": [
+    "Imbuida de rituales ancestrales, nutre el maná del chamán y prolonga sus conjuros.",
+    "Imprégnée de rituels anciens, elle nourrit le mana du chaman et prolonge ses incantations."
+  ],
+  "A replica of the Fallen Reaper, it floods the shaman with mana for both healing and striking.": [
+    "Una réplica del Segador Caído, inunda al chamán de maná tanto para curar como para golpear.",
+    "Une réplique du Faucheur déchu, elle inonde le chaman de mana pour soigner comme pour frapper."
+  ],
+  "A replica of the Fallen Reaper, it grants the shaman mana for both healing and striking.": [
+    "Una réplica del Segador Caído, otorga al chamán maná tanto para curar como para golpear.",
+    "Une réplique du Faucheur déchu, elle accorde au chaman du mana pour soigner comme pour frapper."
   ]
 };
 
@@ -4952,6 +5093,32 @@ const curatedQuestTranslations = {
   "What Harrold Saw": ["Lo que Harrold vio", "Ce que Harrold a vu"],
   "The Chamber Beneath the Fields": ["La cámara bajo los campos", "La chambre sous les champs"],
   "The Geldorack Mine": ["La mina de Geldorack", "La mine de Geldorack"],
+  "Velka, and the Ruins of the Dream": ["Velka, y las ruinas del sueño", "Velka, et les ruines du rêve"],
+  "The Archivist Specter": ["El espectro archivista", "Le spectre archiviste"],
+  "Behind the Great Door": ["Tras la gran puerta", "Derrière la grande porte"],
+  "The Truth About the Seal": ["La verdad sobre el sello", "La vérité sur le sceau"],
+  "The Calamity": ["La calamidad", "La calamité"],
+  "Mephisto": ["Mephisto", "Mephisto"],
+  "Request an Audience with King Harald": [
+    "Solicitar una audiencia con el rey Harald",
+    "Demander une audience au roi Harald"
+  ],
+  "The Trials of the Heralds": ["Las pruebas de los heraldos", "Les épreuves des hérauts"],
+  "Find a Way to Remake the Scroll": [
+    "Encuentra la forma de rehacer el pergamino",
+    "Trouvez un moyen de refaire le parchemin"
+  ],
+  "The Crystal of Tolbana": ["El cristal de Tolbana", "Le cristal de Tolbana"],
+  "Floor 2": ["Piso 2", "Étage 2"],
+  /* Aincrad Current Data side quests (Aincrad/Quests/quests_current.js). */
+  "Too Many Boars": ["Demasiados jabalíes", "Trop de sangliers"],
+  "Webs to Burn": ["Telarañas que quemar", "Des toiles à brûler"],
+  "The Citadel's Cold": ["El frío de la ciudadela", "Le froid de la citadelle"],
+  "Frost Swarm": ["Enjambre de escarcha", "Essaim de givre"],
+  "Wolves of the Valley": ["Lobos del valle", "Loups de la vallée"],
+  "Clearing the Marsh": ["Despejar el pantano", "Nettoyer le marais"],
+  "Bone and Dust": ["Hueso y polvo", "Os et poussière"],
+  "The Road Is No Longer Safe": ["El camino ya no es seguro", "La route n'est plus sûre"],
 
   "Bad Idea": ["Mala idea", "Mauvaise idée"],
   "Request from Corentin of the Grand Regiment": [
@@ -5173,11 +5340,95 @@ const curatedQuestFieldTranslations = {
       "Explora los túneles ~(4281, 44, 3710)\nSube y vuelve a informar a Harrold (3134, 27, 3666)\nVe a donde viven los bandidos (4204, 133, 3899)\nHabla con Bob (4287, 159, 3890)",
       "Explorez les tunnels ~(4281, 44, 3710)\nRemontez et faites votre rapport à Harrold (3134, 27, 3666)\nAllez là où vivent les bandits (4204, 133, 3899)\nParlez à Bob (4287, 159, 3890)"
     ],
-  "Talk to Bob (4287, 159, 3890)\nObtain the Geldorack Dungeon Key (4288, 159, 3887)\nEnter the Mine (4288, 159, 3887)":
+  "Talk to Bob (4287, 159, 3890)\nObtain the Geldorack Dungeon Key (4288, 159, 3887)\nEnter the Mine (4288, 159, 3887)\nComplete the dungeon (4288, 159, 3887)\nLeave the Mine Entrance ~(4260, 152, 3892)\nFind Velka in Castlebrume (2922, 162, 3006)\n(Bonus) Hand the rare material to the Hanaka merchant":
     [
-      "Habla con Bob (4287, 159, 3890)\nConsigue la Llave de Mazmorra de Geldorack (4288, 159, 3887)\nEntra en la Mina (4288, 159, 3887)",
-      "Parlez à Bob (4287, 159, 3890)\nObtenez la Clé de Donjon de Geldorack (4288, 159, 3887)\nEntrez dans la Mine (4288, 159, 3887)"
+      "Habla con Bob (4287, 159, 3890)\nConsigue la Llave de Mazmorra de Geldorack (4288, 159, 3887)\nEntra en la Mina (4288, 159, 3887)\nCompleta la mazmorra (4288, 159, 3887)\nSal de la Entrada de la Mina ~(4260, 152, 3892)\nEncuentra a Velka en Castlebrume (2922, 162, 3006)\n(Bonus) Entrega el material raro al mercader de Hanaka",
+      "Parlez à Bob (4287, 159, 3890)\nObtenez la Clé de Donjon de Geldorack (4288, 159, 3887)\nEntrez dans la Mine (4288, 159, 3887)\nTerminez le donjon (4288, 159, 3887)\nSortez de l'Entrée de la Mine ~(4260, 152, 3892)\nTrouvez Velka à Castlebrume (2922, 162, 3006)\n(Bonus) Remettez la matière rare au marchand de Hanaka"
     ],
+  "Talk to Velka (2922, 162, 3006)\nShow the corrupted wheat (Strange wheat ear) to Velka (2922, 162, 3006)\nFind the ruins to the south (2842, 16, 4400)":
+    [
+      "Habla con Velka (2922, 162, 3006)\nMuéstrale el trigo corrompido (Espiga de trigo extraña) a Velka (2922, 162, 3006)\nEncuentra las ruinas al sur (2842, 16, 4400)",
+      "Parlez à Velka (2922, 162, 3006)\nMontrez le blé corrompu (Épi de blé étrange) à Velka (2922, 162, 3006)\nTrouvez les ruines au sud (2842, 16, 4400)"
+    ],
+  "Speak with the Archivist Specter to continue the main story (2849, -28, 4342)\nCollect 10 cursed cloth\nDefeat Narax, the cursed spirit of the ruins (2757, -32, 4285)\nBring the payment to the Specter (2849, -28, 4342)":
+    [
+      "Habla con el Espectro Archivista para continuar la historia principal (2849, -28, 4342)\nRecoge 10 tela maldita\nDerrota a Narax, el espíritu maldito de las ruinas (2757, -32, 4285)\nLleva el pago al Espectro (2849, -28, 4342)",
+      "Parlez au Spectre Archiviste pour continuer l'histoire principale (2849, -28, 4342)\nRécoltez 10 tissu maudit\nVainquez Narax, l'esprit maudit des ruines (2757, -32, 4285)\nApportez le paiement au Spectre (2849, -28, 4342)"
+    ],
+  "Cross the unsealed door ~(2848, -34, 4254)\nDefeat Nasgul, Cursed Protector\nRetrieve the third Fragment of the Seal of the Ancients\nSpeak with the Echo of A: the Seal reforms\nTake the passage\nGo to the Labyrinth of the Fallen (2382, 29, 2415)":
+    [
+      "Cruza la puerta desellada ~(2848, -34, 4254)\nDerrota a Nasgul, Protector Maldito\nRecupera el tercer Fragmento del Sello de los Antiguos\nHabla con el Eco de A: el Sello se reforma\nToma el pasaje\nVe al Laberinto de los Caídos (2382, 29, 2415)",
+      "Franchissez la porte descellée ~(2848, -34, 4254)\nVainquez Nasgul, Protecteur Maudit\nRécupérez le troisième Fragment du Sceau des Anciens\nParlez à l'Écho d'A : le Sceau se reforme\nPrenez le passage\nAllez au Labyrinthe des Déchus (2382, 29, 2415)"
+    ],
+  "Speak with Catherine to continue the main story": [
+    "Habla con Catherine para continuar la historia principal",
+    "Parlez à Catherine pour continuer l'histoire principale"
+  ],
+  "Speak with the Master Swordsman to continue the main story (1809, 4289)\nTell him what happened in the Labyrinth (1809, 4289)\nChoice: continue, or give up\nAsk the 3 mages about the crystal\nQuestion a mage of Tolbana (3321, 1619)\nQuestion a mage of Tolbana (3200, 1447)\nQuestion a mage of Tolbana (3198, 1469)\nGo and see Mephisto (3260, 1403)":
+    [
+      "Habla con el Maestro Espadachín para continuar la historia principal (1809, 4289)\nCuéntale lo que ocurrió en el Laberinto (1809, 4289)\nElección: continuar o rendirse\nPregunta a los 3 magos sobre el cristal\nInterroga a un mago de Tolbana (3321, 1619)\nInterroga a un mago de Tolbana (3200, 1447)\nInterroga a un mago de Tolbana (3198, 1469)\nVe a ver a Mephisto (3260, 1403)",
+      "Parlez au Maître Spadassin pour continuer l'histoire principale (1809, 4289)\nRacontez-lui ce qui s'est passé dans le Labyrinthe (1809, 4289)\nChoix : continuer ou abandonner\nInterrogez les 3 mages à propos du cristal\nInterrogez un mage de Tolbana (3321, 1619)\nInterrogez un mage de Tolbana (3200, 1447)\nInterrogez un mage de Tolbana (3198, 1469)\nAllez voir Mephisto (3260, 1403)"
+    ],
+  "Speak with Mephisto to continue the main story (3260, 1403)\nAnswer Mephisto's question (3260, 1403) (An Instrument)\nLearn the mechanism: scroll + crystal (3260, 1403)":
+    [
+      "Habla con Mephisto para continuar la historia principal (3260, 1403)\nResponde a la pregunta de Mephisto (3260, 1403) (Un instrumento)\nAprende el mecanismo: pergamino + cristal (3260, 1403)",
+      "Parlez à Mephisto pour continuer l'histoire principale (3260, 1403)\nRépondez à la question de Mephisto (3260, 1403) (Un instrument)\nApprenez le mécanisme : parchemin + cristal (3260, 1403)"
+    ],
+  "Go to the Harald palace (3199, 1510)\nSpeak with King Harald (3198, 1524)\nLearn that a description of him exists in the archives (3198, 1524)":
+    [
+      "Ve al palacio de Harald (3199, 1510)\nHabla con el rey Harald (3198, 1524)\nDescubre que existe una descripción de él en los archivos (3198, 1524)",
+      "Allez au palais de Harald (3199, 1510)\nParlez au roi Harald (3198, 1524)\nApprenez qu'une description de lui existe dans les archives (3198, 1524)"
+    ],
+  "Find the tomb of the ancestors (3681, 1648)\nTrial of Harald 1 (3781, 1673)\nTrial of Harald 2 (3741, 1714)\nTrial of Harald 3 (3701, 1667)\nReceive the three dates (−700, −620, −660)\nReturn to King Harald (3198, 1524)":
+    [
+      "Encuentra la tumba de los antepasados (3681, 1648)\nPrueba de Harald 1 (3781, 1673)\nPrueba de Harald 2 (3741, 1714)\nPrueba de Harald 3 (3701, 1667)\nRecibe las tres fechas (−700, −620, −660)\nVuelve con el rey Harald (3198, 1524)",
+      "Trouvez la tombe des ancêtres (3681, 1648)\nÉpreuve de Harald 1 (3781, 1673)\nÉpreuve de Harald 2 (3741, 1714)\nÉpreuve de Harald 3 (3701, 1667)\nRecevez les trois dates (−700, −620, −660)\nRetournez voir le roi Harald (3198, 1524)"
+    ],
+  "Find Emy in the Tolbana Forge (3227, 1495)\nLearn what it takes to remake the scroll (3227, 1495)\nEnter the old mill (2771, 4777)\nFind the challenge area ~(868, 1675)\nAccept the challenge\nFind the object in the time allowed\nGo to Virelune (1617, 1958)\nSpeak with Dorven (1618, 1959)\nInspect the rocks, see if there's any way in (1419, 1986)\nBring everything back to Emy (3227, 1495)":
+    [
+      "Encuentra a Emy en la Forja de Tolbana (3227, 1495)\nAverigua qué hace falta para rehacer el pergamino (3227, 1495)\nEntra en el viejo molino (2771, 4777)\nEncuentra la zona del desafío ~(868, 1675)\nAcepta el desafío\nEncuentra el objeto en el tiempo permitido\nVe a Virelune (1617, 1958)\nHabla con Dorven (1618, 1959)\nInspecciona las rocas, mira si hay alguna forma de entrar (1419, 1986)\nLleva todo de vuelta a Emy (3227, 1495)",
+      "Trouvez Emy dans la Forge de Tolbana (3227, 1495)\nDécouvrez ce qu'il faut pour refaire le parchemin (3227, 1495)\nEntrez dans le vieux moulin (2771, 4777)\nTrouvez la zone du défi ~(868, 1675)\nAcceptez le défi\nTrouvez l'objet dans le temps imparti\nAllez à Virelune (1617, 1958)\nParlez à Dorven (1618, 1959)\nInspectez les rochers, voyez s'il y a un moyen d'entrer (1419, 1986)\nRapportez tout à Emy (3227, 1495)"
+    ],
+  "Return to Mephisto (3260, 1403)\nMeet him at the door, near the forge (3239, 1461)\nFollow him to the door (3216, 1445)\nGo down beneath the crystal (3047, 1208)\nMeet Mephisto at the Kobold Tower (3400, 1080)":
+    [
+      "Vuelve con Mephisto (3260, 1403)\nReúnete con él en la puerta, cerca de la forja (3239, 1461)\nSíguelo hasta la puerta (3216, 1445)\nBaja por debajo del cristal (3047, 1208)\nReúnete con Mephisto en la Torre de los Kobolds (3400, 1080)",
+      "Retournez voir Mephisto (3260, 1403)\nRetrouvez-le à la porte, près de la forge (3239, 1461)\nSuivez-le jusqu'à la porte (3216, 1445)\nDescendez sous le cristal (3047, 1208)\nRetrouvez Mephisto à la Tour des Kobolds (3400, 1080)"
+    ],
+  "Reach Floor 2": ["Llega al Piso 2", "Atteignez l'Étage 2"],
+  /* Aincrad Current Data side quest objectives: the kill count, then the return step that names
+     the NPC and their coordinates. */
+  "Kill enraged boars (0/10)\nReturn to Guard Tomas (1811, 3748)": [
+    "Mata jabalíes enfurecidos (0/10)\nVuelve con el guardia Tomas (1811, 3748)",
+    "Tuez des sangliers enragés (0/10)\nRetournez voir le garde Tomas (1811, 3748)"
+  ],
+  "Kill young spiders (0/15)\nReturn to Scout Raphael (1440, 3449)": [
+    "Mata arañas jóvenes (0/15)\nVuelve con el explorador Raphael (1440, 3449)",
+    "Tuez de jeunes araignées (0/15)\nRetournez voir l'éclaireur Raphael (1440, 3449)"
+  ],
+  "Take down winter golems (0/10)\nReturn to Sentinel Kael (4075, 1990)": [
+    "Derriba gólems invernales (0/10)\nVuelve con el centinela Kael (4075, 1990)",
+    "Abattez des golems hivernaux (0/10)\nRetournez voir la sentinelle Kael (4075, 1990)"
+  ],
+  "Shoot down frost butterflies (0/12)\nReturn to Shepherd Ivo (4074, 1994)": [
+    "Derriba mariposas de escarcha (0/12)\nVuelve con el pastor Ivo (4074, 1994)",
+    "Abattez des papillons de givre (0/12)\nRetournez voir le berger Ivo (4074, 1994)"
+  ],
+  "Killing White Wolves (0/12)\nReturn to Shepherd Ivo (2405, 4069)": [
+    "Matando lobos blancos (0/12)\nVuelve con el pastor Ivo (2405, 4069)",
+    "Tuer des loups blancs (0/12)\nRetournez voir le berger Ivo (2405, 4069)"
+  ],
+  "Kill spawn slimes (0/20)\nReturn to Herbalist Nessa (1542, 3460)": [
+    "Mata slimes engendrados (0/20)\nVuelve con la herborista Nessa (1542, 3460)",
+    "Tuez des slimes engendrés (0/20)\nRetournez voir l'herboriste Nessa (1542, 3460)"
+  ],
+  "Slay skeleton warriors (0/20)\nReturn to Archivist Orin (2765, 4396)": [
+    "Mata guerreros esqueleto (0/20)\nVuelve con el archivista Orin (2765, 4396)",
+    "Tuez des guerriers squelettes (0/20)\nRetournez voir l'archiviste Orin (2765, 4396)"
+  ],
+  "Kill highway bandits (0/15)\nReturn to Carter Milo (3619, 3443)": [
+    "Mata bandidos de la carretera (0/15)\nVuelve con Carter Milo (3619, 3443)",
+    "Tuez des bandits de grand chemin (0/15)\nRetournez voir Carter Milo (3619, 3443)"
+  ],
   "Kill 5 Fire Harpy, Kill 5 Lightning Harpy, Kill 5 Earth Harpy": [
     "Mata 5 arpías de fuego, mata 5 arpías de relámpago y mata 5 arpías terrenales",
     "Tuez 5 harpies de feu, tuez 5 harpies de foudre et tuez 5 harpies terrestres"
@@ -5365,7 +5616,7 @@ const equivalentLabelTranslations = {
   Monica: ["Mónica", "Monica"],
   "Orc & Roll": ["Orco y Roll", "Orc et Roll"],
   Romeo: ["Romeo", "Roméo"],
-  CastleMist: ["Niebla del Castillo", "Brume du château"],
+  Castlebrume: ["Niebla del Castillo", "Brume du château"],
   Meticulous: ["Meticuloso", "Méticuleux"],
   Timer: ["Temporizador", "Minuteur"]
 };
@@ -5812,7 +6063,10 @@ const curatedMapDescriptionTranslations = {
     "Vend des objets du Sanctuaire de Khesûn."
   ],
   "Side Quest NPC in Candelia.": ["PNJ de misión secundaria en Candelia.", "PNJ de quête secondaire à Candelia."],
-  "Side Quest NPC in Castlemist.": ["PNJ de misión secundaria en Castlemist.", "PNJ de quête secondaire à Castlemist."],
+  "Side Quest NPC in Castlebrume.": [
+    "PNJ de misión secundaria en Castlebrume.",
+    "PNJ de quête secondaire à Castlebrume."
+  ],
   "Side Quest NPC in Hanaka.": ["PNJ de misión secundaria en Hanaka.", "PNJ de quête secondaire à Hanaka."],
   "Side Quest NPC in Mizunari.": ["PNJ de misión secundaria en Mizunari.", "PNJ de quête secondaire à Mizunari."],
   "Side Quest NPC in Tolbana.": ["PNJ de misión secundaria en Tolbana.", "PNJ de quête secondaire à Tolbana."],
@@ -5830,6 +6084,40 @@ const curatedMapDescriptionTranslations = {
   "Article proposal (Side Quest) — Coordinates X: 876 Z: 555": [
     "Propuesta de artículo (misión secundaria) — Coordenadas X: 876 Z: 555",
     "Proposition d'article (quête secondaire) — Coordonnées X : 876 Z : 555"
+  ],
+  /* The Current Data side quest markers (Aincrad/Map/maps_current.js) describe the NPC they
+     stand on, so each one is curated here as a whole sentence. */
+  "Return to Guard Tomas (1811, 3748)": [
+    "Vuelve con el guardia Tomas (1811, 3748)",
+    "Retournez voir le garde Tomas (1811, 3748)"
+  ],
+  "Return to Scout Raphael (1440, 3449)": [
+    "Vuelve con el explorador Raphael (1440, 3449)",
+    "Retournez voir l'éclaireur Raphael (1440, 3449)"
+  ],
+  "Return to Sentinel Kael (4075, 1990)": [
+    "Vuelve con el centinela Kael (4075, 1990)",
+    "Retournez voir la sentinelle Kael (4075, 1990)"
+  ],
+  "Return to Shepherd Ivo (4074, 1994)": [
+    "Vuelve con el pastor Ivo (4074, 1994)",
+    "Retournez voir le berger Ivo (4074, 1994)"
+  ],
+  "Return to Shepherd Ivo (2405, 4069)": [
+    "Vuelve con el pastor Ivo (2405, 4069)",
+    "Retournez voir le berger Ivo (2405, 4069)"
+  ],
+  "Return to Herbalist Nessa (1542, 3460)": [
+    "Vuelve con la herborista Nessa (1542, 3460)",
+    "Retournez voir l'herboriste Nessa (1542, 3460)"
+  ],
+  "Return to Archivist Orin (2765, 4396)": [
+    "Vuelve con el archivista Orin (2765, 4396)",
+    "Retournez voir l'archiviste Orin (2765, 4396)"
+  ],
+  "Return to Carter Milo (3619, 3443)": [
+    "Vuelve con Carter Milo (3619, 3443)",
+    "Retournez voir Carter Milo (3619, 3443)"
   ]
 };
 

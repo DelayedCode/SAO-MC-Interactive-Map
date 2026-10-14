@@ -165,8 +165,8 @@ Object.assign(DATA, {
     description:
       "The stronghold of the renowned and feared OG Guild. A strategic location reserved for elite veterans. The walls exude glory and past victories."
   },
-  castlemist: {
-    title: "Castlemist",
+  castlebrume: {
+    title: "Castlebrume",
     type: "Biome",
     category: "biomes",
     floor: "floor1",
@@ -382,7 +382,7 @@ Object.assign(DATA, {
     floor: "floor1",
     coords: { x: 3293, z: 2920 },
     drops: ["N/A"],
-    description: "Side Quest NPC in Castlemist."
+    description: "Side Quest NPC in Castlebrume."
   },
   "sq-daiki": {
     title: "Daiki",
@@ -418,7 +418,7 @@ Object.assign(DATA, {
     floor: "floor1",
     coords: { x: 3397, z: 2960 },
     drops: ["N/A"],
-    description: "Side Quest NPC in Castlemist."
+    description: "Side Quest NPC in Castlebrume."
   },
   "sq-genzo": {
     title: "Genzo",
@@ -490,7 +490,7 @@ Object.assign(DATA, {
     floor: "floor1",
     coords: { x: 3226, z: 2903 },
     drops: ["N/A"],
-    description: "Side Quest NPC in Castlemist."
+    description: "Side Quest NPC in Castlebrume."
   },
   "sq-juliet": {
     title: "Juliet",

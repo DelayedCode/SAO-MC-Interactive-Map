@@ -1,7 +1,8 @@
-// MAIN QUESTLINE DATA (CURRENT DATA ONLY)
+// MAIN QUESTLINE AND SIDE QUEST DATA (CURRENT DATA ONLY)
 //
-// These are the Aincrad / Fractured Underworld Main Quests. They live exclusively in the
-// Current Data dataset, so Beta-Test Data stays completely main-quest-less.
+// These are the Aincrad / Fractured Underworld Main Quests plus the Current Data side quests.
+// They live exclusively in the Current Data dataset, so Beta-Test Data stays completely
+// main-quest-less and keeps its own side quests.
 // Beta side quests continue to come from quests_floor1.js / quests_floor2.js / quests_floor3.js.
 //
 // Source text (titles, objectives, coordinates) is preserved verbatim. The English values are
@@ -404,17 +405,240 @@ const MAIN_QUESTLINE = [
     objectives: [
       "Talk to Bob (4287, 159, 3890)",
       "Obtain the Geldorack Dungeon Key (4288, 159, 3887)",
-      "Enter the Mine (4288, 159, 3887)"
+      "Enter the Mine (4288, 159, 3887)",
+      "Complete the dungeon (4288, 159, 3887)",
+      "Leave the Mine Entrance ~(4260, 152, 3892)",
+      "Find Velka in Castlebrume (2922, 162, 3006)",
+      "(Bonus) Hand the rare material to the Hanaka merchant"
     ]
+  },
+  /* The source notes label both "The Slime Marsh" and its continuation "The Foot of the Island"
+     as Quest 25, so the continuation keeps its own number (26) and every later quest runs one
+     number above the notes' label. */
+  {
+    number: 36,
+    title: "Velka, and the Ruins of the Dream",
+    npcName: "Velka",
+    coords: { x: 2922, z: 3006 },
+    objectives: [
+      "Talk to Velka (2922, 162, 3006)",
+      "Show the corrupted wheat (Strange wheat ear) to Velka (2922, 162, 3006)",
+      "Find the ruins to the south (2842, 16, 4400)"
+    ]
+  },
+  {
+    number: 37,
+    title: "The Archivist Specter",
+    npcName: "Archivist Specter",
+    coords: { x: 2849, z: 4342 },
+    objectives: [
+      "Speak with the Archivist Specter to continue the main story (2849, -28, 4342)",
+      "Collect 10 cursed cloth",
+      "Defeat Narax, the cursed spirit of the ruins (2757, -32, 4285)",
+      "Bring the payment to the Specter (2849, -28, 4342)"
+    ]
+  },
+  {
+    number: 38,
+    title: "Behind the Great Door",
+    npcName: "N/A",
+    coords: { x: 2848, z: 4254 },
+    objectives: [
+      "Cross the unsealed door ~(2848, -34, 4254)",
+      "Defeat Nasgul, Cursed Protector",
+      "Retrieve the third Fragment of the Seal of the Ancients",
+      "Speak with the Echo of A: the Seal reforms",
+      "Take the passage",
+      "Go to the Labyrinth of the Fallen (2382, 29, 2415)"
+    ]
+  },
+  {
+    number: 39,
+    title: "The Truth About the Seal",
+    npcName: "Catherine",
+    coords: null,
+    objectives: ["Speak with Catherine to continue the main story"]
+  },
+  {
+    number: 40,
+    title: "The Calamity",
+    npcName: "Master Swordsman",
+    coords: { x: 1809, z: 4289 },
+    objectives: [
+      "Speak with the Master Swordsman to continue the main story (1809, 4289)",
+      "Tell him what happened in the Labyrinth (1809, 4289)",
+      "Choice: continue, or give up",
+      "Ask the 3 mages about the crystal",
+      "Question a mage of Tolbana (3321, 1619)",
+      "Question a mage of Tolbana (3200, 1447)",
+      "Question a mage of Tolbana (3198, 1469)",
+      "Go and see Mephisto (3260, 1403)"
+    ]
+  },
+  {
+    number: 41,
+    title: "Mephisto",
+    npcName: "Mephisto",
+    coords: { x: 3260, z: 1403 },
+    objectives: [
+      "Speak with Mephisto to continue the main story (3260, 1403)",
+      "Answer Mephisto's question (3260, 1403) (An Instrument)",
+      "Learn the mechanism: scroll + crystal (3260, 1403)"
+    ]
+  },
+  {
+    number: 42,
+    title: "Request an Audience with King Harald",
+    npcName: "King Harald",
+    coords: { x: 3199, z: 1510 },
+    objectives: [
+      "Go to the Harald palace (3199, 1510)",
+      "Speak with King Harald (3198, 1524)",
+      "Learn that a description of him exists in the archives (3198, 1524)"
+    ]
+  },
+  {
+    number: 43,
+    title: "The Trials of the Heralds",
+    npcName: "N/A",
+    coords: { x: 3681, z: 1648 },
+    objectives: [
+      "Find the tomb of the ancestors (3681, 1648)",
+      "Trial of Harald 1 (3781, 1673)",
+      "Trial of Harald 2 (3741, 1714)",
+      "Trial of Harald 3 (3701, 1667)",
+      "Receive the three dates (−700, −620, −660)",
+      "Return to King Harald (3198, 1524)"
+    ]
+  },
+  {
+    number: 44,
+    title: "Find a Way to Remake the Scroll",
+    npcName: "Emy",
+    coords: { x: 3227, z: 1495 },
+    objectives: [
+      "Find Emy in the Tolbana Forge (3227, 1495)",
+      "Learn what it takes to remake the scroll (3227, 1495)",
+      "Enter the old mill (2771, 4777)",
+      "Find the challenge area ~(868, 1675)",
+      "Accept the challenge",
+      "Find the object in the time allowed",
+      "Go to Virelune (1617, 1958)",
+      "Speak with Dorven (1618, 1959)",
+      "Inspect the rocks, see if there's any way in (1419, 1986)",
+      "Bring everything back to Emy (3227, 1495)"
+    ]
+  },
+  {
+    number: 45,
+    title: "The Crystal of Tolbana",
+    npcName: "Mephisto",
+    coords: { x: 3260, z: 1403 },
+    objectives: [
+      "Return to Mephisto (3260, 1403)",
+      "Meet him at the door, near the forge (3239, 1461)",
+      "Follow him to the door (3216, 1445)",
+      "Go down beneath the crystal (3047, 1208)",
+      "Meet Mephisto at the Kobold Tower (3400, 1080)"
+    ]
+  },
+  /* The Floor 2 transition closes the floor 1 main questline. The source notes label it "Quest 35"
+     as well, so it simply continues the questline's own numbering and carries no location. */
+  {
+    number: 46,
+    title: "Floor 2",
+    npcName: "N/A",
+    coords: null,
+    objectives: ["Reach Floor 2"]
+  }
+];
+/* CURRENT DATA SIDE QUESTS
+   The source notes label these entries "Quest" and "Side Quest" interchangeably; all eight are
+   side quests, so neither prefix is part of the displayed title. Coordinates are the NPC
+   coordinates the notes supply, in the same "X / Z" Minecraft space the Main Questline uses.
+   Numbers run 1-8 in their own `sq-` namespace, exactly like the map's `sq-`/`mq-` markers, so
+   they can never collide with the Main Questline's numbers. */
+const CURRENT_SIDE_QUESTS = [
+  {
+    number: 1,
+    title: "Too Many Boars",
+    npcName: "Guard Tomas",
+    coords: { x: 1811, z: 3748 },
+    xpReward: 300,
+    colReward: 80,
+    objectives: ["Kill enraged boars (0/10)", "Return to Guard Tomas (1811, 3748)"]
+  },
+  {
+    number: 2,
+    title: "Webs to Burn",
+    npcName: "Scout Raphael",
+    coords: { x: 1440, z: 3449 },
+    xpReward: 550,
+    colReward: 150,
+    objectives: ["Kill young spiders (0/15)", "Return to Scout Raphael (1440, 3449)"]
+  },
+  {
+    number: 3,
+    title: "The Citadel's Cold",
+    npcName: "Sentinel Kael",
+    coords: { x: 4075, z: 1990 },
+    xpReward: 700,
+    colReward: 200,
+    objectives: ["Take down winter golems (0/10)", "Return to Sentinel Kael (4075, 1990)"]
+  },
+  {
+    number: 4,
+    title: "Frost Swarm",
+    npcName: "Shepherd Ivo",
+    coords: { x: 4074, z: 1994 },
+    xpReward: 350,
+    colReward: 100,
+    objectives: ["Shoot down frost butterflies (0/12)", "Return to Shepherd Ivo (4074, 1994)"]
+  },
+  {
+    number: 5,
+    title: "Wolves of the Valley",
+    npcName: "Shepherd Ivo",
+    coords: { x: 2405, z: 4069 },
+    xpReward: 400,
+    colReward: 100,
+    objectives: ["Killing White Wolves (0/12)", "Return to Shepherd Ivo (2405, 4069)"]
+  },
+  {
+    number: 6,
+    title: "Clearing the Marsh",
+    npcName: "Herbalist Nessa",
+    coords: { x: 1542, z: 3460 },
+    xpReward: 450,
+    colReward: 120,
+    objectives: ["Kill spawn slimes (0/20)", "Return to Herbalist Nessa (1542, 3460)"]
+  },
+  {
+    number: 7,
+    title: "Bone and Dust",
+    npcName: "Archivist Orin",
+    coords: { x: 2765, z: 4396 },
+    xpReward: 600,
+    colReward: 160,
+    objectives: ["Slay skeleton warriors (0/20)", "Return to Archivist Orin (2765, 4396)"]
+  },
+  {
+    number: 8,
+    title: "The Road Is No Longer Safe",
+    npcName: "Carter Milo",
+    coords: { x: 3619, z: 3443 },
+    xpReward: 550,
+    colReward: 150,
+    objectives: ["Kill highway bandits (0/15)", "Return to Carter Milo (3619, 3443)"]
   }
 ];
 /* Formats the supplied objective list into the quest table's existing text field. */
-function buildMainQuestObjectives(quest) {
+function buildQuestObjectives(quest) {
   return quest.objectives.join("\n");
 }
 
 /* Formats the supplied coordinates as "X / Z", matching the existing quest table style. */
-function buildMainQuestCoordinates(quest) {
+function buildQuestCoordinates(quest) {
   if (!quest.coords) return "N/A";
   return `${quest.coords.x} / ${quest.coords.z}`;
 }
@@ -431,16 +655,37 @@ window.SAO_MAIN_QUESTLINE = MAIN_QUESTLINE.map((quest) => ({
   questName: quest.title,
   npcName: quest.npcName,
   city: "N/A",
-  coordinates: buildMainQuestCoordinates(quest),
-  requirements: buildMainQuestObjectives(quest),
+  coordinates: buildQuestCoordinates(quest),
+  requirements: buildQuestObjectives(quest),
   xpReward: "N/A",
   colReward: "N/A",
   bonusItems: "N/A"
 }));
 
-// Current Data surfaces the Main Questline. Beta-Test Data keeps its existing side quests only.
+/* The side quests use the very same entry shape, so the Quest page's Side filter, its completion
+   state and its localization resolve them without any page change. Unlike the questline they do
+   carry the EXP and Col rewards the notes supply. */
+window.SAO_CURRENT_SIDE_QUESTS = CURRENT_SIDE_QUESTS.map((quest) => ({
+  id: `sq-${quest.number}`,
+  questNumber: quest.number,
+  questType: "side",
+  world: "aincrad",
+  island: null,
+  markerCoords: quest.coords,
+  questName: quest.title,
+  npcName: quest.npcName,
+  city: "N/A",
+  coordinates: buildQuestCoordinates(quest),
+  requirements: buildQuestObjectives(quest),
+  xpReward: quest.xpReward,
+  colReward: quest.colReward,
+  bonusItems: "N/A"
+}));
+
+// Current Data surfaces the Main Questline and its own side quests. Beta-Test Data keeps its
+// existing floor side quests only.
 window.SAO_CURRENT_QUEST_ENTRIES_BY_FLOOR = {
-  floor1: window.SAO_MAIN_QUESTLINE,
+  floor1: [...window.SAO_MAIN_QUESTLINE, ...window.SAO_CURRENT_SIDE_QUESTS],
   floor2: [],
   floor3: []
 };

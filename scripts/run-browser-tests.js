@@ -45,6 +45,10 @@ const SUITES = Object.freeze({
     "test-character-build-prerequisites.js",
     "test-character-build-skill-points.js",
     "test-character-build-picker.js",
+    "test-current-weapons-ui.js",
+    "test-current-offhand-ui.js",
+    "test-current-champion-armor-ui.js",
+    "test-current-normal-armor-ui.js",
     "test-settings-menu.js",
     "equipment-render-check.js"
   ],

@@ -39,10 +39,15 @@ assert.equal(
 );
 /* The Current dataset now ships the Ice Spirits, Ice Golem, Peaceful Deer, Shark, Little Slime,
    Spider, Iron, Copper, Nepenthes, Elite Treant, Standard Skeleton, Weakling Wolf and Shadow
-   Neophyte accessory sets, the Starting Town tools, the Floor 1 beginner weapons/off-hands and the
-   beginner armor; scripts/test-current-equipment.js pins their contents in detail. The audit counts
-   the equipment categories (weapon, armor, accessory, tool). */
-assert.equal(report.currentDatasetEquipmentItems, 73);
+   Neophyte accessory sets, the Starting Town tools, the Floor 1 beginner weapons/off-hands, the
+   beginner armor, the 49 supplied Floor 1 weapons (12 proficiency categories across the Warrior,
+   Assassin, Archer, Mage and Shaman classes), the 32 supplied Floor 1 off-hand entries, the 20
+   Champion's PvP armor pieces (PvP Set P1, four per class) and the 51 supplied normal armor pieces
+   (levels 3, 7 and 9 for the same five classes); scripts/test-current-equipment.js,
+   scripts/test-current-weapons.js, scripts/test-current-offhand.js,
+   scripts/test-current-champion-armor.js and scripts/test-current-normal-armor.js pin their
+   contents in detail. The audit counts the equipment categories (weapon, armor, accessory, tool). */
+assert.equal(report.currentDatasetEquipmentItems, 225);
 assert.deepEqual(report.sameTierStatConflicts, []);
 assert.deepEqual(thiefBracelet, {
   name: "Thief's Bracelet",

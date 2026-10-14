@@ -127,7 +127,747 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         description: "An old shield. It still blocks",
         craftingResources: [{ item: "Col", amount: 1 }],
         stats: { Class: "Warrior", "Attack Damage": "0.25", "Guard Durability": "4", Health: "+4" }
-      }
+      },
+      {
+        name: "Basic Sword",
+        level: 3,
+        description: "Basic, simple, but still effective for a beginner",
+        stats: { Class: "Warrior", "Weapon Category": "Sword [P1]", "Attack Damage": "3.5", "Attack Speed": "1.1/s" }
+      },
+      {
+        name: "Basic Dual Axe",
+        level: 3,
+        description: "Basic, heavy, but still effective for a beginner",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Dual Axe [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "5.5",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+0.5%",
+          "Stamina Regeneration": "+0.05/s"
+        }
+      },
+      {
+        name: "Copper Greatsword",
+        level: 5,
+        description: "Forged from copper, this greatsword is made to vanquish its enemies.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Greatsword [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "6",
+          "Attack Speed": "1.2/s",
+          "Critical Chance": "+1%",
+          "Life Steal": "+5%"
+        }
+      },
+      {
+        name: "Copper Double Axe",
+        level: 5,
+        description: "Forged from copper, this double axe is made to tear its enemies apart.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Double Axe [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "8",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+0.8%",
+          "Stamina Regeneration": "+0.1/s"
+        }
+      },
+      {
+        name: "Simple Longsword Weapon",
+        level: 5,
+        description: "Quite simple, it fits in your hand and can brutally slice in two",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Longsword [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "8",
+          "Attack Speed": "0.9/s",
+          "Critical Damage": "+2%",
+          "Life Steal": "+1%"
+        }
+      },
+      {
+        name: "Simple Sword",
+        level: 5,
+        description: "Quite simple, it fits in the hand and can slash",
+        stats: { Class: "Warrior", "Weapon Category": "Sword [P1]", "Attack Damage": "5", "Attack Speed": "1.1/s" }
+      },
+      {
+        name: "Protector's Hammer",
+        level: 7,
+        description: "Forged in magic, this hammer is imbued with the essence of powerful Tier 1 monsters.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Warhammer [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "11.5",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Damage": "+1%",
+          Defense: "+2"
+        }
+      },
+      {
+        name: "Hunter's Longsword",
+        level: 7,
+        description: "Forged for hunters of powerful Tier 1 monsters. It deals high damage",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Longsword [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "11.5",
+          "Attack Speed": "0.9/s",
+          "Critical Damage": "+2.5%",
+          "Life Steal": "+1%"
+        }
+      },
+      {
+        name: "Protector's Sword",
+        level: 7,
+        description: "Forged in magic, this sword is imbued with the essence of powerful Tier 1 monsters.",
+        stats: { Class: "Warrior", "Weapon Category": "Sword [P1]", "Attack Damage": "7", "Attack Speed": "1.1/s" }
+      },
+      {
+        name: "Hunter's Greatsword",
+        level: 7,
+        description: "Forged for hunters of powerful Tier 1 monsters. It offers good accuracy",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Greatsword [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "8.5",
+          "Attack Speed": "1.2/s",
+          "Critical Chance": "+1.25%",
+          "Life Steal": "+5%"
+        }
+      },
+      {
+        name: "Double Iron Axe",
+        level: 9,
+        description: "Forged for hunters of powerful Tier 1 monsters. It offers good accuracy",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Double Axe [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "14",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+1%",
+          "Stamina Regeneration": "+0.15/s"
+        }
+      },
+      {
+        name: "Iron Greatsword",
+        level: 9,
+        description: "Forged for hunters of powerful Tier 1 monsters. It offers good accuracy.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Greatsword [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "10.5",
+          "Attack Speed": "1.2/s",
+          "Critical Chance": "+1.5%",
+          "Life Steal": "+5%"
+        }
+      },
+      {
+        name: "Guardian's Greatsword",
+        level: 9,
+        description: "Forged for hunters of powerful Tier 1 monsters. It offers good accuracy.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Greatsword [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "12",
+          "Attack Speed": "1.2/s",
+          "Critical Chance": "+1.75%",
+          "Life Steal": "+5%"
+        }
+      },
+      {
+        name: "Guardian's Sword",
+        level: 9,
+        description: "Forged for hunters of powerful Tier 1 monsters. It offers good accuracy",
+        stats: { Class: "Warrior", "Weapon Category": "Sword [P1]", "Attack Damage": "10", "Attack Speed": "1.1/s" }
+      },
+      {
+        name: "Guardian's Longsword",
+        level: 9,
+        description: "Forged for hunters of powerful Tier 1 monsters. It offers good accuracy.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Longsword [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "16",
+          "Attack Speed": "0.9/s",
+          "Critical Damage": "+3.5%",
+          "Life Steal": "+1%"
+        }
+      },
+      {
+        name: "Basic Scythe",
+        level: 3,
+        description: "Basic, simple, but still effective for a beginner",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Scythe [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "6.5",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+0.8%",
+          "Stamina Regeneration": "+0.1/s"
+        }
+      },
+      {
+        name: "Basic Dagger",
+        level: 3,
+        description: "Basic, simple, but still effective for a beginner",
+        stats: { Class: "Assassin", "Weapon Category": "Dagger [P1]", "Attack Damage": "4.5", "Attack Speed": "1.4/s" }
+      },
+      {
+        name: "Basic Katana",
+        level: 3,
+        description: "Basic, simple, but still effective for a beginner",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Katana [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "5",
+          "Attack Speed": "1.2/s",
+          "Life Steal": "+5%",
+          Dodge: "+5%",
+          "Movement Speed": "+15%"
+        }
+      },
+      {
+        name: "Copper Dagger",
+        level: 5,
+        description: "Made from copper, the blade is stronger and sharper than others",
+        stats: { Class: "Assassin", "Weapon Category": "Dagger [P1]", "Attack Damage": "6", "Attack Speed": "1.4/s" }
+      },
+      {
+        name: "Copper Scythe Weapon",
+        level: 5,
+        description: "Made from copper, the blade is stronger and sharper than others",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Scythe [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "9.5",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+1%",
+          "Stamina Regeneration": "+0.15/s"
+        }
+      },
+      {
+        name: "Copper Katana",
+        level: 5,
+        description: "Forged from copper, its blade is stronger and sharper than others",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Katana [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "7",
+          "Attack Speed": "1.2/s",
+          "Life Steal": "+5%",
+          Dodge: "+5%",
+          "Movement Speed": "+15%"
+        }
+      },
+      {
+        name: "Hunter's Scythe",
+        level: 7,
+        description: "Forged to become a hunter of lesser creatures",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Scythe [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "13.5",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+1.2%",
+          "Stamina Regeneration": "+0.2/s"
+        }
+      },
+      {
+        name: "Hunter's Dagger",
+        level: 7,
+        description: "Forged to become a hunter of lesser creatures",
+        stats: { Class: "Assassin", "Weapon Category": "Dagger [P1]", "Attack Damage": "8.5", "Attack Speed": "1.4/s" }
+      },
+      {
+        name: "Hunter's Katana",
+        level: 7,
+        description: "Forged to become a hunter of lesser creatures",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Katana [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "10",
+          "Attack Speed": "1.2/s",
+          "Life Steal": "+5%",
+          Dodge: "+5%",
+          "Movement Speed": "+15%"
+        }
+      },
+      {
+        name: "Iron Katana Weapon",
+        level: 9,
+        description: "Forged from iron, its blade is far sharper and more durable than others",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Katana [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "12.5",
+          "Attack Speed": "1.2/s",
+          "Life Steal": "+5%",
+          Dodge: "+5%",
+          "Movement Speed": "+15%"
+        }
+      },
+      {
+        name: "Iron Scythe",
+        level: 9,
+        description: "Forged from iron, its blade is far sharper and more durable than others",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Scythe [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "16.5",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+1.5%",
+          "Stamina Regeneration": "+0.25/s"
+        }
+      },
+      {
+        name: "Iron Dagger",
+        level: 9,
+        description: "Forged from iron, its blade is far sharper and more durable than others",
+        stats: { Class: "Assassin", "Weapon Category": "Dagger [P1]", "Attack Damage": "10.5", "Attack Speed": "1.4/s" }
+      },
+      {
+        name: "Herald's Katana",
+        level: 9,
+        description: "This katana was forged for heralds, elite assassins capable of facing the Forgotten",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Katana [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "14",
+          "Attack Speed": "1.2/s",
+          "Life Steal": "+5%",
+          Dodge: "+5%",
+          "Movement Speed": "+15%"
+        }
+      },
+      {
+        name: "Herald's Dagger",
+        level: 9,
+        description: "This dagger was forged for heralds, elite assassins capable of facing the Forgotten",
+        stats: { Class: "Assassin", "Weapon Category": "Dagger [P1]", "Attack Damage": "12", "Attack Speed": "1.4/s" }
+      },
+      {
+        name: "Herald's Scythe",
+        level: 9,
+        description: "This scythe was forged for heralds, elite assassins capable of facing the Forgotten",
+        stats: {
+          Class: "Assassin",
+          "Weapon Category": "Scythe [P1]",
+          "Two-Handed": "Yes",
+          "Attack Damage": "19",
+          "Attack Speed": "0.9/s",
+          "Skill Critical Chance": "+1.8%",
+          "Stamina Regeneration": "+0.3/s"
+        }
+      },
+      {
+        name: "Basic Bow",
+        level: 3,
+        description: "A rudimentary bow used by early archers",
+        stats: { Class: "Archer", "Weapon Category": "Bow [P1]", "Attack Damage": "4.5", "Attack Speed": "1.2/s" }
+      },
+      {
+        name: "Basic Crossbow",
+        level: 3,
+        description: "A simple crossbow, hastily assembled but reliable.",
+        stats: {
+          Class: "Archer",
+          "Weapon Category": "Crossbow [P1]",
+          "Attack Damage": "2.5",
+          "Attack Speed": "1/s",
+          "Skill Critical Chance": "+0.8%"
+        }
+      },
+      {
+        name: "Copper Bow",
+        level: 5,
+        description: "A light, maneuverable, and reliable copper bow.",
+        stats: { Class: "Archer", "Weapon Category": "Bow [P1]", "Attack Damage": "6", "Attack Speed": "1.2/s" }
+      },
+      {
+        name: "Copper Crossbow",
+        level: 5,
+        description: "A light copper crossbow, maneuverable and accurate.",
+        stats: {
+          Class: "Archer",
+          "Weapon Category": "Crossbow [P1]",
+          "Attack Damage": "3.5",
+          "Attack Speed": "1/s",
+          "Skill Critical Chance": "+1%"
+        }
+      },
+      {
+        name: "Hunter's Crossbow",
+        level: 7,
+        description: "Crossbow for hunting powerful Tier 1 monsters.",
+        stats: {
+          Class: "Archer",
+          "Weapon Category": "Crossbow [P1]",
+          "Attack Damage": "5",
+          "Attack Speed": "1/s",
+          "Skill Critical Chance": "+1.2%"
+        }
+      },
+      {
+        name: "Hunting Bow",
+        level: 7,
+        description: "Bow for hunting powerful Tier 1 monsters.",
+        stats: { Class: "Archer", "Weapon Category": "Bow [P1]", "Attack Damage": "8.5", "Attack Speed": "1.2/s" }
+      },
+      {
+        name: "Herald's Bow",
+        level: 9,
+        description: "A powerful bow that belonged to one of the Fallen of the Labyrinth.",
+        stats: { Class: "Archer", "Weapon Category": "Bow [P1]", "Attack Damage": "12", "Attack Speed": "1.2/s" }
+      },
+      {
+        name: "Iron Bow",
+        level: 9,
+        description: "A sturdy bow forged from iron, reliable and accurate.",
+        stats: { Class: "Archer", "Weapon Category": "Bow [P1]", "Attack Damage": "10.5", "Attack Speed": "1.2/s" }
+      },
+      {
+        name: "Iron Crossbow",
+        level: 9,
+        description: "A sturdy crossbow forged from iron, solid and accurate.",
+        stats: {
+          Class: "Archer",
+          "Weapon Category": "Crossbow [P1]",
+          "Attack Damage": "6",
+          "Attack Speed": "1/s",
+          "Skill Critical Chance": "+1.5%"
+        }
+      },
+      {
+        name: "Forest Magic Staff (Mage)",
+        level: 3,
+        description: "From heartwood and enchanted twigs, a staff was born.",
+        stats: { Class: "Mage", "Weapon Category": "Staff [P1]", "Attack Damage": "5", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Copper Magic Staff (Mage)",
+        level: 5,
+        description: "A light copper staff, imbued with nascent magic.",
+        stats: { Class: "Mage", "Weapon Category": "Staff [P1]", "Attack Damage": "7", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Magician's Staff (Mage)",
+        level: 7,
+        description: "Forged in the heart of a silent storm. This staff vibrates with a powerful, celestial energy.",
+        stats: { Class: "Mage", "Weapon Category": "Staff [P1]", "Attack Damage": "10", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Dark Magic Staff (Mage)",
+        level: 9,
+        description: "Staff made from enchantments and metals. Perfect for dealing incredible damage.",
+        stats: { Class: "Mage", "Weapon Category": "Staff [P1]", "Attack Damage": "14.5", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Iron Magic Staff (Mage)",
+        level: 9,
+        description: "A solid staff forged from iron, channeling reliable magic.",
+        stats: { Class: "Mage", "Weapon Category": "Staff [P1]", "Attack Damage": "13", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Magic Forest Staff (Shaman)",
+        level: 3,
+        description: "From the Heart of Wood and Enchanted Twigs, a staff is born",
+        stats: { Class: "Shaman", "Weapon Category": "Staff [P1]", "Attack Damage": "5", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Copper Magic Staff (Shaman)",
+        level: 5,
+        description: "A light copper staff, imbued with nascent magic.",
+        stats: { Class: "Shaman", "Weapon Category": "Staff [P1]", "Attack Damage": "7", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Magician's Staff (Shaman)",
+        level: 7,
+        description: "Forged in the heart of a silent storm. This staff vibrates with a powerful, celestial energy.",
+        stats: { Class: "Shaman", "Weapon Category": "Staff [P1]", "Attack Damage": "10", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Dark Magic Staff (Shaman)",
+        level: 9,
+        description: "Staff made from enchantments and metals. Perfect for dealing incredible damage.",
+        stats: { Class: "Shaman", "Weapon Category": "Staff [P1]", "Attack Damage": "14.5", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Iron Magic Staff (Shaman)",
+        level: 9,
+        description: "A solid staff forged from iron, channeling reliable magic.",
+        stats: { Class: "Shaman", "Weapon Category": "Staff [P1]", "Attack Damage": "13", "Attack Speed": "1/s" }
+      },
+      {
+        name: "Ika's Shield",
+        level: 3,
+        description: "Forged from the shells of Ika's turtles. Offers good protection.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Second Hand [P1]",
+          Defense: "+2",
+          "Guard Durability": "12",
+          Health: "+12",
+          "Movement Speed": "-5%"
+        }
+      },
+      {
+        name: "Spiked Wooden Shield",
+        level: 3,
+        description: "A torn piece of wood covered in sharp spikes",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Second Hand [P1]",
+          "Attack Damage": "0.5",
+          "Guard Durability": "6",
+          Health: "+6"
+        }
+      },
+      {
+        name: "Copper Shield (Defensive)",
+        level: 5,
+        description: "Forged from copper, its large size and weight provide effective protection",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Second Hand [P1]",
+          Defense: "+3",
+          "Guard Durability": "16",
+          Health: "+16",
+          "Movement Speed": "-5%"
+        }
+      },
+      {
+        name: "Copper Shield (Offensive)",
+        level: 5,
+        description: "Forged from copper, this shoulder shield protects against counterattacks",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Off-Hand [P1]",
+          "Attack Damage": "0.75",
+          "Guard Durability": "8",
+          Health: "+8"
+        }
+      },
+      {
+        name: "Tolbana Shield (Defensive)",
+        level: 7,
+        description: "Forged in the image of an ancient and powerful Tolbana mage. Ensures your defenses.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Second Hand [P1]",
+          Defense: "+4",
+          "Guard Durability": "20",
+          Health: "+20",
+          "Movement Speed": "-5%"
+        }
+      },
+      {
+        name: "Tolbana Shield (Offensive)",
+        level: 7,
+        description: "Forged in the image of an ancient and powerful Tolbana mage. Ensures your offensives.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Off-Hand [P1]",
+          "Attack Damage": "1",
+          "Guard Durability": "10",
+          Health: "+10"
+        }
+      },
+      {
+        name: "Iron Shield (Defensive)",
+        level: 9,
+        description:
+          "Forged from iron, this shield is large and sturdy, ideal for protecting your life in the heat of battle.",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Second Hand [P1]",
+          Defense: "+4",
+          "Guard Durability": "24",
+          Health: "+24",
+          "Movement Speed": "-5%"
+        }
+      },
+      {
+        name: "Iron Shield (Offensive)",
+        level: 9,
+        description: "Forged from iron, this shield is light and ideal for warriors",
+        stats: {
+          Class: "Warrior",
+          "Weapon Category": "Second Hand [P1]",
+          "Attack Damage": "1.25",
+          "Guard Durability": "12",
+          Health: "+12"
+        }
+      },
+      {
+        name: "Basic Dagger (Offhand)",
+        level: 3,
+        description: "Basic, allows for easier chaining of attacks.",
+        stats: { Class: "Assassin", "Weapon Category": "Off-Hand [P1]", "Critical Chance": "+0.75%" }
+      },
+      {
+        name: "Copper Dagger (Offhand)",
+        level: 5,
+        description: "Made from copper, this dagger is stronger.",
+        stats: { Class: "Assassin", "Weapon Category": "Second Hand [P1]", "Critical Chance": "+1%" }
+      },
+      {
+        name: "Albal's Dagger",
+        level: 7,
+        description: "A dagger of bestial nature, it is made from the sharp, pointed fangs of wolves",
+        stats: { Class: "Assassin", "Weapon Category": "Second Hand [P1]", "Critical Chance": "+1.25%" }
+      },
+      {
+        name: "Iron Dagger (Offhand)",
+        level: 9,
+        description: "Forged from iron, this dagger is sharp.",
+        stats: { Class: "Assassin", "Weapon Category": "Second Hand [P1]", "Critical Chance": "+1.5%" }
+      },
+      {
+        name: "Basic Quiver",
+        level: 3,
+        description: "A simple quiver, ideal for your first hunts.",
+        stats: { Class: "Archer", "Weapon Category": "Second Hand [P1]", "Critical Chance": "+0.75%" }
+      },
+      {
+        name: "Copper Quiver",
+        level: 5,
+        description: "Reinforced with copper, sturdy for adventure.",
+        stats: { Class: "Archer", "Weapon Category": "Second Hand [P1]", "Critical Chance": "+1%" }
+      },
+      {
+        name: "Hunter's Quiver",
+        level: 7,
+        description: "Designed for experienced big-game hunters.",
+        stats: { Class: "Archer", "Weapon Category": "Second Hand [P1]", "Critical Chance": "+1.25%" }
+      },
+      {
+        name: "Iron Quiver",
+        level: 9,
+        description: "Forged from durable iron, reliable in any situation.",
+        stats: { Class: "Archer", "Weapon Category": "Second Hand [P1]", "Critical Chance": "+1.5%" }
+      },
+      {
+        name: "Basic Lantern (Mage)",
+        level: 3,
+        description: "A simple, reliable, and functional lantern.",
+        stats: { Class: "Mage", "Weapon Category": "Second Hand [P1]", "Magic Damage": "+1.25%" }
+      },
+      {
+        name: "Grimoire Sylvestre",
+        level: 3,
+        description: "A book forged from materials from an ancient, putrid swamp. It contains elemental magic",
+        stats: { Class: "Mage", "Weapon Category": "Second Hand [P1]", "Max Mana": "+1.5" }
+      },
+      {
+        name: "Grimoire of the Revenants",
+        level: 5,
+        description: "A book from the cursed ruins. It reeks of blood.",
+        stats: { Class: "Mage", "Weapon Category": "Second Hand [P1]", "Max Mana": "+2" }
+      },
+      {
+        name: "Copper Lantern (Mage)",
+        level: 5,
+        description: "A copper lantern, emitting a warm, arcane glow.",
+        stats: { Class: "Mage", "Weapon Category": "Second Hand [P1]", "Magic Damage": "+1.5%" }
+      },
+      {
+        name: "Magician's Grimoire (Mage)",
+        level: 7,
+        description:
+          "This book was forged using powerful Tier 1 materials. It embodies the power of a Magician.",
+        stats: { Class: "Mage", "Weapon Category": "Second Hand [P1]", "Max Mana": "+2.5" }
+      },
+      {
+        name: "Magician's Lantern (Mage)",
+        level: 7,
+        description: "A lantern crafted by an experienced magician.",
+        stats: { Class: "Mage", "Weapon Category": "Second Hand [P1]", "Magic Damage": "+1.75%" }
+      },
+      {
+        name: "Dark Grimoire (Mage)",
+        level: 9,
+        description:
+          "A dark mixture of ancient materials, lost in a great labyrinth. It could be the grimoire of a reaper",
+        stats: { Class: "Mage", "Weapon Category": "Second Hand [P1]", "Max Mana": "+3" }
+      },
+      {
+        name: "Iron Lantern (Mage)",
+        level: 9,
+        description: "A sturdy iron lantern, radiating steady magic.",
+        stats: { Class: "Mage", "Weapon Category": "Second Hand [P1]", "Magic Damage": "+2%" }
+      },
+      {
+        name: "Beastly Grimoire",
+        level: 3,
+        description: "A book forged from materials from an ancient, putrid swamp. It contains beastly magic.",
+        stats: { Class: "Shaman", "Weapon Category": "Second Hand [P1]", "Healing Bonus": "+1.2" }
+      },
+      {
+        name: "Basic Lantern (Shaman)",
+        level: 3,
+        description: "A simple, reliable, and functional lantern.",
+        stats: { Class: "Shaman", "Weapon Category": "Second Hand [P1]", "Magic Damage": "+1.25%" }
+      },
+      {
+        name: "Copper Lantern (Shaman)",
+        level: 5,
+        description: "A copper lantern, emitting a warm, arcane glow.",
+        stats: { Class: "Shaman", "Weapon Category": "Second Hand [P1]", "Magic Damage": "+1.5%" }
+      },
+      {
+        name: "Skeletal Grimoire",
+        level: 5,
+        description: "A book from the cursed ruins. It reeks of death.",
+        stats: { Class: "Shaman", "Weapon Category": "Second Hand [P1]", "Healing Bonus": "+1.5" }
+      },
+      {
+        name: "Magician's Lantern (Shaman)",
+        level: 7,
+        description: "A lantern crafted by an experienced magician.",
+        stats: { Class: "Shaman", "Weapon Category": "Second Hand [P1]", "Magic Damage": "+1.75%" }
+      },
+      {
+        name: "Sorcerer's Grimoire (Shaman)",
+        level: 7,
+        description:
+          "This book was forged using powerful Tier 1 materials. It embodies the power of a Sorcerer.",
+        stats: { Class: "Shaman", "Weapon Category": "Second Hand [P1]", "Healing Bonus": "+1.8" }
+      },
+      {
+        name: "Iron Lantern (Shaman)",
+        level: 9,
+        description: "A sturdy iron lantern, diffusing steady magic.",
+        stats: { Class: "Shaman", "Weapon Category": "Second Hand [P1]", "Magic Damage": "+2%" }
+      },
+      {
+        name: "Ghostly Grimoire",
+        level: 9,
+        description:
+          "An obscure mixture of ancient materials, lost in a great labyrinth. It could be the grimoire of a powerful ghost.",
+        stats: { Class: "Shaman", "Weapon Category": "Second Hand [P1]", "Healing Bonus": "+2" }
+      },
     ],
     armor: [
       {
@@ -150,6 +890,1014 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         description: "Barely protects against a blade, but it's always better than nothing.",
         craftingResources: [{ item: "Col", amount: 50 }],
         stats: { Class: "Any", Health: "+1" }
+      },
+      {
+        name: "Champion's Mask",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Shaman",
+          Defense: "+2",
+          Health: "+9",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Breastplate",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Shaman",
+          Defense: "+5",
+          Health: "+13",
+          "Rune Slots": "2",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Leggings",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Shaman",
+          Defense: "+3",
+          Health: "+11",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Boots",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Shaman",
+          Defense: "+1",
+          Health: "+8",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Hat",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Mage",
+          Defense: "+2",
+          Health: "+9",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Breastplate",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Mage",
+          Defense: "+5",
+          Health: "+13",
+          "Rune Slots": "2",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Leggings",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Mage",
+          Defense: "+3",
+          Health: "+11",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Boots",
+        level: 7,
+        description: "Forged from pure metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Mage",
+          Defense: "+1",
+          Health: "+8",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Hood",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Archer",
+          Defense: "+2",
+          Health: "+9",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Breastplate",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Archer",
+          Defense: "+5",
+          Health: "+13",
+          "Rune Slots": "2",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Leggings",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Archer",
+          Defense: "+3",
+          Health: "+11",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Boots",
+        level: 7,
+        description: "Forged from pure metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Archer",
+          Defense: "+1",
+          Health: "+8",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Helm",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Warrior",
+          Defense: "+2",
+          Health: "+9",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Breastplate",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Warrior",
+          Defense: "+5",
+          Health: "+13",
+          "Rune Slots": "2",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Leggings",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Warrior",
+          Defense: "+3",
+          Health: "+11",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Boots",
+        level: 7,
+        description: "Forged from pure metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Warrior",
+          Defense: "+1",
+          Health: "+8",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Hood",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Assassin",
+          Defense: "+2",
+          Health: "+9",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Breastplate",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Assassin",
+          Defense: "+5",
+          Health: "+13",
+          "Rune Slots": "2",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Champion's Leggings",
+        level: 7,
+        description: "Forged from purified metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Assassin",
+          Defense: "+3",
+          Health: "+11",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      {
+        name: "Boots of the Champion",
+        level: 7,
+        description: "Forged from pure metal, this armor protects those who have triumphed over corrupted ruins.",
+        set: "PvP Set P1",
+        stats: {
+          Class: "Assassin",
+          Defense: "+1",
+          Health: "+8",
+          "2 Piece Set Bonus": "+5% PvP Reduction, +5% PvP Tenacity",
+          "3 Piece Set Bonus": "+5% PvP Damage",
+          "4 Piece Set Bonus": "+5% Critical Resistance"
+        }
+      },
+      /* --- Normal armor, exactly as supplied -------------------------------------------------
+         Levels 3, 7 and 9 for the Warrior, Assassin, Archer, Mage and Shaman. The item name is kept
+         verbatim, including the "(Warrior)"-style class qualifier the source uses for the sets that
+         exist for more than one class, and the slot is derived from that name (a Breastplate or
+         Chestplate is a Chestplate, a Tunic or Robe is a Chestplate, Sandals are Boots). "Rune
+         Slots" is carried only when the source gives the item at least one, matching the Beta
+         schema, where the key is absent for an item with no rune slot; the count the source
+         supplies (1 for the level 9 chestplates and leggings, 0 for everything else) is what the
+         adapter reports. Set tiers keep the source's own wording inside the existing "N Piece Set
+         Bonus" keys, with the effects of one tier comma-separated when the source lists two of them
+         at the same piece count (the Sorcerer's 3-piece tier). No rarity, cost, drop source or
+         bonus is invented, and no missing piece is added. */
+      {
+        name: "Ika Breastplate",
+        level: 3,
+        description: "Carved from the shell of the ancient Ika turtles, it absorbs the initial blows.",
+        set: "Ika Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+2",
+          Health: "+12",
+          "2 Piece Set Bonus": "+0.5 Stamina",
+          "3 Piece Set Bonus": "+0.5 Health"
+        }
+      },
+      {
+        name: "Ika Leggings",
+        level: 3,
+        description: "Carved from the shell of the ancient Ika turtles, they absorb the initial blows.",
+        set: "Ika Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+1",
+          Health: "+7",
+          "2 Piece Set Bonus": "+0.5 Stamina",
+          "3 Piece Set Bonus": "+0.5 Health"
+        }
+      },
+      {
+        name: "Ika Boots",
+        level: 3,
+        description: "Carved from the shell of the ancient Ika turtles, they absorb the initial blows.",
+        set: "Ika Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+0.5 Stamina",
+          "3 Piece Set Bonus": "+0.5 Health"
+        }
+      },
+      {
+        name: "Protector's Helmet (Warrior)",
+        level: 7,
+        description: "Forged in Tolbana's forge, it makes the warrior an impenetrable wall.",
+        set: "Protector's Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+1",
+          Health: "+6",
+          "2 Piece Set Bonus": "+1 Max Stamina",
+          "3 Piece Set Bonus": "+0.1 Health/s",
+          "4 Piece Set Bonus": "+1% Block Chance"
+        }
+      },
+      {
+        name: "Protector's Breastplate (Warrior)",
+        level: 7,
+        description: "Forged in Tolbana's forge, it makes the warrior an impenetrable wall.",
+        set: "Protector's Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+2",
+          Health: "+16",
+          "2 Piece Set Bonus": "+1 Max Stamina",
+          "3 Piece Set Bonus": "+0.1 Health/s",
+          "4 Piece Set Bonus": "+1% Block Chance"
+        }
+      },
+      {
+        name: "Protector's Leggings (Warrior)",
+        level: 7,
+        description: "Forged in Tolbana's forge, it makes the warrior an impenetrable wall.",
+        set: "Protector's Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+2",
+          Health: "+12",
+          "2 Piece Set Bonus": "+1 Max Stamina",
+          "3 Piece Set Bonus": "+0.1 Health/s",
+          "4 Piece Set Bonus": "+1% Block Chance"
+        }
+      },
+      {
+        name: "Protector's Boots (Warrior)",
+        level: 7,
+        description: "Forged in Tolbana's forge, it makes the warrior an impenetrable wall.",
+        set: "Protector's Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+1",
+          Health: "+6",
+          "2 Piece Set Bonus": "+1 Max Stamina",
+          "3 Piece Set Bonus": "+0.1 Health/s",
+          "4 Piece Set Bonus": "+1% Block Chance"
+        }
+      },
+      {
+        name: "Guardian's Helmet (Warrior)",
+        level: 9,
+        description: "Replica of the Guardian's Armor. Fallen: Heavy and unshakeable, it defies death itself.",
+        set: "Guardian Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+1",
+          Health: "+7",
+          "2 Piece Set Bonus": "+1.5 Max Stamina",
+          "3 Piece Set Bonus": "+0.15 Health/s",
+          "4 Piece Set Bonus": "+2% Block Chance"
+        }
+      },
+      {
+        name: "Guardian's Chestplate (Warrior)",
+        level: 9,
+        description: "Replica of the Guardian's Armor. Fallen: Heavy and unshakeable, it defies death itself.",
+        set: "Guardian Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+4",
+          Health: "+20",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+1.5 Max Stamina",
+          "3 Piece Set Bonus": "+0.15 Health/s",
+          "4 Piece Set Bonus": "+2% Block Chance"
+        }
+      },
+      {
+        name: "Guardian's Leggings (Warrior)",
+        level: 9,
+        description: "Replica of the Guardian's Armor. Fallen: Heavy and unshakeable, it defies death itself.",
+        set: "Guardian Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+3",
+          Health: "+14",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+1.5 Max Stamina",
+          "3 Piece Set Bonus": "+0.15 Health/s",
+          "4 Piece Set Bonus": "+2% Block Chance"
+        }
+      },
+      {
+        name: "Guardian's Boots (Warrior)",
+        level: 9,
+        description: "Replica of the Guardian's Armor. Fallen: Heavy and unshakeable, it defies death itself.",
+        set: "Guardian Set",
+        stats: {
+          Class: "Warrior",
+          Defense: "+1",
+          Health: "+7",
+          "2 Piece Set Bonus": "+1.5 Max Stamina",
+          "3 Piece Set Bonus": "+0.15 Health/s",
+          "4 Piece Set Bonus": "+2% Block Chance"
+        }
+      },
+      {
+        name: "Tactical Chestplate",
+        level: 3,
+        description: "Dark leather and silent soles, designed to approach silently and strike from behind.",
+        set: "Stealth Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+2",
+          Health: "+9",
+          "2 Piece Set Bonus": "+2% Dodge Chance",
+          "3 Piece Set Bonus": "+1% Critical Damage"
+        }
+      },
+      {
+        name: "Tactical Leggings",
+        level: 3,
+        description: "Dark leather and silent soles, designed for approaching silently and striking from behind.",
+        set: "Stealth Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+2% Dodge Chance",
+          "3 Piece Set Bonus": "+1% Critical Damage"
+        }
+      },
+      {
+        name: "Tactical Boots",
+        level: 3,
+        description: "Dark leather and silent soles, designed for approaching silently and striking from behind.",
+        set: "Stealth Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+1",
+          Health: "+4",
+          "2 Piece Set Bonus": "+2% Dodge Chance",
+          "3 Piece Set Bonus": "+1% Critical Damage"
+        }
+      },
+      {
+        name: "Ninja Tunic (Assassin)",
+        level: 7,
+        description: "Light as a shadow, it embraces the assassin and steals him from death.",
+        set: "Ninja Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+3",
+          Health: "+15",
+          "2 Piece Set Bonus": "+3% Dodge Chance",
+          "3 Piece Set Bonus": "+2% Critical Damage"
+        }
+      },
+      {
+        name: "Ninja Leggings (Assassin)",
+        level: 7,
+        description: "Light as a shadow, it embraces the assassin and steals him from death.",
+        set: "Ninja Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+2",
+          Health: "+9",
+          "2 Piece Set Bonus": "+3% Dodge Chance",
+          "3 Piece Set Bonus": "+2% Critical Damage"
+        }
+      },
+      {
+        name: "Ninja Boots (Assassin)",
+        level: 7,
+        description: "Light as a shadow, it embraces the assassin and steals him from death.",
+        set: "Ninja Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+1",
+          Health: "+6",
+          "2 Piece Set Bonus": "+3% Dodge Chance",
+          "3 Piece Set Bonus": "+2% Critical Damage"
+        }
+      },
+      /* The source spells the Assassin Herald set two ways: "Stealth Herald Set" on the helmet and
+         "Stealthy Herald Set" on the other three pieces. Both labels are carried exactly as given
+         (the compendium shows the item's own wording) and the adapter maps them onto one canonical
+         set identifier, so the four pieces still count as one set for the set-bonus engine. */
+      {
+        name: "Herald's Helmet (Assassin)",
+        level: 9,
+        description: "Inherited from the Fallen Herald, it becomes shadow and dagger in the hands of the assassin.",
+        set: "Stealth Herald Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+5% Dodge Chance",
+          "3 Piece Set Bonus": "+3% Critical Damage",
+          "4 Piece Set Bonus": "+5% Movement Speed"
+        }
+      },
+      {
+        name: "Herald's Tunic (Assassin)",
+        level: 9,
+        description: "Inherited from the Fallen Herald, it becomes shadow and dagger in the hands of the assassin.",
+        set: "Stealthy Herald Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+4",
+          Health: "+15",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+5% Dodge Chance",
+          "3 Piece Set Bonus": "+3% Critical Damage",
+          "4 Piece Set Bonus": "+5% Movement Speed"
+        }
+      },
+      {
+        name: "Herald's Leggings (Assassin)",
+        level: 9,
+        description: "Inherited from the Fallen Herald, it becomes shadow and dagger in the hands of the assassin.",
+        set: "Stealthy Herald Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+3",
+          Health: "+11",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+5% Dodge Chance",
+          "3 Piece Set Bonus": "+3% Critical Damage",
+          "4 Piece Set Bonus": "+5% Movement Speed"
+        }
+      },
+      {
+        name: "Herald's Boots (Assassin)",
+        level: 9,
+        description: "Inherited from the Fallen Herald, it becomes shadow and dagger in the hands of the assassin.",
+        set: "Stealthy Herald Set",
+        stats: {
+          Class: "Assassin",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+5% Dodge Chance",
+          "3 Piece Set Bonus": "+3% Critical Damage",
+          "4 Piece Set Bonus": "+5% Movement Speed"
+        }
+      },
+      {
+        name: "Tactical Chestplate",
+        level: 3,
+        description: "Soft leather and fitted straps, designed to strike quickly and disappear before the counterattack.",
+        set: "Tactical Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+2",
+          Health: "+9",
+          "2 Piece Set Bonus": "+0.05 Stamina/s",
+          "3 Piece Set Bonus": "+0.25 Attack Damage"
+        }
+      },
+      {
+        name: "Tactical Leggings",
+        level: 3,
+        description: "Soft leather and fitted straps, designed to strike fast and disappear before the counterattack.",
+        set: "Tactical Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+0.05 Stamina/s",
+          "3 Piece Set Bonus": "+0.25 Attack Damage"
+        }
+      },
+      {
+        name: "Tactical Boots",
+        level: 3,
+        description: "Soft leather and fitted straps, designed to strike fast and disappear before the counterattack.",
+        set: "Tactical Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+1",
+          Health: "+4",
+          "2 Piece Set Bonus": "+0.05 Stamina/s",
+          "3 Piece Set Bonus": "+0.25 Attack Damage"
+        }
+      },
+      {
+        name: "Hunter's Tunic (Archer)",
+        level: 7,
+        description: "Designed for the hunt, it sharpens the archer's eye and guides their shots to the heart.",
+        set: "Hunter's Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+3",
+          Health: "+15",
+          "2 Piece Set Bonus": "+0.1 Stamina/s",
+          "3 Piece Set Bonus": "+0.5% Critical Chance"
+        }
+      },
+      {
+        name: "Hunter's Leggings (Archer)",
+        level: 7,
+        description: "Designed for the hunt, it sharpens the archer's eye and guides their shots to the heart.",
+        set: "Hunter's Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+2",
+          Health: "+9",
+          "2 Piece Set Bonus": "+0.1 Stamina/s",
+          "3 Piece Set Bonus": "+0.5% Critical Chance"
+        }
+      },
+      {
+        name: "Hunter's Boots (Archer)",
+        level: 7,
+        description: "Designed for the hunt, it sharpens the archer's eye and guides their shots to the heart.",
+        set: "Hunter's Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+1",
+          Health: "+6",
+          "2 Piece Set Bonus": "+0.1 Stamina/s",
+          "3 Piece Set Bonus": "+0.5% Critical Chance"
+        }
+      },
+      {
+        name: "Herald's Helmet (Archer)",
+        level: 9,
+        description: "Inherited from the Fallen Herald, light and faithful, it follows the archer into every ambush.",
+        set: "Hunter Herald Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+0.15 Stamina/s",
+          "3 Piece Set Bonus": "+1% Critical Chance",
+          "4 Piece Set Bonus": "+0.5 Attack Damage"
+        }
+      },
+      {
+        name: "Herald's Tunic (Archer)",
+        level: 9,
+        description: "Inherited from the Fallen Herald, light and faithful, it follows the archer into every ambush.",
+        set: "Hunter Herald Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+4",
+          Health: "+15",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+0.15 Stamina/s",
+          "3 Piece Set Bonus": "+1% Critical Chance",
+          "4 Piece Set Bonus": "+0.5 Attack Damage"
+        }
+      },
+      {
+        name: "Herald's Leggings (Archer)",
+        level: 9,
+        description: "Inherited from the Fallen Herald, light and faithful, it follows the archer into every ambush.",
+        set: "Hunter Herald Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+3",
+          Health: "+11",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+0.15 Stamina/s",
+          "3 Piece Set Bonus": "+1% Critical Chance",
+          "4 Piece Set Bonus": "+0.5 Attack Damage"
+        }
+      },
+      {
+        name: "Herald's Boots (Archer)",
+        level: 9,
+        description: "Inherited from the Fallen Herald, light and faithful, it follows the archer into every ambush.",
+        set: "Hunter Herald Set",
+        stats: {
+          Class: "Archer",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+0.15 Stamina/s",
+          "3 Piece Set Bonus": "+1% Critical Chance",
+          "4 Piece Set Bonus": "+0.5 Attack Damage"
+        }
+      },
+      {
+        name: "Spectral Breastplate",
+        level: 3,
+        description: "Woven from a spectral veil, it channels the nascent magic of Aincrad's apprentices.",
+        set: "Spectral Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+1",
+          Health: "+9",
+          "2 Piece Set Bonus": "+0.5 Max Mana",
+          "3 Piece Set Bonus": "+0.5% Skill Critical Chance"
+        }
+      },
+      {
+        name: "Spectral Leggings",
+        level: 3,
+        description: "Woven from a spectral veil, it channels the nascent magic of Aincrad's apprentices.",
+        set: "Spectral Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+0.5 Max Mana",
+          "3 Piece Set Bonus": "+0.5% Skill Critical Chance"
+        }
+      },
+      {
+        name: "Spectral Boots",
+        level: 3,
+        description: "Woven from a spectral veil, it channels the nascent magic of Aincrad's apprentices.",
+        set: "Spectral Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+1",
+          Health: "+4",
+          "2 Piece Set Bonus": "+0.5 Max Mana",
+          "3 Piece Set Bonus": "+0.5% Skill Critical Chance"
+        }
+      },
+      /* The source lists two effects for the Sorcerer's 3-piece tier, so both live in the one
+         "3 Piece Set Bonus" value, comma-separated like the Beta data does. */
+      {
+        name: "Sorcerer's Robe (Mage)",
+        level: 7,
+        description: "Embroidered with enchanted threads, it amplifies the mage's spells like a sorcerer of old.",
+        set: "Sorcerer's Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+3",
+          Health: "+15",
+          "2 Piece Set Bonus": "+0.15 Mana/s",
+          "3 Piece Set Bonus": "+1 Bonus Healing, +2% Ability Haste"
+        }
+      },
+      {
+        name: "Sorcerer's Leggings (Mage)",
+        level: 7,
+        description: "Embroidered with enchanted threads, it amplifies the mage's spells like a sorcerer of old.",
+        set: "Sorcerer's Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+2",
+          Health: "+9",
+          "2 Piece Set Bonus": "+0.15 Mana/s",
+          "3 Piece Set Bonus": "+1 Bonus Healing, +2% Ability Haste"
+        }
+      },
+      {
+        name: "Sorcerer's Sandals (Mage)",
+        level: 7,
+        description: "Embroidered with enchanted threads, they amplify the mage's spells like those of a sorcerer of old.",
+        set: "Sorcerer's Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+1",
+          Health: "+6",
+          "2 Piece Set Bonus": "+0.15 Mana/s",
+          "3 Piece Set Bonus": "+1 Bonus Healing, +2% Ability Haste"
+        }
+      },
+      {
+        name: "Reaper's Helmet (Mage)",
+        level: 9,
+        description: "A replica of the Fallen Reaper, it amplifies spell power tenfold and reaps the enemy from afar.",
+        set: "Mystic Reaper Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+1.5 Max Mana",
+          "3 Piece Set Bonus": "+1.5% Skill Critical Chance",
+          "4 Piece Set Bonus": "+1% Skill Critical Damage"
+        }
+      },
+      {
+        name: "Reaper's Chestplate (Mage)",
+        level: 9,
+        description: "A replica of the Fallen Reaper, it amplifies spell power tenfold and reaps the enemy from afar.",
+        set: "Mystic Reaper Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+4",
+          Health: "+15",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+1.5 Max Mana",
+          "3 Piece Set Bonus": "+1.5% Skill Critical Chance",
+          "4 Piece Set Bonus": "+1% Skill Critical Damage"
+        }
+      },
+      {
+        name: "Reaper's Leggings (Mage)",
+        level: 9,
+        description: "A replica of the Fallen Reaper, it amplifies spell power tenfold and reaps the enemy from afar.",
+        set: "Mystic Reaper Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+3",
+          Health: "+11",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+1.5 Max Mana",
+          "3 Piece Set Bonus": "+1.5% Skill Critical Chance",
+          "4 Piece Set Bonus": "+1% Skill Critical Damage"
+        }
+      },
+      {
+        name: "Reaper's Boots (Mage)",
+        level: 9,
+        description: "A replica of the Fallen Reaper, it amplifies spell power tenfold and reaps the enemy from afar.",
+        set: "Mystic Reaper Set",
+        stats: {
+          Class: "Mage",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+1.5 Max Mana",
+          "3 Piece Set Bonus": "+1.5% Skill Critical Chance",
+          "4 Piece Set Bonus": "+1% Skill Critical Damage"
+        }
+      },
+      {
+        name: "Spectral Breastplate",
+        level: 3,
+        description: "Woven in the breath of spirits, it connects its wearer to the beasts and ancient woods of Aincrad.",
+        set: "Animist Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+2",
+          Health: "+9",
+          "2 Piece Set Bonus": "+0.05 Mana/s",
+          "3 Piece Set Bonus": "+0.5 Bonus Healing"
+        }
+      },
+      {
+        name: "Spectral Leggings",
+        level: 3,
+        description: "Woven from the breath of spirits, it connects its wearer to the beasts and ancient woods of Aincrad.",
+        set: "Animist Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+2",
+          Health: "+5",
+          "2 Piece Set Bonus": "+0.05 Mana/s",
+          "3 Piece Set Bonus": "+0.5 Bonus Healing"
+        }
+      },
+      {
+        name: "Spectral Boots",
+        level: 3,
+        description: "Woven in the breath of spirits, it connects its wearer to the beasts and ancient woods of Aincrad.",
+        set: "Animist Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+1",
+          Health: "+4",
+          "2 Piece Set Bonus": "+0.05 Mana/s",
+          "3 Piece Set Bonus": "+0.5 Bonus Healing"
+        }
+      },
+      {
+        name: "Magician's Robe (Shaman)",
+        level: 7,
+        description: "Imbued with ancient rituals, it nourishes the shaman's mana and prolongs their incantations.",
+        set: "Magician's Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+3",
+          Health: "+15",
+          "2 Piece Set Bonus": "+1 Max Mana",
+          "3 Piece Set Bonus": "+1% Skill Critical Chance"
+        }
+      },
+      {
+        name: "Magician's Leggings (Shaman)",
+        level: 7,
+        description: "Imbued with ancient rituals, it nourishes the shaman's mana and prolongs their incantations.",
+        set: "Magician's Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+2",
+          Health: "+9",
+          "2 Piece Set Bonus": "+1 Max Mana",
+          "3 Piece Set Bonus": "+1% Skill Critical Chance"
+        }
+      },
+      {
+        name: "Magician's Sandals (Shaman)",
+        level: 7,
+        description: "Imbued with ancient rituals, it nourishes the shaman's mana and prolongs their incantations.",
+        set: "Magician's Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+1",
+          Health: "+6",
+          "2 Piece Set Bonus": "+1 Max Mana",
+          "3 Piece Set Bonus": "+1% Skill Critical Chance"
+        }
+      },
+      {
+        name: "Reaper's Helmet (Shaman)",
+        level: 9,
+        description: "A replica of the Fallen Reaper, it floods the shaman with mana for both healing and striking.",
+        set: "Attentive Reaper Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+0.15 Mana/s",
+          "3 Piece Set Bonus": "+1.5 Bonus Healing",
+          "4 Piece Set Bonus": "+2% Ability Haste"
+        }
+      },
+      {
+        name: "Reaper's Chestplate (Shaman)",
+        level: 9,
+        description: "A replica of the Fallen Reaper, it floods the shaman with mana for both healing and striking.",
+        set: "Attentive Reaper Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+4",
+          Health: "+15",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+0.15 Mana/s",
+          "3 Piece Set Bonus": "+1.5 Bonus Healing",
+          "4 Piece Set Bonus": "+2% Ability Haste"
+        }
+      },
+      /* The source words the Shaman Reaper's Leggings differently from the other three pieces
+         ("it grants the shaman mana" instead of "it floods the shaman with mana"); the supplied
+         wording is kept as given. */
+      {
+        name: "Reaper's Leggings (Shaman)",
+        level: 9,
+        description: "A replica of the Fallen Reaper, it grants the shaman mana for both healing and striking.",
+        set: "Attentive Reaper Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+3",
+          Health: "+11",
+          "Rune Slots": "1",
+          "2 Piece Set Bonus": "+0.15 Mana/s",
+          "3 Piece Set Bonus": "+1.5 Bonus Healing",
+          "4 Piece Set Bonus": "+2% Ability Haste"
+        }
+      },
+      {
+        name: "Reaper's Boots (Shaman)",
+        level: 9,
+        description: "A replica of the Fallen Reaper, it floods the shaman with mana for both healing and striking.",
+        set: "Attentive Reaper Set",
+        stats: {
+          Class: "Shaman",
+          Defense: "+1",
+          Health: "+5",
+          "2 Piece Set Bonus": "+0.15 Mana/s",
+          "3 Piece Set Bonus": "+1.5 Bonus Healing",
+          "4 Piece Set Bonus": "+2% Ability Haste"
+        }
       }
     ],
     accessory: [
@@ -1577,7 +3325,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
       {
         name: "Kobold Key",
         description: "Can be used to access the Kobold Tower and the passage to Floor 2.",
-        craftingLocation: "Kobold Dungeon - Loot Info"
+        craftingLocation: "Key Blacksmith"
       }
     ],
     currency: []

@@ -1,5 +1,13 @@
 const PATCH_NOTES = [
   {
+    version: "Character Build Equipment Update - v1.8",
+    date: "2026-10-13",
+    title: "Character Build Equipment Update",
+    summary:
+      "Character Build\n• Added a large collection of new weapons and armor for all five classes.\n• Expanded the available equipment in Character Build and the Equipment Compendium.\n• Updated the formatting and icons used for item stats, buffs, and bonuses.\n• Improved the presentation of equipment effects and stat bonuses to make them easier to read.",
+    tags: ["Character Build", "Equipment", "Compendium", "UI"]
+  },
+  {
     version: "Character Build Skill Tree Update - v1.7",
     date: "2026-10-08",
     title: "Character Build Skill Tree Update",
@@ -100,6 +108,7 @@ function getPatchNoteId(entry) {
   const version = entry.version.match(/v\d+(?:\.\d+)?(?:\.\d+)?/i)?.[0].toLowerCase();
   return (
     {
+      "v1.8": "v180",
       "v1.7": "v170",
       "v1.6": "v160",
       "v1.5": "v150",
@@ -188,6 +197,7 @@ function buildPatchNoteCard(entry) {
       "Bug Fixes": "bugFixes",
       "Beta-Test Data": "betaTestData",
       "Character Build": "characterBuild",
+      Compendium: "compendium",
       "UI Overhaul": "uiOverhaul",
       Commands: "commands",
       Maps: "maps",

@@ -10,6 +10,11 @@
   let walkthroughOpenedDialog = false;
   const fallbackLabels = {
     "page.characterBuild.emptySlot": "Empty slot",
+    "page.characterBuild.statGroups.itemStats": "Item Stats",
+    "page.characterBuild.twoHanded": "Two-Handed",
+    "page.characterBuild.removeItem": "Remove",
+    "page.characterBuild.offhandLocked": "Two-handed weapon equipped",
+    "page.characterBuild.removeOffhandFirst": "Remove the equipped Offhand item first.",
     "page.characterBuild.allRarities": "All rarities",
     "page.characterBuild.select": "Select",
     "page.characterBuild.rune": "Rune",
@@ -66,14 +71,83 @@
   function localizeRarity(rarity) {
     return window.SAOContentTranslations?.translateKnownTerms?.(rarity, i18n?.getLanguage?.()) || rarity;
   }
-  function localizeItemEffect(effect) {
-    const match = String(effect || "").match(/^([^:]+):\s*(.*)$/);
-    if (!match) return String(effect || "");
-    const language = i18n?.getLanguage?.() || "en";
-    const translate = (value) => window.SAOContentTranslations?.translateKnownTerms?.(value, language) || value;
-    const statLabel = localizeStat(match[1]);
-    return `${statLabel === match[1] ? translate(match[1]) : statLabel}: ${translate(match[2])}`;
+  /* Equipment stat presentation. The datasets store one stat per key ("Health": "10") and each
+     "N Piece Set Bonus" tier as a comma-separated list ("+1.5% Skill Critical Hit Chance"). Both are
+     rendered as separate, individually labelled rows with an icon and a colour per stat type, the
+     same visual language the in-game character sheet uses. Stored values are printed unchanged, and
+     any effect the parser does not recognise is still shown verbatim. */
+  const setBonusKeyPattern = /^\d+\s*Piece Set Bonus$/i;
+
+  function localizeStatName(name) {
+    const translated = localizeStat(name);
+    if (translated !== name) return translated;
+    return window.SAOContentTranslations?.translateKnownTerms?.(name, i18n?.getLanguage?.() || "en") || name;
   }
+
+  function localizeStatValue(value) {
+    const text = String(value ?? "");
+    return window.SAOContentTranslations?.translateKnownTerms?.(text, i18n?.getLanguage?.() || "en") || text;
+  }
+
+  function localizeSetBonusTier(sourceKey) {
+    return window.SAOContentTranslations?.translateKnownTerms?.(sourceKey, i18n?.getLanguage?.() || "en") || sourceKey;
+  }
+
+  /* Splits "+1.5/s Health Regeneration" into its number and its stat name. The unit is kept so the
+     value the data carries is printed unchanged; text that does not start with a number keeps its
+     whole text as the name, which is what keeps unrecognized effects visible. */
+  function splitStatEffect(text) {
+    const source = String(text ?? "").trim();
+    const match = source.match(/^([+-]?\d+(?:\.\d+)?(?:\/s|%|s)?)\s+(.+)$/);
+    if (!match) return { value: "", name: source };
+    return { value: match[1], name: match[2].trim() };
+  }
+
+  function statEntryMarkup(name, value) {
+    const label = localizeStatName(name);
+    const category = window.CharacterBuildIcons.statCategory(name);
+    const localizedValue = value === "" || value === null || value === undefined ? "" : localizeStatValue(value);
+    const localizedTitle = localizedValue ? `${label}: ${localizedValue}` : label;
+    const valueMarkup = localizedValue ? `<span class="stat-entry-value">${escapeHtml(localizedValue)}</span>` : "";
+    return `<li class="stat-entry stat-entry--${category}" title="${escapeHtml(localizedTitle)}"><span class="stat-entry-icon" aria-hidden="true">${window.CharacterBuildIcons.stat(category)}</span><span class="stat-entry-name">${escapeHtml(label)}</span>${valueMarkup}</li>`;
+  }
+
+  /* One block for the item's own stats and one block per set-bonus tier. Item stats come from the
+     structured stats object; each tier keeps the piece count the data associates it with, so a bonus
+     is never shown as though it were already active. */
+  function renderItemStats(item) {
+    const groups = [];
+    const stats = item.stats && typeof item.stats === "object" ? item.stats : {};
+    const itemEntries = Object.entries(stats)
+      .filter(([name]) => name.toLowerCase() !== "class" && !setBonusKeyPattern.test(name))
+      .map(([name, value]) => statEntryMarkup(name, String(value)));
+    if (itemEntries.length) {
+      groups.push(
+        `<div class="stat-group" data-stat-group="item"><p class="stat-group-title">${escapeHtml(
+          t("page.characterBuild.statGroups.itemStats")
+        )}</p><ul class="stat-entries">${itemEntries.join("")}</ul></div>`
+      );
+    }
+    const bonuses = Array.isArray(item.setBonuses)
+      ? [...item.setBonuses].sort((first, second) => first.threshold - second.threshold)
+      : [];
+    bonuses.forEach((bonus) => {
+      const entries = (bonus.effects || [])
+        .map((effect) => splitStatEffect(effect.raw))
+        .filter((entry) => entry.name)
+        .map((entry) => statEntryMarkup(entry.name, entry.value));
+      if (!entries.length) return;
+      groups.push(
+        `<div class="stat-group stat-group--bonus" data-stat-group="set-bonus" data-set-threshold="${escapeHtml(
+          String(bonus.threshold)
+        )}"><p class="stat-group-title">${escapeHtml(
+          localizeSetBonusTier(bonus.sourceKey)
+        )}</p><ul class="stat-entries">${entries.join("")}</ul></div>`
+      );
+    });
+    return groups.length ? `<div class="item-effect">${groups.join("")}</div>` : "";
+  }
+
   function registerCharacterBuildTranslations() {
     Object.entries(data.CLASS_SKILLS).forEach(([classId, skills]) => {
       Object.entries(skills).forEach(([skillId, skill]) => {
@@ -154,6 +228,8 @@
     target.level = Math.min(data.MAX_CHARACTER_LEVEL || 25, Math.max(1, Number(saved.level) || 1));
     target.classId = data.classes.some((item) => item.id === saved.classId) ? saved.classId : target.classId;
     target.equipment = saved.equipment && typeof saved.equipment === "object" ? saved.equipment : {};
+    /* A build saved before the two-handed rule (or in another tab) must not come back invalid. */
+    enforceTwoHandedRule(target.equipment);
     target.runes = saved.runes && typeof saved.runes === "object" ? saved.runes : {};
     target.selectedSkills =
       saved.selectedSkills && typeof saved.selectedSkills === "object" ? saved.selectedSkills : {};
@@ -369,6 +445,19 @@
   function slotItems() {
     return adapter.getItemsForSlot(state.source, state.pickerSlot, state.classId);
   }
+  function isTwoHandedItem(item) {
+    return adapter.isTwoHanded(item);
+  }
+  /* A two-handed Main Hand weapon needs both hands, so the Offhand slot stays empty and locked
+     while one is equipped. */
+  function offhandIsLocked() {
+    return isTwoHandedItem(activeBuild()["main-weapon"]);
+  }
+  /* Keeps a build valid: a two-handed Main Hand weapon may never sit next to an Offhand item. The
+     Offhand item is dropped and nothing is equipped in its place. */
+  function enforceTwoHandedRule(target = activeBuild()) {
+    if (target?.offhand && isTwoHandedItem(target["main-weapon"])) delete target.offhand;
+  }
   function iconForType(type) {
     return data.slots.find((slot) => slot.type === type)?.icon || data.slots[0].icon;
   }
@@ -501,10 +590,24 @@
                 }).join("")
               : "";
           const slotLabel = localizeSlot(slot);
-          return `<div class="equipment-slot-wrap"><button class="slot-button${item ? " is-filled" : ""}${item && !available ? " is-unavailable" : ""}" type="button" data-slot-id="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectSlot", { slot: slotLabel }))}"${item && !available ? ` aria-disabled="true" title="${escapeHtml(t("page.characterBuild.unavailable"))}"` : ""}>
+          /* A two-handed Main Hand weapon locks the Offhand slot until the weapon is removed. */
+          const locked = slot.id === "offhand" && offhandIsLocked();
+          const stateText = locked
+            ? t("page.characterBuild.offhandLocked")
+            : item
+              ? available
+                ? t("page.characterBuild.equipped")
+                : t("page.characterBuild.unavailable")
+              : t("page.characterBuild.emptySlot");
+          const disabledReason = locked
+            ? t("page.characterBuild.offhandLocked")
+            : item && !available
+              ? t("page.characterBuild.unavailable")
+              : "";
+          return `<div class="equipment-slot-wrap"><button class="slot-button${item ? " is-filled" : ""}${item && !available ? " is-unavailable" : ""}${locked ? " is-locked" : ""}" type="button" data-slot-id="${slot.id}" aria-label="${escapeHtml(t("page.characterBuild.selectSlot", { slot: slotLabel }))}"${disabledReason ? ` aria-disabled="true" title="${escapeHtml(disabledReason)}"` : ""}>
           <span class="slot-icon" aria-hidden="true">${slot.icon}</span>
           <span class="slot-name">${escapeHtml(slotLabel)}</span>
-          ${item ? `<span class="slot-item">${escapeHtml(itemLabel)}</span>${rarity}<span class="slot-empty">${available ? t("page.characterBuild.equipped") : t("page.characterBuild.unavailable")}</span>` : `<span class="slot-empty">${t("page.characterBuild.emptySlot")}</span>`}
+          ${item ? `<span class="slot-item">${escapeHtml(itemLabel)}</span>${rarity}` : ""}<span class="slot-empty">${stateText}</span>
         </button>${runeControls ? `<div class="rune-controls" aria-label="${escapeHtml(t("page.characterBuild.runeSlots", { slot: slotLabel }))}">${runeControls}</div>` : ""}</div>`;
         })
         .join("");
@@ -913,9 +1016,7 @@
     $("itemList").innerHTML = items.length
       ? items
           .map((item) => {
-            const effects = item.effects.length
-              ? `<p class="item-effect">${escapeHtml(item.effects.map(localizeItemEffect).join(" / "))}</p>`
-              : "";
+            const effects = renderItemStats(item);
             const level =
               item.levelRequirement === null
                 ? ""
@@ -924,13 +1025,18 @@
             const set = item.set
               ? `<span>${escapeHtml(t("page.ecompendium.labels.set"))}: ${escapeHtml(window.SAOContentTranslations?.translateKnownTerms?.(item.set, i18n?.getLanguage?.()) || item.set)}</span>`
               : "";
-            return `<article class="item-card"><div class="item-icon" aria-hidden="true">${item.type ? iconForType(item.type) : window.CharacterBuildIcons.markup("rune")}</div><div><h3>${escapeHtml(displayText(item, "name") || item.name)}</h3><div class="item-meta"><span>${state.pickerMode === "rune" ? t("page.characterBuild.rune") : escapeHtml(item.type)}</span>${item.rarity ? `<span class="${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>` : ""}${level}${classes}${set}</div>${effects}${item.description ? `<p class="item-description">${escapeHtml(displayText(item, "description") || item.description)}</p>` : ""}</div><button class="equip-button" type="button" data-${state.pickerMode === "rune" ? "rune" : "item"}-id="${item.id}">${t("page.characterBuild.select")}</button></article>`;
+            const twoHanded = item.twoHanded
+              ? `<span class="item-badge">${escapeHtml(t("page.characterBuild.twoHanded"))}</span>`
+              : "";
+            return `<article class="item-card"><div class="item-icon" aria-hidden="true">${item.type ? iconForType(item.type) : window.CharacterBuildIcons.markup("rune")}</div><div><h3>${escapeHtml(displayText(item, "name") || item.name)}</h3><div class="item-meta"><span>${state.pickerMode === "rune" ? t("page.characterBuild.rune") : escapeHtml(item.type)}</span>${item.rarity ? `<span class="${rarityClass(item.rarity)}">${escapeHtml(localizeRarity(item.rarity))}</span>` : ""}${level}${classes}${set}${twoHanded}</div>${effects}${item.description ? `<p class="item-description">${escapeHtml(displayText(item, "description") || item.description)}</p>` : ""}</div><button class="equip-button" type="button" data-${state.pickerMode === "rune" ? "rune" : "item"}-id="${item.id}">${t("page.characterBuild.select")}</button></article>`;
           })
           .join("")
       : `<div class="empty-state">${escapeHtml(t("page.characterBuild.noMatchingItems", { slot: slot?.name || "rune", level: state.level }))}</div>`;
   }
 
   function openPicker(slotId) {
+    /* The Offhand slot is locked while a two-handed weapon occupies the Main Hand. */
+    if (slotId === "offhand" && offhandIsLocked()) return;
     state.pickerMode = "equipment";
     state.pickerSlot = slotId;
     state.pickerArmorSlot = null;
@@ -941,6 +1047,7 @@
     $("dialogTitle").textContent = t("page.characterBuild.selectSlot", { slot: localizeSlot(slot) });
     $("itemSearch").value = "";
     $("pickerNotice").textContent = "";
+    updateRemoveButton();
     setFilterOptions();
     renderItems();
     $("equipmentDialog").showModal();
@@ -962,10 +1069,30 @@
     });
     $("itemSearch").value = "";
     $("pickerNotice").textContent = "";
+    updateRemoveButton();
     setFilterOptions();
     renderItems();
     $("equipmentDialog").showModal();
     requestAnimationFrame(() => $("itemSearch").focus());
+  }
+
+  /* The Remove action empties the slot the dialog was opened for, so the Offhand item a two-handed
+     weapon requires removing can always be taken off. */
+  function updateRemoveButton() {
+    const button = $("removeItem");
+    if (!button) return;
+    const slotId = state.pickerMode === "equipment" ? state.pickerSlot : null;
+    button.hidden = !(slotId && activeBuild()[slotId]);
+  }
+
+  function removeEquippedItem() {
+    const slotId = state.pickerMode === "equipment" ? state.pickerSlot : null;
+    if (!slotId || !activeBuild()[slotId]) return;
+    delete activeBuild()[slotId];
+    saveState();
+    renderSlots();
+    renderStats();
+    $("equipmentDialog").close();
   }
 
   function equipItem(itemId) {
@@ -973,8 +1100,26 @@
     if (!item || !state.pickerSlot || !itemIsClassCompatible(item, state.classId)) return;
     const weaponSlot = item.type === "Main Weapon" || item.type === "Offhand";
     const otherSlot = state.pickerSlot === "main-weapon" ? "offhand" : "main-weapon";
-    if (weaponSlot && activeBuild()[otherSlot]?.equipmentKey === item.equipmentKey) {
+    /* Only the very same entry is refused in both weapon slots. Two distinct items may share a
+       name - a main-hand dagger and the off-hand dagger - so the entry id decides, with the
+       name-derived key kept as the fallback for stored items that carry no id. */
+    const otherItem = activeBuild()[otherSlot];
+    const sameEntry =
+      Boolean(otherItem) &&
+      (otherItem.id && item.id ? otherItem.id === item.id : otherItem.equipmentKey === item.equipmentKey);
+    if (weaponSlot && sameEntry) {
       $("pickerNotice").textContent = t("page.characterBuild.weaponAlreadyEquipped");
+      return;
+    }
+    /* A two-handed Main Hand weapon needs both hands: an equipped Offhand item must be removed
+       first. Switching back to a one-handed weapon unlocks the Offhand slot again without
+       equipping anything automatically. */
+    if (state.pickerSlot === "main-weapon" && isTwoHandedItem(item) && activeBuild().offhand) {
+      $("pickerNotice").textContent = t("page.characterBuild.removeOffhandFirst");
+      return;
+    }
+    if (state.pickerSlot === "offhand" && offhandIsLocked()) {
+      $("pickerNotice").textContent = t("page.characterBuild.offhandLocked");
       return;
     }
     activeBuild()[state.pickerSlot] = item;
@@ -1212,6 +1357,7 @@
     });
     $("resetBuild").addEventListener("click", resetBuild);
     $("closeDialog").addEventListener("click", () => $("equipmentDialog").close());
+    $("removeItem").addEventListener("click", removeEquippedItem);
     $("equipmentDialog").addEventListener("click", (event) => {
       if (event.target === $("equipmentDialog")) $("equipmentDialog").close();
     });

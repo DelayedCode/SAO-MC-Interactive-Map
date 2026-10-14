@@ -257,12 +257,19 @@ async function verifyOccultSetDetails(page, language, viewportName) {
     const amulet = items.find((item) => item.name === "Occult Amulet" && item.set === "Shadow Neophyte F1");
     const ring = items.find((item) => item.name === "Occult Ring" && item.set === "Shadow Neophyte F1");
     if (!amulet || !ring) return null;
-    const localizeEffect = (effect) => {
-      const match = String(effect).match(/^([^:]+):\s*(.*)$/);
-      if (!match) return effect;
-      return `${window.SAOContentTranslations.translateKnownTerms(match[1], language)}: ${window.SAOContentTranslations.translateKnownTerms(match[2], language)}`;
-    };
-    const tierDetails = amulet.effects.filter((effect) => /^[2-7] Piece Set Bonus:/.test(effect)).map(localizeEffect);
+    /* Each set-bonus tier is its own block in the item card. The expectation is built from the
+       structured setBonuses data (piece count + raw effect values) so the test proves every tier
+       reaches the card together with the piece count it belongs to. */
+    const tierGroups = amulet.setBonuses
+      .filter((bonus) => bonus.threshold >= 2)
+      .sort((first, second) => first.threshold - second.threshold)
+      .map((bonus) => ({
+        threshold: bonus.threshold,
+        label: window.SAOContentTranslations.translateKnownTerms(bonus.sourceKey, language),
+        values: bonus.effects
+          .map((effect) => (String(effect.raw).match(/^[+-]?\d+(?:\.\d+)?(?:\/s|%)?/) || [null])[0])
+          .filter(Boolean)
+      }));
     /* The sheet also carries the live class/level gains, so compare against the real calculator
        with the same inputs the panel uses instead of a set-bonus-only figure. */
     const result = window.CharacterBuildCalculator.calculateBuildStats({
@@ -274,13 +281,13 @@ async function verifyOccultSetDetails(page, language, viewportName) {
     return {
       amuletId: amulet.id,
       ringId: ring.id,
-      tierDetails,
+      tierGroups,
       healthRegenerationLabel: window.SAOI18n.t("page.characterBuild.statNames.healthRegeneration"),
       healthRegenerationValue: window.CharacterBuildCalculator.formatValue(result["Health Regeneration"])
     };
   }, language);
   assert.ok(occult, `${language}/${viewportName}: Shadow Neophyte Amulet and Ring are available`);
-  assert.equal(occult.tierDetails.length, 6, `${language}/${viewportName}: all six Occult tiers reach item details`);
+  assert.equal(occult.tierGroups.length, 6, `${language}/${viewportName}: all six Occult tiers reach item details`);
 
   for (const [slot, itemName, itemId] of [
     ["amulet", "Occult Amulet", occult.amuletId],
@@ -290,10 +297,31 @@ async function verifyOccultSetDetails(page, language, viewportName) {
     await page.locator("#itemSearch").fill(itemName);
     const card = page.locator(`#itemList .item-card:has([data-item-id="${itemId}"])`);
     await card.waitFor();
-    const effectText = await card.locator(".item-effect").textContent();
-    occult.tierDetails.forEach((effect) =>
-      assert(effectText.includes(effect), `${language}/${viewportName}: item detail renders ${effect}`)
+    const bonusGroups = card.locator(".stat-group--bonus");
+    assert.equal(
+      await bonusGroups.count(),
+      occult.tierGroups.length,
+      `${language}/${viewportName}: each set-bonus tier gets its own block`
     );
+    for (const tier of occult.tierGroups) {
+      const group = card.locator(`.stat-group[data-set-threshold="${tier.threshold}"]`);
+      assert.equal(
+        await group.count(),
+        1,
+        `${language}/${viewportName}: the ${tier.threshold}-piece tier keeps its piece count`
+      );
+      const groupText = await group.textContent();
+      assert(
+        groupText.includes(tier.label),
+        `${language}/${viewportName}: the ${tier.threshold}-piece tier shows its localized label`
+      );
+      tier.values.forEach((value) =>
+        assert(
+          groupText.includes(value),
+          `${language}/${viewportName}: the ${tier.threshold}-piece tier keeps the value ${value}`
+        )
+      );
+    }
     await card.locator(`[data-item-id="${itemId}"]`).click();
     await page.waitForFunction(() => !document.getElementById("equipmentDialog").open);
   }

@@ -206,7 +206,13 @@
     const sets = new Map();
     equippedItems.forEach((item) => {
       if (!item?.set || !Array.isArray(item.setBonuses) || !item.setBonuses.length) return;
-      const summary = sets.get(item.set) || { count: 0, thresholds: new Map() };
+      /* The adapter's canonical set label is what groups the pieces: the source spells one of the
+         supplied sets two ways, and the supplied label alone would split it into two groups and
+         hold back its highest tier. An item without the label (a build saved before it existed)
+         keeps grouping by its own set name, which is the same string for every set that has no
+         variant. */
+      const setKey = item.setKey || item.set;
+      const summary = sets.get(setKey) || { count: 0, thresholds: new Map() };
       summary.count += 1;
       item.setBonuses.forEach((bonus) => {
         const effects = summary.thresholds.get(bonus.threshold) || new Map();
@@ -217,7 +223,7 @@
         });
         summary.thresholds.set(bonus.threshold, effects);
       });
-      sets.set(item.set, summary);
+      sets.set(setKey, summary);
     });
 
     sets.forEach((summary) => {

@@ -42,7 +42,7 @@ const EXPECTED_OTHER_ITEMS = [
   { bucket: "dungeon", name: "Forest Key", location: "F1 - Geldorack Dungeon Guard - Starting Town", cols: 10, resources: [["Sylvan Bark", 8], ["Wood Heart", 4], ["Magic Mycelium", 1]], stats: {} },
   { bucket: "dungeon", name: "Key of the Fallen", location: "F1 - Fallen Labyrinth Dungeon Guard - Tolbana", cols: 20, resources: [["Cursed Fabric", 8], ["Leaf Fragment", 8]], stats: {} },
   { bucket: "dungeon", name: "Key of Xal'Zirith", location: "F1 - Xal'Zirith Dungeon Guard - Candelia", cols: 15, resources: [["Spider Cloth", 16], ["Spider Thread", 16]], stats: {} },
-  { bucket: "dungeon", name: "Kobold Key", location: "Kobold Dungeon - Loot Info", cols: null, resources: [], stats: {} },
+  { bucket: "dungeon", name: "Kobold Key", location: "Key Blacksmith", cols: null, resources: [], stats: {} },
   { bucket: "food", name: "Boar Meat", level: 1, cols: 1, resources: [], stats: { "Effect: Level Required To Use Food": "1", "Effect: Nourriture": "5 Nourriture", "Effect: Recharge Nourriture": "1s" } },
   { bucket: "consumable", name: "Teleportation Crystal", location: "Starting Merchant", cols: null, resources: [], stats: {} },
   { bucket: "consumable", name: "Health Potion I", level: 1, cols: 5, resources: [], stats: { "Health Restored": "10", Cooldown: "15s", "Effect: Healing": "HEALING" } },

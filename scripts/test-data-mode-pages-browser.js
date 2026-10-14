@@ -166,9 +166,9 @@ async function run() {
       "the Current map dataset keeps only the Main Questline and the Current waypoints"
     );
 
-    /* Categories with no Current Data waypoints stay empty; the Main Quest waypoints and the
-       Current Data copy of the mob areas still render. The Biome category now ships Current Data
-       waypoints, so it is checked separately. */
+    /* Every category Current Data supplies renders: the Main Quest waypoints, the Current Data
+       side quests and the Current Data copy of the mob areas. The Biome category now ships
+       Current Data waypoints, so it is checked separately. */
     for (const category of ["mobAreas", "sideQuests", "mainQuests"]) {
       await page.locator(`[data-category='${category}']`).click();
       await page.waitForFunction((name) => window.__aincradMapRuntime.getCategoryState(name), category);
@@ -180,11 +180,18 @@ async function run() {
       Array.from(document.querySelectorAll("#markers .marker")).map((element) => element.dataset.markerId)
     );
     assert.ok(
-      renderedIds.every((id) => /mob-area:|(^|cluster:)mq-/.test(id)),
-      `Current renders only Main Quest waypoints and the copied mob areas (got ${renderedIds.slice(0, 6).join(", ")})`
+      renderedIds.every((id) => /mob-area:|(^|cluster:)(mq|sq)-/.test(id)),
+      `Current renders only Main Quest, side quest and mob-area waypoints (got ${renderedIds.slice(0, 6).join(", ")})`
     );
-    /* Switching the mob areas back off leaves the Main Questline alone on the map, exactly as it
-       rendered before Current Data gained its mob-area copy. */
+    /* The side quest markers on screen are the numbered Current Data ones; no Beta-Test side
+       quest marker (whose ids are `sq-<npc>`) may leak into Current Data. */
+    const renderedSideQuestIds = renderedIds.filter((id) => id.includes("sq-"));
+    assert.ok(renderedSideQuestIds.length > 0, "Current renders the Current Data side quest markers");
+    assert.ok(
+      renderedSideQuestIds.every((id) => /(^|cluster:)sq-\d+$/.test(id)),
+      `Current renders only the numbered Current Data side quests (got ${renderedSideQuestIds.join(", ")})`
+    );
+    /* Switching the mob areas back off leaves the quest waypoints alone on the map. */
     await page.locator("[data-category='mobAreas']").click();
     await page.waitForFunction(() => !window.__aincradMapRuntime.getCategoryState("mobAreas"));
     await page.waitForFunction(() => !document.querySelector("#markers .marker.mob-area-marker"));
@@ -192,8 +199,8 @@ async function run() {
       Array.from(document.querySelectorAll("#markers .marker")).map((element) => element.dataset.markerId)
     );
     assert.ok(
-      questOnlyIds.length > 0 && questOnlyIds.every((id) => /(^|cluster:)mq-/.test(id)),
-      `Current renders the Main Quest waypoints themselves (got ${questOnlyIds.slice(0, 6).join(", ")})`
+      questOnlyIds.length > 0 && questOnlyIds.every((id) => /(^|cluster:)(mq|sq)-/.test(id)),
+      `Current renders the Main Quest and side quest waypoints themselves (got ${questOnlyIds.slice(0, 6).join(", ")})`
     );
     assert.ok(
       renderedIds.some((id) => id.includes("mob-area:")),
@@ -202,10 +209,6 @@ async function run() {
     assert.ok(
       !renderedIds.some((id) => id.includes("wild-boar-meadow")),
       "Current never renders Wild Boar Meadow"
-    );
-    assert.ok(
-      !renderedIds.some((id) => id.includes("side-quest")),
-      "Current still renders no side quests"
     );
 
     /* The Current accessory waypoints sit behind three category buttons that already belong to the
@@ -260,9 +263,47 @@ async function run() {
       keyBlacksmith: [
         "F1 - Geldorack Dungeon Guard - Starting Town",
         "F1 - Fallen Labyrinth Dungeon Guard - Tolbana",
-        "F1 - Xal'Zirith Dungeon Guard - Candelia"
+        "F1 - Xal'Zirith Dungeon Guard - Candelia",
+        "Key Blacksmith"
       ],
-      dungeons: ["Kobold Dungeon - Loot Info"]
+      dungeons: [
+        "Xal'zirith Dungeon",
+        "Kobold Tower",
+        "Fallen Labyrinth Dungeon",
+        "Nasgul Sub-Dungeon",
+        "Geldorak Mine Dungeon"
+      ],
+      /* The Boss Spawn and Farming Spot categories ship the Current Data copies of the Beta floor 1
+         markers, with the three supplied boss corrections applied (Corrupted Pumba added, Albal
+         moved, Kazor dropped). The floor 2 and floor 3 copies are checked by
+         scripts/test-current-waypoints.js, which reads every floor. */
+      bossSpawns: [
+        "Corrupted Pumba",
+        "Corrupted Pumba",
+        "Corrupted Pumba",
+        "Corrupted Pumba",
+        "Corrupted Pumba",
+        "Colossal Guardian",
+        "Colossal Guardian",
+        "Colossal Guardian",
+        "Colossal Guardian",
+        "Gorbel",
+        "Albal",
+        "Albal",
+        "Albal",
+        "Nasgul",
+        "Narax Cursed Skeleton",
+        "Ice Bear",
+        "Illfang, Lord Kobold",
+        "Pricilia",
+        "Yula",
+        "Kamilia",
+        "Jira",
+        "Vyrmos",
+        "Tornak",
+        "Nymbrea"
+      ],
+      farmingSpots: ["West Mines", "East Mines", "Oak Forest", "Birch Forest", "Farm"]
     };
     for (const [category, titles] of Object.entries(currentWaypointCategories)) {
       const button = page.locator(`.sidebar-list-button[data-category='${category}']`);
@@ -315,6 +356,47 @@ async function run() {
         )
       );
     }
+
+    /* The corrected Kobold key blacksmith renders as a Key Blacksmith on the map and in the info
+       panel: the marker sits in the Key Blacksmith category and its panel names the marker, its
+       marker type and its description as a Key Blacksmith, with no dungeon loot information left. */
+    await page.locator("#clearFilters").click();
+    await page.locator(".sidebar-list-button[data-category='keyBlacksmith']").click();
+    await page.waitForFunction(() => window.__aincradMapRuntime.getCategoryState("keyBlacksmith"));
+    await page.waitForFunction(
+      () => Boolean(document.querySelector('#markers .marker[data-marker-id="current-key-blacksmith-kobold"]')),
+      null,
+      { timeout: 10000 }
+    );
+    await page.evaluate(() => {
+      document
+        .querySelector('#markers .marker[data-marker-id="current-key-blacksmith-kobold"]')
+        .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await page.waitForFunction(() => document.getElementById("title")?.textContent.trim() === "Key Blacksmith", null, {
+      timeout: 10000
+    });
+    const koboldKeyBlacksmithInfo = await page.evaluate(() => ({
+      title: document.getElementById("title").textContent.trim(),
+      content: document.getElementById("content").textContent
+    }));
+    assert.equal(
+      koboldKeyBlacksmithInfo.title,
+      "Key Blacksmith",
+      "the info panel names the corrected marker Key Blacksmith"
+    );
+    assert.match(koboldKeyBlacksmithInfo.content, /NPC/, "the info panel shows the Key Blacksmith marker type");
+    assert.match(koboldKeyBlacksmithInfo.content, /Key Blacksmith/, "the info panel describes the marker as a Key Blacksmith");
+    assert.doesNotMatch(
+      koboldKeyBlacksmithInfo.content,
+      /Loot Info|Dungeon/i,
+      "the info panel shows no dungeon loot information for the corrected marker"
+    );
+    assert.match(
+      koboldKeyBlacksmithInfo.content,
+      /X:\s*3396\s*Z:\s*1081/,
+      "the info panel keeps the supplied coordinates"
+    );
 
     /* The Biome category now ships a Current Data copy of the Beta biome waypoints, so its button
        renders those markers instead of staying empty. */
@@ -400,10 +482,52 @@ async function run() {
 
     await page.goto(`${server.url}${QUESTS}?floor=floor1`, { waitUntil: "load", timeout: 60000 });
     await page.waitForFunction(() => document.querySelectorAll("#questTableRoot tbody tr").length > 0);
+    await page.locator("button[data-quest-type='main']").click();
+    await page.waitForFunction(() => document.querySelectorAll("#questTableRoot tbody tr").length > 0);
     assert.ok((await page.locator("#questTableRoot tbody tr").count()) > 0, "Current Quests show the Main Questline");
     await page.locator("button[data-quest-type='side']").click();
-    await page.waitForFunction(() => document.querySelectorAll("#questTableRoot tbody tr").length === 0);
-    assert.equal(await page.locator("#questTableRoot tbody tr").count(), 0, "Current Side Quests are empty");
+    await page.waitForFunction(() => document.querySelectorAll("#questTableRoot tbody tr").length === 8);
+    assert.equal(
+      await page.locator("#questTableRoot tbody tr").count(),
+      8,
+      "Current Side Quests show the eight Current Data side quests"
+    );
+    assert.equal(
+      await page.locator("#questTableRoot tbody tr td.questName", { hasText: "Too Many Boars" }).count(),
+      1,
+      "the Current side quests carry the supplied quest titles"
+    );
+    assert.equal(
+      await page.locator("#questTableRoot tbody tr td.questName", { hasText: "Bad Idea" }).count(),
+      0,
+      "no Beta-Test side quest leaks into Current Data"
+    );
+    /* One full row, so the supplied objectives, NPC coordinates and rewards are pinned as the
+       page actually renders them. */
+    const renderedSideQuestRow = await page.evaluate(() => {
+      const row = Array.from(document.querySelectorAll("#questTableRoot tbody tr")).find((candidate) =>
+        (candidate.querySelector("td.questName")?.textContent || "").includes("Too Many Boars")
+      );
+      if (!row) return null;
+      return {
+        npcName: row.querySelector("td.npcName")?.textContent,
+        coordinates: row.querySelector("td.coordinates")?.textContent,
+        requirements: row.querySelector("td.requirements")?.textContent,
+        xpReward: row.querySelector("td.xpReward")?.textContent,
+        colReward: row.querySelector("td.colReward")?.textContent
+      };
+    });
+    assert.deepEqual(
+      renderedSideQuestRow,
+      {
+        npcName: "Guard Tomas",
+        coordinates: "1811 / 3748",
+        requirements: "Kill enraged boars (0/10)\nReturn to Guard Tomas (1811, 3748)",
+        xpReward: "300",
+        colReward: "80"
+      },
+      "the Current side quest row shows the supplied objectives, coordinates and rewards"
+    );
 
     await page.goto(`${server.url}${MISCINFO}`, { waitUntil: "load", timeout: 60000 });
     await page.waitForSelector("#progressionTableRoot .empty-state", { timeout: 10000 });

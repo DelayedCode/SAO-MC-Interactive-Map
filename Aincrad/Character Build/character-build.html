@@ -218,15 +218,20 @@
             <p class="section-kicker" data-i18n="page.characterBuild.equipmentSelector">EQUIPMENT SELECTOR</p>
             <h2 id="dialogTitle" data-i18n="page.characterBuild.selectEquipment">Select equipment</h2>
           </div>
-          <button
-            class="icon-button"
-            id="closeDialog"
-            type="button"
-            data-i18n-aria-label="page.characterBuild.closeEquipmentSelector"
-            aria-label="Close equipment selector"
-          >
-            <span class="close-icon" data-cb-icon="close" aria-hidden="true"></span>
-          </button>
+          <div class="dialog-actions">
+            <button class="remove-button" id="removeItem" type="button" data-i18n="page.characterBuild.removeItem" hidden>
+              Remove
+            </button>
+            <button
+              class="icon-button"
+              id="closeDialog"
+              type="button"
+              data-i18n-aria-label="page.characterBuild.closeEquipmentSelector"
+              aria-label="Close equipment selector"
+            >
+              <span class="close-icon" data-cb-icon="close" aria-hidden="true"></span>
+            </button>
+          </div>
         </div>
         <div class="dialog-controls">
           <label class="search-field"

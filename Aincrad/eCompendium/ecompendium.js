@@ -243,6 +243,12 @@ function createEntryCard(entry) {
       "</strong></p>";
   }
 
+  /* Two-handed indicator. The stat list below still carries the raw "Two-Handed" row, so the flag
+     stays visible and localized either way. */
+  if (String((entry.stats || {})["Two-Handed"] || "").toLowerCase() === "yes") {
+    html += "<span class='ecompendium-badge'>" + escapeHtml(localizeRuntimeText("Two-Handed")) + "</span>";
+  }
+
   html += "</div>";
 
   if (entry.description) {

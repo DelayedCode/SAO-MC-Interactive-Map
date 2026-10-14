@@ -1,11 +1,12 @@
-// CURRENT DATA ACCESSORY WAYPOINTS
+// CURRENT DATA WAYPOINTS AND SIDE QUEST MARKERS
 //
 // These waypoints are Current Data only. Every marker carries `dataset: "current"`, which
 // shared/sao-datasets.js uses to keep them out of Beta mode; the Main Questline keeps using its own
 // `mainQuests` category for the same purpose. The regular accessory blacksmiths reuse the map's
 // existing Accessories Blacksmith category, the Occult Merchant locations reuse the existing Occult
 // Merchant category, and the secret accessory locations have their own Secret Accessory Blacksmith
-// category so they are never mixed into the regular Accessories Blacksmith button.
+// category so they are never mixed into the regular Accessories Blacksmith button. The Current Data
+// side quests reuse the map's existing Side Quest category, exactly like the Beta-Test side quests.
 //
 // Coordinates are exactly the ones supplied for Current Data; nothing here is guessed.
 
@@ -170,6 +171,7 @@ Object.assign(DATA, {
     dataset: "current",
     floor: "floor1",
     coords: { x: 3650, z: 1331 },
+    underground: true,
     drops: ["N/A"],
     description: "Secret Accessory Blacksmith"
   },
@@ -180,6 +182,7 @@ Object.assign(DATA, {
     dataset: "current",
     floor: "floor1",
     coords: { x: 1316, z: 2096 },
+    underground: true,
     drops: ["N/A"],
     description: "Secret Accessory Blacksmith"
   },
@@ -446,15 +449,20 @@ Object.assign(DATA, {
     drops: ["N/A"],
     description: "Key Blacksmith"
   },
-  "current-kobold-dungeon-loot-info": {
-    title: "Kobold Dungeon - Loot Info",
-    type: "Dungeon",
-    category: "dungeons",
+  /* The Kobold key blacksmith. It was supplied as "Kobold Dungeon - Loot Info" in the Dungeon
+     category, but it is a Key Blacksmith: it carries the key blacksmith marker type, category and
+     description the three Dungeon Guard key blacksmiths above use, so the map renders it with the
+     Key Blacksmith icon, colour and label. Only the name and type were corrected - the supplied
+     coordinates (3396, 1081) and the floor are unchanged. */
+  "current-key-blacksmith-kobold": {
+    title: "Key Blacksmith",
+    type: "NPC",
+    category: "keyBlacksmith",
     dataset: "current",
     floor: "floor1",
     coords: { x: 3396, z: 1081 },
     drops: ["N/A"],
-    description: "Dungeon"
+    description: "Key Blacksmith"
   },
 
   /* Current Data biome waypoints.
@@ -584,8 +592,8 @@ Object.assign(DATA, {
     drops: ["N/A"],
     description: "The stronghold of the renowned and feared OG Guild. A strategic location reserved for elite veterans. The walls exude glory and past victories."
   },
-  "current-castlemist": {
-    title: "Castlemist",
+  "current-castlebrume": {
+    title: "Castlebrume",
     type: "Biome",
     category: "biomes",
     dataset: "current",
@@ -1181,6 +1189,105 @@ Object.assign(DATA, {
   }
 });
 
+// CURRENT DATA SIDE QUEST MARKERS
+//
+// The eight side quests Aincrad/Quests/quests_current.js lists keep the map's existing side-quest
+// marker shape (`sq-` id, `sideQuests` category, the NPC's own location) and carry
+// `dataset: "current"` like every other Current Data waypoint, so Beta-Test Data never sees them.
+// Coordinates are the NPC coordinates the quest data supplies, unchanged; no calibration or
+// transform is applied here.
+
+Object.assign(DATA, {
+  "sq-1": {
+    title: "Too Many Boars",
+    type: "Quest",
+    category: "sideQuests",
+    dataset: "current",
+    floor: "floor1",
+    questNumber: 1,
+    coords: { x: 1811, z: 3748 },
+    drops: ["N/A"],
+    description: "Return to Guard Tomas (1811, 3748)"
+  },
+  "sq-2": {
+    title: "Webs to Burn",
+    type: "Quest",
+    category: "sideQuests",
+    dataset: "current",
+    floor: "floor1",
+    questNumber: 2,
+    coords: { x: 1440, z: 3449 },
+    drops: ["N/A"],
+    description: "Return to Scout Raphael (1440, 3449)"
+  },
+  "sq-3": {
+    title: "The Citadel's Cold",
+    type: "Quest",
+    category: "sideQuests",
+    dataset: "current",
+    floor: "floor1",
+    questNumber: 3,
+    coords: { x: 4075, z: 1990 },
+    drops: ["N/A"],
+    description: "Return to Sentinel Kael (4075, 1990)"
+  },
+  "sq-4": {
+    title: "Frost Swarm",
+    type: "Quest",
+    category: "sideQuests",
+    dataset: "current",
+    floor: "floor1",
+    questNumber: 4,
+    coords: { x: 4074, z: 1994 },
+    drops: ["N/A"],
+    description: "Return to Shepherd Ivo (4074, 1994)"
+  },
+  "sq-5": {
+    title: "Wolves of the Valley",
+    type: "Quest",
+    category: "sideQuests",
+    dataset: "current",
+    floor: "floor1",
+    questNumber: 5,
+    coords: { x: 2405, z: 4069 },
+    drops: ["N/A"],
+    description: "Return to Shepherd Ivo (2405, 4069)"
+  },
+  "sq-6": {
+    title: "Clearing the Marsh",
+    type: "Quest",
+    category: "sideQuests",
+    dataset: "current",
+    floor: "floor1",
+    questNumber: 6,
+    coords: { x: 1542, z: 3460 },
+    drops: ["N/A"],
+    description: "Return to Herbalist Nessa (1542, 3460)"
+  },
+  "sq-7": {
+    title: "Bone and Dust",
+    type: "Quest",
+    category: "sideQuests",
+    dataset: "current",
+    floor: "floor1",
+    questNumber: 7,
+    coords: { x: 2765, z: 4396 },
+    drops: ["N/A"],
+    description: "Return to Archivist Orin (2765, 4396)"
+  },
+  "sq-8": {
+    title: "The Road Is No Longer Safe",
+    type: "Quest",
+    category: "sideQuests",
+    dataset: "current",
+    floor: "floor1",
+    questNumber: 8,
+    coords: { x: 3619, z: 3443 },
+    drops: ["N/A"],
+    description: "Return to Carter Milo (3619, 3443)"
+  }
+});
+
 // CURRENT DATA MOB AREAS
 //
 // The Current Data copy of the mob areas. Every entry below is the Beta-Test Data entry
@@ -1190,6 +1297,548 @@ Object.assign(DATA, {
 // untouched original dataset.
 //
 // "Wild Boar Meadow" is deliberately not part of Current Data.
+
+// CURRENT DATA BOSS SPAWNS, DUNGEONS AND FARMING SPOTS
+//
+// Every Boss Spawn, Dungeon and Farming Spot the Beta-Test floor files carry is copied here as
+// its own Current Data marker: the same title, type, category, floor, coordinates, underground
+// flag, drops and description, plus `dataset: "current"` so shared/sao-datasets.js keeps them out
+// of Beta mode - exactly how the Current biome copies and the Current waypoints above work. The
+// Beta floor files are untouched.
+//
+// Three supplied corrections are applied to these copies, and only to these copies:
+//   - Corrupted Pumba at (1987, 3636) is added; the four Beta spawns keep their own positions.
+//   - Albal is moved from (2392, 3832) to (2513, 3722): the copy carries the new coordinates and
+//     the old position is not copied.
+//   - The Kazor spawn at (2442, 957) is not copied, so Current Data ships no Kazor.
+// No other coordinate is recalculated, no calibration is involved and no other marker is dropped.
+
+Object.assign(DATA, {
+  "current-pumba-1": {
+    title: "Corrupted Pumba",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1859, z: 3606 },
+    drops: ["N/A"],
+    description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
+  },
+  "current-pumba-2": {
+    title: "Corrupted Pumba",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1677, z: 3581 },
+    drops: ["N/A"],
+    description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
+  },
+  "current-pumba-3": {
+    title: "Corrupted Pumba",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1974, z: 3583 },
+    drops: ["N/A"],
+    description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
+  },
+  "current-pumba-4": {
+    title: "Corrupted Pumba",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1931, z: 3515 },
+    drops: ["N/A"],
+    description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
+  },
+  "current-pumba-5": {
+    title: "Corrupted Pumba",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1987, z: 3636 },
+    drops: ["N/A"],
+    description: "A wild beast from the forests of the first level. He charges relentlessly, driven by primitive rage."
+  },
+  "current-colossal-guardian-1": {
+    title: "Colossal Guardian",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1238, z: 2972 },
+    drops: ["N/A"],
+    description: "Forged in stone and awakened by ancient magic, it guards forgotten lands against any intrusion. His steps alone make the forest shake..."
+  },
+  "current-colossal-guardian-2": {
+    title: "Colossal Guardian",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1274, z: 3150 },
+    drops: ["N/A"],
+    description: "Forged in stone and awakened by ancient magic, it guards forgotten lands against any intrusion. His steps alone make the forest shake..."
+  },
+  "current-colossal-guardian-3": {
+    title: "Colossal Guardian",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1077, z: 3252 },
+    drops: ["N/A"],
+    description: "Forged in stone and awakened by ancient magic, it guards forgotten lands against any intrusion. His steps alone make the forest shake..."
+  },
+  "current-colossal-guardian-4": {
+    title: "Colossal Guardian",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 4577, z: 1612 },
+    drops: ["N/A"],
+    description: "Forged in stone and awakened by ancient magic, it guards forgotten lands against any intrusion. His steps alone make the forest shake..."
+  },
+  "current-gorbel": {
+    title: "Gorbel",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 302, z: 3202 },
+    drops: ["N/A"],
+    description: "A gelatinous colossus, master of swarms of slimes. He crushes everything in his path, slowly but surely."
+  },
+  "current-albal-1": {
+    title: "Albal",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2617, z: 3837 },
+    drops: ["N/A"],
+    description: "A lone wolf with icy silver eyes. Its passage leaves a mist and silence."
+  },
+  "current-albal-2": {
+    title: "Albal",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2512, z: 3967 },
+    drops: ["N/A"],
+    description: "A lone wolf with icy silver eyes. Its passage leaves a mist and silence."
+  },
+  "current-albal-3": {
+    title: "Albal",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2513, z: 3722 },
+    drops: ["N/A"],
+    description: "A lone wolf with icy silver eyes. Its passage leaves a mist and silence."
+  },
+  "current-nasgul-underground": {
+    title: "Nasgul",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2829, z: 4247 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A cursed entity emerging from ancient darkness, it prowls, invisible, ready to tear the souls of the living."
+  },
+  "current-narax-cursed-skeleton-underground": {
+    title: "Narax Cursed Skeleton",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2722, z: 4332 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A cursed entity emerging from ancient darkness, it prowls, invisible, ready to tear apart the souls of the living."
+  },
+  "current-ice-bear": {
+    title: "Ice Bear",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 4002, z: 2007 },
+    drops: ["N/A"],
+    description: "Born in the coldest caves of the mountains, the Ice Bear embodies the brute force of the North. Its roar makes the air shiver, and its icy breath freezes everything in its path."
+  },
+  "current-illfang-lord-kobold": {
+    title: "Illfang, Lord Kobold",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2, z: 2 },
+    drops: ["N/A"],
+    description: "The iconic first-floor raid tyrant, infamous for sudden weapon swaps and punishing final-phase aggression."
+  },
+  "current-pricilia-underground": {
+    title: "Pricilia",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1232, z: 1102 },
+    underground: true,
+    drops: ["N/A"],
+    description: "An ancient and cunning creature, Pricilia weaves her webs in the forgotten corners of the darkest forests. Its prey never sees death... only his glowing eyes."
+  },
+  "current-yula-underground": {
+    title: "Yula",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1102, z: 1227 },
+    underground: true,
+    drops: ["N/A"],
+    description: "Lurking in the damp darkness of the dungeon, Yula is a spider feared by adventurers. Its sharp legs and glowing eyes inspire terror in anyone who crosses its path."
+  },
+  "current-kamilia-underground": {
+    title: "Kamilia",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 987, z: 1247 },
+    underground: true,
+    drops: ["N/A"],
+    description: "Silent in the heart of the dungeon, Kamilia weaves invisible traps in the shadows. Its bite injects paralyzing venom, leaving its prey conscious, but unable to flee."
+  },
+  "current-jira-underground": {
+    title: "Jira",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1192, z: 1407 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A silent creature lurking between the canvases, Jira watches every corner of the dungeon. Faster than lightning, she strikes without warning, leaving behind only silence... and bloody webs."
+  },
+  "current-vyrmos-underground": {
+    title: "Vyrmos",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 4252, z: 3857 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A creeping entity born from the mines of Geldorak, Vyrmos soaks up spores and damp earth. His skin is covered in living foam, and his breath corrupts everything he touches."
+  },
+  "current-tornak-underground": {
+    title: "Tornak",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 4302, z: 3972 },
+    underground: true,
+    drops: ["N/A"],
+    description: "Massive and wild, this creature watches over the forest. She repels intruders with devastating punches. No words, only the brute force of nature."
+  },
+  "current-nymbrea-underground": {
+    title: "Nymbrea",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1412, z: 2142 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A mythical snake sliding between deep currents, Nymbrea embodies the grace and treachery of calm waters. Its scales sparkle like cursed pearls, and its hypnotic gaze draws the unwary towards the abyss."
+  },
+  "current-gardien_sanctuaire": {
+    title: "Sanctuary Guardian",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: 0, z: 190 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A powerful boss guarding the sacred sanctuary."
+  },
+  "current-magnus": {
+    title: "Magnus",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: 228, z: 316 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A fearsome boss encountered underground in Map 2."
+  },
+  "current-melisara": {
+    title: "Melisara",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: 175, z: -409 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A dangerous boss lurking in the depths of Map 2."
+  },
+  "current-morveth": {
+    title: "Morveth",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: 583, z: -187 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A subterranean boss found deep below Map 2."
+  },
+  "current-rugiboeuf": {
+    title: "Rugiboeuf",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: -155, z: 571 },
+    drops: ["N/A"],
+    description: "A colossal boss roaming the northern reaches of Map 2."
+  },
+  "current-velindra": {
+    title: "Velindra",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: 800, z: 300 },
+    underground: true,
+    drops: ["N/A"],
+    description: "A shadowy boss hidden beneath the surface."
+  },
+  "current-winnie": {
+    title: "Winnie",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: 578, z: -774 },
+    drops: ["N/A"],
+    description: "A rare boss found in the western areas of Map 2."
+  },
+  "current-furacas-guardian-of-the-labyrinth": {
+    title: "Furacas, Guardian of the Labyrinth",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor3",
+    coords: { x: 393, z: 340 },
+    drops: ["N/A"],
+    description: "Furacas, Guardian of the Labyrinth (Boss) — Coordinates X: 393 Z: 340"
+  },
+  "current-misty-wolf-alpha": {
+    title: "Misty Wolf Alpha",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor3",
+    coords: { x: 757, z: 790 },
+    drops: ["N/A"],
+    description: "Misty Wolf Alpha (Boss) — Coordinates X: 757 Z: 790"
+  },
+  "current-alpha-of-the-woods": {
+    title: "Alpha of the Woods",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor3",
+    coords: { x: 1060, z: 892 },
+    drops: ["N/A"],
+    description: "Alpha of the Woods (Boss) — Coordinates X: 1060 Z: 892"
+  },
+  "current-leader-of-the-bandits": {
+    title: "Leader of the Bandits",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor3",
+    coords: { x: 1175, z: 837 },
+    drops: ["N/A"],
+    description: "Leader of the Bandits (Boss) — Coordinates X: 1175 Z: 837"
+  },
+  "current-king-of-the-cave": {
+    title: "King of the Cave",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor3",
+    coords: { x: 886, z: 1098 },
+    drops: ["N/A"],
+    description: "King of the Cave (Boss) — Coordinates X: 886 Z: 1098"
+  },
+  "current-muffet-mother-of-black-spiders": {
+    title: "Muffet, Mother of Black Spiders",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor3",
+    coords: { x: 344, z: 1273 },
+    drops: ["N/A"],
+    description: "Muffet, Mother of Black Spiders (Boss) — Coordinates X: 344 Z: 1273"
+  },
+  "current-adoryll-the-bird-in-a-cage": {
+    title: "Adoryll, the Bird in a Cage",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor3",
+    coords: { x: 275, z: 1245 },
+    drops: ["N/A"],
+    description: "Adoryll, the Bird in a Cage (Boss) — Coordinates X: 275 Z: 1245"
+  },
+  "current-samurai-orc-boss": {
+    title: "Samurai Orc Boss",
+    type: "Boss",
+    category: "bossSpawns",
+    dataset: "current",
+    floor: "floor3",
+    coords: { x: 256, z: 1219 },
+    drops: ["N/A"],
+    description: "Samurai Orc Boss (Boss) — Coordinates X: 256 Z: 1219"
+  },
+  "current-xal-zirith-dungeon": {
+    title: "Xal'zirith Dungeon",
+    type: "Dungeon",
+    category: "dungeons",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1034, z: 1184 },
+    drops: ["N/A"],
+    description: "A fractured ruin wrapped in red mist where sword skills desync in narrow halls. Parties that clear its upper chambers often hear one extra set of footsteps behind them."
+  },
+  "current-kobold-tower-dungeon": {
+    title: "Kobold Tower",
+    type: "Dungeon",
+    category: "dungeons",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 3409, z: 972 },
+    drops: ["N/A"],
+    description: "The old boss tower from early Aincrad records, layered with trap stairs and ambush rooms. Every floor feels like a raid rehearsal built to punish hesitation."
+  },
+  "current-fallen-labyrinth-dungeon": {
+    title: "Fallen Labyrinth Dungeon",
+    type: "Dungeon",
+    category: "dungeons",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2383, z: 2415 },
+    drops: ["N/A"],
+    description: "A maze that rewrites its routes after each elite pull, like the system is learning your pathing. Scouts call it the place where map memory goes to die."
+  },
+  "current-nasgul-sub-dungeon": {
+    title: "Nasgul Sub-Dungeon",
+    type: "Dungeon",
+    category: "dungeons",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2782, z: 4422 },
+    drops: ["N/A"],
+    description: "Hidden beneath broken stone circles, this sub-dungeon is tuned for tight duels and poison attrition. The deeper vaults feel like a side route meant for front-liners only."
+  },
+  "current-geldorak-mine-dungeon": {
+    title: "Geldorak Mine Dungeon",
+    type: "Dungeon",
+    category: "dungeons",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 4270, z: 3888 },
+    drops: ["N/A"],
+    description: "Collapsed ore tunnels now host armored mobs that patrol like a disciplined guild squad. Miners left warning runes at each fork, but most parties still pick the wrong descent."
+  },
+  "current-donjon_ruche_de_melliona": {
+    title: "Melliona's Hive Dungeon",
+    type: "Dungeon",
+    category: "dungeons",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: 506, z: -724 },
+    drops: ["N/A"],
+    description: "A dungeon formed inside Melliona's Hive."
+  },
+  "current-donjon_tombeau_du_necromancien": {
+    title: "Necromancer's Tomb Dungeon",
+    type: "Dungeon",
+    category: "dungeons",
+    dataset: "current",
+    floor: "floor2",
+    coords: { x: 721, z: 244 },
+    drops: ["N/A"],
+    description: "A dungeon built within the Necromancer's Tomb."
+  },
+  "current-west-mines": {
+    title: "West Mines",
+    type: "Biome",
+    category: "farmingSpots",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 986, z: 3491 },
+    drops: ["Coal", "Copper", "Iron"],
+    description: "West Mines — Coordinates X: 986 Z: 3491. Gather Coal, Copper, and Iron."
+  },
+  "current-east-mines": {
+    title: "East Mines",
+    type: "Biome",
+    category: "farmingSpots",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2399, z: 3510 },
+    drops: ["Coal", "Copper", "Iron"],
+    description: "East Mines — Coordinates X: 2399 Z: 3510. Gather Coal, Copper, and Iron."
+  },
+  "current-oak-forest": {
+    title: "Oak Forest",
+    type: "Biome",
+    category: "farmingSpots",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2459, z: 4320 },
+    drops: ["Oak Wood"],
+    description: "Oak Forest — Coordinates X: 2459 Z: 4320. Gather Oak Wood."
+  },
+  "current-birch-forest": {
+    title: "Birch Forest",
+    type: "Biome",
+    category: "farmingSpots",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1788, z: 1196 },
+    drops: ["Birch Wood"],
+    description: "Birch Forest — Coordinates X: 1788 Z: 1196. Gather Birch Wood."
+  },
+  "current-farm": {
+    title: "Farm",
+    type: "Biome",
+    category: "farmingSpots",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2351, z: 3662 },
+    drops: ["Allium", "Wheat"],
+    description: "Farm — Coordinates X: 2351 Z: 3662. Gather Allium and Wheat."
+  }
+});
 
 const CURRENT_MOB_AREAS = [
   {
