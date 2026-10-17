@@ -1,7 +1,7 @@
 /* Browser smoke guardrail.
  *
- * Loads every player-facing page in English, Spanish and French at the three canonical
- * viewports and fails if any combination produces a JavaScript console error, a failed
+ * Loads every player-facing page in every supported language (scripts/localization-languages.js) at
+ * the canonical viewports and fails if any combination produces a JavaScript console error, a failed
  * request for a local resource, a page crash, a horizontal document overflow, or clipped
  * text. It also records the Character Build stats summary width so the localized-summary
  * overflow can be watched directly.
@@ -19,6 +19,7 @@
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
 const { attachDiagnostics, ensureStaticServer } = require("./harness-helpers");
+const { uiLanguages } = require("./localization-languages");
 
 const pages = [
   { id: "hub", url: "/index.html" },
@@ -35,7 +36,7 @@ const pages = [
   { id: "underworld-compendium", url: "/Fractured%20Underworld/Compendium/compendium.html" }
 ];
 
-const languages = ["en", "es", "fr"];
+const languages = uiLanguages();
 const viewports = [
   { name: "1440x1000", width: 1440, height: 1000 },
   { name: "1024x768", width: 1024, height: 768 },

@@ -226,16 +226,21 @@ async function run() {
         "Deer Accessories",
         "Ice Golem Accessories",
         "Ice Spirit Accessories",
-        "Skeleton Accessories"
+        "Skeleton Accessories",
+        "Sylve Accessories",
+        "Wolf Accessories",
+        "Bandit Accessories"
       ],
+      equipmentBlacksmith: ["Nodachi Blacksmith"],
       secretAccessoryBlacksmith: [
         "Bracelet of Ice",
         "Necklace of Aragorn",
-        "Sticky Ring",
+        "Secret Sticky Ring Merchant",
         "Skeleton Skull",
-        "Belt of the Stags",
+        "Secret Deer Belt Merchant",
         "Ring of the Leviathan",
-        "Secret Accessory Blacksmith"
+        "Secret Accessory Blacksmith",
+        "Secret Gelatinous Cloak"
       ],
       occultMerchants: [
         "Occult Merchant - Gloves",
@@ -257,8 +262,14 @@ async function run() {
         "Hanaka - Loot Buyer",
         "Labyrinth of the Fallen - Loot Buyer",
         "Labyrinth of the Fallen (2) - Loot Buyer",
-        "Aragorn's Lair - Loot Buyer"
+        "Aragorn's Lair - Loot Buyer",
+        "Local Lumberjack",
+        "Candelia",
+        "Local Miner"
       ],
+      alchemist: ["Alchemist"],
+      materialsBlacksmith: ["Sewer Reshaper", "Cabinetmaker"],
+      worldEvents: ["Floor 1 World Event"],
       toolMerchants: ["Starting Merchant", "F1 - Starting Town - Tools"],
       keyBlacksmith: [
         "F1 - Geldorack Dungeon Guard - Starting Town",
@@ -292,7 +303,7 @@ async function run() {
         "Albal",
         "Albal",
         "Nasgul",
-        "Narax Cursed Skeleton",
+        "Narax the Cursed Skeleton",
         "Ice Bear",
         "Illfang, Lord Kobold",
         "Pricilia",
@@ -303,7 +314,7 @@ async function run() {
         "Tornak",
         "Nymbrea"
       ],
-      farmingSpots: ["West Mines", "East Mines", "Oak Forest", "Birch Forest", "Farm"]
+      farmingSpots: ["West Mines", "East Mines", "Oak/Birch Forest", "Farm"]
     };
     for (const [category, titles] of Object.entries(currentWaypointCategories)) {
       const button = page.locator(`.sidebar-list-button[data-category='${category}']`);
@@ -432,7 +443,11 @@ async function run() {
       "refaire",
       "ingotBlacksmith",
       "armorBlacksmith",
-      "weaponSellers"
+      "weaponSellers",
+      /* The three merchant categories Current Data no longer carries. */
+      "accessoriesMerchants",
+      "equipmentMerchants",
+      "travelingMerchants"
     ];
     assert.deepEqual(
       await page.evaluate(

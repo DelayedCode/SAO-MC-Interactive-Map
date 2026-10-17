@@ -86,7 +86,9 @@
       { title: "Navigation" },
       { title: "Map Controls" },
       { title: "Filters" },
-      { title: "Map Area" }
+      { title: "Map Area" },
+      { title: "Right-Click Map Menu" },
+      { title: "Argo the Info Broker" }
     ]),
     walkthroughStorageKey: "sao.walkthrough.mainui.completed",
     supportsVisitedCategory,

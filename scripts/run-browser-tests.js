@@ -7,7 +7,7 @@
  *
  * Usage:
  *   node scripts/run-browser-tests.js core     # walkthrough/cluster/navigation/char-build/equipment
- *   node scripts/run-browser-tests.js smoke    # en/es/fr zero-console-error smoke guardrail
+ *   node scripts/run-browser-tests.js smoke    # zero-console-error smoke guardrail for every language
  *   node scripts/run-browser-tests.js ui       # verify-ui-polish + visual-quality-inspection
  *   node scripts/run-browser-tests.js all      # every browser suite, in order
  *
@@ -22,6 +22,7 @@ const { startStaticServer, isServerReachable } = require("./serve-static");
 const SUITES = Object.freeze({
   core: [
     "test-walkthrough-pages.js",
+    "test-argo-window-browser.js",
     "test-cluster-wheel.js",
     "test-map-zoom-browser.js",
     "test-miscinfo-navigation.js",

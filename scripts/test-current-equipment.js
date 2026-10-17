@@ -8,7 +8,11 @@
    These checks pin the shipped data (every supplied stat, resource and Col cost), the
    one-set-one-bonus rule, that Beta Data is untouched, and the Character Build wiring: an item is
    equippable in the slot its name derives, and its modelled stats plus its set bonuses reach the
-   build totals through the existing calculator. */
+   build totals through the existing calculator.
+
+   The items the later Current-Data update adds are pinned here too: the Gelatinous Cloak (Little
+   Slime Set), the three Sylvan accessories (one Sylvan Set), the two materials the Sewer Reshaper
+   produces, and the crafting locations all of them name. */
 "use strict";
 
 const assert = require("node:assert/strict");
@@ -40,13 +44,13 @@ const EXPECTED_OTHER_ITEMS = [
   { bucket: "tool", name: "Twisted Hoe", rarity: "Common", level: 1, location: "F1 - Starting Town - Tools", cols: 50, resources: [], stats: { "Effect: Sustainability": "448" } },
   { bucket: "tool", name: "Wooden Fishing Rod", rarity: "Common", level: 1, location: "F1 - Starting Town - Tools", cols: 50, resources: [], stats: { "Effect: Sustainability": "448" } },
   { bucket: "dungeon", name: "Forest Key", location: "F1 - Geldorack Dungeon Guard - Starting Town", cols: 10, resources: [["Sylvan Bark", 8], ["Wood Heart", 4], ["Magic Mycelium", 1]], stats: {} },
-  { bucket: "dungeon", name: "Key of the Fallen", location: "F1 - Fallen Labyrinth Dungeon Guard - Tolbana", cols: 20, resources: [["Cursed Fabric", 8], ["Leaf Fragment", 8]], stats: {} },
+  { bucket: "dungeon", name: "Key of the Fallen", location: "F1 - Fallen Labyrinth Dungeon Guard - Tolbana", cols: 20, resources: [["Cursed Cloth", 8], ["Leaf Fragment", 8]], stats: {} },
   { bucket: "dungeon", name: "Key of Xal'Zirith", location: "F1 - Xal'Zirith Dungeon Guard - Candelia", cols: 15, resources: [["Spider Cloth", 16], ["Spider Thread", 16]], stats: {} },
   { bucket: "dungeon", name: "Kobold Key", location: "Key Blacksmith", cols: null, resources: [], stats: {} },
-  { bucket: "food", name: "Boar Meat", level: 1, cols: 1, resources: [], stats: { "Effect: Level Required To Use Food": "1", "Effect: Nourriture": "5 Nourriture", "Effect: Recharge Nourriture": "1s" } },
+  { bucket: "food", name: "Boar Meat", level: 1, location: "Starting Merchant", cols: 1, resources: [], stats: { "Effect: Level Required To Use Food": "1", "Effect: Nourriture": "5 Nourriture", "Effect: Recharge Nourriture": "1s" } },
   { bucket: "consumable", name: "Teleportation Crystal", location: "Starting Merchant", cols: null, resources: [], stats: {} },
-  { bucket: "consumable", name: "Health Potion I", level: 1, cols: 5, resources: [], stats: { "Health Restored": "10", Cooldown: "15s", "Effect: Healing": "HEALING" } },
-  { bucket: "consumable", name: "Mana Potion I", level: 1, cols: 5, resources: [], stats: { "Mana Restored": "5", Cooldown: "15s", "Effect: Mana": "MANA" } }
+  { bucket: "consumable", name: "Health Potion I", level: 1, location: "Starting Merchant / Alchemist", cols: 5, resources: [["Sylve Shoot", 8], ["Allium Flower", 8]], stats: { "Health Restored": "10", Cooldown: "15s", "Purchase Price": "5.02 Cols per 1", "Effect: Healing": "HEALING" } },
+  { bucket: "consumable", name: "Mana Potion I", level: 1, location: "Starting Merchant / Alchemist", cols: 5, resources: [["Soul of the Ruins", 8], ["Allium Flower", 8]], stats: { "Mana Restored": "5", Cooldown: "15s", "Purchase Price": "5.02 Cols per 1", "Effect: Mana": "MANA" } }
 ];
 
 /* Every supplied accessory, with the item stats and material costs exactly as given. The Col cost
@@ -69,6 +73,15 @@ const EXPECTED_ACCESSORIES = [
   { name: "Slimy Ring", level: 4, set: "Little Slime Set", cols: 25, stats: { Health: "+1", "Max Mana": "+0.5", "Max Stamina": "+0.5" }, resources: [["Slime Jelly", 8]] },
   { name: "Gelatinous Bracelet", level: 4, set: "Little Slime Set", cols: 28, stats: { Health: "+1", "Health Regeneration": "+0.05/s", "Mana Regeneration": "+0.05/s", "Stamina Regeneration": "+0.05/s" }, resources: [["Slime Jelly", 12], ["Slime Core", 4]] },
   { name: "Gelatinous Amulet", level: 4, set: "Little Slime Set", cols: 25, stats: { "Bonus Healing": "+0.5" }, resources: [["Oak String", 1], ["Slime Jelly", 8]] },
+  /* The Gelatinous Cloak the later update adds: the supplied Little Slime Set artifact. Its three
+     ingredients are carried exactly as named, so "Essence Slime" and "Tear Slime" stay distinct
+     from the Sewer Reshaper's own "Slime Essence" and "Slime Tear". */
+  { name: "Gelatinous Cloak", level: 7, set: "Little Slime Set", cols: null, stats: { "Ability Haste": "+5%", Health: "+3", "Bonus Healing": "+1" }, resources: [["Stolen Cloak", 1], ["Essence Slime", 1], ["Tear Slime", 1]] },
+  /* The three Sylvan accessories the same update adds. All three share the one Sylvan Set, and the
+     ingredient names now use the confirmed spellings. */
+  { name: "Bracelet of the Sylvan", level: 3, set: "Sylvan Set", cols: null, stats: { "Health Regeneration": "+0.05/s", "Mana Regeneration": "+0.05/s", "Stamina Regeneration": "+0.05/s" }, resources: [["Oak Log", 8], ["Magic Wood Shard", 8]] },
+  { name: "Amulet of the Sylvan", level: 3, set: "Sylvan Set", cols: null, stats: { "Bonus Healing": "+0.5" }, resources: [["Magic Wood Shard", 8], ["Oak String", 1]] },
+  { name: "Ring of the Sylve", level: 3, set: "Sylvan Set", cols: null, stats: { Health: "+2", "Max Mana": "+0.5", "Max Stamina": "+0.5" }, resources: [["Magic Wood Shard", 8], ["Allium Flower", 8], ["Oak Log", 4], ["Wood Heart", 1]] },
   { name: "Spider Ring", level: 6, set: "Spider Set", cols: 30, stats: { "Critical Damage": "+2%", Dodge: "+1%" }, resources: [["Spider Cloth", 8], ["Coal Ore", 8]] },
   { name: "Spider Bracelet", level: 6, set: "Spider Set", cols: 30, stats: { Dodge: "+1%", Health: "+2" }, resources: [["Spider Cloth", 8], ["Corrupted Spore", 8]] },
   { name: "Spider Gloves", level: 6, set: "Spider Set", cols: 30, stats: { "Critical Damage": "+2%", Dodge: "+0.5%" }, resources: [["Spider Cloth", 8], ["Spider Thread", 8]] },
@@ -83,18 +96,18 @@ const EXPECTED_ACCESSORIES = [
   { name: "Copper Gloves", level: 3, set: "Copper Set", cols: 25, stats: { Defense: "+1", Health: "+0.5" }, resources: [["Copper Ingot", 1]] },
   { name: "Copper Coin", level: 3, set: "Copper Set", cols: 25, stats: { "Attack Damage": "+0.25", Health: "+0.5", "Bonus Healing": "+0.5" }, resources: [["Copper Ingot", 1]] },
   { name: "Copper Amulet", level: 3, set: "Copper Set", cols: 25, stats: { Health: "+0.5", "Max Mana": "+0.5", "Max Stamina": "+0.5" }, resources: [["Copper Ingot", 1], ["Copper String", 1]] },
-  { name: "Ring of the Nepenthes", level: 5, set: "Nepenthes Set", cols: 25, stats: { "Max Mana": "+1" }, resources: [["Leaf Fragments", 8], ["Corrupted Spore", 8]] },
-  { name: "Bracelet of the Nepenthes", level: 5, set: "Nepenthes Set", cols: 28, stats: { "Skill Damage": "+1%", Defense: "+2" }, resources: [["Leaf Fragments", 12]] },
-  { name: "Amulet of the Nepenthes", level: 5, set: "Nepenthes Set", cols: 25, stats: { "Skill Critical Damage": "+2%", "Mana Regeneration": "+0.1/s" }, resources: [["Leaf Fragments", 4], ["Corrupted Spore", 4], ["Oak String", 1]] },
+  { name: "Ring of the Nepenthes", level: 5, set: "Nepenthes Set", cols: 25, stats: { "Max Mana": "+1" }, resources: [["Leaf Fragment", 8], ["Corrupted Spore", 8]] },
+  { name: "Bracelet of the Nepenthes", level: 5, set: "Nepenthes Set", cols: 28, stats: { "Skill Damage": "+1%", Defense: "+2" }, resources: [["Leaf Fragment", 12]] },
+  { name: "Amulet of the Nepenthes", level: 5, set: "Nepenthes Set", cols: 25, stats: { "Skill Critical Damage": "+2%", "Mana Regeneration": "+0.1/s" }, resources: [["Leaf Fragment", 4], ["Corrupted Spore", 4], ["Oak String", 1]] },
   { name: "Elite Gloves", level: 3, set: "Elite Treant Set", cols: 25, stats: { "Attack Damage": "+0.25", "Critical Damage": "+1%" }, resources: [["Wolf Fur", 8]] },
   { name: "Elite Amulet", level: 3, set: "Elite Treant Set", cols: 25, stats: { "Max Stamina": "+0.5" }, resources: [["Oak String", 1], ["Sylvan Bark", 8]] },
   { name: "Elite Bracelet", level: 3, set: "Elite Treant Set", cols: 28, stats: { "Critical Hit Chance": "+1%" }, resources: [["Oak Log", 4], ["Titan Bark", 4], ["Sylvan Bark", 8]] },
-  { name: "Elite Carapace", level: 3, set: "Elite Treant Set", cols: 28, stats: { "Attack Damage": "+0.5", Health: "+2" }, resources: [["Titan Bark", 8], ["Sylvan Bark", 8], ["Sylve Sprout", 8]] },
+  { name: "Elite Carapace", level: 3, set: "Elite Treant Set", cols: 28, stats: { "Attack Damage": "+0.5", Health: "+2" }, resources: [["Titan Bark", 8], ["Sylvan Bark", 8], ["Sylve Shoot", 8]] },
   { name: "Bracelet of Ice", level: 8, set: "Ice Golem Set", cols: 45, stats: { "Skill Damage": "+2%", "Ability Haste": "+2%", "Damage Reduction": "+2%", Health: "+2" }, resources: [["Fragment of the Bear's Soul", 3], ["Hard Glacial Hide", 24]] },
   { name: "Necklace of Aragorn", level: 8, set: "Spider Set", cols: 50, stats: { "Attack Damage": "+0.5", "Fall Damage Reduction": "+15%", Dodge: "+5%" }, resources: [["Spider Venom", 3], ["Oak String", 1], ["Spider Thread", 20]] },
-  { name: "Sticky Ring", level: 5, set: "Little Slime Set", cols: null, note: "N/A", stats: { Defense: "+1", Health: "+2", "Bonus Healing": "+1" }, resources: [] },
+  { name: "Sticky Ring", level: 5, set: "Little Slime Set", cols: 35, stats: { Defense: "+1", Health: "+2", "Bonus Healing": "+1" }, resources: [["Slime Jelly", 12], ["Essence of Gorbel", 3], ["Slime Core", 8]] },
   { name: "Skeleton Skull", level: 8, set: "Standard Skeleton Set", cols: 35, stats: { "Skill Damage": "+1%", Health: "+5", "Max Mana": "+1", "Max Stamina": "+1", "Health Regeneration": "+0.05/s" }, resources: [["Reinforced Skeleton Bone", 20]] },
-  { name: "Belt of the Stags", level: 7, set: "Peaceful Deer Set", cols: null, note: "N/A", stats: { "Ability Haste": "+5%", Health: "+2", "Bonus Healing": "+0.5" }, resources: [] },
+  { name: "Belt of the Stags", level: 7, set: "Peaceful Deer Set", cols: 40, stats: { "Ability Haste": "+5%", Health: "+2", "Bonus Healing": "+0.5" }, resources: [["Mountain Stag Hide", 20]] },
   { name: "Ring of the Leviathan", level: 7, set: "Shark Set", cols: 55, stats: { "Attack Damage": "+1", Defense: "+3", Health: "+5" }, resources: [["Shark Carapace", 24], ["Heart of Nymbrea", 3], ["Iron Ingot", 1]] },
   /* Forged by the Secret Accessory Blacksmith: no resource cost or Col price was supplied, so none
      is invented and the crafting resources stay empty. */
@@ -105,8 +118,19 @@ const EXPECTED_ACCESSORIES = [
   { name: "Occult Amulet", level: 10, set: "Shadow Neophyte Set", cols: 5000, stats: { "Critical Hit Chance": "+2%", "Skill Critical Hit Chance": "+2%", Health: "+5" }, resources: [] },
   { name: "Occult Skull", level: 10, set: "Shadow Neophyte Set", cols: 5000, stats: { "Skill Critical Damage": "+5%", "Magic Damage": "+2%", "Max Mana": "+1" }, resources: [] },
   { name: "Occult Robe", level: 10, set: "Shadow Neophyte Set", cols: 5000, stats: { "Attack Speed": "0.05/s", Dodge: "+2.5%", "Max Stamina": "+1", "Movement Speed": "+2.5%" }, resources: [] },
-  /* Current Data supplies no stats, description, resources or cost for the Occult Hood. */
-  { name: "Occult Hood", level: 10, set: "Shadow Neophyte Set", cols: null, stats: {}, resources: [] }
+  /* Current Data supplies no stats or description for the Occult Hood; its merchant and 5000 Col
+     price are the ones the supplied data names. */
+  { name: "Occult Hood", level: 10, set: "Shadow Neophyte Set", cols: 5000, stats: {}, resources: [] },
+  /* The Weakling Wolf and Bandit accessories the accessory update adds, with the supplied values:
+     minimum level, item statistics, the Col cost carried separately (null when the source gave none)
+     and the crafting materials. */
+  { name: "Ring of the Wolf", level: 3, set: "Weakling Wolf Set", cols: 33, stats: { "Attack Damage": "+0.25", "Max Stamina": "+0.5" }, resources: [["Wolf Fur", 16], ["Oak Log", 8]] },
+  { name: "Albal's Necklace", level: 3, set: "Weakling Wolf Set", cols: 33, stats: { "Critical Damage": "+1%", Health: "+1", "Movement Speed": "+5%" }, resources: [["Birch String", 1], ["Fangs of Albal", 4]] },
+  { name: "Bandit's Gloves", level: 5, set: "Bandit Set", cols: null, stats: { "Attack Speed": "+0.05/s" }, resources: [["Small Purse", 16]] },
+  { name: "Bandit Hood", level: 5, set: "Bandit Set", cols: null, stats: { "Attack Damage": "+0.25", Health: "+2" }, resources: [["Small Purse", 16]] },
+  { name: "Stolen Amulet", level: 5, set: "Bandit Set", cols: null, stats: { "Critical Chance": "+1%", "Max Stamina": "+0.5" }, resources: [["Small Purse", 24]] },
+  { name: "Stolen Cloak", level: 5, set: "Bandit Set", cols: null, stats: { "Attack Damage": "+1" }, resources: [["Small Purse", 24]] },
+  { name: "Bandit Coin", level: 5, set: "Bandit Set", cols: null, stats: { "Critical Chance": "+1%" }, resources: [["Small Purse", 24]] }
 ];
 
 /* One set, one bonus: every piece of a set repeats the same tiered bonuses. */
@@ -116,6 +140,7 @@ const EXPECTED_SET_BONUSES = {
   "Peaceful Deer Set": { 2: "+1 Bonus Healing", 3: "+2 Max Mana" },
   "Shark Set": { 2: "+5% Ability Haste", 3: "+3 Health", 4: "+3% Physical Damage" },
   "Little Slime Set": { 2: "+2 Health", 3: "+0.05/s Health Regeneration, +0.05/s Mana Regeneration, +0.05/s Stamina Regeneration", 4: "+5% Cooldown Reduction" },
+  "Sylvan Set": { 2: "+1 Health", 3: "+0.5 Bonus Healing", 4: "+0.1/s Health Regeneration, +0.1/s Mana Regeneration, +0.1/s Stamina Regeneration" },
   "Spider Set": { 2: "+2.5% Movement Speed", 3: "+0.025 Attack Speed", 4: "+2.5% Dodge Chance", 5: "+0.25 Attack Damage, +1% Critical Hit Chance" },
   "Iron Set": { 2: "+3% Movement Speed", 3: "+0.1/s Health Regeneration, +0.1/s Mana Regeneration, +0.1/s Stamina Regeneration", 4: "+2% Magic Damage, +2% Physical Damage, +2% Projectile Damage", 5: "+2 Health, +2 Defense" },
   "Copper Set": { 2: "+2.5% Movement Speed", 3: "+0.05/s Health Regeneration, +0.05/s Mana Regeneration, +0.05/s Stamina Regeneration", 4: "+1% Magic Damage, +1% Physical Damage, +1% Projectile Damage", 5: "+1 Health, +1 Defense" },
@@ -123,6 +148,7 @@ const EXPECTED_SET_BONUSES = {
   "Elite Treant Set": { 2: "+0.5% Critical Hit Chance", 3: "+2% Movement Speed", 4: "+5% Projectile Damage" },
   "Standard Skeleton Set": { 2: "+5% Ability Haste", 3: "+0.05/s Health Regeneration", 4: "-2% Damage Reduction" },
   "Weakling Wolf Set": { 2: "+0.5% Critical Power", 3: "+5% Movement Speed", 4: "+0.25 Attack Damage" },
+  "Bandit Set": { 2: "+1 Health, +2% Critical Power", 3: "+0.5 Attack Damage", 4: "+1% Critical Chance" },
   "Shadow Neophyte Set": {
     2: "-0.6/s Health Regeneration, -50% Healing Received",
     3: "-0.6/s Health Regeneration",
@@ -162,6 +188,119 @@ assert.equal(
   byName.get("Gloves of the Wolves").craftingLocation,
   "Secret Accessory Blacksmith",
   "Gloves of the Wolves names its Secret Accessory Blacksmith"
+);
+
+/* The items this update adds name the Current-Data location that produces them, exactly the way the
+   Gloves of the Wolves name their blacksmith. */
+assert.equal(
+  byName.get("Gelatinous Cloak").craftingLocation,
+  "Secret Gelatinous Cloak",
+  "Gelatinous Cloak names its secret equipment location"
+);
+["Bracelet of the Sylvan", "Amulet of the Sylvan", "Ring of the Sylve"].forEach((name) => {
+  assert.equal(
+    byName.get(name).craftingLocation,
+    "Sylve Accessories",
+    `${name} names the Sylve Accessories blacksmith`
+  );
+});
+/* The accessories the accessory update adds name the blacksmith that forges them, the same way the
+   Sylve accessories name theirs. */
+["Ring of the Wolf", "Albal's Necklace"].forEach((name) => {
+  assert.equal(
+    byName.get(name).craftingLocation,
+    "Wolf Accessories",
+    `${name} names the Wolf Accessories blacksmith`
+  );
+});
+["Bandit's Gloves", "Bandit Hood", "Stolen Amulet", "Stolen Cloak", "Bandit Coin"].forEach((name) => {
+  assert.equal(
+    byName.get(name).craftingLocation,
+    "Bandit Accessories",
+    `${name} names the Bandit Accessories blacksmith`
+  );
+});
+
+/* The merchant associations the latest update supplies: the two secret accessory merchants and the
+   five Occult Merchant markers, plus the two merchants the starter potions name. */
+assert.equal(
+  byName.get("Sticky Ring").craftingLocation,
+  "Secret Sticky Ring Merchant",
+  "Sticky Ring names its secret merchant"
+);
+assert.equal(
+  byName.get("Belt of the Stags").craftingLocation,
+  "Secret Deer Belt Merchant",
+  "Belt of the Stags names its secret merchant"
+);
+const OCCULT_MERCHANTS = {
+  "Occult Gloves": "Occult Merchant - Gloves",
+  "Occult Bracelet": "Occult Merchant - Bracelet",
+  "Occult Ring": "Occult Merchant - Ring",
+  "Occult Amulet": "Occult Merchant - Amulet",
+  "Occult Skull": "Occult Merchant - Artifacts",
+  "Occult Robe": "Occult Merchant - Artifacts",
+  "Occult Hood": "Occult Merchant - Artifacts"
+};
+Object.entries(OCCULT_MERCHANTS).forEach(([name, merchant]) => {
+  assert.equal(byName.get(name).craftingLocation, merchant, `${name} names its Occult Merchant`);
+});
+/* The two potions keep both their purchase price and their crafting recipe. */
+["Health Potion I", "Mana Potion I", "Stamina Potion I"].forEach((name) => {
+  const potion = currentFloorData.consumable.find((entry) => entry.name === name);
+  assert.equal(
+    potion.craftingLocation,
+    "Starting Merchant / Alchemist",
+    `${name} keeps both of its purchase locations`
+  );
+  assert.equal(
+    (potion.craftingResources || []).length,
+    3,
+    `${name} keeps its crafting recipe beside the purchase option`
+  );
+  assert.equal(potion.stats["Purchase Price"], "5.02 Cols per 1", `${name} keeps its purchase price`);
+});
+
+/* The two materials the Sewer Reshaper produces: the supplied descriptions and recipes, carried
+   with no invented Col cost, and tied to the Sewer Reshaper location. */
+const currentMaterials = currentFloorData.material;
+[
+  {
+    name: "Slime Essence",
+    description: "A viscous essence made from a gelatinous mix of fluids",
+    resources: [["Slime Jelly", 16], ["Essence of Gorbel", 1]]
+  },
+  {
+    name: "Slime Tear",
+    description: "A gelatinous tear and particularly precious",
+    resources: [["Slime Core", 16]]
+  }
+].forEach((expected) => {
+  const item = currentMaterials.find((entry) => entry.name === expected.name);
+  assert.ok(item, `${expected.name} is present in Current Data`);
+  assert.equal(item.description, expected.description, `${expected.name} description`);
+  assert.equal(item.craftingLocation, "Sewer Reshaper", `${expected.name} names the Sewer Reshaper`);
+  assert.deepEqual(
+    (item.craftingResources || []).map((resource) => [resource.item, resource.amount]),
+    expected.resources,
+    `${expected.name} recipe`
+  );
+});
+/* The Sewer Reshaper's materials and the Gelatinous Cloak's ingredients are distinct supplied names:
+   "Slime Essence"/"Slime Tear" stay the materials, "Essence Slime"/"Tear Slime" stay the ingredients
+   and neither is silently renamed into the other. */
+assert.deepEqual(
+  currentMaterials.map((entry) => entry.name).sort(),
+  ["Purification Elixir", "Slime Essence", "Slime Tear"],
+  "the material bucket carries the Sewer Reshaper materials alongside the existing elixir"
+);
+assert.deepEqual(
+  byName
+    .get("Gelatinous Cloak")
+    .craftingResources.map((resource) => resource.item)
+    .sort(),
+  ["Essence Slime", "Stolen Cloak", "Tear Slime"],
+  "the Gelatinous Cloak keeps its own ingredient names"
 );
 
 /* --- The other supplied Current items --------------------------------------- */
@@ -262,7 +401,11 @@ const EXPECTED_TYPES = {
   "Bracelet of Ice": "Bracelet", "Necklace of Aragorn": "Amulet", "Sticky Ring": "Ring", "Skeleton Skull": "Artifact",
   "Belt of the Stags": "Artifact", "Ring of the Leviathan": "Ring", "Gloves of the Wolves": "Glove",
   "Occult Gloves": "Glove", "Occult Bracelet": "Bracelet", "Occult Ring": "Ring", "Occult Amulet": "Amulet",
-  "Occult Skull": "Artifact", "Occult Robe": "Artifact", "Occult Hood": "Artifact"
+  "Occult Skull": "Artifact", "Occult Robe": "Artifact", "Occult Hood": "Artifact",
+  "Gelatinous Cloak": "Artifact",
+  "Bracelet of the Sylvan": "Bracelet", "Amulet of the Sylvan": "Amulet", "Ring of the Sylve": "Ring",
+  "Ring of the Wolf": "Ring", "Albal's Necklace": "Amulet", "Bandit's Gloves": "Glove", "Bandit Hood": "Artifact",
+  "Stolen Amulet": "Amulet", "Stolen Cloak": "Artifact", "Bandit Coin": "Artifact"
 };
 
 const currentItems = toHost(adapter.getItems("current"));
@@ -359,6 +502,39 @@ const nepenthesTwo = buildStats({
   bracelet: itemByName("Bracelet of the Nepenthes")
 });
 assert.equal(percentGain(nepenthesTwo, "Skill Critical Hit Chance"), 1, "the Nepenthes 2-piece bonus applies");
+
+/* --- The Sylvan Set applies each tier once ---------------------------------- */
+const sylvanPieces = ["Bracelet of the Sylvan", "Amulet of the Sylvan", "Ring of the Sylve"];
+assert.equal(
+  new Set(sylvanPieces.map((name) => itemByName(name).setKey)).size,
+  1,
+  "the three Sylvan accessories share one set identity"
+);
+assert.equal(
+  new Set(sylvanPieces.map((name) => itemByName(name).set)).size,
+  1,
+  "the three Sylvan accessories carry the same set label"
+);
+const sylvanThree = buildStats({
+  "ring-1": itemByName("Ring of the Sylve"),
+  bracelet: itemByName("Bracelet of the Sylvan"),
+  amulet: itemByName("Amulet of the Sylvan")
+});
+assert.equal(
+  flatGain(sylvanThree, "Health"),
+  3,
+  "the Ring's own Health and the Sylvan 2-piece bonus each apply exactly once"
+);
+assert.equal(
+  flatGain(sylvanThree, "Health Regeneration"),
+  0.05,
+  "the Sylvan 4-piece regeneration tier stays inactive with three pieces equipped"
+);
+assert.equal(
+  flatGain(sylvanThree, "Mana Regeneration"),
+  0.05,
+  "the Sylvan 4-piece regeneration tier is never applied once per piece"
+);
 
 /* Stats the current stat model does not compute are preserved and reported, never dropped: the
    Compendium and the builder's picker both render them from item.stats / item.effects. */

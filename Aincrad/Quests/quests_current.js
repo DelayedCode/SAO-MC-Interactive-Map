@@ -589,7 +589,7 @@ const CURRENT_SIDE_QUESTS = [
   {
     number: 4,
     title: "Frost Swarm",
-    npcName: "Shepherd Ivo",
+    npcName: "Hunter Lysa",
     coords: { x: 4074, z: 1994 },
     xpReward: 350,
     colReward: 100,

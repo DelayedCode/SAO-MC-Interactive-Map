@@ -86,20 +86,26 @@ function buildMobList(rawData) {
       };
       const contentRegistry = window.SAOContentTranslations;
       if (contentRegistry?.register) {
+        /* Every language the registry holds a slot for is registered from that language's own value:
+           the curated entry for the language, else the shared glossary, else the English source text.
+           The page names no language, so a language added to the registry is covered here as well. */
         const mobKey = `bestiary.mob.${mob.id}`;
         contentRegistry.register(
           mobKey,
           mob.name,
-          contentRegistry.es[mobKey] || mob.name,
-          contentRegistry.fr[mobKey] || mob.name
+          contentRegistry.translationsByLanguage((language) => contentRegistry[language][mobKey] || mob.name)
         );
         mob.drops.forEach((drop) => {
           const dropKey = `bestiary.item.${drop.id}`;
           contentRegistry.register(
             dropKey,
             drop.item,
-            contentRegistry.es[dropKey] || contentRegistry.translateKnownTerms?.(drop.item, "es") || drop.item,
-            contentRegistry.fr[dropKey] || contentRegistry.translateKnownTerms?.(drop.item, "fr") || drop.item
+            contentRegistry.translationsByLanguage(
+              (language) =>
+                contentRegistry[language][dropKey] ||
+                contentRegistry.translateKnownTerms?.(drop.item, language) ||
+                drop.item
+            )
           );
         });
       }

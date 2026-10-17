@@ -18,7 +18,8 @@ const expectedHardcodedCategories = [
   "alchemist", "lumberjack", "lootBuyers", "weaponSellers", "travelingMerchants", "equipmentMerchants",
   "toolMerchants", "accessoriesMerchants", "occultMerchants", "consumablesMerchants", "refaire",
   "weaponsmith", "armorBlacksmith", "ingotBlacksmith", "keyBlacksmith", "accessoriesBlacksmith",
-  "secretAccessoryBlacksmith",
+  "equipmentBlacksmith", "secretAccessoryBlacksmith", "materialsBlacksmith",
+  "worldEvents",
   "runeCraftsmen", "npc", "rulid", "fishingSpot", "oakWood", "copper", "iron", "coal"
 ].sort();
 const hardcodedColors = colorUtils.HARDCODED_CATEGORY_COLORS;
@@ -190,6 +191,56 @@ assert.equal(riverWaypoint.groupId, biomesGroup[0]);
 const dungeonWaypoint = exportedWaypoints.find((waypoint) => waypoint.name === "Dungeon Gate");
 assert.equal(dungeonWaypoint.groupId, dungeonsGroup[0], "second category group reference is preserved");
 assert.equal(new Set(exportedWaypoints.map((waypoint) => waypoint.guid)).size, 3, "waypoint GUIDs are unique");
+
+/* --- A custom waypoint keeps its identity through the file -------------------
+   The store gives every custom waypoint its own id, and the collector hands it to the exporter as the
+   entry's stable identity. The export writes it as the waypoint GUID, so a file this site exported
+   still names the same waypoint when it is imported back - the store then skips it instead of adding
+   a second copy - and re-exporting never renames the waypoint in JourneyMap. Two distinct waypoints
+   keep their own identities even when they sit at the same coordinates. */
+const CUSTOM_IDENTITY = "8f14e45f-ceea-467a-9f6a-3c1b0f2d4e77";
+const OTHER_CUSTOM_IDENTITY = "0b3f9d2a-4c1e-4b7a-8f2d-5a6c7e8f9012";
+const customIdentityExport = () =>
+  buildJourneyMapExport({
+    world: "aincrad",
+    categories: {
+      Default: [
+        { name: "Round trip", x: 12, y: -30, z: 34, stableId: CUSTOM_IDENTITY },
+        { name: "Same place, other waypoint", x: 12, y: -30, z: 34, stableId: OTHER_CUSTOM_IDENTITY }
+      ]
+    }
+  });
+const firstCustom = parseJourneyMapDat(customIdentityExport().toUint8Array());
+const secondCustom = parseJourneyMapDat(customIdentityExport().toUint8Array());
+const customWaypoints = Object.values(firstCustom.waypoints);
+const roundTripWaypoint = customWaypoints.find((waypoint) => waypoint.name === "Round trip");
+assert.equal(roundTripWaypoint.guid, CUSTOM_IDENTITY, "a custom waypoint exports under its own identity");
+assert.equal(
+  Object.values(secondCustom.waypoints).find((waypoint) => waypoint.name === "Round trip").guid,
+  CUSTOM_IDENTITY,
+  "re-exporting the same custom waypoint keeps its identity"
+);
+assert.equal(customWaypoints.length, 2, "both custom waypoints are exported");
+assert.equal(
+  new Set(customWaypoints.map((waypoint) => waypoint.guid)).size,
+  2,
+  "distinct custom waypoints keep distinct identities even at the same coordinates"
+);
+assert.equal(
+  customWaypoints.find((waypoint) => waypoint.name === "Same place, other waypoint").guid,
+  OTHER_CUSTOM_IDENTITY,
+  "the second waypoint keeps its own identity"
+);
+/* A built-in marker carries no store identity, so it still exports under a fresh UUID. */
+const builtInExport = buildJourneyMapExport({
+  world: "aincrad",
+  categories: { Default: [{ name: "Built-in marker", x: 1, y: -30, z: 2 }] }
+});
+assert.match(
+  Object.values(parseJourneyMapDat(builtInExport.toUint8Array()).waypoints)[0].guid,
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+  "a marker without a store identity keeps a generated UUID"
+);
 
 const colorizedExport = buildJourneyMapExport({
   world: "aincrad",

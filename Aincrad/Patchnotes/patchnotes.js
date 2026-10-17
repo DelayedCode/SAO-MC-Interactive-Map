@@ -1,5 +1,13 @@
 const PATCH_NOTES = [
   {
+    version: "Content, Localization & Bug Fix Update - v1.9",
+    date: "2026-10-17",
+    title: "Content, Localization & Bug Fix Update",
+    summary:
+      "NPCs & Equipment\n• Added \"Argo the Info Broker\".\n• Added new NPC locations, including Candelia, Nodachi Blacksmith, Local Miner, Wolf Accessories, and Bandit Accessories.\n• Added seven new accessories, including the Weakling Wolf Set and Bandit Set, with their set bonuses.\n• Updated the Oak/Birch Forest farming location.\n\nLocalization\n• Added Italian language support.\n• Expanded Italian translations for equipment, map locations, and other content.\n• Updated and corrected translations across the website.\n\nBug Fixes & Improvements\n• Fixed JourneyMap waypoint duplication when exporting and re-importing custom waypoints.\n• Improved waypoint identity handling to prevent duplicate imports without merging separate waypoints that share the same name and coordinates.\n• Fixed outdated Italian equipment-rendering test expectations.\n• Added regression tests for waypoint imports and equipment translations.",
+    tags: ["NPCs", "Equipment", "Maps", "Localization", "Bug Fixes"]
+  },
+  {
     version: "Character Build Equipment Update - v1.8",
     date: "2026-10-13",
     title: "Character Build Equipment Update",
@@ -108,6 +116,7 @@ function getPatchNoteId(entry) {
   const version = entry.version.match(/v\d+(?:\.\d+)?(?:\.\d+)?/i)?.[0].toLowerCase();
   return (
     {
+      "v1.9": "v190",
       "v1.8": "v180",
       "v1.7": "v170",
       "v1.6": "v160",
@@ -220,6 +229,7 @@ function buildPatchNoteCard(entry) {
       Biomes: "biomes",
       Dungeons: "dungeons",
       Bestiary: "bestiary",
+      NPCs: "npcs",
       "Floor 2": "floor2",
       POI: "poi",
       Waypoints: "waypoints",
@@ -271,7 +281,7 @@ window.addEventListener("DOMContentLoaded", () => {
       if (status) {
         status.textContent = t("page.patchnotes.statusShowing", {
           count: visibleNotes.length,
-          suffix: visibleNotes.length === 1 ? "" : "s"
+          suffix: visibleNotes.length === 1 ? "" : t("ui.common.pluralSuffix")
         });
       }
     };

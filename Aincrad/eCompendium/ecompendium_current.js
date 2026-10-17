@@ -2195,6 +2195,32 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
           "4 Piece Set Bonus": "+5% Cooldown Reduction"
         }
       },
+      /* The Gelatinous Cloak, forged at the secret equipment location this update adds. The supplied
+         category (Artifacts [F1]) maps onto the existing schema as the floor 1 accessory bucket and
+         the Artifact slot the name derives. The item keeps the Little Slime Set identity and repeats
+         that set's own tiered bonuses, so its bonuses are the same ones the set's other pieces carry.
+         Only the supplied values are carried: the item stats, the set bonuses and the three supplied
+         ingredients, exactly as named. No Col cost, rarity or extra stat is invented for it. */
+      {
+        name: "Gelatinous Cloak",
+        level: 7,
+        description: "A gelatinous cloak fished out of the castle sewers; strangely alive",
+        set: "Little Slime Set",
+        craftingLocation: "Secret Gelatinous Cloak",
+        craftingResources: [
+          { item: "Stolen Cloak", amount: 1 },
+          { item: "Essence Slime", amount: 1 },
+          { item: "Tear Slime", amount: 1 }
+        ],
+        stats: {
+          "Ability Haste": "+5%",
+          Health: "+3",
+          "Bonus Healing": "+1",
+          "2 Piece Set Bonus": "+2 Health",
+          "3 Piece Set Bonus": "+0.05/s Health Regeneration, +0.05/s Mana Regeneration, +0.05/s Stamina Regeneration",
+          "4 Piece Set Bonus": "+5% Cooldown Reduction"
+        }
+      },
       {
         name: "Spider Ring",
         level: 6,
@@ -2467,7 +2493,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         description: "A ring girded with carnivorous petals, nourished by the mana of a voracious flower.",
         set: "Nepenthes Set",
         craftingResources: [
-          { item: "Leaf Fragments", amount: 8 },
+          { item: "Leaf Fragment", amount: 8 },
           { item: "Corrupted Spore", amount: 8 },
           { item: "Col", amount: 25 }
         ],
@@ -2484,7 +2510,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         description: "Woven from carnivorous vines, it strengthens the spells and the guard of its wearer",
         set: "Nepenthes Set",
         craftingResources: [
-          { item: "Leaf Fragments", amount: 12 },
+          { item: "Leaf Fragment", amount: 12 },
           { item: "Col", amount: 28 }
         ],
         stats: {
@@ -2501,7 +2527,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         description: "An amulet brimming with sap, it sharpens magic and regenerates mana",
         set: "Nepenthes Set",
         craftingResources: [
-          { item: "Leaf Fragments", amount: 4 },
+          { item: "Leaf Fragment", amount: 4 },
           { item: "Corrupted Spore", amount: 4 },
           { item: "Oak String", amount: 1 },
           { item: "Col", amount: 25 }
@@ -2574,7 +2600,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         craftingResources: [
           { item: "Titan Bark", amount: 8 },
           { item: "Sylvan Bark", amount: 8 },
-          { item: "Sylve Sprout", amount: 8 },
+          { item: "Sylve Shoot", amount: 8 },
           { item: "Col", amount: 28 }
         ],
         stats: {
@@ -2583,6 +2609,70 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
           "2 Piece Set Bonus": "+0.5% Critical Hit Chance",
           "3 Piece Set Bonus": "+2% Movement Speed",
           "4 Piece Set Bonus": "+5% Projectile Damage"
+        }
+      },
+      /* The Sylve Accessories set this update adds, forged at the Sylve Accessories blacksmith.
+         All three pieces carry the same set label and repeat the same tiered bonuses verbatim, so the
+         Character Build set-bonus engine groups them by one set identity and applies each tier once
+         however many of them are equipped. The supplied category ([F1] Bracelet / Amulet / Ring)
+         maps onto the floor 1 accessory bucket and the slot each name derives. Only the supplied
+         stats, descriptions and ingredients are carried - the ingredient names are kept exactly as
+         supplied, plural or singular as given, and no Col cost is invented. */
+      {
+        name: "Bracelet of the Sylvan",
+        level: 3,
+        description: "Woven from vines and leaves, it distills the serenity of the ancient undergrowth",
+        set: "Sylvan Set",
+        craftingLocation: "Sylve Accessories",
+        craftingResources: [
+          { item: "Oak Log", amount: 8 },
+          { item: "Magic Wood Shard", amount: 8 }
+        ],
+        stats: {
+          "Health Regeneration": "+0.05/s",
+          "Mana Regeneration": "+0.05/s",
+          "Stamina Regeneration": "+0.05/s",
+          "2 Piece Set Bonus": "+1 Health",
+          "3 Piece Set Bonus": "+0.5 Bonus Healing",
+          "4 Piece Set Bonus": "+0.1/s Health Regeneration, +0.1/s Mana Regeneration, +0.1/s Stamina Regeneration"
+        }
+      },
+      {
+        name: "Amulet of the Sylvan",
+        level: 3,
+        description: "An amulet of carved oak, brimming with the healing sap of the forest",
+        set: "Sylvan Set",
+        craftingLocation: "Sylve Accessories",
+        craftingResources: [
+          { item: "Magic Wood Shard", amount: 8 },
+          { item: "Oak String", amount: 1 }
+        ],
+        stats: {
+          "Bonus Healing": "+0.5",
+          "2 Piece Set Bonus": "+1 Health",
+          "3 Piece Set Bonus": "+0.5 Bonus Healing",
+          "4 Piece Set Bonus": "+0.1/s Health Regeneration, +0.1/s Mana Regeneration, +0.1/s Stamina Regeneration"
+        }
+      },
+      {
+        name: "Ring of the Sylve",
+        level: 3,
+        description: "A ring of oak wood, humming with the peaceful energy that flows through the sylve",
+        set: "Sylvan Set",
+        craftingLocation: "Sylve Accessories",
+        craftingResources: [
+          { item: "Magic Wood Shard", amount: 8 },
+          { item: "Allium Flower", amount: 8 },
+          { item: "Oak Log", amount: 4 },
+          { item: "Wood Heart", amount: 1 }
+        ],
+        stats: {
+          Health: "+2",
+          "Max Mana": "+0.5",
+          "Max Stamina": "+0.5",
+          "2 Piece Set Bonus": "+1 Health",
+          "3 Piece Set Bonus": "+0.5 Bonus Healing",
+          "4 Piece Set Bonus": "+0.1/s Health Regeneration, +0.1/s Mana Regeneration, +0.1/s Stamina Regeneration"
         }
       },
       {
@@ -2630,9 +2720,15 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
       {
         name: "Sticky Ring",
         level: 5,
-        description: "A ring coated in a slimy layer; hardly elegant, but surprising",
+        description: "A ring coated in a slimy layer; Hardly elegant, but surprising",
         set: "Little Slime Set",
-        craftingNote: "N/A",
+        craftingLocation: "Secret Sticky Ring Merchant",
+        craftingResources: [
+          { item: "Slime Jelly", amount: 12 },
+          { item: "Essence of Gorbel", amount: 3 },
+          { item: "Slime Core", amount: 8 },
+          { item: "Col", amount: 35 }
+        ],
         stats: {
           Defense: "+1",
           Health: "+2",
@@ -2668,7 +2764,11 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         level: 7,
         description: "A belt made from stag hides",
         set: "Peaceful Deer Set",
-        craftingNote: "N/A",
+        craftingLocation: "Secret Deer Belt Merchant",
+        craftingResources: [
+          { item: "Mountain Stag Hide", amount: 20 },
+          { item: "Col", amount: 40 }
+        ],
         stats: {
           "Ability Haste": "+5%",
           Health: "+2",
@@ -2724,6 +2824,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         level: 10,
         description: "Cut from black silk blessed by the Circle, they allow runes to be traced without burns.",
         set: "Shadow Neophyte Set",
+        craftingLocation: "Occult Merchant - Gloves",
         craftingResources: [{ item: "Col", amount: 5000 }],
         stats: {
           "Life Steal": "+2%",
@@ -2744,6 +2845,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         level: 10,
         description: "Woven during a nocturnal ceremony of the Circle, it marks one's belonging to the Eclipse.",
         set: "Shadow Neophyte Set",
+        craftingLocation: "Occult Merchant - Bracelet",
         craftingResources: [{ item: "Col", amount: 5000 }],
         stats: {
           Defense: "+2",
@@ -2762,6 +2864,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         description:
           "Worn by the initiates of the Circle of the Eclipse, it silently engraves the oath of the first rite.",
         set: "Shadow Neophyte Set",
+        craftingLocation: "Occult Merchant - Ring",
         craftingResources: [{ item: "Col", amount: 5000 }],
         stats: {
           "Physical Damage": "+5%",
@@ -2782,6 +2885,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         description:
           "Engraved with the seal of the Circle, it awakens the senses to the hidden energies of Aincrad",
         set: "Shadow Neophyte Set",
+        craftingLocation: "Occult Merchant - Amulet",
         craftingResources: [{ item: "Col", amount: 5000 }],
         stats: {
           "Critical Hit Chance": "+2%",
@@ -2800,6 +2904,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         level: 10,
         description: "Torn away during the last rite of the Circle, it murmurs the oaths of the vanished members.",
         set: "Shadow Neophyte Set",
+        craftingLocation: "Occult Merchant - Artifacts",
         craftingResources: [{ item: "Col", amount: 5000 }],
         stats: {
           "Skill Critical Damage": "+5%",
@@ -2818,6 +2923,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         level: 10,
         description: "Woven from a cloth blessed by the Master, it hides its wearer from the eyes of the profane.",
         set: "Shadow Neophyte Set",
+        craftingLocation: "Occult Merchant - Artifacts",
         craftingResources: [{ item: "Col", amount: 5000 }],
         stats: {
           "Attack Speed": "0.05/s",
@@ -2832,13 +2938,15 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
           "7 Piece Set Bonus": "-0.6/s Health Regeneration"
         }
       },
-      /* Current Data supplies no stats, description, resources or cost for the Occult Hood, so the
-         entry carries only what is known: its level, its set and the set bonuses every Shadow
-         Neophyte piece shares. Nothing was invented to fill the gap. */
+      /* The Occult Hood's merchant is supplied as the Occult Merchant - Artifacts and its price as
+         5000 Cols, the same merchant and price the other Shadow Neophyte pieces carry. Current Data
+         still supplies no stats or description for the Hood, so none is invented. */
       {
         name: "Occult Hood",
         level: 10,
         set: "Shadow Neophyte Set",
+        craftingLocation: "Occult Merchant - Artifacts",
+        craftingResources: [{ item: "Col", amount: 5000 }],
         stats: {
           "2 Piece Set Bonus": "-0.6/s Health Regeneration, -50% Healing Received",
           "3 Piece Set Bonus": "-0.6/s Health Regeneration",
@@ -2848,6 +2956,122 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
           "7 Piece Set Bonus": "-0.6/s Health Regeneration"
         }
       },
+      /* The two Weakling Wolf Set accessories and the five Bandit Set accessories this update adds.
+         Every supplied value is carried exactly as given: minimum level, item statistics, the
+         description, the set, the set-bonus tiers, the crafting materials and the Col cost. The Col
+         cost is a crafting resource named "Col", the shape every other Current accessory uses, and
+         the crafting location each item names is the blacksmith that forges it. */
+      {
+        name: "Ring of the Wolf",
+        level: 3,
+        description: "A ring set with a wolf's fang, a relic of a feeble yet ferocious pack",
+        set: "Weakling Wolf Set",
+        craftingLocation: "Wolf Accessories",
+        craftingResources: [
+          { item: "Wolf Fur", amount: 16 },
+          { item: "Oak Log", amount: 8 },
+          { item: "Col", amount: 33 }
+        ],
+        stats: {
+          "Attack Damage": "+0.25",
+          "Max Stamina": "+0.5",
+          "2 Piece Set Bonus": "+0.5% Critical Power",
+          "3 Piece Set Bonus": "+5% Movement Speed",
+          "4 Piece Set Bonus": "+0.25 Attack Damage"
+        }
+      },
+      {
+        name: "Albal's Necklace",
+        level: 3,
+        description: "Adorned with massive fangs, torn from the alpha wolf Albal, dominant predator of the wolves' valley",
+        set: "Weakling Wolf Set",
+        craftingLocation: "Wolf Accessories",
+        craftingResources: [
+          { item: "Birch String", amount: 1 },
+          { item: "Fangs of Albal", amount: 4 },
+          { item: "Col", amount: 33 }
+        ],
+        stats: {
+          "Critical Damage": "+1%",
+          Health: "+1",
+          "Movement Speed": "+5%",
+          "2 Piece Set Bonus": "+0.5% Critical Power",
+          "3 Piece Set Bonus": "+5% Movement Speed",
+          "4 Piece Set Bonus": "+0.25 Attack Damage"
+        }
+      },
+      {
+        name: "Bandit's Gloves",
+        level: 5,
+        description: "Gloves worn to a thread, marked by a thousand petty thefts and treacherous blows",
+        set: "Bandit Set",
+        craftingLocation: "Bandit Accessories",
+        craftingResources: [{ item: "Small Purse", amount: 16 }],
+        stats: {
+          "Attack Speed": "+0.05/s",
+          "2 Piece Set Bonus": "+1 Health, +2% Critical Power",
+          "3 Piece Set Bonus": "+0.5 Attack Damage",
+          "4 Piece Set Bonus": "+1% Critical Chance"
+        }
+      },
+      {
+        name: "Bandit Hood",
+        level: 5,
+        description: "A threadbare hood that conceals the face in the shadows of the alleys",
+        set: "Bandit Set",
+        craftingLocation: "Bandit Accessories",
+        craftingResources: [{ item: "Small Purse", amount: 16 }],
+        stats: {
+          "Attack Damage": "+0.25",
+          Health: "+2",
+          "2 Piece Set Bonus": "+1 Health, +2% Critical Power",
+          "3 Piece Set Bonus": "+0.5 Attack Damage",
+          "4 Piece Set Bonus": "+1% Critical Chance"
+        }
+      },
+      {
+        name: "Stolen Amulet",
+        level: 5,
+        description: "An amulet plucked from a poorly guarded chest, the loot of a daring bandit",
+        set: "Bandit Set",
+        craftingLocation: "Bandit Accessories",
+        craftingResources: [{ item: "Small Purse", amount: 24 }],
+        stats: {
+          "Critical Chance": "+1%",
+          "Max Stamina": "+0.5",
+          "2 Piece Set Bonus": "+1 Health, +2% Critical Power",
+          "3 Piece Set Bonus": "+0.5 Attack Damage",
+          "4 Piece Set Bonus": "+1% Critical Chance"
+        }
+      },
+      {
+        name: "Stolen Cloak",
+        level: 5,
+        description: "A cloak stolen from the back of a traveler; it still smells of the getaway",
+        set: "Bandit Set",
+        craftingLocation: "Bandit Accessories",
+        craftingResources: [{ item: "Small Purse", amount: 24 }],
+        stats: {
+          "Attack Damage": "+1",
+          "2 Piece Set Bonus": "+1 Health, +2% Critical Power",
+          "3 Piece Set Bonus": "+0.5 Attack Damage",
+          "4 Piece Set Bonus": "+1% Critical Chance"
+        }
+      },
+      {
+        name: "Bandit Coin",
+        level: 5,
+        description: "A coin snatched from a purse, the lucky charm of a thief with nimble hands",
+        set: "Bandit Set",
+        craftingLocation: "Bandit Accessories",
+        craftingResources: [{ item: "Small Purse", amount: 24 }],
+        stats: {
+          "Critical Chance": "+1%",
+          "2 Piece Set Bonus": "+1 Health, +2% Critical Power",
+          "3 Piece Set Bonus": "+0.5 Attack Damage",
+          "4 Piece Set Bonus": "+1% Critical Chance"
+        }
+      }
     ],
     rune: [],
     tool: [
@@ -2903,6 +3127,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         name: "Boar Meat",
         level: 1,
         description: "This fine boar meat, nice and juicy, might make you want to eat even more!",
+        craftingLocation: "Starting Merchant",
         craftingResources: [{ item: "Col", amount: 1 }],
         stats: {
           "Effect: Level Required To Use Food": "1",
@@ -2921,10 +3146,16 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         name: "Health Potion I",
         level: 1,
         description: "Restores your HP immediately and applies a 15s cooldown to all healing potions.",
-        craftingResources: [{ item: "Col", amount: 5 }],
+        craftingLocation: "Starting Merchant / Alchemist",
+        craftingResources: [
+          { item: "Sylve Shoot", amount: 8 },
+          { item: "Allium Flower", amount: 8 },
+          { item: "Col", amount: 5 }
+        ],
         stats: {
           "Health Restored": "10",
           Cooldown: "15s",
+          "Purchase Price": "5.02 Cols per 1",
           "Effect: Healing": "HEALING"
         }
       },
@@ -2932,10 +3163,16 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         name: "Mana Potion I",
         level: 1,
         description: "Restores your mana immediately and applies a 15s cooldown to all mana potions.",
-        craftingResources: [{ item: "Col", amount: 5 }],
+        craftingLocation: "Starting Merchant / Alchemist",
+        craftingResources: [
+          { item: "Soul of the Ruins", amount: 8 },
+          { item: "Allium Flower", amount: 8 },
+          { item: "Col", amount: 5 }
+        ],
         stats: {
           "Mana Restored": "5",
           Cooldown: "15s",
+          "Purchase Price": "5.02 Cols per 1",
           "Effect: Mana": "MANA"
         }
       },
@@ -2943,11 +3180,17 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         name: "Stamina Potion I",
         level: 1,
         description: "Restores your stamina immediately and applies a 15s cooldown to all stamina potions.",
-        craftingResources: [{ item: "Col", amount: 5 }],
+        craftingLocation: "Starting Merchant / Alchemist",
+        craftingResources: [
+          { item: "Wheat", amount: 8 },
+          { item: "Allium Flower", amount: 8 },
+          { item: "Col", amount: 5 }
+        ],
         stats: {
           "Stamina Restored": "5",
           Cooldown: "15s",
           Unique: "Yes",
+          "Purchase Price": "5.02 Cols per 1",
           "Effect: Stamina": "STAMINA"
         }
       },
@@ -2977,7 +3220,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         craftingResources: [
           { item: "Wolf Fangs", amount: 16 },
           { item: "Wheat Flower", amount: 2 },
-          { item: "Fangs of Albal", amount: 1 },
+          { item: "Albal's Fangs", amount: 1 },
           { item: "Col", amount: 10 }
         ],
         stats: {
@@ -3118,7 +3361,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         level: 1,
         description: "Restores 12 HP immediately and applies a 15s cooldown to all healing potions.",
         craftingResources: [
-          { item: "Sylve Sprout", amount: 8 },
+          { item: "Sylve Shoot", amount: 8 },
           { item: "Allium Flower", amount: 8 },
           { item: "Col", amount: 5 }
         ],
@@ -3135,7 +3378,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         level: 5,
         description: "Restores 25 HP immediately and applies a 15s cooldown to all healing potions.",
         craftingResources: [
-          { item: "Sylve Sprout", amount: 8 },
+          { item: "Sylve Shoot", amount: 8 },
           { item: "Bone Dust", amount: 8 },
           { item: "Allium Flower", amount: 12 },
           { item: "Col", amount: 7 }
@@ -3153,7 +3396,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         level: 8,
         description: "Restores 32 HP immediately and applies a 15s cooldown to all healing potions.",
         craftingResources: [
-          { item: "Sylve Sprout", amount: 8 },
+          { item: "Sylve Shoot", amount: 8 },
           { item: "Bone Dust", amount: 8 },
           { item: "Ancestral Root", amount: 1 },
           { item: "Allium Flower", amount: 16 },
@@ -3277,15 +3520,38 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
       }
     ],
     material: [
+      /* The supplied location for the Purification Elixir is the coordinate pair (1813, 4180), which
+         is exactly the Current Data marker "F1 - PvP Purification Alchemist", so the elixir names
+         that marker as its location. No merchant name, price or extra detail is invented. */
       {
         name: "Purification Elixir",
         description: "A cold, milky liquid, its scent evokes the sap of ancient forests.",
+        craftingLocation: "F1 - PvP Purification Alchemist",
         craftingResources: [
           { item: "Ancestral Root", amount: 1 },
           { item: "Frost Dust", amount: 1 },
           { item: "Bone Dust", amount: 1 },
           { item: "Slime Core", amount: 1 }
         ]
+      },
+      /* The two materials the Sewer Reshaper produces, supplied as Material [F1]. The supplied
+         names, descriptions and quantities are carried exactly; no Col cost, level or extra
+         ingredient is invented, and the location the material is associated with is the Sewer
+         Reshaper marker Aincrad/Map/maps_current.js ships. */
+      {
+        name: "Slime Essence",
+        description: "A viscous essence made from a gelatinous mix of fluids",
+        craftingLocation: "Sewer Reshaper",
+        craftingResources: [
+          { item: "Slime Jelly", amount: 16 },
+          { item: "Essence of Gorbel", amount: 1 }
+        ]
+      },
+      {
+        name: "Slime Tear",
+        description: "A gelatinous tear and particularly precious",
+        craftingLocation: "Sewer Reshaper",
+        craftingResources: [{ item: "Slime Core", amount: 16 }]
       }
     ],
     quest_item: [],
@@ -3307,7 +3573,7 @@ window.SAO_CURRENT_EQUIPMENT_DATA = {
         description: "Can be used to access the dungeon - Labyrinth of the Fallen",
         craftingLocation: "F1 - Fallen Labyrinth Dungeon Guard - Tolbana",
         craftingResources: [
-          { item: "Cursed Fabric", amount: 8 },
+          { item: "Cursed Cloth", amount: 8 },
           { item: "Leaf Fragment", amount: 8 },
           { item: "Col", amount: 20 }
         ]

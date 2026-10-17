@@ -234,8 +234,8 @@ assert.equal(
 );
 assert.equal(
   currentItems.length,
-  225,
-  "Current Data ships the 122 earlier equipment items, the 32 off-hand entries, the 20 Champion's PvP armor pieces and the 51 normal armor pieces"
+  236,
+  "Current Data ships the 126 earlier equipment items, the 32 off-hand entries, the 20 Champion's PvP armor pieces, the 51 normal armor pieces and the 7 accessory-update items"
 );
 
 console.log(

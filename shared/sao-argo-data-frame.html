@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <!--
+    Data-only document, loaded inside a hidden sandboxed iframe by shared/sao-argo-data-provider.js.
+    It renders nothing and runs no page UI: its single script loads the site's own dataset files and
+    hands the records back to the page that asked for them. See sao-argo-data-frame.js for why the
+    isolation matters (the map datasets declare top-level const globals, and the Bestiary floor files
+    overwrite the same window keys, so they cannot be loaded into an arbitrary page).
+  -->
+  <body>
+    <script src="sao-argo-data-frame.js"></script>
+  </body>
+</html>

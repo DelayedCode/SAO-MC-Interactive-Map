@@ -18,8 +18,15 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const { readFile } = require("./harness-helpers");
+const { translatedContentLanguages } = require("./localization-languages");
 
 const root = path.resolve(__dirname, "..");
+/* The languages the content registry has translation slots for: these checks read localized content
+   values, so they follow the content-slot configuration, not the site's UI language list. */
+/* The content languages whose translations are complete (scripts/localization-languages.js). Italian
+   is still being translated - the audit reports that backlog - so its glossary entries are not
+   required to be translated here yet. */
+const CONTENT_LANGUAGES = translatedContentLanguages();
 
 /* Exactly the eight side quests the notes supply, with every supplied value verbatim. */
 const EXPECTED_SIDE_QUESTS = [
@@ -60,7 +67,7 @@ const EXPECTED_SIDE_QUESTS = [
     id: "sq-4",
     number: 4,
     title: "Frost Swarm",
-    npcName: "Shepherd Ivo",
+    npcName: "Hunter Lysa",
     x: 4074,
     z: 1994,
     xpReward: 350,
@@ -298,7 +305,7 @@ function assertTranslated(key, language, english, label) {
 EXPECTED_SIDE_QUESTS.forEach((expected) => {
   const entry = sideQuests.find((candidate) => candidate.id === expected.id);
   registry.registerQuestEntry(entry, slugify);
-  ["es", "fr"].forEach((language) => {
+  CONTENT_LANGUAGES.forEach((language) => {
     assertTranslated(`quest.${expected.id}.questName`, language, expected.title, `${expected.id} title`);
     assertTranslated(
       `quest.${expected.id}.requirements`,
@@ -308,7 +315,7 @@ EXPECTED_SIDE_QUESTS.forEach((expected) => {
     );
   });
   registry.registerMapMarker(expected.id, data[expected.id]);
-  ["es", "fr"].forEach((language) => {
+  CONTENT_LANGUAGES.forEach((language) => {
     assertTranslated(`map.${expected.id}.title`, language, expected.title, `${expected.id} marker title`);
     assertTranslated(
       `map.${expected.id}.description`,

@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
 const { attachDiagnostics, ensureStaticServer } = require("./harness-helpers");
+const { uiLanguages } = require("./localization-languages");
 
 const pageUrl = `${process.env.SAO_BASE_URL || "http://127.0.0.1:8080"}/Aincrad/Character%20Build/character-build.html`;
 const viewports = [
@@ -508,7 +509,7 @@ async function verifyRuneAndResetFlow(browser, language) {
   const browser = await chromium.launch({ headless: true });
   const results = [];
   try {
-    for (const language of ["en", "es", "fr"]) {
+    for (const language of uiLanguages()) {
       results.push(await verifyClassLevelProgression(browser, language));
       results.push(await verifyRuneAndResetFlow(browser, language));
       for (const viewport of viewports) {

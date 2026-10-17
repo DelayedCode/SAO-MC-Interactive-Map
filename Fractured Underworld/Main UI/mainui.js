@@ -689,6 +689,11 @@ function buildWalkthroughSteps() {
       body: t("page.mainui.walkthrough.step5Body"),
       onEnter: enterWalkthroughContextMenuDemo,
       onExit: exitWalkthroughContextMenuDemo
+    },
+    {
+      selector: "#argo-launcher",
+      title: t("page.mainui.walkthrough.step6Title"),
+      body: t("page.mainui.walkthrough.step6Body")
     }
   ];
 }

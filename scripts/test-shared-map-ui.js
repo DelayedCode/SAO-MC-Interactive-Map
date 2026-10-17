@@ -45,7 +45,7 @@ context.globalThis = context;
 vm.runInContext(read("shared/sao-map-helpers.js"), context, { filename: "shared/sao-map-helpers.js" });
 const helpers = context.window.SAOMapHelpers;
 
-const ICON_KINDS = ["biome", "dungeon", "boss", "sideQuest", "alchemist", "lumberjack", "mobArea"];
+const ICON_KINDS = ["biome", "dungeon", "boss", "sideQuest", "alchemist", "lumberjack", "worldEvent", "mobArea"];
 assert.equal(typeof helpers.MARKER_ICON_LIBRARY, "object", "MARKER_ICON_LIBRARY is exported");
 assert.equal(typeof helpers.buildMarkerIcon, "function", "buildMarkerIcon is exported");
 assert.ok(Object.isFrozen(helpers.MARKER_ICON_LIBRARY), "the icon library is frozen");

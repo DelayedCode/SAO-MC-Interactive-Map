@@ -369,7 +369,7 @@ assert.equal(
   false,
   "no Champion's PvP armor name leaks into the Beta armor bucket"
 );
-assert.equal(currentItems.length, 225, "Current Data ships the 154 earlier equipment items, the 20 armor pieces and the 51 normal armor pieces");
+assert.equal(currentItems.length, 236, "Current Data ships the 158 earlier equipment items, the 20 armor pieces, the 51 normal armor pieces and the 7 accessory-update items");
 assert.equal(
   toHost(context.SAO_CURRENT_EQUIPMENT_DATA.floor1.weapon).length,
   95,

@@ -287,7 +287,10 @@ function getWaypointInfoHref(marker, markerId) {
     const bossCategory = marker.underground === true ? "dungeonBoss" : "boss";
     return getFloorSpecificBestiaryUrl(marker.floor, bossCategory, query);
   }
-  return getFloorSpecificQuestsUrl(marker.floor, query);
+  /* A Main Quest marker opens the Main tab and a side quest marker the Side tab; without the type
+     the Quests page keeps the tab the visitor last used. */
+  const questType = marker.category === MAIN_QUESTS_CATEGORY ? "main" : "side";
+  return getFloorSpecificQuestsUrl(marker.floor, query, questType);
 }
 
 function registerContextTranslations() {
@@ -336,6 +339,7 @@ const initialCategoryState = Object.freeze({
   mobAreas: false,
   bossSpawns: false,
   farmingSpots: false,
+  worldEvents: false,
   sideQuests: false,
   alchemist: false,
   lumberjack: false,
@@ -352,7 +356,9 @@ const initialCategoryState = Object.freeze({
   armorBlacksmith: false,
   ingotBlacksmith: false,
   keyBlacksmith: false,
+  materialsBlacksmith: false,
   accessoriesBlacksmith: false,
+  equipmentBlacksmith: false,
   secretAccessoryBlacksmith: false,
   runeCraftsmen: false
 });
@@ -1008,8 +1014,10 @@ function getFloorSpecificBestiaryUrl(floor, category, search) {
   return window.SAOPageUtils.buildQueryUrl("../Bestiary/bestiary.html", { floor, category, search });
 }
 
-function getFloorSpecificQuestsUrl(floor, search) {
-  return window.SAOPageUtils.buildQueryUrl("../Quests/quests.html", { floor, search });
+/* The Quests page has a Main tab and a Side tab and opens on the remembered tab unless it is told
+   otherwise, so the marker's own quest type travels with the link (see getWaypointInfoHref). */
+function getFloorSpecificQuestsUrl(floor, search, questType) {
+  return window.SAOPageUtils.buildQueryUrl("../Quests/quests.html", { floor, search, type: questType });
 }
 
 function attachSectionNavButtons() {
@@ -1040,8 +1048,12 @@ function buildMobAreaMobListMarkup(areaId, areaFloor) {
     selectLabel: t("page.maps.viewWaypointInfo"),
     getHref: (mob) => {
       const search = mob.search ? mob.search : mob.name;
-      const href = getFloorSpecificBestiaryUrl(areaFloor, category, search);
-      return category === "dungeonMobs" ? `${href}#dungeonMobs` : href;
+      /* A mob row may name the Bestiary tab it lives in (see the Current-Data mob-area link
+         overrides in Aincrad/Map/maps_current.js); without it the row keeps the tab the area's own
+         layer implies. */
+      const mobCategory = mob.category || category;
+      const href = getFloorSpecificBestiaryUrl(areaFloor, mobCategory, search);
+      return mobCategory === "dungeonMobs" ? `${href}#dungeonMobs` : href;
     }
   });
 }
@@ -1182,6 +1194,11 @@ function buildWalkthroughSteps() {
       body: t("page.maps.walkthrough.step5Body"),
       onEnter: enterWalkthroughContextMenuDemo,
       onExit: exitWalkthroughContextMenuDemo
+    },
+    {
+      selector: "#argo-launcher",
+      title: t("page.maps.walkthrough.step6Title"),
+      body: t("page.maps.walkthrough.step6Body")
     }
   ];
 }
@@ -2137,6 +2154,11 @@ function renderMarkers() {
     } else if (isLumberjack) {
       markerEl.classList.add("lumberjack-marker");
       markerEl.innerHTML = buildMarkerIcon("lumberjack");
+    } else if (marker.category === "worldEvents") {
+      /* The World Event category the Current-Data update adds renders the shared event glyph, the
+         same way the alchemist and lumberjack categories render theirs. */
+      markerEl.classList.add("world-event-marker");
+      markerEl.innerHTML = buildMarkerIcon("worldEvent");
     } else if (isCraftsmenCategory) {
       markerEl.classList.add("craftsman-marker", `${marker.category}-marker`);
       markerEl.innerHTML = buildCraftsmanMarkerIcon(marker.category);

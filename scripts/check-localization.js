@@ -2,11 +2,39 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 const { readFile, loadScript } = require("./harness-helpers");
+const {
+  classificationReportKey,
+  classificationStatus,
+  contentLanguages,
+  sourceLanguage,
+  translationBacklogLanguages,
+  uiLanguages
+} = require("./localization-languages");
 
 const root = path.resolve(__dirname, "..");
 const registryContext = { window: {}, console };
 vm.runInNewContext(fs.readFileSync(path.join(root, "shared", "sao-content-translations.js"), "utf8"), registryContext);
 const registry = registryContext.window.SAOContentTranslations;
+
+/* ------------------------------------------------------------------------------------------------
+   Languages.
+
+   The audit works from two lists read out of the shared modules (see scripts/localization-languages.js):
+
+     - SOURCE_LANGUAGE / UI_LANGUAGES: the language the source text is written in, and every language
+       the site offers. The UI dictionary audit covers all of UI_LANGUAGES.
+     - CONTENT_LANGUAGES: the languages the content-translation registry has positional [spanish,
+       french] slots for. The dataset audit covers these; the source language is the text being
+       compared against, not a slot.
+
+   Neither list is restated below, so registering a language in the shared configuration is all the
+   audit needs to pick it up. `reportKey` keeps the JSON report's established Spanish/French keys; a
+   language without a report key reports under its own language code.
+   ------------------------------------------------------------------------------------------------ */
+const SOURCE_LANGUAGE = sourceLanguage();
+const UI_LANGUAGES = uiLanguages();
+const CONTENT_LANGUAGES = contentLanguages();
+const reportKey = classificationReportKey;
 const manualResolutionPath = path.join(root, "scripts", "localization-unresolved.json");
 const sameAsEnglishPath = path.join(root, "scripts", "localization-same-as-english.json");
 const manualResolutionSource = fs.existsSync(manualResolutionPath)
@@ -172,12 +200,13 @@ function auditRuntimeUi() {
   const translations = loadUiTranslations();
   const english = flattenTranslations(translations.en);
   const localeAudit = {};
-  for (const language of ["en", "es", "fr"]) {
+  for (const language of UI_LANGUAGES) {
     const localized = flattenTranslations(translations[language]);
-    const missingKeys = language === "en" ? [] : Object.keys(english).filter((key) => localized[key] === undefined);
+    const missingKeys =
+      language === SOURCE_LANGUAGE ? [] : Object.keys(english).filter((key) => localized[key] === undefined);
     const englishFallbackKeys = missingKeys.map((key) => ({ key, english: english[key] }));
     const placeholderMismatches =
-      language === "en"
+      language === SOURCE_LANGUAGE
         ? []
         : Object.keys(english)
             .filter(
@@ -275,11 +304,10 @@ function auditRuntimeUi() {
     }
     for (const textMatch of html.matchAll(/>([^<\r\n]{3,})</g)) {
       const value = textMatch[1].trim();
-      if (
-        !value ||
-        ["Change Language Here!", "Changez de langue ici !", "¡Cambia el idioma aquí!", "&times;"].includes(value)
-      )
-        continue;
+      /* The first-visit language hint sentences now live in the dictionaries and are rendered by the
+         hub from the shared language configuration, so the only text-node exception left here is the
+         shared close glyph the pickers render. */
+      if (!value || value === "&times;") continue;
       if (/^[\d\s.XZ:>+%,-]+$/.test(value)) continue;
       const before = html.slice(0, textMatch.index);
       const openingTag = before.slice(before.lastIndexOf("<"));
@@ -439,15 +467,22 @@ for (const name of bestiaryNames) add(`bestiary.mob.${slug(name)}`, name);
 for (const drop of bestiaryDrops) add(`bestiary.item.${slug(drop)}`, drop);
 for (const name of bestiaryNames) {
   const key = `bestiary.mob.${slug(name)}`;
-  registry.register(key, name, registry.es[key] || name, registry.fr[key] || name);
+  /* The Bestiary page registers every language the registry has a slot for through the shared
+     adapter, so the audit mirrors that rather than naming Spanish and French. */
+  registry.register(
+    key,
+    name,
+    registry.translationsByLanguage((language) => registry[language][key] || name)
+  );
 }
 for (const drop of bestiaryDrops) {
   const key = `bestiary.item.${slug(drop)}`;
   registry.register(
     key,
     drop,
-    registry.es[key] || registry.translateKnownTerms(drop, "es"),
-    registry.fr[key] || registry.translateKnownTerms(drop, "fr")
+    registry.translationsByLanguage(
+      (language) => registry[language][key] || registry.translateKnownTerms(drop, language)
+    )
   );
 }
 
@@ -570,14 +605,14 @@ for (const item of towerDefenseItems) {
     if (!english) return;
     const key = `towerDefense.${id}.${field}`;
     add(key, english);
-    const legacySpanish = uiBundle("es")[`page.towerdefense.shopItems.${id}.${legacyField}`];
-    const legacyFrench = uiBundle("fr")[`page.towerdefense.shopItems.${id}.${legacyField}`];
-    registry.register(
-      key,
-      english,
-      registry.es[key] || legacySpanish || english,
-      registry.fr[key] || legacyFrench || english
-    );
+    /* The legacy UI key exists per language, so the effective localized value is resolved per
+       language and registered through the language-keyed form instead of naming Spanish and French. */
+    const translations = {};
+    for (const language of CONTENT_LANGUAGES) {
+      const legacy = uiBundle(language)[`page.towerdefense.shopItems.${id}.${legacyField}`];
+      translations[language] = registry[language][key] || legacy || english;
+    }
+    registry.register(key, english, translations);
   };
   for (const field of ["name", "unlockRequirement", "invocationCost", "levelOne"]) registerField(field, item[field]);
   registerField("universalUpgradeCosts", item.universalUpgradeCosts, "upgradeCosts");
@@ -602,7 +637,7 @@ for (const entry of underworldCompendium) {
   if (entry.category) {
     const camel = slug(entry.category).replace(/-([a-z])/g, (_match, character) => character.toUpperCase());
     const categoryKey = `page.uwcompendium.categories.${camel}`;
-    for (const language of ["en", "es", "fr"]) {
+    for (const language of UI_LANGUAGES) {
       if (typeof uiBundle(language)[categoryKey] !== "string")
         missingUnderworldCategoryKeys.push({ language, key: categoryKey, category: entry.category });
     }
@@ -627,7 +662,7 @@ for (const [classId, nodes] of Object.entries(characterBuildTrees)) {
 const patchNotes =
   loadLiteral(readFile("Aincrad/Patchnotes/patchnotes.js"), "const PATCH_NOTES = [", "patch notes") || [];
 const patchnoteIds = new Set();
-for (const language of ["en", "es", "fr"]) {
+for (const language of UI_LANGUAGES) {
   for (const key of Object.keys(uiBundle(language))) {
     const match = key.match(/^page\.patchnotes\.entries\.([^.]+)\./);
     if (match) patchnoteIds.add(match[1]);
@@ -651,7 +686,7 @@ for (const note of patchNotes) {
     continue;
   }
   for (const field of ["version", "title", "summary"]) {
-    for (const language of ["es", "fr"]) {
+    for (const language of CONTENT_LANGUAGES) {
       if (typeof uiBundle(language)[`page.patchnotes.entries.${id}.${field}`] !== "string") {
         missingPatchnoteKeys.push({ id, language, field, version: note.version });
       }
@@ -674,35 +709,55 @@ const unresolvedPageContentKeys = [];
     for (const match of source.matchAll(pageContentKeyPattern)) seen.set(match[1], relativePath);
   }
   for (const [key, relativePath] of seen) {
-    const missing = ["en", "es", "fr"].filter(
-      (language) => typeof uiBundle(language)[key] !== "string" && typeof registry[language][key] !== "string"
+    /* The content registry only holds the source language and the content languages, so a UI language
+       without a content slot is resolved from its own dictionary alone - its game content falls back
+       to the English source text by design (shared/sao-content-translations.js). */
+    const missing = UI_LANGUAGES.filter(
+      (language) =>
+        typeof uiBundle(language)[key] !== "string" &&
+        typeof (registry[language] || {})[key] !== "string"
     );
     if (missing.length) unresolvedPageContentKeys.push({ file: relativePath, key, missingLanguages: missing });
   }
 }
 
+/* A source string can reach the registry carrying CP437-decoded UTF-8 bytes - two box-drawing
+   characters standing where the accented letter of "Nymbréa" belongs - when a dataset is written
+   through the wrong code page. The table below holds the verified correct source text and its
+   translations, and it is applied only to a value that still shows those bytes: a clean value is never
+   rewritten, so the audit measures the shipped text as it stands instead of replacing it with the
+   corrupted form. The pair is the same positional [spanish, french, italian] list every glossary uses,
+   so a repaired entry is translated in every content language rather than falling back to the English
+   source. */
+const MOJIBAKE_CHARACTERS = /[\u2500-\u257f\u2310]/;
+const printableAsciiPrefix = (value) => value.split(/[^\x20-\x7E]/)[0];
 const verifiedSourceCorrections = {
-  "Nymbr├⌐a": ["Nymbréa", "Nymbréa"],
-  "Baobab Mill├⌐naire": ["Baobab milenario", "Baobab millénaire"],
-  "Sanctuary of Khes├╗n": ["Santuario de Khesûn", "Sanctuaire de Khesûn"]
+  Nymbréa: ["Nymbréa", "Nymbréa", "Nymbréa"],
+  "Baobab Millénaire": ["Baobab milenario", "Baobab millénaire", "Baobab millenario"],
+  "Sanctuary of Khesûn": ["Santuario de Khesûn", "Sanctuaire de Khesûn", "Santuario di Khesûn"]
 };
-for (const [english, [spanish, french]] of Object.entries(verifiedSourceCorrections)) {
+for (const [english, pair] of Object.entries(verifiedSourceCorrections)) {
+  /* The corrupted spelling differs from the verified one only after the first accented character, so
+     the printable prefix identifies which correction applies. */
+  const prefix = printableAsciiPrefix(english);
   for (const key of Object.keys(registry.en)) {
     const source = String(registry.en[key]);
-    const matchesCorruptedSource = english.startsWith("Nymbr")
-      ? source.startsWith("Nymbr")
-      : english.startsWith("Baobab")
-        ? source.startsWith("Baobab Mill")
-        : source.startsWith("Sanctuary of Khes");
-    if (registry.en[key] === english || matchesCorruptedSource) registry.register(key, english, spanish, french);
+    if (source === english || !MOJIBAKE_CHARACTERS.test(source)) continue;
+    if (prefix && !source.startsWith(prefix)) continue;
+    registry.register(
+      key,
+      english,
+      registry.translationsByLanguage((language) => registry.pairValue(pair, language) ?? english)
+    );
   }
 }
 
 const englishKeys = new Set(Object.keys(registry.en));
 const duplicateKeys = [];
-const allLanguages = ["en", "es", "fr"];
-for (const language of allLanguages) {
-  const keys = Object.keys(registry[language]);
+for (const language of UI_LANGUAGES) {
+  /* Only the languages the registry holds a dictionary for: a UI language without a content slot has
+     no registry keys to check, so it contributes nothing here. */
+  const keys = Object.keys(registry[language] || {});
   const seen = new Set();
   for (const key of keys) {
     if (seen.has(key)) duplicateKeys.push(`${language}:${key}`);
@@ -744,15 +799,20 @@ function reportLanguage(language) {
   };
 }
 
+/* The report keeps its established per-language keys (report.spanish, report.french, ...) for the
+   languages that have one and uses each language's own code for any language added later, so the
+   JSON other tooling reads keeps its shape while the grouping logic stays language-agnostic. */
 const report = {
-  englishRegistryKeys: englishKeys.size,
-  spanishRegistryKeys: Object.keys(registry.es).length,
-  frenchRegistryKeys: Object.keys(registry.fr).length,
-  requiredDatasetKeys: required.size,
-  duplicateKeys,
-  spanish: reportLanguage("es"),
-  french: reportLanguage("fr")
+  englishRegistryKeys: englishKeys.size
 };
+for (const language of CONTENT_LANGUAGES) {
+  report[`${reportKey(language)}RegistryKeys`] = Object.keys(registry[language]).length;
+}
+report.requiredDatasetKeys = required.size;
+report.duplicateKeys = duplicateKeys;
+for (const language of CONTENT_LANGUAGES) {
+  report[reportKey(language)] = reportLanguage(language);
+}
 const uiAudit = auditRuntimeUi();
 const genuineUiBypasses = (uiAudit.genuineHardcodedPlayerFacing || uiAudit.hardcodedPlayerFacing || []).filter(Boolean);
 if (genuineUiBypasses.length > 0) {
@@ -785,34 +845,52 @@ function isLanguageNeutralKey(key) {
   return /\.(?:id|slug|coordinates|coords|xpReward|colReward|command)$/.test(key);
 }
 
+/* One family entry, built by looping the content languages rather than naming Spanish and French.
+   The key groups are emitted in their established order (missing, translated, English-equivalent) so
+   the report's JSON keeps the same shape for the languages that already have a report key. */
+const familyEntry = (keys) => {
+  const entry = { required: keys.length };
+  for (const language of CONTENT_LANGUAGES) {
+    entry[`${reportKey(language)}Missing`] = keys.filter((key) => !(key in registry[language])).length;
+  }
+  for (const language of CONTENT_LANGUAGES) {
+    entry[`${reportKey(language)}Translated`] = keys.filter(
+      (key) => registry[language][key] !== undefined && registry[language][key] !== registry.en[key]
+    ).length;
+  }
+  for (const language of CONTENT_LANGUAGES) {
+    entry[`${reportKey(language)}EnglishEquivalent`] = keys.filter(
+      (key) => registry[language][key] === registry.en[key]
+    ).length;
+  }
+  return entry;
+};
+
+const fieldEntry = (fieldKeys) => {
+  const entry = { total: fieldKeys.length };
+  for (const language of CONTENT_LANGUAGES) {
+    entry[`${reportKey(language)}Translated`] = fieldKeys.filter(
+      (key) => registry[language][key] !== registry.en[key]
+    ).length;
+  }
+  for (const language of CONTENT_LANGUAGES) {
+    entry[`${reportKey(language)}EnglishEquivalent`] = fieldKeys.filter(
+      (key) => registry[language][key] === registry.en[key]
+    ).length;
+  }
+  return entry;
+};
+
 for (const prefix of ["equipment.", "quest.", "map.", "bestiary."]) {
   const keys = [...required].filter((key) => key.startsWith(prefix));
-  familyReport[prefix.slice(0, -1)] = {
-    required: keys.length,
-    spanishMissing: keys.filter((key) => !(key in registry.es)).length,
-    frenchMissing: keys.filter((key) => !(key in registry.fr)).length,
-    spanishTranslated: keys.filter((key) => registry.es[key] !== undefined && registry.es[key] !== registry.en[key])
-      .length,
-    frenchTranslated: keys.filter((key) => registry.fr[key] !== undefined && registry.fr[key] !== registry.en[key])
-      .length,
-    spanishEnglishEquivalent: keys.filter((key) => registry.es[key] === registry.en[key]).length,
-    frenchEnglishEquivalent: keys.filter((key) => registry.fr[key] === registry.en[key]).length,
-    fields: Object.fromEntries(
-      [...new Set(keys.map(getFieldType))].sort().map((field) => {
-        const fieldKeys = keys.filter((key) => getFieldType(key) === field);
-        return [
-          field,
-          {
-            total: fieldKeys.length,
-            spanishTranslated: fieldKeys.filter((key) => registry.es[key] !== registry.en[key]).length,
-            frenchTranslated: fieldKeys.filter((key) => registry.fr[key] !== registry.en[key]).length,
-            spanishEnglishEquivalent: fieldKeys.filter((key) => registry.es[key] === registry.en[key]).length,
-            frenchEnglishEquivalent: fieldKeys.filter((key) => registry.fr[key] === registry.en[key]).length
-          }
-        ];
-      })
-    )
-  };
+  const family = familyEntry(keys);
+  family.fields = Object.fromEntries(
+    [...new Set(keys.map(getFieldType))].sort().map((field) => [
+      field,
+      fieldEntry(keys.filter((key) => getFieldType(key) === field))
+    ])
+  );
+  familyReport[prefix.slice(0, -1)] = family;
 }
 
 const manualByKey = new Map(manualResolution.map((entry) => [entry.key, entry]));
@@ -830,40 +908,50 @@ function getManualClassification(key) {
     )
   );
 }
+/* Every content language must declare a valid status for a group. A language added to the shared
+   configuration without classification data is therefore reported here instead of being skipped. */
+const VALID_CLASSIFICATION_STATUSES = new Set(["translated", "SAME_AS_ENGLISH", "unresolved"]);
 const invalidManualEntries = manualResolution.filter((entry) => {
-  const validStatuses = new Set(["translated", "SAME_AS_ENGLISH", "unresolved"]);
   return (
     (!entry.key && !entry.field) ||
     typeof entry.english !== "string" ||
-    !validStatuses.has(entry.spanishStatus) ||
-    !validStatuses.has(entry.frenchStatus) ||
+    !CONTENT_LANGUAGES.every((language) =>
+      VALID_CLASSIFICATION_STATUSES.has(classificationStatus(entry, language))
+    ) ||
     typeof entry.reason !== "string"
   );
 });
 const equivalentValues = [...required]
   .filter((key) => !isLanguageNeutralKey(key))
-  .filter((key) => registry.es[key] === registry.en[key] || registry.fr[key] === registry.en[key])
+  .filter((key) => CONTENT_LANGUAGES.some((language) => registry[language][key] === registry.en[key]))
   .sort()
-  .map((key) => ({
-    key,
-    field: `${key.split(".")[0]}.${getFieldType(key)}`,
-    english: registry.en[key],
-    spanish: registry.es[key],
-    french: registry.fr[key],
-    spanishEquivalent: registry.es[key] === registry.en[key],
-    frenchEquivalent: registry.fr[key] === registry.en[key],
-    manual: Boolean(getManualClassification(key)),
-    spanishStatus: getManualClassification(key)?.spanishStatus || null,
-    frenchStatus: getManualClassification(key)?.frenchStatus || null
-  }));
+  .map((key) => {
+    const classification = getManualClassification(key);
+    const entry = {
+      key,
+      field: `${key.split(".")[0]}.${getFieldType(key)}`,
+      english: registry.en[key]
+    };
+    for (const language of CONTENT_LANGUAGES) entry[reportKey(language)] = registry[language][key];
+    for (const language of CONTENT_LANGUAGES) {
+      entry[`${reportKey(language)}Equivalent`] = registry[language][key] === registry.en[key];
+    }
+    entry.manual = Boolean(classification);
+    for (const language of CONTENT_LANGUAGES) {
+      entry[`${reportKey(language)}Status`] = classificationStatus(classification, language) || null;
+    }
+    return entry;
+  });
 
-const unclassifiedEquivalentValues = equivalentValues.filter(
-  (entry) =>
-    (entry.spanishEquivalent && !["SAME_AS_ENGLISH", "unresolved"].includes(entry.spanishStatus)) ||
-    (entry.frenchEquivalent && !["SAME_AS_ENGLISH", "unresolved"].includes(entry.frenchStatus))
+const unclassifiedEquivalentValues = equivalentValues.filter((entry) =>
+  CONTENT_LANGUAGES.some(
+    (language) =>
+      entry[`${reportKey(language)}Equivalent`] &&
+      !["SAME_AS_ENGLISH", "unresolved"].includes(entry[`${reportKey(language)}Status`])
+  )
 );
 const remainingByField = {};
-for (const language of ["es", "fr"]) {
+for (const language of CONTENT_LANGUAGES) {
   remainingByField[language] = {};
   for (const key of required) {
     if (registry.explicitCounterparts?.[language]?.has(key)) continue;
@@ -877,14 +965,11 @@ for (const language of ["es", "fr"]) {
 }
 
 const remainingValues = {};
-for (const language of ["es", "fr"]) {
+for (const language of CONTENT_LANGUAGES) {
   remainingValues[language] = [...required]
     .filter((key) => {
       const classification = getManualClassification(key);
-      return (
-        registry[language][key] === registry.en[key] &&
-        !classification?.[language === "es" ? "spanishStatus" : "frenchStatus"]
-      );
+      return registry[language][key] === registry.en[key] && !classificationStatus(classification, language);
     })
     .sort()
     .map((key) => ({
@@ -896,29 +981,26 @@ for (const language of ["es", "fr"]) {
 }
 
 function expandManualEntry(entry) {
-  return {
-    ...entry,
-    spanish:
-      registry.es[entry.key] ||
-      entry.spanish ||
-      equivalentValues.find((value) => value.field === entry.field && value.english === entry.english)?.spanish ||
-      null,
-    french:
-      registry.fr[entry.key] ||
-      entry.french ||
-      equivalentValues.find((value) => value.field === entry.field && value.english === entry.english)?.french ||
-      null,
-    needs: ["es", "fr"].filter(
-      (language) => entry[language === "es" ? "spanishStatus" : "frenchStatus"] === "unresolved"
-    )
-  };
+  const expanded = { ...entry };
+  for (const language of CONTENT_LANGUAGES) {
+    const key = reportKey(language);
+    expanded[key] =
+      registry[language][entry.key] ||
+      entry[key] ||
+      equivalentValues.find((value) => value.field === entry.field && value.english === entry.english)?.[key] ||
+      null;
+  }
+  expanded.needs = CONTENT_LANGUAGES.filter((language) => classificationStatus(entry, language) === "unresolved");
+  return expanded;
 }
 
 const unresolved = manualResolution
-  .filter((entry) => entry.spanishStatus === "unresolved" || entry.frenchStatus === "unresolved")
+  .filter((entry) => CONTENT_LANGUAGES.some((language) => classificationStatus(entry, language) === "unresolved"))
   .map(expandManualEntry);
 const sameAsEnglish = manualResolution
-  .filter((entry) => entry.spanishStatus === "SAME_AS_ENGLISH" || entry.frenchStatus === "SAME_AS_ENGLISH")
+  .filter((entry) =>
+    CONTENT_LANGUAGES.some((language) => classificationStatus(entry, language) === "SAME_AS_ENGLISH")
+  )
   .map(expandManualEntry);
 
 const uiLocaleProblems = Object.entries(uiAudit.localeAudit).flatMap(([language, locale]) => [
@@ -927,9 +1009,8 @@ const uiLocaleProblems = Object.entries(uiAudit.localeAudit).flatMap(([language,
   ...locale.placeholderKeys.map((entry) => ({ language, ...entry, issue: "placeholder-ui-copy" })),
   ...locale.placeholderMismatches.map((entry) => ({ language, ...entry, issue: "placeholder-token-mismatch" }))
 ]);
-const datasetLocaleProblems = ["es", "fr"].flatMap((language) => {
-  const languageName = language === "es" ? "spanish" : "french";
-  const languageReport = report[languageName];
+const datasetLocaleProblems = CONTENT_LANGUAGES.flatMap((language) => {
+  const languageReport = report[reportKey(language)];
   return [
     ...languageReport.missingRegistryKeys.map((key) => ({ language, key, issue: "missing-registry-key" })),
     ...languageReport.missingExplicitCounterparts.map((key) => ({
@@ -1230,7 +1311,7 @@ function residueTokens(value, options = {}) {
 }
 
 const residueVocabulary = {};
-for (const language of ["es", "fr"]) {
+for (const language of CONTENT_LANGUAGES) {
   const words = new Set();
   for (const value of Object.values(uiBundle(language))) {
     if (typeof value === "string") residueTokens(value).forEach((token) => words.add(token));
@@ -1240,15 +1321,14 @@ for (const language of ["es", "fr"]) {
 
 const englishResidue = [];
 const backlogResidue = [];
-for (const language of ["es", "fr"]) {
+for (const language of CONTENT_LANGUAGES) {
   for (const key of englishKeys) {
     const value = registry[language][key];
     if (typeof value !== "string" || value.length < 16) continue;
     if (isLanguageNeutralKey(key)) continue;
     if (value === registry.en[key]) continue;
     const status = getManualClassification(key);
-    if (["SAME_AS_ENGLISH", "unresolved"].includes(language === "es" ? status?.spanishStatus : status?.frenchStatus))
-      continue;
+    if (["SAME_AS_ENGLISH", "unresolved"].includes(classificationStatus(status, language))) continue;
     const residue = residueTokens(value, { commandExample: /^command\..+\.example$/.test(key) }).filter(
       (token) =>
         (ENGLISH_RESIDUE_WORDS.has(token) || ENGLISH_RESIDUE_TERMS.has(token)) &&
@@ -1268,16 +1348,88 @@ for (const language of ["es", "fr"]) {
   }
 }
 
+/* ------------------------------------------------------------------------------------------------
+   Italian coverage.
+
+   Italian is still being translated. A glossary entry with no Italian value yet falls back to the
+   English source text (see shared/sao-content-translations.js), which the checks above report as an
+   English-identical value or as English residue. That backlog is counted here and does not fail the
+   build, so the audit states how far Italian has come instead of blocking on work in progress.
+
+   Only the two "not translated yet" categories are treated this way, and only for the languages
+   scripts/localization-languages.js lists as still being translated: a missing key, an empty value, a
+   missing counterpart, a duplicate key, an invalid classification entry or any Spanish/French issue
+   still fails exactly as before. */
+const TRANSLATION_BACKLOG_LANGUAGES = translationBacklogLanguages();
+
+const equivalentValuesBlocking = unclassifiedEquivalentValues.filter((entry) =>
+  CONTENT_LANGUAGES.some(
+    (language) =>
+      !TRANSLATION_BACKLOG_LANGUAGES.includes(language) &&
+      entry[`${reportKey(language)}Equivalent`] &&
+      !["SAME_AS_ENGLISH", "unresolved"].includes(entry[`${reportKey(language)}Status`])
+  )
+);
+const residueBlocking = englishResidue.filter(
+  (entry) => !TRANSLATION_BACKLOG_LANGUAGES.includes(entry.language)
+);
+const unresolvedBlocking = unresolved.filter(
+  (entry) => !(entry.needs || []).every((language) => TRANSLATION_BACKLOG_LANGUAGES.includes(language))
+);
+
+/* The coverage of a language that is still being translated, as four disjoint buckets over the
+   registry's key set - so the numbers always add up:
+     translatedValues            the value differs from the English source text
+     intentionallyUnchangedValues the value is the English source text and the classification data
+                                 records why (a canonical name, a token, punctuation)
+     pendingTranslationValues    the value is the English source text and no classification covers it
+     missingKeys                 the registry has no key for the language at all
+   `translatedWithEnglishLeft` is not a fifth bucket: it counts the subset of the translated values
+   that still contain an English word, i.e. entries that are translated but worth another pass. */
+const italianCoverage = TRANSLATION_BACKLOG_LANGUAGES.map((language) => {
+  const key = reportKey(language);
+  const languageReport = report[key] || { count: 0, translatedValues: 0, unchangedValues: 0, missingRegistryKeys: [] };
+  const residueKeys = new Set(
+    englishResidue.filter((entry) => entry.language === language).map((entry) => entry.key)
+  );
+  const pendingEquivalent = unclassifiedEquivalentValues.filter(
+    (entry) => entry[`${key}Equivalent`] && !equivalentValuesBlocking.includes(entry)
+  );
+  const translatedValues = languageReport.translatedValues;
+  const intentionallyUnchangedValues = languageReport.unchangedValues - pendingEquivalent.length;
+  const missingKeys = languageReport.missingRegistryKeys.length;
+  const translatedWithEnglishLeft = [...residueKeys].filter((residueKey) => {
+    const entry = equivalentValues.find((value) => value.key === residueKey);
+    return !entry || !entry[`${key}Equivalent`];
+  }).length;
+  return {
+    language,
+    registryKeys: languageReport.count,
+    englishRegistryKeys: englishKeys.size,
+    missingKeys,
+    translatedValues,
+    translatedWithEnglishLeft,
+    intentionallyUnchangedValues,
+    pendingTranslationValues: pendingEquivalent.length,
+    coveragePercent: Number(((translatedValues / englishKeys.size) * 100).toFixed(2)),
+    pendingPercent: Number(((pendingEquivalent.length / englishKeys.size) * 100).toFixed(2)),
+    accountingBalanced:
+      translatedValues + intentionallyUnchangedValues + pendingEquivalent.length + missingKeys ===
+      languageReport.count,
+    pendingSamples: pendingEquivalent.slice(0, 8).map((entry) => ({ key: entry.key, english: entry.english }))
+  };
+});
+
 const localeQualityIssues = {
   ui: uiLocaleProblems,
   dataset: datasetLocaleProblems,
   invalidReferencedUiKeys: uiAudit.invalidReferencedUiKeys,
   hardcodedPlayerFacing: genuineUiBypasses,
-  unclassifiedEquivalentValues,
-  unresolved,
+  unclassifiedEquivalentValues: equivalentValuesBlocking,
+  unresolved: unresolvedBlocking,
   duplicateKeys,
   invalidManualEntries,
-  englishResidue,
+  englishResidue: residueBlocking,
   missingUnderworldCategoryKeys,
   missingPatchnoteKeys,
   unresolvedPageContentKeys
@@ -1287,11 +1439,11 @@ if (
   datasetLocaleProblems.length ||
   uiAudit.invalidReferencedUiKeys.length ||
   genuineUiBypasses.length ||
-  unclassifiedEquivalentValues.length ||
-  unresolved.length ||
+  equivalentValuesBlocking.length ||
+  unresolvedBlocking.length ||
   duplicateKeys.length ||
   invalidManualEntries.length ||
-  englishResidue.length ||
+  residueBlocking.length ||
   missingUnderworldCategoryKeys.length ||
   missingPatchnoteKeys.length ||
   unresolvedPageContentKeys.length
@@ -1304,7 +1456,8 @@ const reportWithManual = {
   ...report,
   manualResolutionEntries: unresolved.length,
   sameAsEnglishEntries: sameAsEnglish.length,
-  invalidManualEntries
+  invalidManualEntries,
+  italianCoverage
 };
 
 if (process.argv.includes("--remaining")) {
@@ -1341,20 +1494,35 @@ if (process.argv.includes("--remaining")) {
 } else if (process.argv.includes("--verbose")) {
   console.log(JSON.stringify({ ...reportWithManual, uiAudit }, null, 2));
 } else {
-  for (const language of ["spanish", "french"]) {
-    const result = report[language];
-    console.log(`${language} registry keys: ${result.count}`);
-    console.log(`${language} missing registry keys: ${result.missingRegistryKeys.length}`);
-    console.log(`${language} missing dataset keys: ${result.missingDatasetKeys.length}`);
-    console.log(`${language} translated values: ${result.translatedValues}`);
-    console.log(`${language} unchanged English values: ${result.unchangedValues}`);
-    console.log(`${language} coverage: ${result.coveragePercentage}%`);
-    console.log(`${language} missing dataset sample: ${result.missingDatasetKeys.slice(0, 10).join(", ") || "none"}`);
+  for (const language of CONTENT_LANGUAGES) {
+    const label = reportKey(language);
+    const result = report[label];
+    console.log(`${label} registry keys: ${result.count}`);
+    console.log(`${label} missing registry keys: ${result.missingRegistryKeys.length}`);
+    console.log(`${label} missing dataset keys: ${result.missingDatasetKeys.length}`);
+    console.log(`${label} translated values: ${result.translatedValues}`);
+    console.log(`${label} unchanged English values: ${result.unchangedValues}`);
+    console.log(`${label} coverage: ${result.coveragePercentage}%`);
+    console.log(`${label} missing dataset sample: ${result.missingDatasetKeys.slice(0, 10).join(", ") || "none"}`);
     console.log(
-      `${language} english residue values: ${englishResidue.filter((entry) => entry.language === (language === "spanish" ? "es" : "fr")).length}`
+      `${label} english residue values: ${englishResidue.filter((entry) => entry.language === language).length}`
     );
   }
   console.log(`English registry keys: ${report.englishRegistryKeys}`);
+  for (const coverage of italianCoverage) {
+    console.log(
+      `${coverage.language} translation progress: ${coverage.coveragePercent}% (${coverage.translatedValues}/${coverage.englishRegistryKeys} values translated)`
+    );
+    console.log(
+      `${coverage.language} value accounting: ${coverage.translatedValues} translated + ${coverage.intentionallyUnchangedValues} intentionally unchanged + ${coverage.pendingTranslationValues} pending translation + ${coverage.missingKeys} missing = ${coverage.registryKeys} registry keys (balanced: ${coverage.accountingBalanced})`
+    );
+    console.log(
+      `${coverage.language} partly translated: ${coverage.translatedWithEnglishLeft} of the ${coverage.translatedValues} translated values still contain an English word (tracked, not failing; run with --residue for the full list)`
+    );
+    console.log(
+      `${coverage.language} pending translation backlog: ${coverage.pendingTranslationValues} English-identical values (${coverage.pendingPercent}% of the registry; tracked, not failing; run with --remaining for the full list)`
+    );
+  }
   console.log(`Required dataset keys: ${report.requiredDatasetKeys}`);
   console.log(`Duplicate keys: ${report.duplicateKeys.length}`);
   console.log(`Language-neutral keys: ${[...required].filter(isLanguageNeutralKey).length}`);

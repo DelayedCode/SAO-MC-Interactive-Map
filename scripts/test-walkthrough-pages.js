@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
 const { attachDiagnostics, ensureStaticServer } = require("./harness-helpers");
+const { uiLanguages } = require("./localization-languages");
 
 const rootUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const WARNING_LOCK_SECONDS = 15;
@@ -18,29 +19,47 @@ const ALL_STORAGE_KEYS = [...Object.values(WALKTHROUGH_KEYS), WARNING_ENCOUNTER_
 /* Feature pages start their first-visit tour on their own; only the Welcome Mat puts the
    mandatory Aincrad/beta warning in front of the tour. */
 const pageTours = [
-  { name: "aincrad-map", path: "/Aincrad/Map/maps.html", key: WALKTHROUGH_KEYS.maps, steps: 5 },
+  { name: "aincrad-map", path: "/Aincrad/Map/maps.html", key: WALKTHROUGH_KEYS.maps, steps: 6 },
   {
     name: "underworld-map",
     path: "/Fractured%20Underworld/Main%20UI/mainui.html",
     key: WALKTHROUGH_KEYS.mainui,
-    steps: 5
+    steps: 6
   }
 ];
 
+/* The Welcome Mat tour keeps its own five steps. The two feature-page tours above finish with the
+   Argo the Info Broker step, which is why they have six. */
 const welcomeTour = { name: "welcome", path: "/index.html", key: WALKTHROUGH_KEYS.index, steps: 5 };
 
-const languages = ["en", "es", "fr"];
+const languages = uiLanguages();
 const mapMenuWalkthroughTitles = {
   en: "Right-Click Map Menu",
   es: "Menú del mapa con clic derecho",
-  fr: "Menu contextuel du clic droit"
+  fr: "Menu contextuel du clic droit",
+  it: "Menu della mappa con clic destro"
 };
 const mapMenuWalkthroughBodies = {
   en: "Right-click the map to open the map action menu. This menu contains the available map actions and tools.",
   es: "Haz clic derecho en el mapa para abrir el menú de acciones. Este menú contiene las acciones y herramientas disponibles para el mapa.",
-  fr: "Fais un clic droit sur la carte pour ouvrir le menu d'actions. Ce menu contient les actions et outils disponibles pour la carte."
+  fr: "Fais un clic droit sur la carte pour ouvrir le menu d'actions. Ce menu contient les actions et outils disponibles pour la carte.",
+  it: "Fai clic destro sulla mappa per aprire il menu delle azioni. Questo menu contiene le azioni e gli strumenti disponibili per la mappa."
 };
-const warningLanguageOrder = ["en", "fr", "es"];
+/* The final step of both feature-page tours introduces Argo. The wording is shared by the two maps,
+   so both tours are checked against the same expected text. */
+const argoWalkthroughTitles = {
+  en: "Argo the Info Broker",
+  es: "Argo, la corredora de información",
+  fr: "Argo, l'informatrice",
+  it: "Argo, l'informatrice"
+};
+const argoWalkthroughBodies = {
+  en: "You'll find the Argo the Info Broker button in the bottom-left corner of the map. Click it to open Argo and ask questions about the game.\n\nImportant Note: Argo isn't an AI system.\n\nShe uses a rule-based system that scans your messages, matches keywords and patterns, and searches the game's actual data to find relevant information. Her responses come from programmed logic and written dialogue rather than an AI model generating answers.\n\nBecause of this, she can be a little picky about how you phrase things. Unclear wording, unusual phrasing, or overly complex questions may produce inaccurate or unexpected results. Try using specific keywords, such as mob names, item names, NPCs, or locations, if she doesn't understand what you're looking for.\n\nNow you're all set! Enjoy exploring!",
+  es: "Encontrarás el botón de Argo, la corredora de información, en la esquina inferior izquierda del mapa. Haz clic en él para abrir a Argo y preguntar sobre el juego.\n\nNota importante: Argo no es un sistema de IA.\n\nUsa un sistema basado en reglas que analiza tus mensajes, busca palabras clave y patrones, y consulta los datos reales del juego para encontrar información relevante. Sus respuestas provienen de lógica programada y diálogos escritos, no de un modelo de IA que genere respuestas.\n\nPor eso puede ser un poco exigente con la forma en que te expresas. Un texto poco claro, una frase inusual o una pregunta demasiado compleja pueden dar resultados inexactos o inesperados. Si no entiende lo que buscas, prueba con palabras clave concretas, como nombres de mobs, objetos, PNJ o ubicaciones.\n\n¡Ya está todo listo! ¡Disfruta explorando!",
+  fr: "Tu trouveras le bouton d'Argo, l'informatrice, dans le coin inférieur gauche de la carte. Clique dessus pour ouvrir Argo et poser des questions sur le jeu.\n\nRemarque importante : Argo n'est pas un système d'IA.\n\nElle utilise un système à base de règles qui analyse tes messages, recherche des mots-clés et des motifs, puis consulte les données réelles du jeu pour trouver les informations pertinentes. Ses réponses viennent d'une logique programmée et de dialogues écrits, et non d'un modèle d'IA qui génère des réponses.\n\nC'est pourquoi elle peut être un peu pointilleuse sur la formulation. Un texte peu clair, une tournure inhabituelle ou une question trop complexe peuvent donner des résultats inexacts ou inattendus. Si elle ne comprend pas ce que tu cherches, essaie des mots-clés précis, comme des noms de monstres, d'objets, de PNJ ou de lieux.\n\nTout est prêt ! Bonne exploration !",
+  it: "Trovi il pulsante di Argo, l'informatrice, nell'angolo in basso a sinistra della mappa. Fai clic su di esso per aprire Argo e fare domande sul gioco.\n\nNota importante: Argo non è un sistema di IA.\n\nUsa un sistema basato su regole che analizza i tuoi messaggi, cerca parole chiave e schemi, e consulta i dati reali del gioco per trovare le informazioni pertinenti. Le sue risposte derivano da logica programmata e dialoghi scritti, non da un modello di IA che genera risposte.\n\nPer questo può essere un po' pignola su come formuli le cose. Un testo poco chiaro, una frase insolita o una domanda troppo complessa possono produrre risultati imprecisi o inattesi. Se non capisce cosa stai cercando, prova a usare parole chiave specifiche, come nomi di mostri, oggetti, PNG o luoghi.\n\nOra è tutto pronto! Buona esplorazione!"
+};
+const warningLanguageOrder = ["en", "fr", "es", "it"];
 const viewports = [
   { name: "desktop", width: 1440, height: 1000 },
   { name: "tablet", width: 1024, height: 768 },
@@ -441,7 +460,9 @@ async function verifyWarningLanguageSwitch(browser) {
   const titleByLanguage = {};
   const hintByLanguage = {};
   let lastSwitchAt = 0;
-  for (const language of ["fr", "es", "en"]) {
+  /* Every supported language is switched through, English last so the "switching back restores the
+     English text" assertion below always has the English run to compare against. */
+  for (const language of [...languages].reverse()) {
     lastSwitchAt = Date.now();
     await page.click(`.sao-warning-language-options button[data-language="${language}"]`);
     await page.waitForTimeout(250);
@@ -734,7 +755,7 @@ async function verifyWarningEncounterThreshold(browser) {
 async function verifyPageTours(browser) {
   const results = [];
   for (const tour of pageTours) {
-    assert.equal(tour.steps, 5, `${tour.name}: walkthrough configuration has five steps`);
+    assert.equal(tour.steps, 6, `${tour.name}: walkthrough configuration has six steps`);
   }
   for (const viewport of viewports) {
     for (const language of languages) {
@@ -798,7 +819,7 @@ async function verifyPageTours(browser) {
             };
           });
           assert.equal(state.open, true, `${label}: tour is open at step ${stepIndex + 1}`);
-          assert.equal(state.totalSteps, tour.steps, `${label}: active walkthrough has five steps`);
+          assert.equal(state.totalSteps, tour.steps, `${label}: active walkthrough has every configured step`);
           assert.equal(state.target, true, `${label}: target missing at step ${stepIndex + 1}`);
           assert.equal(
             inViewport(state.targetRect, viewport.width, viewport.height),
@@ -812,16 +833,25 @@ async function verifyPageTours(browser) {
           );
           assert.equal(state.overflow, false, `${label}: horizontal overflow at step ${stepIndex + 1}`);
           assert.equal(state.text.includes("page."), false, `${label}: raw localization key at step ${stepIndex + 1}`);
-          if (stepIndex === tour.steps - 1) {
-            assert.equal(state.stepNumber, 5, `${label}: walkthrough is at step 5 of 5`);
+          /* The map-menu demonstration is the step before the tour's own final step. */
+          if (stepIndex === tour.steps - 2) {
+            assert.equal(state.stepNumber, tour.steps - 1, `${label}: walkthrough is at the map-menu step`);
             assert.equal(state.targetId, "mapContextMenu", `${label}: the map menu is the walkthrough target`);
-            assert.equal(state.menuVisible, true, `${label}: entering the final step opens the actual map menu`);
-            assert.equal(state.title, mapMenuWalkthroughTitles[language], `${label}: the menu walkthrough step is localized`);
-            assert.equal(state.body, mapMenuWalkthroughBodies[language], `${label}: the menu walkthrough body is localized`);
+            assert.equal(state.menuVisible, true, `${label}: entering the map-menu step opens the actual map menu`);
+            assert.equal(
+              state.title,
+              mapMenuWalkthroughTitles[language],
+              `${label}: the menu walkthrough step is localized`
+            );
+            assert.equal(
+              state.body,
+              mapMenuWalkthroughBodies[language],
+              `${label}: the menu walkthrough body is localized`
+            );
             assert.equal(
               await page.evaluate(() => window.__walkthroughContextMenuEventCount),
               1,
-              `${label}: Step 5 opens the real menu through the map contextmenu event`
+              `${label}: the map-menu step opens the real menu through the map contextmenu event`
             );
             assert.ok(
               Math.abs((state.menuRect.left + state.menuRect.right) / 2 - viewport.width / 2) <= 2,
@@ -832,8 +862,40 @@ async function verifyPageTours(browser) {
               `${label}: demonstrated menu is vertically centered`
             );
           }
+          /* The tour finishes on the Argo launcher, which has to be the page's real launcher button. */
+          if (stepIndex === tour.steps - 1) {
+            assert.equal(state.stepNumber, tour.steps, `${label}: the walkthrough ends on the Argo step`);
+            assert.equal(
+              state.targetId,
+              "argo-launcher",
+              `${label}: the Argo launcher is the final walkthrough target`
+            );
+            assert.equal(state.menuVisible, false, `${label}: leaving the map-menu step closes the demonstrated menu`);
+            assert.equal(
+              state.title,
+              argoWalkthroughTitles[language],
+              `${label}: the Argo walkthrough step is localized`
+            );
+            assert.equal(
+              state.body,
+              argoWalkthroughBodies[language],
+              `${label}: the Argo walkthrough body is localized`
+            );
+            assert.equal(
+              await page.evaluate(() => {
+                const launcher = document.getElementById("argo-launcher");
+                return Boolean(
+                  launcher && launcher.tagName === "BUTTON" && launcher.getAttribute("aria-expanded") === "false"
+                );
+              }),
+              true,
+              `${label}: the highlighted Argo launcher is the page's own launcher button`
+            );
+          }
           if (stepIndex < tour.steps - 1) {
-            if (stepIndex === tour.steps - 2) {
+            /* The counter is armed on the step before the map menu, so it observes the contextmenu
+               event the menu step fires when it opens. */
+            if (stepIndex === tour.steps - 3) {
               await page.evaluate(() => {
                 const mapImage = document.getElementById("mapImage");
                 if (!mapImage) throw new Error("Map image is required for the context-menu walkthrough.");
@@ -902,7 +964,8 @@ async function verifyMapMenuWalkthroughLifecycle(page, tour, label) {
     const originalPosition = await readMenuPosition();
     await page.evaluate(() => document.dispatchEvent(new Event("sao:walkthroughrestart")));
     await page.waitForFunction(() => Boolean(document.querySelector(".sao-tour-overlay.open")));
-    for (let index = 0; index < tour.steps - 1; index += 1) {
+    /* The menu is the second-to-last step now: the tour hands over to the Argo step afterwards. */
+    for (let index = 0; index < tour.steps - 2; index += 1) {
       await next.click({ force: true });
     }
     await waitForMenu();
@@ -915,7 +978,7 @@ async function verifyMapMenuWalkthroughLifecycle(page, tour, label) {
   await assertMenuPositionRestored(positionBeforeBack, "going Back");
   assert.match(
     await page.locator(".sao-tour-step").textContent(),
-    /4\s+of\s+5/,
+    new RegExp(`4\\s+of\\s+${tour.steps}`),
     `${label}: going back leaves and closes the menu step`
   );
 
@@ -943,7 +1006,11 @@ async function verifyMapMenuWalkthroughLifecycle(page, tour, label) {
   await assertMenuPositionRestored(positionBeforeSkip, "closing the walkthrough");
 
   const positionBeforeFinish = await advanceToMenuStep();
+  /* The menu step now hands over to the Argo step, so finishing takes one more click than before:
+     the first leaves the menu step, the second ends the tour. */
   await next.click({ force: true });
+  await next.click({ force: true });
+  await page.waitForFunction(() => !document.querySelector(".sao-tour-overlay.open"));
   await page.waitForFunction(() => document.getElementById("mapContextMenu")?.hidden === true);
   await assertMenuPositionRestored(positionBeforeFinish, "finishing the walkthrough");
   const point = await page.evaluate(() => {

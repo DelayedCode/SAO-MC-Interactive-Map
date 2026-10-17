@@ -376,4 +376,63 @@ const unshiftedStore = createStore({ storage, world: migrationWorld, floorIds: [
 assert.equal(unshiftedStore.getRecord("map-created-1").x, 1800, "a store without migrations never shifts records");
 assert.equal(unshiftedStore.getRecord("floor2-created-1").x, 100, "missing migrations leave every floor alone");
 
+/* --- A JourneyMap file that names a waypoint this store already holds ----------
+   A file this site exported carries a custom waypoint's own store identity as the waypoint GUID, and
+   the importer passes it on as the record's source identity. Importing that file back finds the
+   waypoint already here instead of adding a second copy. A distinct waypoint keeps its own identity,
+   so it is imported even when its name and coordinates are identical to an existing one. */
+const identityWorld = "identity-check";
+const identityStore = createStore({ storage, world: identityWorld, floorIds: ["floor1"] });
+const existingRecord = identityStore.add({ name: "Round trip", floor: "floor1", x: 12, z: 34, button: "Default" });
+assert.ok(existingRecord, "the custom waypoint is created");
+const otherIdentity = "0b3f9d2a-4c1e-4b7a-8f2d-5a6c7e8f9012";
+const importedRecord = (identity) => ({
+  id: `journeymap-import-${identity.replace(/-/g, "").slice(0, 16)}`,
+  name: "Round trip",
+  description: "",
+  x: 12,
+  z: 34,
+  floor: "floor1",
+  button: "Default",
+  logo: "pin",
+  sourceGuid: identity
+});
+const roundTripImport = identityStore.addMany([importedRecord(existingRecord.id)]);
+assert.equal(roundTripImport.records.length, 0, "a file naming a waypoint the store already holds adds nothing");
+assert.equal(roundTripImport.duplicateCount, 1, "the round trip is reported as a duplicate");
+assert.equal(identityStore.count(), 1, "the round trip leaves exactly one record");
+assert.equal(identityStore.getRecord(existingRecord.id).x, 12, "the existing waypoint keeps its coordinates");
+assert.equal(identityStore.getRecord(existingRecord.id).z, 34, "the existing waypoint keeps its coordinates");
+
+const distinctImport = identityStore.addMany([importedRecord(otherIdentity)]);
+assert.equal(distinctImport.records.length, 1, "a distinct waypoint with the same name and coordinates is imported");
+assert.equal(distinctImport.duplicateCount, 0, "a distinct waypoint is never counted as a duplicate");
+assert.equal(identityStore.count(), 2, "both waypoints coexist");
+assert.equal(identityStore.countForFloor("floor1"), 2, "both waypoints stay on their floor");
+assert.equal(
+  identityStore.getRecord(distinctImport.records[0].id).name,
+  "Round trip",
+  "the imported waypoint keeps its name"
+);
+assert.equal(
+  identityStore.getRecord(distinctImport.records[0].id).x,
+  12,
+  "the imported waypoint keeps its coordinates"
+);
+assert.equal(
+  identityStore.getRecord(distinctImport.records[0].id).z,
+  34,
+  "the imported waypoint keeps its coordinates"
+);
+
+const repeatedImport = identityStore.addMany([importedRecord(otherIdentity)]);
+assert.equal(repeatedImport.records.length, 0, "re-importing the very same file adds nothing");
+assert.equal(repeatedImport.duplicateCount, 1, "the repeated import is reported as a duplicate");
+assert.equal(identityStore.count(), 2, "the store still holds exactly two waypoints");
+assert.equal(
+  JSON.stringify(identityStore.getRecord(distinctImport.records[0].id)).includes("sourceGuid"),
+  false,
+  "the identity hint is used for the check and never stored"
+);
+
 console.log("Custom waypoint store regression tests passed.");

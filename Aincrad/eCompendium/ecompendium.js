@@ -119,7 +119,7 @@ function localizeRuntimeText(value) {
     if (known && known !== text) return known;
   }
   if (window.SAOContentTranslations && typeof window.SAOContentTranslations.translateEquivalentLabel === "function") {
-    const equivalent = window.SAOContentTranslations.translateEquivalentLabel(text, language === "fr" ? 1 : 0);
+    const equivalent = window.SAOContentTranslations.translateEquivalentLabel(text, language);
     if (equivalent && equivalent !== text) return equivalent;
   }
   return text;
@@ -514,6 +514,23 @@ function initCompendiumRuntime() {
 
   if (typeof floorState.search === "string") {
     searchInput.value = floorState.search;
+  }
+
+  /* A link from elsewhere on the site - Argo's answers - can name the record it wants shown: the
+     category tab to open and the text to filter by. Both are applied before the first render, so the
+     record is already on screen when the page appears; with neither parameter the page behaves exactly
+     as it always has. */
+  const params = new URLSearchParams(window.location.search);
+  const requestedCategory = String(params.get("category") || "").trim();
+  const requestedSearch = String(params.get("search") || params.get("q") || "").trim();
+
+  if (requestedCategory && LIST_TITLES[requestedCategory]) {
+    activeCategory = requestedCategory;
+  }
+
+  /* The link's own search wins over the remembered one: the visitor asked for a specific record. */
+  if (requestedSearch) {
+    searchInput.value = requestedSearch;
   }
 
   if (!LIST_TITLES[activeCategory]) {

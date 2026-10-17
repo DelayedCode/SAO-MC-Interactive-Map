@@ -591,6 +591,19 @@ header::before {
   border-color: #ffefb7;
 }
 
+/* The Materials Blacksmith and World Event categories the Current-Data update adds. Both are
+   declared here with the other category colours so the Aincrad map and the Fractured Underworld
+   keep one source for marker styling. */
+.marker.materialsBlacksmith-marker {
+  background: #4b5f3a;
+  border-color: #dfeecb;
+}
+
+.marker.world-event-marker {
+  background: #7a5a12;
+  border-color: #ffeaa8;
+}
+
 .marker.accessoriesBlacksmith-marker {
   background: #2f5f96;
   border-color: #d6e8ff;
@@ -657,6 +670,7 @@ header::before {
 .marker.side-quest-marker .quest-icon,
 .marker.alchemist-marker .alchemist-icon,
 .marker.lumberjack-marker .lumberjack-icon,
+.marker.world-event-marker .world-event-icon,
 .marker.craftsman-marker .craftsman-icon,
 .marker.market-marker .market-icon {
   width: 20px;
@@ -794,4 +808,15 @@ header::before {
 body.resizing-sidebar {
   cursor: col-resize;
   user-select: none;
+}
+
+/* Argo's launcher (shared/sao-argo.css) keeps the map's bottom-left corner clear. On both
+   interactive maps the zoom bar owns that corner - the launcher would otherwise sit on top of it -
+   so it is lifted just above the bar and aligned with it. The offset clears the taller of the two
+   bars (the Fractured Underworld's measures 44px and starts 31px above the viewport bottom, so its
+   top edge reaches 75px). This stylesheet is linked before sao-argo.css, so the selector is one
+   level more specific than the shared rule to also win on source order. */
+body #argo-launcher {
+  left: 28px;
+  bottom: 84px;
 }

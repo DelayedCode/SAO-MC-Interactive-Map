@@ -1,9 +1,12 @@
 const assert = require("node:assert/strict");
 const vm = require("node:vm");
 const { loadScript, createClassList, createStyleStub } = require("./harness-helpers");
+const { registryLanguages } = require("./localization-languages");
 
 const UNDERWORLD_NAMESPACE = "underworld-map";
-const LANGUAGES = ["en", "es", "fr"];
+/* Every language the content registry holds a dictionary for: the source language plus each
+   translation slot (scripts/localization-languages.js). */
+const LANGUAGES = registryLanguages();
 
 function createEventTarget() {
   const listeners = new Map();

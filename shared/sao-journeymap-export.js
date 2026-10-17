@@ -92,6 +92,20 @@
     return uuid;
   }
 
+  const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+  /* A custom waypoint keeps the identity the store gave it: the exported file carries it as the
+     waypoint's GUID, so a file this site exported still describes the same waypoint when it is
+     imported back - re-importing it adds no duplicate - and re-exporting it never renames the
+     waypoint in JourneyMap. Built-in markers have no such identity, so they keep a fresh GUID per
+     export. */
+  function stableWaypointGuid(entry, usedIds) {
+    const candidate = entry && typeof entry.stableId === "string" ? entry.stableId.trim() : "";
+    if (!UUID_PATTERN.test(candidate) || usedIds.has(candidate)) return null;
+    usedIds.add(candidate);
+    return candidate;
+  }
+
   function floatTag(value) {
     return { [FLOAT_TAG_VALUE]: Number(value) };
   }
@@ -186,7 +200,7 @@
       entry && entry.waypointColor !== undefined
         ? entry.waypointColor
         : fallbackColor ?? categoryColorOverride ?? 0xffffff;
-    const waypointId = createUuid(usedIds);
+    const waypointId = stableWaypointGuid(entry, usedIds) || createUuid(usedIds);
     return {
       settings: { showDeviation: false, enable: true, persistent: true },
       color: normalizeJourneyMapColor(colorValue),
@@ -501,7 +515,10 @@
           visible: 1,
           group: exportCategory,
           uuid: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`),
-          id: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`)
+          id: String(marker.id || marker.customWaypointId || `${category}:${floor}:${x}:${z}`),
+          /* A custom waypoint's own store identity, carried so the exporter can use it as the file's
+             waypoint GUID. Built-in markers have none and keep a generated GUID. */
+          stableId: typeof marker.customWaypointId === "string" ? marker.customWaypointId : undefined
         };
         if (!result[exportCategory]) result[exportCategory] = [];
         exportedIds.add(entry.uuid);

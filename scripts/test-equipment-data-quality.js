@@ -42,12 +42,14 @@ assert.equal(
    Neophyte accessory sets, the Starting Town tools, the Floor 1 beginner weapons/off-hands, the
    beginner armor, the 49 supplied Floor 1 weapons (12 proficiency categories across the Warrior,
    Assassin, Archer, Mage and Shaman classes), the 32 supplied Floor 1 off-hand entries, the 20
-   Champion's PvP armor pieces (PvP Set P1, four per class) and the 51 supplied normal armor pieces
-   (levels 3, 7 and 9 for the same five classes); scripts/test-current-equipment.js,
+   Champion's PvP armor pieces (PvP Set P1, four per class), the 51 supplied normal armor pieces
+   (levels 3, 7 and 9 for the same five classes) and the four supplied accessories the Sewer
+   Reshaper / Sylve Accessories / Gelatinous Cloak update adds (Gelatinous Cloak and the three
+   Sylvan accessories); scripts/test-current-equipment.js,
    scripts/test-current-weapons.js, scripts/test-current-offhand.js,
    scripts/test-current-champion-armor.js and scripts/test-current-normal-armor.js pin their
    contents in detail. The audit counts the equipment categories (weapon, armor, accessory, tool). */
-assert.equal(report.currentDatasetEquipmentItems, 225);
+assert.equal(report.currentDatasetEquipmentItems, 236);
 assert.deepEqual(report.sameTierStatConflicts, []);
 assert.deepEqual(thiefBracelet, {
   name: "Thief's Bracelet",

@@ -160,4 +160,71 @@ assert.equal(
 );
 assert.match(aincradControllerSource, /mapAdapter\?\.mapImageSources/);
 
+/* --- The Current-Data mob-area corrections -----------------------------------
+   Current Data corrects its own mob-area rows (rename, drop, add, re-target) through
+   CURRENT_MOB_AREA_MOB_LINKS, because the shared MOB_AREA_MOBS table lives in the Beta-Test floor
+   files. The corrections must apply in Current Data only and must never mutate the shared rows. */
+const currentAdapterContext = createBrowserGlobals();
+vm.runInContext(fs.readFileSync(path.join(root, "Aincrad", "Map", "mapData.js"), "utf8"), currentAdapterContext, {
+  filename: "Aincrad/Map/mapData.js"
+});
+for (const floorFile of ["maps_floor1.js", "maps_floor2.js", "maps_floor3.js"]) {
+  vm.runInContext(fs.readFileSync(path.join(root, "Aincrad", "Map", floorFile), "utf8"), currentAdapterContext, {
+    filename: `Aincrad/Map/${floorFile}`
+  });
+}
+vm.runInContext(fs.readFileSync(path.join(root, "Aincrad", "Map", "maps_current.js"), "utf8"), currentAdapterContext, {
+  filename: "Aincrad/Map/maps_current.js"
+});
+vm.runInContext(fs.readFileSync(path.join(root, "shared", "map-runtime.js"), "utf8"), currentAdapterContext, {
+  filename: "shared/map-runtime.js"
+});
+currentAdapterContext.window.SAODatasets = {
+  getDatasetFromLocation: () => "current",
+  filterMarkerDatasetForActiveMode: (dataset) => dataset
+};
+vm.runInContext(fs.readFileSync(path.join(root, "Aincrad", "Map", "adapter.js"), "utf8"), currentAdapterContext, {
+  filename: "Aincrad/Map/adapter.js"
+});
+
+const currentMobLookup = JSON.parse(
+  JSON.stringify(currentAdapterContext.window.AincradMapAdapter.mobAreaMobLookup)
+);
+assert.deepEqual(
+  currentMobLookup["snow-citadel-mobs"],
+  [{ name: "Ice Spirit" }, { name: "Ice Golem" }],
+  "the Current mob lookup renames Ice Spiritist to Ice Spirit"
+);
+assert.deepEqual(
+  currentMobLookup["cursed-ruins"].filter((row) => row.name === "Skeleton Sorcerer"),
+  [],
+  "the Current mob lookup drops Skeleton Sorcerer from the Cursed Ruins"
+);
+assert.equal(currentMobLookup["cursed-ruins"].length, 4, "the remaining Cursed Ruins rows are kept");
+assert.deepEqual(
+  currentMobLookup["skeleton-dungeon-underground-mobs"],
+  [
+    { name: "Archer Skeleton", search: "Skeleton Archer", category: "regular" },
+    { name: "Tank Skeleton", search: "Skeleton Tank" },
+    { name: "Skeleton Sorcerer" }
+  ],
+  "the Current mob lookup adds Skeleton Sorcerer to the Skeleton Dungeon"
+);
+
+const sharedMobRows = JSON.parse(JSON.stringify(vm.runInContext("MOB_AREA_MOBS", currentAdapterContext)));
+assert.deepEqual(
+  sharedMobRows["snow-citadel-mobs"],
+  [{ name: "Ice Spiritist" }, { name: "Ice Golem" }],
+  "the shared Beta-Test rows keep Ice Spiritist"
+);
+assert.ok(
+  sharedMobRows["cursed-ruins"].some((row) => row.name === "Skeleton Sorcerer"),
+  "the shared Beta-Test rows keep their Cursed Ruins Skeleton Sorcerer"
+);
+assert.equal(
+  sharedMobRows["skeleton-dungeon-underground-mobs"].length,
+  2,
+  "the shared Beta-Test Skeleton Dungeon rows are untouched"
+);
+
 console.log("Aincrad adapter regression tests passed.");

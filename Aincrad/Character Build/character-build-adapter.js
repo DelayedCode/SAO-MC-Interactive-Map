@@ -356,11 +356,22 @@
 
   function captureEquipmentTranslations() {
     const translations = global.SAOContentTranslations;
-    if (!translations?.en || !translations.es || !translations.fr) return null;
+    /* Every language the content registry has a dictionary for, read from its own slot list: the
+       snapshot stays keyed by language code instead of naming Spanish and French, so a language added
+       to the registry later is captured without editing this cache. */
+    const contentLanguages = translations?.TRANSLATION_SLOT_LANGUAGES || [];
+    if (!translations?.en || !contentLanguages.length) return null;
+    if (!contentLanguages.every((language) => translations[language])) return null;
     return Object.fromEntries(
       Object.keys(translations.en)
         .filter((key) => key.startsWith("equipment."))
-        .map((key) => [key, { en: translations.en[key], es: translations.es[key], fr: translations.fr[key] }])
+        .map((key) => [
+          key,
+          Object.fromEntries([
+            ["en", translations.en[key]],
+            ...contentLanguages.map((language) => [language, translations[language][key]])
+          ])
+        ])
     );
   }
 
@@ -368,9 +379,10 @@
     const translations = global.SAOContentTranslations;
     if (!translations || !snapshot) return;
     Object.entries(snapshot).forEach(([key, values]) => {
-      translations.en[key] = values.en;
-      translations.es[key] = values.es;
-      translations.fr[key] = values.fr;
+      Object.entries(values || {}).forEach(([language, value]) => {
+        if (!translations[language]) return;
+        translations[language][key] = value;
+      });
     });
   }
 

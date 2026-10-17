@@ -427,7 +427,11 @@
           button: groupName,
           buttonColor: categoryColors.get(waypoint.groupId) || undefined,
           waypointColor: journeyMapColorToHex(waypoint.color) || undefined,
-          logo: getLogoIdFromJourneyMapIcon(waypoint.icon, target)
+          logo: getLogoIdFromJourneyMapIcon(waypoint.icon, target),
+          /* The file's own waypoint GUID. A file this site exported carries the store identity of a
+             custom waypoint here, so the store can recognise a waypoint it already holds instead of
+             importing a second copy of it. It is an identity hint, never persisted. */
+          sourceGuid: waypoint.guid
         }
       });
     }
@@ -492,7 +496,10 @@
             button: groupName,
             buttonColor: undefined,
             waypointColor: waypointColor || undefined,
-            logo: logoIds.includes(waypoint.icon) ? waypoint.icon : "pin"
+            logo: logoIds.includes(waypoint.icon) ? waypoint.icon : "pin",
+            /* The legacy format's stable identity, carried the same way the canonical GUID is: a file
+               that names a waypoint this store already holds is recognised instead of duplicated. */
+            sourceGuid: stableId
           }
         });
       }

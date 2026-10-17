@@ -16,6 +16,7 @@
     bossSpawns: true,
     farmingSpots: true,
     mobAreas: true,
+    worldEvents: true,
     sideQuests: true,
     mainQuests: true,
     alchemist: true,
@@ -32,7 +33,9 @@
     armorBlacksmith: true,
     ingotBlacksmith: true,
     keyBlacksmith: true,
+    materialsBlacksmith: true,
     accessoriesBlacksmith: true,
+    equipmentBlacksmith: true,
     secretAccessoryBlacksmith: true,
     runeCraftsmen: true,
     refaire: true
@@ -41,8 +44,13 @@
   /* Categories that belong to Beta-Test Data only. Current Data has no waypoints behind them, so
      the map hides their buttons while the Current Data mode is active; Beta keeps every button.
      The categories themselves stay declared above, so the marker filtering and the Beta map are
-     unchanged. */
+     unchanged. The three merchant categories Current Data does not carry - the Accessories
+     Merchant, the Equipment Merchant and the Traveling Merchants - are listed here so their
+     buttons disappear with the Current Data mode, exactly like the Beta-only craftsman buttons. */
   const betaOnlyCategories = Object.freeze({
+    accessoriesMerchants: true,
+    equipmentMerchants: true,
+    travelingMerchants: true,
     weaponsmith: true,
     armorBlacksmith: true,
     ingotBlacksmith: true,
@@ -89,13 +97,50 @@
      Current keeps only them. The mob areas follow the same split, so Beta keeps the full Beta
      dataset while Current keeps its own copy. */
   const isCurrentDataset = globalObject.SAODatasets?.getDatasetFromLocation?.() === "current";
+
+  /* Current Data may correct its mob-area rows (rename, drop, add or re-target a row) through
+     CURRENT_MOB_AREA_MOB_LINKS, because the shared MOB_AREA_MOBS table lives in the Beta-Test floor
+     files. The shared rows are copied, never mutated, and the corrections are only consulted while
+     Current Data is active, so Beta-Test Data keeps its own rows, order and markup. */
+  const currentMobAreaMobLinks =
+    typeof CURRENT_MOB_AREA_MOB_LINKS !== "undefined"
+      ? CURRENT_MOB_AREA_MOB_LINKS
+      : globalObject.SAO_CURRENT_MOB_AREA_MOB_LINKS && typeof globalObject.SAO_CURRENT_MOB_AREA_MOB_LINKS === "object"
+        ? globalObject.SAO_CURRENT_MOB_AREA_MOB_LINKS
+        : {};
+  function applyMobAreaMobLinks(lookup, overrides) {
+    const areaIds = Object.keys(overrides || {});
+    if (!areaIds.length) return lookup;
+    const merged = { ...lookup };
+    areaIds.forEach((areaId) => {
+      const rows = Array.isArray(lookup[areaId]) ? lookup[areaId] : [];
+      const plan = overrides[areaId] || {};
+      const removed = new Set(plan.remove || []);
+      const replaced = plan.replace || {};
+      const updated = plan.update || {};
+      const added = plan.add || [];
+      merged[areaId] = rows
+        .filter((row) => row && !removed.has(row.name))
+        .map((row) => {
+          if (replaced[row.name]) return { ...row, ...replaced[row.name] };
+          if (updated[row.name]) return { ...row, ...updated[row.name] };
+          return row;
+        })
+        .concat(added.map((row) => ({ ...row })));
+    });
+    return merged;
+  }
+  const resolvedMobAreaMobLookup = isCurrentDataset
+    ? applyMobAreaMobLinks(mobAreaMobLookup, currentMobAreaMobLinks)
+    : mobAreaMobLookup;
+
   const markerDataset =
     globalObject.SAODatasets?.filterMarkerDatasetForActiveMode?.(fullMarkerDataset) || fullMarkerDataset;
   const mobAreaDataset = isCurrentDataset ? currentMobAreaDataset : fullMobAreaDataset;
   const getContextData = globalObject.SAOMapRuntime.createContextDataResolver({
     markerDataset,
     mobAreaDataset,
-    mobAreaMobLookup
+    mobAreaMobLookup: resolvedMobAreaMobLookup
   });
   const coordinateDependencies = {
     mapWebsiteCoordinates:
@@ -124,7 +169,7 @@
     }),
     markerDataset,
     mobAreaDataset,
-    mobAreaMobLookup: Object.freeze(mobAreaMobLookup),
+    mobAreaMobLookup: Object.freeze(resolvedMobAreaMobLookup),
     getContextData,
     navigationSections: Object.freeze({
       patchnotes: true,
@@ -142,7 +187,9 @@
       { title: "Navigation" },
       { title: "Map Controls" },
       { title: "Filters" },
-      { title: "Interactive Map" }
+      { title: "Interactive Map" },
+      { title: "Right-Click Map Menu" },
+      { title: "Argo the Info Broker" }
     ]),
     walkthroughStorageKey: "sao.walkthrough.maps.completed",
     supportsVisitedCategory,

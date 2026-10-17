@@ -8,7 +8,8 @@ const rootUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const tutorialUrl = "https://www.youtube.com/watch?v=W9nZ6u15yis";
 const translatedLabels = {
   es: "Tutorial: cómo importar/exportar puntos de ruta",
-  fr: "Tutoriel : importer/exporter des points de passage"
+  fr: "Tutoriel : importer/exporter des points de passage",
+  it: "Tutorial: come importare/esportare i waypoint"
 };
 const pages = [
   {

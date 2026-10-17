@@ -246,7 +246,7 @@ const currentData = vm.runInContext("DATA", currentContext);
 const crossChecks = [
   { current: "Elite Treant Accessories", floorTitle: "Level 5 Weapon Buyer", tolerance: 4 },
   { current: "Nepenthes Accessories", floorTitle: "Tool Merchant", tolerance: 8 },
-  { current: "Sticky Ring", floorTitle: "Manufacturer of the Glutinous Ring", tolerance: 4 },
+  { current: "Secret Sticky Ring Merchant", floorTitle: "Manufacturer of the Glutinous Ring", tolerance: 4 },
   { current: "Skeleton Skull", floorTitle: "Skeleton Skull Manufacturer", tolerance: 8 },
   { current: "Occult Merchant - Bracelet", floorTitle: "Occult Bracelet Merchant", tolerance: 6 }
 ];

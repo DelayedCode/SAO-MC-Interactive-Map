@@ -17,6 +17,11 @@
 
 const assert = require("node:assert/strict");
 const { loadScript } = require("./harness-helpers");
+const { translatedContentLanguages } = require("./localization-languages");
+/* The content languages whose translations are complete (scripts/localization-languages.js). Italian
+   is still being translated - the audit reports that backlog - so its glossary entries are not
+   required to be translated here yet. */
+const CONTENT_LANGUAGES = translatedContentLanguages();
 
 const context = { window: {}, console };
 context.window = context;
@@ -1070,7 +1075,7 @@ assert.equal(
   false,
   "no Current-Data class-qualified name leaks into the Beta armor bucket"
 );
-assert.equal(currentItems.length, 225, "Current Data ships the 174 earlier equipment items plus the 51 armor pieces");
+assert.equal(currentItems.length, 236, "Current Data ships the 178 earlier equipment items, the 51 armor pieces and the 7 accessory-update items");
 assert.equal(
   toHost(context.SAO_CURRENT_EQUIPMENT_DATA.floor1.weapon).length,
   95,
@@ -1078,16 +1083,16 @@ assert.equal(
 );
 assert.equal(
   toHost(context.SAO_CURRENT_EQUIPMENT_DATA.floor1.accessory).length,
-  52,
-  "the Current accessory bucket is untouched"
+  63,
+  "the Current accessory bucket carries the accessories the accessory updates add, including the 7 this update adds"
 );
 
-/* --- Every supplied item is translated into Spanish and French --------------- */
+/* --- Every supplied item is translated into every content language -------------- */
 PIECES.forEach((expected) => {
   const entry = findEntry(expected);
   registry.registerEquipmentEntry(entry, slugify, { fields: ["name", "description"] });
   const id = slugify(expected.name);
-  ["es", "fr"].forEach((language) => {
+  CONTENT_LANGUAGES.forEach((language) => {
     const localizedName = registry[language][`equipment.${id}.name`];
     const localizedDescription = registry[language][`equipment.${id}.description`];
     assert.ok(localizedName, `${expected.name} has a ${language} name`);

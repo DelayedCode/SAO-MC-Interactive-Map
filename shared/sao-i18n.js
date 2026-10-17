@@ -32,7 +32,17 @@
 
   const SETTINGS_STORAGE_KEY = "sao.global.settings";
   const DEFAULT_LANGUAGE = "en";
-  const SUPPORTED_LANGUAGES = ["en", "es", "fr"];
+  const SUPPORTED_LANGUAGES = ["en", "es", "fr", "it"];
+  /* The order the site's own language pickers list: English, Français, Español, Italiano. This is a
+     display order only, never a second source of truth for which languages exist: a supported
+     language the order omits is appended below, so a new language only has to be added to
+     SUPPORTED_LANGUAGES and to its dictionary. */
+  const LANGUAGE_DISPLAY_ORDER = ["en", "fr", "es", "it"];
+  const SUPPORTED_LANGUAGE_CHOICES = Object.freeze(
+    LANGUAGE_DISPLAY_ORDER.filter((language) => SUPPORTED_LANGUAGES.includes(language)).concat(
+      SUPPORTED_LANGUAGES.filter((language) => !LANGUAGE_DISPLAY_ORDER.includes(language))
+    )
+  );
   const WALKTHROUGH_PROGRESS_KEYS = Object.freeze([
     "sao.walkthrough.index.completed",
     "sao.walkthrough.maps.completed",
@@ -47,6 +57,9 @@
   const translations = {
     en: {
       languageName: "English",
+      /* The first-visit hint sentence in this language, shown to a visitor who may not read the
+         active language yet. Every bundle carries its own wording, so no caller has to hardcode it. */
+      languageHint: "Change Language Here!",
       ui: {
         settings: {
           buttonLabel: "Open settings",
@@ -74,7 +87,11 @@
           menu: "Go back to Menu"
         },
         common: {
-          loading: "Loading..."
+          loading: "Loading...",
+          /* The suffix the count messages append to their noun. Italian forms its plurals by changing
+             the word ending, so its bundle declares an empty suffix and its wording carries the
+             plural instead; every other language appends this. */
+          pluralSuffix: "s"
         },
         walkthrough: {
           skip: "Skip",
@@ -172,7 +189,10 @@
               "Drag to pan and scroll to zoom. Select a marker to open details and shortcuts in the info panel.",
             step5Title: "Right-Click Map Menu",
             step5Body:
-              "Right-click the map to open the map action menu. This menu contains the available map actions and tools."
+              "Right-click the map to open the map action menu. This menu contains the available map actions and tools.",
+            step6Title: "Argo the Info Broker",
+            step6Body:
+              "You'll find the Argo the Info Broker button in the bottom-left corner of the map. Click it to open Argo and ask questions about the game.\n\nImportant Note: Argo isn't an AI system.\n\nShe uses a rule-based system that scans your messages, matches keywords and patterns, and searches the game's actual data to find relevant information. Her responses come from programmed logic and written dialogue rather than an AI model generating answers.\n\nBecause of this, she can be a little picky about how you phrase things. Unclear wording, unusual phrasing, or overly complex questions may produce inaccurate or unexpected results. Try using specific keywords, such as mob names, item names, NPCs, or locations, if she doesn't understand what you're looking for.\n\nNow you're all set! Enjoy exploring!"
           },
           runtimeError: "The map could not be loaded right now. Refresh the page and try again.",
           runtimeTitle: "Map unavailable",
@@ -387,6 +407,7 @@
     },
     es: {
       languageName: "Espanol",
+      languageHint: "¡Cambia el idioma aquí!",
       ui: {
         settings: {
           buttonLabel: "Abrir configuracion",
@@ -414,7 +435,8 @@
           menu: "Volver al Menu"
         },
         common: {
-          loading: "Cargando..."
+          loading: "Cargando...",
+          pluralSuffix: "s"
         }
       },
       page: {
@@ -475,6 +497,7 @@
     },
     fr: {
       languageName: "Francais",
+      languageHint: "Changez de langue ici !",
       ui: {
         settings: {
           buttonLabel: "Ouvrir les parametres",
@@ -502,7 +525,8 @@
           menu: "Retour au menu"
         },
         common: {
-          loading: "Chargement..."
+          loading: "Chargement...",
+          pluralSuffix: "s"
         }
       },
       page: {
@@ -655,6 +679,7 @@
             dungeons: "Dungeons",
             farmingSpots: "Farming Spots",
             mobAreas: "Mob Areas",
+            worldEvents: "World Event",
             sideQuests: "Side Quests",
             alchemist: "Alchemist",
             lumberjack: "Lumberjack",
@@ -667,10 +692,12 @@
             travelingMerchants: "Traveling Merchants",
             weaponSellers: "Weapon Sellers",
             accessoriesBlacksmith: "Accessories Blacksmith",
+            equipmentBlacksmith: "Equipment Blacksmith",
             secretAccessoryBlacksmith: "Secret Accessory Blacksmith",
             armorBlacksmith: "Armor Blacksmith",
             ingotBlacksmith: "Ingot Blacksmith",
             keyBlacksmith: "Key Blacksmith",
+            materialsBlacksmith: "Materials Blacksmith",
             refaire: "Refaire",
             runeCraftsmen: "Rune Craftsmen",
             weaponsmith: "Weaponsmith"
@@ -786,7 +813,7 @@
             deleteButtonWarning: "All waypoints in this button will be removed along with the button",
             areYouSure: "Are you sure?",
             confirmDelete: "Confirm Delete",
-            deleteConfirm: "Delete this custom waypoint?",
+            deleteConfirm: "Delete this custom waypoint?"
           }
         },
         mainui: {
@@ -852,7 +879,10 @@
             step4Body: "Drag to pan, scroll to zoom, and select a marker to open details in the side panel.",
             step5Title: "Right-Click Map Menu",
             step5Body:
-              "Right-click the map to open the map action menu. This menu contains the available map actions and tools."
+              "Right-click the map to open the map action menu. This menu contains the available map actions and tools.",
+            step6Title: "Argo the Info Broker",
+            step6Body:
+              "You'll find the Argo the Info Broker button in the bottom-left corner of the map. Click it to open Argo and ask questions about the game.\n\nImportant Note: Argo isn't an AI system.\n\nShe uses a rule-based system that scans your messages, matches keywords and patterns, and searches the game's actual data to find relevant information. Her responses come from programmed logic and written dialogue rather than an AI model generating answers.\n\nBecause of this, she can be a little picky about how you phrase things. Unclear wording, unusual phrasing, or overly complex questions may produce inaccurate or unexpected results. Try using specific keywords, such as mob names, item names, NPCs, or locations, if she doesn't understand what you're looking for.\n\nNow you're all set! Enjoy exploring!"
           },
           runtimeError: "The map could not be loaded right now. Refresh the page and try again.",
           runtimeTitle: "Map unavailable",
@@ -922,6 +952,7 @@
             biomes: "Biomes",
             dungeons: "Dungeons",
             bestiary: "Bestiary",
+            npcs: "NPCs",
             floor2: "Floor 2",
             poi: "POI",
             waypoints: "Waypoints",
@@ -1045,9 +1076,7 @@
           xp: "XP",
           na: "N/A",
           loadError: "No se pudieron cargar los datos del bestiario. Actualiza la página e inténtalo de nuevo.",
-          loadUnavailable: "Los datos del bestiario no están disponibles en este momento.",
-          notice:
-            "La mayor parte del contenido de esta página todavía no está traducida porque el sitio lo mantiene una sola persona con poco tiempo."
+          loadUnavailable: "Los datos del bestiario no están disponibles en este momento."
         },
         commands: {
           title: "Guía de comandos de Aincrad",
@@ -1072,9 +1101,7 @@
             useless: "Comandos inútiles"
           },
           loadError: "No se pudieron cargar los comandos en este momento. Actualiza la página e inténtalo de nuevo.",
-          loadUnavailable: "Los comandos no están disponibles en este momento.",
-          notice:
-            "La mayor parte del contenido de esta página todavía no está traducida porque el sitio lo mantiene una sola persona con poco tiempo."
+          loadUnavailable: "Los comandos no están disponibles en este momento."
         },
         ecompendium: {
           eyebrow: "AINCRAD / COMPENDIO DE EQUIPO",
@@ -1109,9 +1136,7 @@
           },
           unknownItem: "Objeto desconocido",
           loadError: "No se pudieron cargar los datos de equipamiento. Actualiza la página e inténtalo de nuevo.",
-          loadUnavailable: "Los datos de equipamiento no están disponibles en este momento.",
-          notice:
-            "La mayor parte del contenido de esta página todavía no está traducida porque el sitio lo mantiene una sola persona con poco tiempo."
+          loadUnavailable: "Los datos de equipamiento no están disponibles en este momento."
         },
         quests: {
           eyebrow: "AINCRAD / MISIONES",
@@ -1153,9 +1178,7 @@
           noQuestMatchFloor:
             "No hay entradas de misiones que coincidan con tu búsqueda en {floor}. {completed} completadas.",
           shownStatus: "{visible} de {total} entradas de misiones mostradas para {floor} || {completed} completadas.",
-          loadedStatus: "{count} entradas de misiones cargadas para {floor}.",
-          notice:
-            "La mayor parte del contenido de esta página todavía no está traducida porque el sitio lo mantiene una sola persona con poco tiempo."
+          loadedStatus: "{count} entradas de misiones cargadas para {floor}."
         },
         maps: {
           categories: {
@@ -1166,6 +1189,7 @@
             dungeons: "Mazmorras",
             farmingSpots: "Puntos de cosecha",
             mobAreas: "Areas de mobs",
+            worldEvents: "Evento mundial",
             sideQuests: "Misiones secundarias",
             alchemist: "Alquimista",
             lumberjack: "Leñador",
@@ -1178,10 +1202,12 @@
             travelingMerchants: "Mercaderes ambulantes",
             weaponSellers: "Vendedores de armas",
             accessoriesBlacksmith: "Herrero de accesorios",
+            equipmentBlacksmith: "Herrero de equipo",
             secretAccessoryBlacksmith: "Herrero secreto de accesorios",
             armorBlacksmith: "Herrero de armaduras",
             ingotBlacksmith: "Herrero de lingotes",
             keyBlacksmith: "Herrero de llaves",
+            materialsBlacksmith: "Herrero de materiales",
             refaire: "Refaire",
             runeCraftsmen: "Artesanos de runas",
             weaponsmith: "Herrero de armas"
@@ -1211,7 +1237,10 @@
               "Arrastra para mover la vista y usa la rueda para acercar. Selecciona un marcador para abrir detalles y accesos rápidos en el panel de información.",
             step5Title: "Menú del mapa con clic derecho",
             step5Body:
-              "Haz clic derecho en el mapa para abrir el menú de acciones. Este menú contiene las acciones y herramientas disponibles para el mapa."
+              "Haz clic derecho en el mapa para abrir el menú de acciones. Este menú contiene las acciones y herramientas disponibles para el mapa.",
+            step6Title: "Argo, la corredora de información",
+            step6Body:
+              "Encontrarás el botón de Argo, la corredora de información, en la esquina inferior izquierda del mapa. Haz clic en él para abrir a Argo y preguntar sobre el juego.\n\nNota importante: Argo no es un sistema de IA.\n\nUsa un sistema basado en reglas que analiza tus mensajes, busca palabras clave y patrones, y consulta los datos reales del juego para encontrar información relevante. Sus respuestas provienen de lógica programada y diálogos escritos, no de un modelo de IA que genere respuestas.\n\nPor eso puede ser un poco exigente con la forma en que te expresas. Un texto poco claro, una frase inusual o una pregunta demasiado compleja pueden dar resultados inexactos o inesperados. Si no entiende lo que buscas, prueba con palabras clave concretas, como nombres de mobs, objetos, PNJ o ubicaciones.\n\n¡Ya está todo listo! ¡Disfruta explorando!"
           },
           runtimeError: "El mapa no se pudo cargar en este momento. Actualiza la página e inténtalo de nuevo.",
           runtimeTitle: "Mapa no disponible",
@@ -1302,7 +1331,7 @@
             deleteButtonWarning: "Todos los puntos de ruta de este botón se eliminarán junto con el botón",
             areYouSure: "¿Estás seguro?",
             confirmDelete: "Confirmar eliminación",
-            deleteConfirm: "¿Eliminar este punto de ruta personalizado?",
+            deleteConfirm: "¿Eliminar este punto de ruta personalizado?"
           }
         },
         mainui: {
@@ -1370,13 +1399,14 @@
               "Arrastra para desplazarte, desplázate para hacer zoom y selecciona un marcador para abrir detalles en el panel lateral.",
             step5Title: "Menú del mapa con clic derecho",
             step5Body:
-              "Haz clic derecho en el mapa para abrir el menú de acciones. Este menú contiene las acciones y herramientas disponibles para el mapa."
+              "Haz clic derecho en el mapa para abrir el menú de acciones. Este menú contiene las acciones y herramientas disponibles para el mapa.",
+            step6Title: "Argo, la corredora de información",
+            step6Body:
+              "Encontrarás el botón de Argo, la corredora de información, en la esquina inferior izquierda del mapa. Haz clic en él para abrir a Argo y preguntar sobre el juego.\n\nNota importante: Argo no es un sistema de IA.\n\nUsa un sistema basado en reglas que analiza tus mensajes, busca palabras clave y patrones, y consulta los datos reales del juego para encontrar información relevante. Sus respuestas provienen de lógica programada y diálogos escritos, no de un modelo de IA que genere respuestas.\n\nPor eso puede ser un poco exigente con la forma en que te expresas. Un texto poco claro, una frase inusual o una pregunta demasiado compleja pueden dar resultados inexactos o inesperados. Si no entiende lo que buscas, prueba con palabras clave concretas, como nombres de mobs, objetos, PNJ o ubicaciones.\n\n¡Ya está todo listo! ¡Disfruta explorando!"
           },
           runtimeError: "El mapa no se pudo cargar en este momento. Actualiza la página e inténtalo de nuevo.",
           runtimeTitle: "Mapa no disponible",
-          coordinatesPlaceholder: "X: -- Z: --",
-          notice:
-            "La mayor parte del contenido de esta página todavía no está traducida porque el sitio lo mantiene una sola persona con poco tiempo."
+          coordinatesPlaceholder: "X: -- Z: --"
         },
         miscinfo: {
           title: "Info. Varia",
@@ -1452,6 +1482,7 @@
             biomes: "Biomas",
             dungeons: "Mazmorras",
             bestiary: "Bestiario",
+            npcs: "PNJ",
             floor2: "Piso 2",
             poi: "POI",
             waypoints: "Waypoints",
@@ -1460,8 +1491,6 @@
           }
         },
         towerdefense: {
-          notice:
-            "La mayor parte del contenido de esta página todavía no está traducida porque el sitio lo mantiene una sola persona con poco tiempo.",
           arc1Title: "Arco 1 - Tutorial (Boar Planes)",
           arc1Rewards:
             "Bolsa de 100 Col (100%), Cristal de utilidad (25%), Runa menor de PvE (8%), Llave de mazmorra (4%), Helecho (objeto de hábitat) (30%), Linterna escarchada (objeto de hábitat) (20%), Fogata (objeto de hábitat) (20%)",
@@ -1578,9 +1607,7 @@
           xp: "XP",
           na: "N/A",
           loadError: "Les données du bestiaire n'ont pas pu être chargées. Actualise la page et réessaie.",
-          loadUnavailable: "Les données du bestiaire ne sont actuellement pas disponibles.",
-          notice:
-            "La majeure partie du contenu de cette page n'est pas encore traduite, car le site est géré par une seule personne avec peu de temps."
+          loadUnavailable: "Les données du bestiaire ne sont actuellement pas disponibles."
         },
         commands: {
           title: "Guide des commandes d'Aincrad",
@@ -1605,9 +1632,7 @@
             useless: "Commandes inutiles"
           },
           loadError: "Les commandes n'ont pas pu être chargées pour le moment. Actualise la page et réessaie.",
-          loadUnavailable: "Les commandes ne sont actuellement pas disponibles.",
-          notice:
-            "La majeure partie du contenu de cette page n'est pas encore traduite, car le site est géré par une seule personne avec peu de temps."
+          loadUnavailable: "Les commandes ne sont actuellement pas disponibles."
         },
         ecompendium: {
           eyebrow: "AINCRAD / COMPENDIUM D'ÉQUIPEMENT",
@@ -1642,9 +1667,7 @@
           },
           unknownItem: "Objet inconnu",
           loadError: "Les données d'équipement n'ont pas pu être chargées. Actualise la page et réessaie.",
-          loadUnavailable: "Les données d'équipement ne sont actuellement pas disponibles.",
-          notice:
-            "La majeure partie du contenu de cette page n'est pas encore traduite, car le site est géré par une seule personne avec peu de temps."
+          loadUnavailable: "Les données d'équipement ne sont actuellement pas disponibles."
         },
         quests: {
           eyebrow: "AINCRAD / QUÊTES",
@@ -1685,9 +1708,7 @@
           noQuestData: "Aucune donnée de quête n'a encore été ajoutée pour {floor}.",
           noQuestMatchFloor: "Aucune entrée de quête ne correspond à ta recherche sur {floor}. {completed} terminé.",
           shownStatus: "{visible} sur {total} entrées de quête affichées pour {floor} || {completed} terminé.",
-          loadedStatus: "{count} entrées de quête chargées pour {floor}.",
-          notice:
-            "La majeure partie du contenu de cette page n'est pas encore traduite, car le site est géré par une seule personne avec peu de temps."
+          loadedStatus: "{count} entrées de quête chargées pour {floor}."
         },
         maps: {
           categories: {
@@ -1698,6 +1719,7 @@
             farmingSpots: "Zones de récolte",
             main: "Quêtes principales",
             mobAreas: "Zones de mobs",
+            worldEvents: "Événement mondial",
             sideQuests: "Quêtes annexes",
             alchemist: "Alchimiste",
             lumberjack: "Bûcheron",
@@ -1710,10 +1732,12 @@
             travelingMerchants: "Marchands ambulants",
             weaponSellers: "Vendeurs d'armes",
             accessoriesBlacksmith: "Forgeron d'accessoires",
+            equipmentBlacksmith: "Forgeron d'équipement",
             secretAccessoryBlacksmith: "Forgeron secret d'accessoires",
             armorBlacksmith: "Forgeron d'armures",
             ingotBlacksmith: "Forgeron de lingots",
             keyBlacksmith: "Forgeron de clés",
+            materialsBlacksmith: "Forgeron de matériaux",
             refaire: "Refaire",
             runeCraftsmen: "Artisans de runes",
             weaponsmith: "Forgeron d'armes"
@@ -1743,7 +1767,10 @@
               "Fais glisser pour déplacer et utilise la molette pour zoomer. Sélectionne un marqueur pour ouvrir les détails et les raccourcis dans le panneau d'informations.",
             step5Title: "Menu contextuel du clic droit",
             step5Body:
-              "Fais un clic droit sur la carte pour ouvrir le menu d'actions. Ce menu contient les actions et outils disponibles pour la carte."
+              "Fais un clic droit sur la carte pour ouvrir le menu d'actions. Ce menu contient les actions et outils disponibles pour la carte.",
+            step6Title: "Argo, l'informatrice",
+            step6Body:
+              "Tu trouveras le bouton d'Argo, l'informatrice, dans le coin inférieur gauche de la carte. Clique dessus pour ouvrir Argo et poser des questions sur le jeu.\n\nRemarque importante : Argo n'est pas un système d'IA.\n\nElle utilise un système à base de règles qui analyse tes messages, recherche des mots-clés et des motifs, puis consulte les données réelles du jeu pour trouver les informations pertinentes. Ses réponses viennent d'une logique programmée et de dialogues écrits, et non d'un modèle d'IA qui génère des réponses.\n\nC'est pourquoi elle peut être un peu pointilleuse sur la formulation. Un texte peu clair, une tournure inhabituelle ou une question trop complexe peuvent donner des résultats inexacts ou inattendus. Si elle ne comprend pas ce que tu cherches, essaie des mots-clés précis, comme des noms de monstres, d'objets, de PNJ ou de lieux.\n\nTout est prêt ! Bonne exploration !"
           },
           runtimeError: "La carte n'a pas pu être chargée pour le moment. Actualise la page et réessaie.",
           runtimeTitle: "Carte indisponible",
@@ -1834,7 +1861,7 @@
             deleteButtonWarning: "Tous les points de passage de ce bouton seront supprimés avec le bouton",
             areYouSure: "Es-tu sûr ?",
             confirmDelete: "Confirmer la suppression",
-            deleteConfirm: "Supprimer ce point de passage personnalisé ?",
+            deleteConfirm: "Supprimer ce point de passage personnalisé ?"
           }
         },
         mainui: {
@@ -1903,13 +1930,14 @@
               "Fais glisser pour déplacer, utilise la molette pour zoomer et sélectionne un marqueur pour ouvrir les détails dans le panneau latéral.",
             step5Title: "Menu contextuel du clic droit",
             step5Body:
-              "Fais un clic droit sur la carte pour ouvrir le menu d'actions. Ce menu contient les actions et outils disponibles pour la carte."
+              "Fais un clic droit sur la carte pour ouvrir le menu d'actions. Ce menu contient les actions et outils disponibles pour la carte.",
+            step6Title: "Argo, l'informatrice",
+            step6Body:
+              "Tu trouveras le bouton d'Argo, l'informatrice, dans le coin inférieur gauche de la carte. Clique dessus pour ouvrir Argo et poser des questions sur le jeu.\n\nRemarque importante : Argo n'est pas un système d'IA.\n\nElle utilise un système à base de règles qui analyse tes messages, recherche des mots-clés et des motifs, puis consulte les données réelles du jeu pour trouver les informations pertinentes. Ses réponses viennent d'une logique programmée et de dialogues écrits, et non d'un modèle d'IA qui génère des réponses.\n\nC'est pourquoi elle peut être un peu pointilleuse sur la formulation. Un texte peu clair, une tournure inhabituelle ou une question trop complexe peuvent donner des résultats inexacts ou inattendus. Si elle ne comprend pas ce que tu cherches, essaie des mots-clés précis, comme des noms de monstres, d'objets, de PNJ ou de lieux.\n\nTout est prêt ! Bonne exploration !"
           },
           runtimeError: "La carte n'a pas pu être chargée pour le moment. Actualise la page et réessaie.",
           runtimeTitle: "Carte indisponible",
-          coordinatesPlaceholder: "X : -- Z : --",
-          notice:
-            "La majeure partie du contenu de cette page n'est pas encore traduite, car le site est géré par une seule personne avec peu de temps."
+          coordinatesPlaceholder: "X : -- Z : --"
         },
         miscinfo: {
           title: "Infos diverses",
@@ -1985,6 +2013,7 @@
             biomes: "Biomes",
             dungeons: "Donjons",
             bestiary: "Bestiaire",
+            npcs: "PNJ",
             floor2: "Étage 2",
             poi: "POI",
             waypoints: "Waypoints",
@@ -1993,8 +2022,6 @@
           }
         },
         towerdefense: {
-          notice:
-            "La majeure partie du contenu de cette page n'est pas encore traduite, car le site est géré par une seule personne avec peu de temps.",
           arc1Title: "Arc 1 - Tutoriel (Boar Planes)",
           arc1Rewards:
             "Pochon de 100 Col (100 %), Cristal d'utilité (25 %), Rune PvE mineure (8 %), Clé de donjon (4 %), Fougère (objet d'habitat) (30 %), Lanterne givrée (objet d'habitat) (20 %), Feu de camp (objet d'habitat) (20 %)",
@@ -2426,6 +2453,1434 @@
     }
   });
 
+  /* Argo the Info Broker - interface and answer strings. The 35-per-category dialogue expansion
+     belongs to a later stage; this is the initial response set. */
+  translations.en = deepMerge(translations.en, {
+    argo: {
+      launcherLabel: "Open Argo the Info Broker",
+      title: "Argo the Info Broker",
+      closeLabel: "Close Argo the Info Broker",
+      logLabel: "Conversation with Argo",
+      inputLabel: "Ask Argo about game information",
+      inputPlaceholder: "Ask about mobs, drops, items, recipes, NPCs, quests or locations...",
+      sendLabel: "Send",
+      dragHint: "Drag the title bar to move this window",
+      whoArgo: "Argo",
+      whoYou: "You",
+      intro: {
+        1: "Heya! What info are ya after? Ask me about items, mobs, drops, crafting, quests, NPCs or map locations.",
+        2: "Argo here. Give me a name - an item, a mob, a quest, a merchant - and I'll dig through the records.",
+        3: "Back again? Good. Name somethin' and I'll tell ya what I know about it.",
+        4: "Information's a trade, and I'm open for business. What are ya lookin' for?",
+        5: "Well now, a customer. Items, mobs, drops, quests - I keep notes on all of it.",
+        6: "Argo's the name and answers are the trade. Ask away.",
+        7: "Got a name for me? A place, a monster, a piece of gear - anything with a record behind it.",
+        8: "Hm? Oh, it's you. Come to buy somethin', or just to chat? Either way, ask.",
+        9: "Everything worth knowin' in Aincrad passes through my hands sooner or later. What do ya need?",
+        10: "You've got questions and I've got notes. Let's see if they match up."
+      }
+    }
+  });
+
+  translations.es = deepMerge(translations.es, {
+    argo: {
+      launcherLabel: "Abrir a Argo, la corredora de información",
+      title: "Argo, la corredora de información",
+      closeLabel: "Cerrar a Argo, la corredora de información",
+      logLabel: "Conversación con Argo",
+      inputLabel: "Pregúntale a Argo sobre información del juego",
+      inputPlaceholder: "Pregunta por mobs, botines, objetos, recetas, PNJ, misiones o ubicaciones...",
+      sendLabel: "Enviar",
+      dragHint: "Arrastra la barra de título para mover esta ventana",
+      whoArgo: "Argo",
+      whoYou: "Tú",
+      intro: {
+        1: "¡Hola! ¿Qué información buscas? Pregúntame por objetos, mobs, botines, crafteo, misiones, PNJ o ubicaciones del mapa.",
+        2: "Soy Argo. Dame un nombre —un objeto, un mob, una misión, un mercader— y rebuscaré en mis registros.",
+        3: "¿Otra vez por aquí? Bien. Nombra algo y te diré lo que sé.",
+        4: "La información es un negocio, y yo estoy abierta. ¿Qué buscas?",
+        5: "Vaya, un cliente. Objetos, mobs, botines, misiones: de todo eso tengo notas.",
+        6: "Argo me llamo y respuestas vendo. Pregunta sin miedo.",
+        7: "¿Me das un nombre? Un lugar, un monstruo, una pieza de equipo, cualquier cosa con ficha detrás.",
+        8: "¿Mmm? Ah, eres tú. ¿Vienes a comprar algo o solo a charlar? Da igual, pregunta.",
+        9: "Todo lo que vale la pena saber en Aincrad pasa antes o después por mis manos. ¿Qué necesitas?",
+        10: "Tú tienes preguntas y yo tengo notas. Veamos si encajan."
+      }
+    }
+  });
+
+  translations.fr = deepMerge(translations.fr, {
+    argo: {
+      launcherLabel: "Ouvrir Argo, l'informatrice",
+      title: "Argo, l'informatrice",
+      closeLabel: "Fermer Argo, l'informatrice",
+      logLabel: "Conversation avec Argo",
+      inputLabel: "Poser une question à Argo sur les informations de jeu",
+      inputPlaceholder: "Pose une question sur les monstres, butins, objets, recettes, PNJ, quêtes ou lieux...",
+      sendLabel: "Envoyer",
+      dragHint: "Fais glisser la barre de titre pour déplacer cette fenêtre",
+      whoArgo: "Argo",
+      whoYou: "Toi",
+      intro: {
+        1: "Salut ! Quelle info te faut-il ? Demande-moi des objets, monstres, butins, artisanat, quêtes, PNJ ou lieux sur la carte.",
+        2: "Argo à l'appareil. Donne-moi un nom — un objet, un monstre, une quête, un marchand — et je fouille mes dossiers.",
+        3: "Encore toi ? Bien. Nomme quelque chose et je te dirai ce que j'en sais.",
+        4: "L'information, c'est un métier, et je suis ouverte. Tu cherches quoi ?",
+        5: "Tiens, un client. Objets, monstres, butins, quêtes : j'ai des notes sur tout ça.",
+        6: "Argo, c'est mon nom, et les réponses sont ma marchandise. Vas-y, demande.",
+        7: "Tu as un nom pour moi ? Un lieu, un monstre, une pièce d'équipement, n'importe quoi avec une fiche derrière.",
+        8: "Hmm ? Ah, c'est toi. Tu viens acheter quelque chose ou juste discuter ? Peu importe, demande.",
+        9: "Tout ce qui vaut la peine d'être su à Aincrad finit tôt ou tard entre mes mains. Il te faut quoi ?",
+        10: "Tu as des questions et j'ai des notes. Voyons si elles concordent."
+      }
+    }
+  });
+
+  /* Argo's answer wording: lead-ins per category, field labels, honest notes and question outcomes.
+     Every string here is also mirrored as an English fallback in shared/sao-argo.js. */
+  translations.en = deepMerge(translations.en, {
+    argo: {
+      lead: {
+        item: {
+          1: "Oho, found a lead!",
+          2: "Let's see what the records say about that one.",
+          3: "Got the file right here.",
+          4: "That one rings a bell. Give me a moment.",
+          5: "Gear questions are my bread and butter.",
+          6: "Hm, let me check my notes on that.",
+          7: "You're in luck - I've got a page on it.",
+          8: "An item, is it? I like it when folks ask about things I can actually name.",
+          9: "Let's dig. Items leave a paper trail, and I keep the paper.",
+          10: "I've sold worse information for good Col. This one's free.",
+          11: "Right, that name's familiar.",
+          12: "Let's see what I've got written down.",
+          13: "Oho, askin' about the good stuff.",
+          14: "I've been waitin' for someone to ask about that one.",
+          15: "Sure, I know that one.",
+          16: "Hm, that name's in my book somewhere.",
+          17: "Let me flip to the right page.",
+          18: "You want the details? I've got the details.",
+          19: "Now that's a name worth lookin' up.",
+          20: "Let's see how much I can tell ya."
+        },
+        recipe: {
+          1: "Ah, a crafter's question. I like it.",
+          2: "Let me dig up that recipe.",
+          3: "Here's what the records list for that one.",
+          4: "Makin' somethin', are ya? Let me check.",
+          5: "Hm, recipes I keep tidy.",
+          6: "Let's see what goes into that.",
+          7: "Right, let's find the materials.",
+          8: "A crafter with Col to spend. Good.",
+          9: "Let me see what the records say it takes.",
+          10: "That one's got a recipe, I'm fairly sure.",
+          11: "Let me pull up the list.",
+          12: "Hm, let me check what's needed for that."
+        },
+        mob: {
+          1: "Oho, a huntin' question.",
+          2: "Let's see what the Bestiary says.",
+          3: "I've got a page on that one.",
+          4: "A monster, hm? Those leave plenty of tracks.",
+          5: "You're huntin', are ya? Let me check.",
+          6: "That one's got a nasty reputation, if I recall right.",
+          7: "Let's see what the records say about that beast.",
+          8: "Plenty of folks ask about that one. Let me pull my notes.",
+          9: "Hm, I know that name.",
+          10: "Let me look up what I've got on it.",
+          11: "A hunter's question. My favourite kind.",
+          12: "Right, that one. Give me a second.",
+          13: "Let's see where it lives and what it hits with.",
+          14: "I keep notes on everything with teeth. Let me check.",
+          15: "That's a name I've heard more than once.",
+          16: "Let me see what I've got written down on that one.",
+          17: "Careful with that one - or don't, it's your neck. Here's what I know.",
+          18: "Hm, let me dig through the Bestiary pages.",
+          19: "Monsters are easy business. They're always somewhere.",
+          20: "Let's see if it's as nasty as they say."
+        },
+        mobDrops: {
+          1: "Ah, a looter's question!",
+          2: "Let's check what it drops.",
+          3: "Here's the loot list I've got.",
+          4: "After its pockets, are ya? Sensible.",
+          5: "Let's see what falls out of that one.",
+          6: "Hm, drop lists I do keep.",
+          7: "You want what it's carryin'. Fair enough.",
+          8: "Let me check the list. I don't guess these.",
+          9: "That one's worth huntin' for a reason.",
+          10: "Right, let's see what it leaves behind.",
+          11: "Kill it, take its things. That's the business.",
+          12: "Let me see what I've got recorded for it.",
+          13: "Hm, let me check what's on the list.",
+          14: "Let's see if it's worth your time."
+        },
+        drop: {
+          1: "Oho, followin' a drop trail?",
+          2: "Let's see who's holding that.",
+          3: "I dug through the drop lists for that.",
+          4: "Lookin' for where it comes from? Smart.",
+          5: "Let me check who's carryin' that.",
+          6: "Hm, that one's a drop, is it?",
+          7: "Somebody's got it. Let's find out who.",
+          8: "I keep the drop lists sorted. Give me a moment.",
+          9: "Right, let's trace it back.",
+          10: "Let me see which mobs are holdin' that.",
+          11: "Chasin' a drop, are ya? I'd do the same.",
+          12: "Hm, let me see what's recorded.",
+          13: "That one doesn't grow on trees. Let me look.",
+          14: "Let's see who's generous enough to hand it over."
+        },
+        npc: {
+          1: "Ask around, and you find people. Let me check.",
+          2: "Let's see where you can find them.",
+          3: "I've got a line on that one.",
+          4: "Lookin' for someone? Let me check my notes.",
+          5: "Hm, people move around. Let me look.",
+          6: "Right, let's see where they set up shop.",
+          7: "I know most of the shopkeepers. Let me look.",
+          8: "Let me see what I've got on them.",
+          9: "Hm, let me check where they're standin'.",
+          10: "Merchants and wanderers - I keep track of both.",
+          11: "Let me see if I can point ya their way.",
+          12: "Right, let's find them."
+        },
+        quest: {
+          1: "Ah, a quest lead.",
+          2: "Let's look at the quest sheet.",
+          3: "Here's what I've got on that quest.",
+          4: "Work, is it? Let me check the board.",
+          5: "Hm, that one's been askin' around for help.",
+          6: "Let me see what I've got written down.",
+          7: "A quest, hm? Those I keep careful notes on.",
+          8: "Right, let's see who's handin' it out.",
+          9: "Somebody wants somethin' done. Let me check.",
+          10: "I've got notes on most of these.",
+          11: "Let's see the details before ya take the job.",
+          12: "Hm, let me pull that sheet.",
+          13: "Work pays. Let's see what it's worth.",
+          14: "Let's see the reward before ya commit to it."
+        },
+        location: {
+          1: "Oho, want the lay of the land?",
+          2: "Let's see where that is.",
+          3: "I've got that pinned on the map.",
+          4: "Directions, is it? I can do directions.",
+          5: "Let me check the map notes.",
+          6: "Hm, that's a place, is it? Let me look.",
+          7: "You'll be wantin' coordinates, I expect.",
+          8: "Right, let's find it on the map.",
+          9: "I know these floors better than most.",
+          10: "Let me see what's marked down there.",
+          11: "Places I can usually pin down. Let's try.",
+          12: "Hm, let me check my map notes.",
+          13: "Easy enough - if my notes are right.",
+          14: "Let's see what's around there."
+        }
+      },
+      /* Transitions into the facts: these sit between the lead-in and the list itself. */
+      facts: {
+        item: { 1: "Here's what's written down:", 2: "This is what I've got on it:", 3: "The records say this:" },
+        recipe: { 1: "Here's the list:", 2: "What it takes:", 3: "This is what's recorded:" },
+        mob: { 1: "Here's what I've got:", 2: "The page says this:", 3: "The entry reads like this:" },
+        mobDrops: {
+          1: "Here's the drop list:",
+          2: "This is what's noted for it:",
+          3: "What I've got says this:"
+        },
+        drop: { 1: "Here's who's holding it:", 2: "The lists say this:", 3: "This is what I found:" },
+        npc: { 1: "Here's what I know:", 2: "This is what's noted:", 3: "The notes say this:" },
+        quest: { 1: "Here's the sheet:", 2: "This is what's on it:", 3: "The sheet says this:" },
+        location: { 1: "Here's what's marked:", 2: "This is what I have:", 3: "The map notes say this:" }
+      },
+      /* Sign-offs, used only on answers that needed no caveat at all. */
+      close: {
+        1: "That's straight from the records.",
+        2: "That's all solid - I checked.",
+        3: "No guessin' in any of that.",
+        4: "You can take that to the bank.",
+        5: "Every line of that is written down somewhere.",
+        6: "That's the whole of what's recorded.",
+        7: "Reliable, that. I don't pass on rumors.",
+        8: "That's from the source, not from gossip.",
+        9: "Good information, that. Worth the price.",
+        10: "That's what the records say, and they don't lie to me.",
+        11: "Clean information. Enjoy it.",
+        12: "That's confirmed, not hearsay."
+      },
+      label: {
+        floor: "Floor {floor}",
+        level: "Lv {level}",
+        stats: "Stats",
+        craftingLocation: "Crafting location",
+        craftingResources: "Crafting resources",
+        droppedBy: "Dropped by",
+        drops: "Drops",
+        spawnArea: "Spawn area",
+        mobs: "Mobs",
+        rewards: "Rewards",
+        requirements: "Requirements",
+        npc: "NPC",
+        sells: "Sells",
+        quests: "Quests",
+        unknown: "unknown",
+        recordsFound: "{label}: {count}",
+        moreRecords: "and {count} more (of {total})",
+        rankedBy: "{label} by {field}, {direction}:",
+        highestFirst: "highest first",
+        lowestFirst: "lowest first",
+        bestSource: "Best recorded source: {mob} ({chance}%)",
+        levelField: "Level",
+        typeField: "Type",
+        categoryField: "Category",
+        questType: "Quest type",
+        bestiaryTab: "Bestiary list",
+        target: {
+          quest: "Quests",
+          boss: "Bosses",
+          mob: "Mobs",
+          item: "Items",
+          npc: "NPCs",
+          location: "Locations",
+          dungeon: "Dungeons",
+          area: "Areas"
+        }
+      },
+      note: {
+        itemRecordMissing: {
+          1: "There's more to this one than I've got in my notes. That's all I can give ya for now.",
+          2: "That's everythin' I've got on it - my notes on this one are thin.",
+          3: "I've given ya what I have. The rest of it isn't written down anywhere I can reach."
+        },
+        bestiaryRecordMissing: {
+          1: "I've no page on that one in my notes - only what I've got here.",
+          2: "My notes on it start and end with what ya see.",
+          3: "That one's barely written up. What's above is the whole of it."
+        },
+        noDropRecord: {
+          1: "Nobody's written down what it drops, so I won't guess.",
+          2: "No drop list on that one - and I don't invent those.",
+          3: "I've got no drop list for it. I'd rather say nothin' than make somethin' up."
+        },
+        noRecipe: {
+          1: "No recipe's written down for it, so I can't hand ya one.",
+          2: "I've got no recipe for that one.",
+          3: "Nobody's recorded how that's made, and I don't invent recipes."
+        },
+        noCraftingLocation: {
+          1: "My notes don't say where it's made or sold.",
+          2: "No workshop or merchant is written next to that one.",
+          3: "I can't tell ya where to make it - that part's blank in my notes."
+        },
+        noStats: {
+          1: "There are no numbers written down for it.",
+          2: "Nobody's recorded its stats.",
+          3: "I've got no figures for that one."
+        },
+        noSpawnArea: {
+          1: "No spawn area is written down for it.",
+          2: "My notes don't say where it turns up.",
+          3: "Where it lives isn't recorded."
+        },
+        markerNotFound: {
+          1: "I couldn't pin that one on the map.",
+          2: "That name isn't marked anywhere I can see.",
+          3: "No map mark for that one, so I can't point ya there."
+        },
+        questMarkerOnly: {
+          1: "All I've got is its mark on the map, not the quest details.",
+          2: "Only its location is written down, not the rest of the job.",
+          3: "The map knows it. My notes on the quest itself are empty."
+        },
+        absenceNotProof: {
+          1: "That's no proof it isn't in the game - just that my notes don't have it.",
+          2: "Don't take that as proof it doesn't exist. It only means I haven't got it written down.",
+          3: "Me not knowin' it isn't the same as it not bein' there."
+        },
+        otherIsland: {
+          1: "That one's on a different island than the one you're lookin' at.",
+          2: "That belongs to another island - you're viewin' a different one.",
+          3: "Different island entirely, that one."
+        },
+        englishOnly: {
+          1: "Fair warning: I read the wording in English, with a few words of Spanish and French - keep names in English and we'll get on fine.",
+          2: "I read the question itself in English, and I catch a handful of Spanish or French words, but names should be in English.",
+          3: "Questions I read in English, and I pick up a little Spanish and French - though names are safest in English."
+        },
+        floorInferred: {
+          1: "That record lives on Floor {floor}.",
+          2: "I've got that written down under Floor {floor}.",
+          3: "You'll find that on Floor {floor} in my notes."
+        },
+        otherFloorRecords: {
+          1: "{count} more are recorded on {floors}.",
+          2: "There are {count} more on {floors}, if you ever head that way.",
+          3: "My notes hold {count} more on {floors}."
+        },
+        rankingUnknown: {
+          1: "{count} of them have no recorded value, so I'm not ranking those.",
+          2: "Another {count} have no figure written down, so I left them out rather than guess.",
+          3: "{count} more have nothing recorded for it, so they are not in the list."
+        },
+        chanceNotRecorded: {
+          1: "Some of those rates aren't written down anywhere.",
+          2: "Not every source has a recorded rate - I only pass on what's written.",
+          3: "Where the rate isn't recorded, I've left it out rather than guess."
+        },
+        noRecordedRate: {
+          1: "Nobody's written down a drop rate for any of those sources.",
+          2: "I've got the sources, but not a single rate, so I can't call any of them the best.",
+          3: "The sources are recorded; the rates are not."
+        },
+        comparisonTruncated: {
+          1: "That's not every field - there are {count} of them in total.",
+          2: "There are {count} fields altogether; I've shown the first few.",
+          3: "The full list runs to {count} fields."
+        }
+      },
+      status: {
+        ambiguous: {
+          1: "Hm, that could be a few things. Which one did ya mean?",
+          2: "Hold on - I've got more than one match for that:",
+          3: "That name's doin' double duty. Which one?",
+          4: "Hm, ya gave me a name that fits more than one thing:",
+          5: "Careful now - that could be any of these:",
+          6: "I've got a few entries under that name. Take your pick:",
+          7: "That's not specific enough for my notes. Which of these?",
+          8: "More than one thing answers to that name. Which?"
+        },
+        missing: {
+          1: "Hm, I found the name but not the details.",
+          2: "I've only got part of that one.",
+          3: "I know the name, but my notes run dry after that.",
+          4: "That one's only half-written in my book.",
+          5: "I've got the name and not much else.",
+          6: "Hm, that one's thin. Here's what I do have.",
+          7: "I've got a piece of that, not the whole.",
+          8: "My notes on that one are incomplete. Here's what's there."
+        },
+        unsupported: {
+          1: "Hm, haven't got a reliable lead on that one yet.",
+          2: "That's outside my records, sorry.",
+          3: "That's not the kind of thing I keep notes on.",
+          4: "Can't help ya with that one - it's not in my line.",
+          5: "Hm, that's beyond what I deal in.",
+          6: "I've got nothin' for that, and I won't invent it.",
+          7: "That one's outside my trade, I'm afraid.",
+          8: "No records on that one. Try me with somethin' from the game."
+        },
+        candidates: { 1: "Candidates:", 2: "Here's what turned up:", 3: "Possible matches:" },
+        emptySet: {
+          1: "Nothing on this floor matches that.",
+          2: "That list came up empty, I'm afraid.",
+          3: "I've been through the whole list - there's nothing matching that here."
+        },
+        sourcesAvailable: "On this page I can only see: {sources}.",
+        noSources: "I can't see any game records on this page yet.",
+        engineMissing: {
+          1: "My records aren't loaded on this page yet, so I can't look anything up here.",
+          2: "I've got no notes with me on this page. Try me where my records are loaded.",
+          3: "My book isn't on this page, so there's nothin' for me to check.",
+          4: "Nothin' to work with here - my records aren't loaded on this page yet."
+        },
+        datasetUnsupported: {
+          1: "Heh, I only deal in Current Data these days. Switch your dataset to Current Data, and I'll see what I can find for ya.",
+          2: "My notes only cover Current Data now. Flip your dataset over to Current Data and ask me again.",
+          3: "Current Data only - that's my rule. Change your dataset and I'll dig through what I've got.",
+          4: "Ya won't get Beta-Test answers out of me; I work from Current Data. Switch your dataset and I'll take another look."
+        },
+        error: {
+          1: "Something jammed in my files just now. Try asking me again?",
+          2: "Hm, my notes just scattered on me. Ask me again?",
+          3: "That one got lost on the way to my desk. Try me again?",
+          4: "Something's tangled up in my notes. Give it another go?"
+        }
+      },
+      type: {
+        item: "Item",
+        mob: "Mob",
+        boss: "Boss",
+        npc: "NPC",
+        merchant: "Merchant",
+        location: "Location",
+        dungeon: "Dungeon",
+        quest: "Quest"
+      },
+      help: {
+        body: {
+          1: "Ask me about items and gear, mobs and bosses, what drops what, crafting recipes, quests, NPCs and merchants, or map locations. Give me a name and I'll dig through the records.",
+          2: "I deal in names: items, gear, monsters, bosses, drops, recipes, quests, shopkeepers, places. Give me one and I'll tell ya what I know.",
+          3: "Bring me a name - a mob, an item, a quest, a merchant, a spot on the map - and I'll check my notes on it.",
+          4: "Mobs, drops, items, recipes, quests, NPCs, locations. Name any of those and I'll look it up for ya."
+        }
+      }
+    }
+  });
+
+  translations.es = deepMerge(translations.es, {
+    argo: {
+      lead: {
+        item: {
+          1: "¡Oho, tengo una pista!",
+          2: "Veamos qué dicen los registros.",
+          3: "Tengo el expediente aquí mismo.",
+          4: "Ese nombre me suena. Dame un momento.",
+          5: "Las preguntas de equipo son mi pan de cada día.",
+          6: "Mmm, déjame mirar mis notas.",
+          7: "Estás de suerte: tengo una ficha de eso.",
+          8: "¿Un objeto? Me gusta cuando preguntan por cosas que puedo nombrar.",
+          9: "Vamos a indagar. Los objetos dejan rastro en el papel, y el papel lo guardo yo.",
+          10: "He vendido información peor por buen Col. Esta va gratis.",
+          11: "Bien, ese nombre me suena.",
+          12: "Veamos qué tengo anotado.",
+          13: "Oho, preguntando por lo bueno.",
+          14: "Llevaba tiempo esperando que alguien preguntara por eso.",
+          15: "Claro, ese lo conozco.",
+          16: "Mmm, ese nombre está en mi libro por algún lado.",
+          17: "Déjame pasar a la página correcta.",
+          18: "¿Quieres detalles? Detalles tengo.",
+          19: "Ahora sí, un nombre que vale la pena buscar.",
+          20: "Veamos cuánto puedo contarte."
+        },
+        recipe: {
+          1: "Ah, una pregunta de artesano. Me gusta.",
+          2: "Déjame buscar esa receta.",
+          3: "Esto es lo que listan los registros.",
+          4: "¿Estás fabricando algo? Déjame comprobar.",
+          5: "Mmm, las recetas las tengo ordenadas.",
+          6: "Veamos qué lleva eso.",
+          7: "Bien, vamos a por los materiales.",
+          8: "Un artesano con Col que gastar. Bien.",
+          9: "Veamos qué dicen los registros que hace falta.",
+          10: "Esa tiene receta, estoy bastante segura.",
+          11: "Déjame sacar la lista.",
+          12: "Mmm, déjame ver qué se necesita para eso."
+        },
+        mob: {
+          1: "Oho, una pregunta de caza.",
+          2: "Veamos qué dice el bestiario.",
+          3: "Tengo una ficha de ese.",
+          4: "¿Un monstruo? Esos dejan muchas huellas.",
+          5: "¿Vas de caza? Déjame comprobar.",
+          6: "Ese tiene mala fama, si no me falla la memoria.",
+          7: "Veamos qué dicen los registros de esa bestia.",
+          8: "Mucha gente pregunta por ese. Déjame sacar mis notas.",
+          9: "Mmm, ese nombre lo conozco.",
+          10: "Déjame ver qué tengo sobre él.",
+          11: "Una pregunta de cazador. Mi favorita.",
+          12: "Bien, ese. Dame un segundo.",
+          13: "Veamos dónde vive y con qué golpea.",
+          14: "Tengo notas de todo lo que tiene dientes. Déjame mirar.",
+          15: "Ese nombre lo he oído más de una vez.",
+          16: "Déjame ver qué tengo anotado sobre ese.",
+          17: "Cuidado con ese... o no, es tu cuello. Esto es lo que sé.",
+          18: "Mmm, déjame rebuscar en las páginas del bestiario.",
+          19: "Los monstruos son negocio fácil. Siempre están en algún sitio.",
+          20: "Veamos si es tan peligroso como dicen."
+        },
+        mobDrops: {
+          1: "¡Ah, una pregunta de saqueador!",
+          2: "Veamos qué suelta.",
+          3: "Esta es la lista de botín que tengo.",
+          4: "¿Vas a por sus bolsillos? Sensato.",
+          5: "Veamos qué cae de ese.",
+          6: "Mmm, listas de botín sí guardo.",
+          7: "Quieres lo que lleva encima. Justo.",
+          8: "Déjame mirar la lista. Estas no me las invento.",
+          9: "Ese vale la pena cazarlo por algo.",
+          10: "Bien, veamos qué deja atrás.",
+          11: "Mátalo y llévate sus cosas. Ese es el negocio.",
+          12: "Déjame ver qué tengo registrado para él.",
+          13: "Mmm, déjame comprobar qué hay en la lista.",
+          14: "Veamos si merece tu tiempo."
+        },
+        drop: {
+          1: "¿Oho, sigues el rastro de un botín?",
+          2: "Veamos quién lo tiene.",
+          3: "He rebuscado en las listas de botín.",
+          4: "¿Buscas de dónde sale? Listo.",
+          5: "Déjame ver quién lo lleva.",
+          6: "Mmm, ¿eso es un botín?",
+          7: "Alguien lo tiene. Vamos a averiguar quién.",
+          8: "Tengo las listas de botín ordenadas. Dame un momento.",
+          9: "Bien, vamos a rastrearlo.",
+          10: "Déjame ver qué mobs lo llevan.",
+          11: "¿Persigues un botín? Yo haría lo mismo.",
+          12: "Mmm, déjame ver qué está registrado.",
+          13: "Eso no crece en los árboles. Déjame mirar.",
+          14: "Veamos quién es tan generoso como para soltarlo."
+        },
+        npc: {
+          1: "Preguntando se encuentra gente. Déjame comprobar.",
+          2: "Veamos dónde puedes encontrarlo.",
+          3: "Tengo una pista de ese.",
+          4: "¿Buscas a alguien? Déjame mirar mis notas.",
+          5: "Mmm, la gente se mueve. Déjame ver.",
+          6: "Bien, veamos dónde montan su puesto.",
+          7: "Conozco a casi todos los tenderos. Déjame mirar.",
+          8: "Déjame ver qué tengo sobre esa persona.",
+          9: "Mmm, déjame comprobar dónde se encuentra.",
+          10: "Mercaderes y errantes: de los dos llevo registro.",
+          11: "Déjame ver si puedo orientarte hacia ellos.",
+          12: "Bien, vamos a encontrarlos."
+        },
+        quest: {
+          1: "Ah, una pista de misión.",
+          2: "Veamos la ficha de la misión.",
+          3: "Esto es lo que tengo de esa misión.",
+          4: "¿Trabajo? Déjame mirar el tablón.",
+          5: "Mmm, ese lleva tiempo buscando ayuda.",
+          6: "Déjame ver qué tengo anotado.",
+          7: "¿Una misión? De esas guardo notas cuidadosas.",
+          8: "Bien, veamos quién la reparte.",
+          9: "Alguien quiere que le hagan algo. Déjame comprobar.",
+          10: "De casi todas estas tengo notas.",
+          11: "Veamos los detalles antes de que aceptes el trabajo.",
+          12: "Mmm, déjame sacar esa ficha.",
+          13: "El trabajo paga. Veamos cuánto vale.",
+          14: "Veamos la recompensa antes de que te comprometas."
+        },
+        location: {
+          1: "¿Oho, quieres orientarte?",
+          2: "Veamos dónde está eso.",
+          3: "Lo tengo marcado en el mapa.",
+          4: "¿Indicaciones? Eso sé darlas.",
+          5: "Déjame mirar mis notas del mapa.",
+          6: "Mmm, ¿eso es un lugar? Déjame ver.",
+          7: "Supongo que querrás coordenadas.",
+          8: "Bien, vamos a buscarlo en el mapa.",
+          9: "Conozco estos pisos mejor que la mayoría.",
+          10: "Veamos qué hay marcado por ahí abajo.",
+          11: "Los lugares suelo localizarlos. Probemos.",
+          12: "Mmm, déjame revisar mis notas del mapa.",
+          13: "Fácil, si mis notas no me engañan.",
+          14: "Veamos qué hay por esa zona."
+        }
+      },
+      facts: {
+        item: { 1: "Esto es lo que está anotado:", 2: "Esto es lo que tengo de él:", 3: "Los registros dicen esto:" },
+        recipe: { 1: "Esta es la lista:", 2: "Lo que hace falta:", 3: "Esto es lo que está registrado:" },
+        mob: { 1: "Esto es lo que tengo:", 2: "La ficha dice esto:", 3: "La entrada dice así:" },
+        mobDrops: {
+          1: "Esta es la lista de botín:",
+          2: "Esto es lo anotado para él:",
+          3: "Lo que tengo dice esto:"
+        },
+        drop: { 1: "Esto es quien lo tiene:", 2: "Las listas dicen esto:", 3: "Esto es lo que he encontrado:" },
+        npc: { 1: "Esto es lo que sé:", 2: "Esto es lo anotado:", 3: "Las notas dicen esto:" },
+        quest: { 1: "Esta es la ficha:", 2: "Esto es lo que pone:", 3: "La ficha dice esto:" },
+        location: {
+          1: "Esto es lo que está marcado:",
+          2: "Esto es lo que hay:",
+          3: "Las notas del mapa dicen esto:"
+        }
+      },
+      close: {
+        1: "Eso sale directo de los registros.",
+        2: "Todo eso es firme, lo he comprobado.",
+        3: "Ahí no hay nada inventado.",
+        4: "Puedes fiarte de eso.",
+        5: "Cada línea de eso está anotada en algún sitio.",
+        6: "Eso es todo lo que está registrado.",
+        7: "Fiable, esto. Yo no paso habladurías.",
+        8: "Viene de la fuente, no de lo que se cuenta por ahí.",
+        9: "Buena información. Vale su precio.",
+        10: "Eso dicen los registros, y a mí no me mienten.",
+        11: "Información limpia. Disfrútala.",
+        12: "Eso está confirmado, no es nada oído por ahí."
+      },
+      label: {
+        floor: "Piso {floor}",
+        level: "Nv {level}",
+        stats: "Estadísticas",
+        craftingLocation: "Lugar de fabricación",
+        craftingResources: "Recursos de fabricación",
+        droppedBy: "Lo sueltan",
+        drops: "Botín",
+        spawnArea: "Zona de aparición",
+        mobs: "Mobs",
+        rewards: "Recompensas",
+        requirements: "Requisitos",
+        npc: "PNJ",
+        sells: "Vende",
+        quests: "Misiones",
+        unknown: "desconocido",
+        recordsFound: "{label}: {count}",
+        moreRecords: "y {count} más (de {total})",
+        rankedBy: "{label} por {field}, {direction}:",
+        highestFirst: "de mayor a menor",
+        lowestFirst: "de menor a mayor",
+        bestSource: "Mejor fuente registrada: {mob} ({chance}%)",
+        levelField: "Nivel",
+        typeField: "Tipo",
+        categoryField: "Categoría",
+        questType: "Tipo de misión",
+        bestiaryTab: "Lista del bestiario",
+        target: {
+          quest: "Misiones",
+          boss: "Jefes",
+          mob: "Mobs",
+          item: "Objetos",
+          npc: "PNJ",
+          location: "Lugares",
+          dungeon: "Mazmorras",
+          area: "Zonas"
+        }
+      },
+      note: {
+        itemRecordMissing: {
+          1: "Hay más de este de lo que tengo en mis notas. Eso es todo lo que puedo darte por ahora.",
+          2: "Eso es todo lo que tengo: mis notas sobre este son escasas.",
+          3: "Te he dado lo que hay. El resto no está anotado en ningún sitio al que yo llegue."
+        },
+        bestiaryRecordMissing: {
+          1: "No tengo ficha de ese en mis notas, solo lo que ves aquí.",
+          2: "Mis notas sobre eso empiezan y acaban en lo que ves.",
+          3: "Ese está apenas documentado. Lo de arriba es todo lo que hay."
+        },
+        noDropRecord: {
+          1: "Nadie ha anotado qué suelta, así que no me lo voy a inventar.",
+          2: "No hay lista de botín de ese, y esas no me las invento.",
+          3: "No tengo lista de botín suya. Prefiero no decir nada antes que inventármelo."
+        },
+        noRecipe: {
+          1: "No hay receta anotada, así que no puedo darte una.",
+          2: "De ese no tengo receta.",
+          3: "Nadie ha registrado cómo se fabrica, y yo no invento recetas."
+        },
+        noCraftingLocation: {
+          1: "Mis notas no dicen dónde se fabrica ni dónde se vende.",
+          2: "No hay taller ni mercader anotado junto a ese.",
+          3: "No puedo decirte dónde fabricarlo: esa parte está en blanco en mis notas."
+        },
+        noStats: {
+          1: "No hay números anotados para eso.",
+          2: "Nadie ha registrado sus estadísticas.",
+          3: "De ese no tengo cifras."
+        },
+        noSpawnArea: {
+          1: "No hay zona de aparición anotada.",
+          2: "Mis notas no dicen dónde aparece.",
+          3: "Dónde vive no está registrado."
+        },
+        markerNotFound: {
+          1: "No he podido localizar ese en el mapa.",
+          2: "Ese nombre no está marcado en ningún sitio que yo vea.",
+          3: "No hay marca en el mapa, así que no puedo orientarte."
+        },
+        questMarkerOnly: {
+          1: "Solo tengo su marca en el mapa, no los detalles de la misión.",
+          2: "Solo está anotado su lugar, no el resto del encargo.",
+          3: "El mapa lo conoce. Mis notas sobre la misión están vacías."
+        },
+        absenceNotProof: {
+          1: "Eso no prueba que no esté en el juego: solo que mis notas no lo tienen.",
+          2: "No lo tomes como prueba de que no existe. Solo significa que no lo tengo anotado.",
+          3: "Que yo no lo sepa no es lo mismo que no esté ahí."
+        },
+        otherIsland: {
+          1: "Ese está en una isla distinta de la que estás viendo.",
+          2: "Eso pertenece a otra isla; estás viendo una diferente.",
+          3: "Otra isla por completo, ese."
+        },
+        englishOnly: {
+          1: "Aviso: leo la pregunta en inglés y pillo algunas palabras en español, pero los nombres mejor en inglés.",
+          2: "Entiendo la pregunta en inglés y algo de español; los nombres, mejor en inglés.",
+          3: "Las preguntas las leo en inglés, con algo de español; si nombras las cosas en inglés nos entenderemos."
+        },
+        floorInferred: {
+          1: "Ese registro está en el Piso {floor}.",
+          2: "Eso lo tengo anotado en el Piso {floor}.",
+          3: "Eso lo encontrarás en el Piso {floor} según mis notas."
+        },
+        otherFloorRecords: {
+          1: "Hay {count} más registrados en {floors}.",
+          2: "Hay {count} más en {floors}, por si algún día vas por allí.",
+          3: "Mis notas guardan {count} más en {floors}."
+        },
+        rankingUnknown: {
+          1: "{count} de ellos no tienen valor registrado, así que no los ordeno.",
+          2: "Otros {count} no tienen cifra anotada, así que los he dejado fuera antes que inventarla.",
+          3: "{count} más no tienen nada registrado, así que no están en la lista."
+        },
+        chanceNotRecorded: {
+          1: "Algunas de esas tasas no están anotadas en ningún sitio.",
+          2: "No todas las fuentes tienen tasa registrada: solo te paso lo que está escrito.",
+          3: "Donde no hay tasa registrada, la he omitido en vez de inventarla."
+        },
+        noRecordedRate: {
+          1: "Nadie ha anotado una tasa de botín para ninguna de esas fuentes.",
+          2: "Tengo las fuentes, pero ni una sola tasa, así que no puedo decir que ninguna sea la mejor.",
+          3: "Las fuentes están registradas; las tasas no."
+        },
+        comparisonTruncated: {
+          1: "No son todos los campos: hay {count} en total.",
+          2: "Hay {count} campos en total; te he mostrado los primeros.",
+          3: "La lista completa llega a {count} campos."
+        }
+      },
+      status: {
+        ambiguous: {
+          1: "Mmm, eso puede ser varias cosas. ¿A cuál te refieres?",
+          2: "Espera, tengo más de una coincidencia:",
+          3: "Ese nombre hace doble trabajo. ¿Cuál de ellos?",
+          4: "Mmm, me has dado un nombre que encaja con más de una cosa:",
+          5: "Cuidado, eso puede ser cualquiera de estos:",
+          6: "Tengo varias fichas con ese nombre. Elige:",
+          7: "Eso no es lo bastante concreto para mis notas. ¿Cuál de estos?",
+          8: "Más de una cosa responde a ese nombre. ¿Cuál?"
+        },
+        missing: {
+          1: "Mmm, encontré el nombre pero no los detalles.",
+          2: "Solo tengo una parte de eso.",
+          3: "Conozco el nombre, pero mis notas se acaban ahí.",
+          4: "Ese está a medio escribir en mi libro.",
+          5: "Tengo el nombre y poco más.",
+          6: "Mmm, ese está escaso. Esto es lo que tengo.",
+          7: "Tengo un trozo de eso, no todo.",
+          8: "Mis notas sobre ese están incompletas. Esto es lo que hay."
+        },
+        unsupported: {
+          1: "Mmm, aún no tengo una pista fiable de eso.",
+          2: "Eso queda fuera de mis registros, lo siento.",
+          3: "No es el tipo de cosa de la que guardo notas.",
+          4: "Con eso no puedo ayudarte: no es mi especialidad.",
+          5: "Mmm, eso va más allá de lo que yo trato.",
+          6: "De eso no tengo nada, y no me lo voy a inventar.",
+          7: "Eso queda fuera de mi negocio, me temo.",
+          8: "No hay registros de eso. Prueba con algo del juego."
+        },
+        candidates: { 1: "Candidatos:", 2: "Esto es lo que ha salido:", 3: "Posibles coincidencias:" },
+        emptySet: {
+          1: "Nada en este piso coincide con eso.",
+          2: "Esa lista me ha salido vacía, lo siento.",
+          3: "He repasado toda la lista: aquí no hay nada que coincida."
+        },
+        sourcesAvailable: "En esta página solo puedo ver: {sources}.",
+        noSources: "Todavía no puedo ver ningún registro del juego en esta página.",
+        engineMissing: {
+          1: "Mis registros aún no están cargados en esta página, así que aquí no puedo buscar nada.",
+          2: "En esta página no llevo mis notas encima. Pregúntame donde estén cargadas.",
+          3: "Mi libro no está en esta página, así que no tengo nada que consultar.",
+          4: "Aquí no hay con qué trabajar: mis registros aún no están cargados en esta página."
+        },
+        datasetUnsupported: {
+          1: "Je, je. Últimamente solo trabajo con Datos actuales. Cambia tu conjunto de datos a Datos actuales y veré qué puedo encontrar para ti.",
+          2: "Mis notas solo cubren los Datos actuales ahora. Cambia tu conjunto de datos a Datos actuales y pregúntame otra vez.",
+          3: "Solo Datos actuales, esa es mi norma. Cambia tu conjunto de datos y rebuscaré en lo que tengo.",
+          4: "De mí no vas a sacar respuestas de prueba beta; yo trabajo con los Datos actuales. Cambia tu conjunto de datos y vuelvo a mirar."
+        },
+        error: {
+          1: "Algo se ha atascado en mis archivos. ¿Me lo preguntas otra vez?",
+          2: "Mmm, mis notas se me han desparramado. ¿Me lo repites?",
+          3: "Eso se ha perdido de camino a mi mesa. ¿Otra vez?",
+          4: "Algo se ha enredado en mis notas. ¿Lo intentas de nuevo?"
+        }
+      },
+      type: {
+        item: "Objeto",
+        mob: "Mob",
+        boss: "Jefe",
+        npc: "PNJ",
+        merchant: "Mercader",
+        location: "Ubicación",
+        dungeon: "Mazmorra",
+        quest: "Misión"
+      },
+      help: {
+        body: {
+          1: "Pregúntame por objetos y equipo, mobs y jefes, qué suelta qué, recetas de fabricación, misiones, PNJ y mercaderes, o ubicaciones del mapa. Dame un nombre y rebuscaré en los registros.",
+          2: "Yo trato con nombres: objetos, equipo, monstruos, jefes, botines, recetas, misiones, tenderos, lugares. Dame uno y te diré lo que sé.",
+          3: "Tráeme un nombre —un mob, un objeto, una misión, un mercader, un punto del mapa— y consultaré mis notas.",
+          4: "Mobs, botines, objetos, recetas, misiones, PNJ, ubicaciones. Nombra cualquiera de esos y lo busco para ti."
+        }
+      }
+    }
+  });
+
+  translations.fr = deepMerge(translations.fr, {
+    argo: {
+      lead: {
+        item: {
+          1: "Oho, une piste !",
+          2: "Voyons ce que disent les dossiers.",
+          3: "J'ai le dossier sous la main.",
+          4: "Ce nom me dit quelque chose. Un instant.",
+          5: "Les questions d'équipement, c'est mon pain quotidien.",
+          6: "Hmm, laisse-moi vérifier mes notes.",
+          7: "Tu as de la chance : j'ai une fiche là-dessus.",
+          8: "Un objet, hein ? J'aime quand on me demande des choses que je peux nommer.",
+          9: "Fouillons. Les objets laissent des traces sur le papier, et le papier, c'est moi qui le garde.",
+          10: "J'ai vendu de pires informations pour de bons Cols. Celle-ci est offerte.",
+          11: "Bien, ce nom me dit quelque chose.",
+          12: "Voyons ce que j'ai noté.",
+          13: "Oho, on demande du beau matériel.",
+          14: "J'attendais que quelqu'un me demande ça.",
+          15: "Bien sûr, je connais celui-là.",
+          16: "Hmm, ce nom est quelque part dans mon carnet.",
+          17: "Laisse-moi tourner à la bonne page.",
+          18: "Tu veux les détails ? J'ai les détails.",
+          19: "Voilà un nom qui vaut la peine d'être cherché.",
+          20: "Voyons tout ce que je peux te dire."
+        },
+        recipe: {
+          1: "Ah, une question d'artisan. J'aime ça.",
+          2: "Laisse-moi dénicher cette recette.",
+          3: "Voilà ce que listent les dossiers.",
+          4: "Tu fabriques quelque chose ? Je vérifie.",
+          5: "Hmm, les recettes, je les tiens en ordre.",
+          6: "Voyons ce qu'il faut pour ça.",
+          7: "Bien, cherchons les matériaux.",
+          8: "Un artisan avec des Cols à dépenser. Bien.",
+          9: "Voyons ce que les dossiers disent qu'il faut.",
+          10: "Celle-là a une recette, j'en suis assez sûre.",
+          11: "Laisse-moi sortir la liste.",
+          12: "Hmm, laisse-moi voir les ingrédients."
+        },
+        mob: {
+          1: "Oho, une question de chasse.",
+          2: "Voyons ce que dit le bestiaire.",
+          3: "J'ai une fiche là-dessus.",
+          4: "Un monstre, hein ? Ça laisse beaucoup de traces.",
+          5: "Tu chasses ? Laisse-moi vérifier.",
+          6: "Celui-là a mauvaise réputation, si je me souviens bien.",
+          7: "Voyons ce que les dossiers disent de cette bête.",
+          8: "Beaucoup de gens me demandent celui-là. Je sors mes notes.",
+          9: "Hmm, ce nom me dit quelque chose.",
+          10: "Laisse-moi voir ce que j'ai sur lui.",
+          11: "Une question de chasseur. Ma préférée.",
+          12: "Bien, celui-là. Un instant.",
+          13: "Voyons où il vit et avec quoi il frappe.",
+          14: "Je note tout ce qui a des dents. Laisse-moi regarder.",
+          15: "Ce nom, je l'ai entendu plus d'une fois.",
+          16: "Laisse-moi voir ce que j'ai noté là-dessus.",
+          17: "Fais attention à celui-là... ou pas, c'est ta nuque. Voilà ce que je sais.",
+          18: "Hmm, laisse-moi fouiller les pages du bestiaire.",
+          19: "Les monstres, c'est du commerce facile. Ils sont toujours quelque part.",
+          20: "Voyons s'il est aussi méchant qu'on le dit."
+        },
+        mobDrops: {
+          1: "Ah, une question de pilleur !",
+          2: "Voyons ce qu'il lâche.",
+          3: "Voilà la liste de butin que j'ai.",
+          4: "Tu vises ses poches ? Judicieux.",
+          5: "Voyons ce qui tombe de celui-là.",
+          6: "Hmm, les listes de butin, j'en tiens.",
+          7: "Tu veux ce qu'il transporte. Entendu.",
+          8: "Laisse-moi regarder la liste. Je ne les devine pas.",
+          9: "Celui-là vaut la peine d'être chassé pour une raison.",
+          10: "Bien, voyons ce qu'il laisse derrière lui.",
+          11: "Tuer, prendre ses affaires. C'est le métier.",
+          12: "Laisse-moi voir ce que j'ai noté pour lui.",
+          13: "Hmm, laisse-moi vérifier ce qu'il y a sur la liste.",
+          14: "Voyons si ça vaut ton temps."
+        },
+        drop: {
+          1: "Oho, tu suis une piste de butin ?",
+          2: "Voyons qui le détient.",
+          3: "J'ai fouillé les listes de butin.",
+          4: "Tu cherches d'où ça vient ? Malin.",
+          5: "Laisse-moi voir qui le porte.",
+          6: "Hmm, c'est un butin, ça ?",
+          7: "Quelqu'un l'a. Voyons qui.",
+          8: "Je tiens mes listes de butin en ordre. Un instant.",
+          9: "Bien, remontons la piste.",
+          10: "Laisse-moi voir quels monstres le portent.",
+          11: "Tu cours après un butin ? Je ferais pareil.",
+          12: "Hmm, laisse-moi voir ce qui est enregistré.",
+          13: "Ça ne pousse pas sur les arbres. Laisse-moi regarder.",
+          14: "Voyons qui est assez généreux pour le lâcher."
+        },
+        npc: {
+          1: "En demandant, on trouve des gens. Je vérifie.",
+          2: "Voyons où le trouver.",
+          3: "J'ai une piste là-dessus.",
+          4: "Tu cherches quelqu'un ? Laisse-moi voir mes notes.",
+          5: "Hmm, les gens bougent. Laisse-moi regarder.",
+          6: "Bien, voyons où ils ont monté leur boutique.",
+          7: "Je connais presque tous les marchands. Laisse-moi regarder.",
+          8: "Laisse-moi voir ce que j'ai sur cette personne.",
+          9: "Hmm, laisse-moi vérifier où elle se trouve.",
+          10: "Marchands et vagabonds : je suis les deux.",
+          11: "Laisse-moi voir si je peux t'orienter vers eux.",
+          12: "Bien, allons les trouver."
+        },
+        quest: {
+          1: "Ah, une piste de quête.",
+          2: "Regardons la fiche de quête.",
+          3: "Voilà ce que j'ai sur cette quête.",
+          4: "Du travail ? Laisse-moi regarder le tableau.",
+          5: "Hmm, celle-là cherche de l'aide depuis un moment.",
+          6: "Laisse-moi voir ce que j'ai noté.",
+          7: "Une quête, hein ? Celles-là, je les note avec soin.",
+          8: "Bien, voyons qui la distribue.",
+          9: "Quelqu'un veut qu'on lui rende un service. Je vérifie.",
+          10: "J'ai des notes sur presque toutes.",
+          11: "Voyons les détails avant que tu acceptes le travail.",
+          12: "Hmm, laisse-moi sortir cette fiche.",
+          13: "Le travail paie. Voyons combien ça vaut.",
+          14: "Voyons la récompense avant que tu t'engages."
+        },
+        location: {
+          1: "Oho, tu veux le plan des lieux ?",
+          2: "Voyons où ça se trouve.",
+          3: "Je l'ai épinglé sur la carte.",
+          4: "Des indications ? Ça, je sais faire.",
+          5: "Laisse-moi consulter mes notes de carte.",
+          6: "Hmm, c'est un lieu, ça ? Laisse-moi regarder.",
+          7: "Tu voudras des coordonnées, je suppose.",
+          8: "Bien, trouvons-le sur la carte.",
+          9: "Je connais ces étages mieux que la plupart.",
+          10: "Voyons ce qui est marqué là-dessous.",
+          11: "Les lieux, j'arrive en général à les situer. Essayons.",
+          12: "Hmm, laisse-moi vérifier mes notes de carte.",
+          13: "Facile, si mes notes ne me trompent pas.",
+          14: "Voyons ce qu'il y a dans ce coin."
+        }
+      },
+      facts: {
+        item: { 1: "Voilà ce qui est noté :", 2: "Voilà ce que j'ai là-dessus :", 3: "Les dossiers disent ceci :" },
+        recipe: { 1: "Voilà la liste :", 2: "Ce qu'il faut :", 3: "Voilà ce qui est enregistré :" },
+        mob: { 1: "Voilà ce que j'ai :", 2: "La fiche dit ceci :", 3: "L'entrée dit ceci :" },
+        mobDrops: {
+          1: "Voilà la liste de butin :",
+          2: "Voilà ce qui est noté pour lui :",
+          3: "Ce que j'ai dit ceci :"
+        },
+        drop: { 1: "Voilà qui le détient :", 2: "Les listes disent ceci :", 3: "Voilà ce que j'ai trouvé :" },
+        npc: { 1: "Voilà ce que je sais :", 2: "Voilà ce qui est noté :", 3: "Les notes disent ceci :" },
+        quest: { 1: "Voilà la fiche :", 2: "Voilà ce qu'elle dit :", 3: "La fiche dit ceci :" },
+        location: {
+          1: "Voilà ce qui est marqué :",
+          2: "Voilà ce que j'ai en main :",
+          3: "Les notes de carte disent ceci :"
+        }
+      },
+      close: {
+        1: "Ça vient droit des dossiers.",
+        2: "Tout ça est solide, j'ai vérifié.",
+        3: "Rien d'inventé là-dedans.",
+        4: "Tu peux te fier à ça.",
+        5: "Chaque ligne de ça est notée quelque part.",
+        6: "C'est tout ce qui est enregistré.",
+        7: "Fiable, ça. Je ne colporte pas de racontars.",
+        8: "Ça vient de la source, pas des on-dit.",
+        9: "Bonne information. Elle vaut son prix.",
+        10: "C'est ce que disent les dossiers, et ils ne me mentent pas.",
+        11: "Information propre. Profites-en.",
+        12: "C'est confirmé, pas du ouï-dire."
+      },
+      label: {
+        floor: "Étage {floor}",
+        level: "Niv. {level}",
+        stats: "Statistiques",
+        craftingLocation: "Lieu de fabrication",
+        craftingResources: "Ressources de fabrication",
+        droppedBy: "Lâché par",
+        drops: "Butin",
+        spawnArea: "Zone d'apparition",
+        mobs: "Monstres",
+        rewards: "Récompenses",
+        requirements: "Prérequis",
+        npc: "PNJ",
+        sells: "Vend",
+        quests: "Quêtes",
+        unknown: "inconnu",
+        recordsFound: "{label} : {count}",
+        moreRecords: "et {count} de plus (sur {total})",
+        rankedBy: "{label} par {field}, {direction} :",
+        highestFirst: "du plus haut au plus bas",
+        lowestFirst: "du plus bas au plus haut",
+        bestSource: "Meilleure source enregistrée : {mob} ({chance}%)",
+        levelField: "Niveau",
+        typeField: "Type",
+        categoryField: "Catégorie",
+        questType: "Type de quête",
+        bestiaryTab: "Liste du bestiaire",
+        target: {
+          quest: "Quêtes",
+          boss: "Boss",
+          mob: "Monstres",
+          item: "Objets",
+          npc: "PNJ",
+          location: "Lieux",
+          dungeon: "Donjons",
+          area: "Zones"
+        }
+      },
+      note: {
+        itemRecordMissing: {
+          1: "Il y a plus sur celui-là que ce que j'ai dans mes notes. C'est tout ce que je peux te donner pour l'instant.",
+          2: "C'est tout ce que j'ai là-dessus : mes notes sur celui-ci sont maigres.",
+          3: "Je t'ai donné ce que j'ai. Le reste n'est noté nulle part où je puisse aller."
+        },
+        bestiaryRecordMissing: {
+          1: "Je n'ai pas de fiche sur celui-là, seulement ce que tu vois ici.",
+          2: "Mes notes là-dessus commencent et finissent à ce que tu vois.",
+          3: "Celui-là est à peine documenté. Ce qui est au-dessus, c'est tout."
+        },
+        noDropRecord: {
+          1: "Personne n'a noté ce qu'il lâche, alors je ne vais pas le deviner.",
+          2: "Pas de liste de butin pour celui-là, et je ne les invente pas.",
+          3: "Je n'ai aucune liste de butin pour lui. Je préfère ne rien dire que d'inventer."
+        },
+        noRecipe: {
+          1: "Aucune recette n'est notée, je ne peux pas t'en donner une.",
+          2: "Je n'ai pas de recette pour celui-là.",
+          3: "Personne n'a enregistré comment ça se fabrique, et je n'invente pas de recettes."
+        },
+        noCraftingLocation: {
+          1: "Mes notes ne disent pas où c'est fabriqué ni vendu.",
+          2: "Aucun atelier ni marchand n'est noté à côté de celui-là.",
+          3: "Je ne peux pas te dire où le fabriquer : cette partie est vide dans mes notes."
+        },
+        noStats: {
+          1: "Aucun chiffre n'est noté pour ça.",
+          2: "Personne n'a enregistré ses statistiques.",
+          3: "Je n'ai aucun chiffre pour celui-là."
+        },
+        noSpawnArea: {
+          1: "Aucune zone d'apparition n'est notée.",
+          2: "Mes notes ne disent pas où il apparaît.",
+          3: "L'endroit où il vit n'est pas enregistré."
+        },
+        markerNotFound: {
+          1: "Je n'ai pas pu le situer sur la carte.",
+          2: "Ce nom n'est marqué nulle part où je puisse voir.",
+          3: "Pas de marque sur la carte, je ne peux pas t'y orienter."
+        },
+        questMarkerOnly: {
+          1: "Je n'ai que sa marque sur la carte, pas les détails de la quête.",
+          2: "Seul son emplacement est noté, pas le reste du travail.",
+          3: "La carte le connaît. Mes notes sur la quête elle-même sont vides."
+        },
+        absenceNotProof: {
+          1: "Ce n'est pas une preuve que ça n'existe pas dans le jeu : juste que mes notes ne l'ont pas.",
+          2: "Ne prends pas ça pour une preuve que ça n'existe pas. Ça veut seulement dire que je ne l'ai pas noté.",
+          3: "Que je ne le connaisse pas ne veut pas dire que ça n'existe pas."
+        },
+        otherIsland: {
+          1: "Celui-là est sur une autre île que celle que tu regardes.",
+          2: "Ça appartient à une autre île : tu en regardes une différente.",
+          3: "Une autre île, complètement, celui-là."
+        },
+        englishOnly: {
+          1: "Petit avertissement : je lis la question en anglais et j'attrape quelques mots de français, mais les noms, de préférence en anglais.",
+          2: "Je comprends la question en anglais, avec un peu de français ; pour les noms, reste en anglais.",
+          3: "Les questions, je les lis en anglais, avec un peu de français ; si tu nommes les choses en anglais, on s'entendra."
+        },
+        floorInferred: {
+          1: "Cette fiche se trouve à l'Étage {floor}.",
+          2: "J'ai ça noté à l'Étage {floor}.",
+          3: "Tu trouveras ça à l'Étage {floor} dans mes notes."
+        },
+        otherFloorRecords: {
+          1: "{count} de plus sont enregistrés à {floors}.",
+          2: "Il y en a {count} de plus à {floors}, si jamais tu y vas.",
+          3: "Mes notes en gardent {count} de plus à {floors}."
+        },
+        rankingUnknown: {
+          1: "{count} d'entre eux n'ont aucune valeur enregistrée, je ne les classe donc pas.",
+          2: "{count} autres n'ont aucun chiffre noté : je les ai laissés de côté plutôt que de deviner.",
+          3: "{count} de plus n'ont rien d'enregistré, ils ne sont donc pas dans la liste."
+        },
+        chanceNotRecorded: {
+          1: "Certains de ces taux ne sont notés nulle part.",
+          2: "Toutes les sources n'ont pas de taux enregistré : je ne transmets que ce qui est écrit.",
+          3: "Là où le taux n'est pas enregistré, je l'ai omis plutôt que de deviner."
+        },
+        noRecordedRate: {
+          1: "Personne n'a noté de taux de butin pour ces sources.",
+          2: "J'ai les sources, mais pas un seul taux : je ne peux donc pas dire laquelle est la meilleure.",
+          3: "Les sources sont enregistrées ; les taux, non."
+        },
+        comparisonTruncated: {
+          1: "Ce ne sont pas tous les champs : il y en a {count} au total.",
+          2: "Il y a {count} champs en tout ; je t'ai montré les premiers.",
+          3: "La liste complète compte {count} champs."
+        }
+      },
+      status: {
+        ambiguous: {
+          1: "Hmm, ça pourrait être plusieurs choses. Laquelle voulais-tu ?",
+          2: "Attends, j'ai plus d'une correspondance :",
+          3: "Ce nom fait double emploi. Lequel ?",
+          4: "Hmm, tu m'as donné un nom qui colle à plusieurs choses :",
+          5: "Attention, ça pourrait être n'importe lequel de ceux-là :",
+          6: "J'ai plusieurs fiches sous ce nom. À toi de choisir :",
+          7: "Ce n'est pas assez précis pour mes notes. Lequel de ceux-là ?",
+          8: "Plus d'une chose répond à ce nom. Laquelle ?"
+        },
+        missing: {
+          1: "Hmm, j'ai trouvé le nom mais pas les détails.",
+          2: "Je n'ai qu'une partie de ça.",
+          3: "Je connais le nom, mais mes notes s'arrêtent là.",
+          4: "Celui-là n'est écrit qu'à moitié dans mon carnet.",
+          5: "J'ai le nom et pas grand-chose de plus.",
+          6: "Hmm, celui-là est maigre. Voilà ce que j'ai.",
+          7: "J'ai un morceau de ça, pas le tout.",
+          8: "Mes notes là-dessus sont incomplètes. Voilà ce qu'il y a."
+        },
+        unsupported: {
+          1: "Hmm, je n'ai pas encore de piste fiable là-dessus.",
+          2: "Ça sort de mes dossiers, désolée.",
+          3: "Ce n'est pas le genre de chose sur laquelle je prends des notes.",
+          4: "Pour ça, je ne peux pas t'aider : ce n'est pas mon domaine.",
+          5: "Hmm, ça dépasse ce dont je traite.",
+          6: "Là-dessus je n'ai rien, et je ne vais pas l'inventer.",
+          7: "Ça sort de mon commerce, j'en ai peur.",
+          8: "Aucun dossier là-dessus. Essaie avec quelque chose du jeu."
+        },
+        candidates: { 1: "Candidats :", 2: "Voilà ce qui est ressorti :", 3: "Correspondances possibles :" },
+        emptySet: {
+          1: "Rien sur cet étage ne correspond à ça.",
+          2: "Cette liste est vide, j'en ai peur.",
+          3: "J'ai passé toute la liste en revue : rien ne correspond ici."
+        },
+        sourcesAvailable: "Sur cette page, je ne vois que : {sources}.",
+        noSources: "Je ne vois encore aucun registre de jeu sur cette page.",
+        engineMissing: {
+          1: "Mes dossiers ne sont pas encore chargés sur cette page, je ne peux rien y chercher.",
+          2: "Je n'ai pas mes notes sur cette page. Demande-moi là où elles sont chargées.",
+          3: "Mon carnet n'est pas sur cette page, je n'ai donc rien à consulter.",
+          4: "Rien pour travailler ici : mes dossiers ne sont pas encore chargés sur cette page."
+        },
+        datasetUnsupported: {
+          1: "Hé, je ne travaille plus qu'avec les Données actuelles. Passe ton jeu de données sur Données actuelles et je verrai ce que je peux trouver pour toi.",
+          2: "Mes notes ne couvrent plus que les Données actuelles. Passe ton jeu de données sur Données actuelles et redemande-moi.",
+          3: "Données actuelles uniquement, c'est ma règle. Change ton jeu de données et je fouillerai ce que j'ai.",
+          4: "Tu n'auras pas de réponses de test bêta de ma part : je travaille avec les Données actuelles. Change ton jeu de données et je regarde à nouveau."
+        },
+        error: {
+          1: "Quelque chose s'est coincé dans mes dossiers. Tu me la reposes ?",
+          2: "Hmm, mes notes se sont éparpillées. Tu me le redemandes ?",
+          3: "Ça s'est perdu en chemin vers mon bureau. Réessaie ?",
+          4: "Quelque chose s'est emmêlé dans mes notes. Tu retentes ?"
+        }
+      },
+      type: {
+        item: "Objet",
+        mob: "Monstre",
+        boss: "Boss",
+        npc: "PNJ",
+        merchant: "Marchand",
+        location: "Lieu",
+        dungeon: "Donjon",
+        quest: "Quête"
+      },
+      help: {
+        body: {
+          1: "Demande-moi des objets et de l'équipement, des monstres et des boss, ce qui lâche quoi, des recettes de fabrication, des quêtes, des PNJ et des marchands, ou des lieux sur la carte. Donne-moi un nom et je fouille les dossiers.",
+          2: "Je travaille sur des noms : objets, équipement, monstres, boss, butins, recettes, quêtes, marchands, lieux. Donne-m'en un et je te dirai ce que je sais.",
+          3: "Apporte-moi un nom — un monstre, un objet, une quête, un marchand, un point sur la carte — et je consulterai mes notes.",
+          4: "Monstres, butins, objets, recettes, quêtes, PNJ, lieux. Nomme n'importe lequel et je le cherche pour toi."
+        }
+      }
+    }
+  });
+  translations.en = deepMerge(translations.en, {
+    argo: {
+      lead: {
+        collection: {
+          1: "{label}? I've got {count} on record - here's the whole lot.",
+          2: "A full sweep of {label}, is it? {count} names, and not one of them a guess.",
+          3: "The {label} shelf, is it? {count} of them, every one checked.",
+          4: "You're after the {label} list. {count} of them - let's read them out.",
+          5: "Ah, browsing the whole shelf. {count} {label}, coming right up.",
+          6: "Right, let me pull the {label} file. {count} of them - have a look."
+        },
+        ranking: {
+          1: "Let's see who comes out on top.",
+          2: "A ranking, is it? Now that's my kind of question.",
+          3: "Numbers don't argue. Let's line them up.",
+          4: "Let me sort these the way the records do.",
+          5: "You want the top of the list. Let's have a look.",
+          6: "Oho, weighing the field. I do like a good ladder."
+        },
+        comparison: {
+          1: "Side by side, then. Let's see how they measure up.",
+          2: "Putting those two next to each other - here's the picture.",
+          3: "A comparison? Fair enough, let's line them up.",
+          4: "Let's lay them out and see who blinks first.",
+          5: "Two records, one table. Have a look.",
+          6: "You want them weighed against each other. Here's what the records hold."
+        },
+        farming: {
+          1: "Hunting for it, are you? Let's find your best odds.",
+          2: "A farming question. That's the practical kind - I approve.",
+          3: "So you want it in bulk. Here's where it comes from.",
+          4: "Let's see who's been dropping that, and how often.",
+          5: "Ah, a supply question. My favourite sort of business.",
+          6: "You'll want the sources, then. Let me dig them out."
+        }
+      },
+      close: {
+        collection: {
+          1: "That's the set, complete as the records have it.",
+          2: "Every one of those is on the books - nothing padded.",
+          3: "If it's not in that list, the records don't know it either.",
+          4: "That's the lot. Happy hunting."
+        },
+        ranking: {
+          1: "That's how the records stack them up.",
+          2: "The order is the records' own, not my opinion.",
+          3: "That's the ladder as the records put it.",
+          4: "Those are the standings, straight off the page."
+        },
+        comparison: {
+          1: "Both entries are the records' own - draw your own conclusion.",
+          2: "That's the pair of them, field by field.",
+          3: "Nothing hidden in that table.",
+          4: "Judge for yourself - the numbers are all there."
+        },
+        farming: {
+          1: "Those are the recorded sources, best odds first.",
+          2: "The rates are the records' own; the rest is your luck.",
+          3: "That's where it drops, as far as my notes go.",
+          4: "Good luck out there - that's everything the notes hold."
+        }
+      }
+    }
+  });
+
+
+  translations.es = deepMerge(translations.es, {
+    argo: {
+      lead: {
+        collection: {
+          1: "¿{label}? Tengo {count} en el registro: aquí va la lista completa.",
+          2: "¿Un repaso completo de {label}? {count} nombres, y ninguno es una suposición.",
+          3: "¿El estante de {label}? {count} en total, todos comprobados.",
+          4: "Buscas la lista de {label}. Son {count}: vamos a leerlos.",
+          5: "Vaya, quieres ver todo el estante. {count} {label}, ahora mismo.",
+          6: "Vale, saco el expediente de {label}. {count} en total: échale un ojo."
+        },
+        ranking: {
+          1: "Veamos quién queda arriba.",
+          2: "¿Una clasificación? Esa sí es mi clase de pregunta.",
+          3: "Los números no discuten. Vamos a alinearlos.",
+          4: "Déjame ordenarlos como lo hacen los registros.",
+          5: "Quieres la cabeza de la lista. Vamos a verla.",
+          6: "Oho, pesando el terreno. Me gusta una buena escalera."
+        },
+        comparison: {
+          1: "Lado a lado, entonces. Veamos cómo miden.",
+          2: "Pongo esos dos juntos: esta es la foto.",
+          3: "¿Una comparación? Vale, vamos a alinearlos.",
+          4: "Vamos a ponerlos en fila y ver quién parpadea primero.",
+          5: "Dos fichas, una tabla. Échale un ojo.",
+          6: "Los quieres medidos el uno contra el otro. Esto es lo que guardan los registros."
+        },
+        farming: {
+          1: "¿Lo andas buscando? Vamos a ver tus mejores probabilidades.",
+          2: "Una pregunta de recolección. Esa es práctica, me gusta.",
+          3: "Así que lo quieres en cantidad. De aquí sale.",
+          4: "Veamos quién lo suelta, y con qué frecuencia.",
+          5: "Ah, una pregunta de suministro. Mi negocio favorito.",
+          6: "Querrás las fuentes, entonces. Déjame sacarlas."
+        }
+      },
+      close: {
+        collection: {
+          1: "Ese es el conjunto, completo según los registros.",
+          2: "Todos esos están en mis notas; nada rellenado.",
+          3: "Si no está en esa lista, los registros tampoco lo saben.",
+          4: "Eso es todo. Buena caza."
+        },
+        ranking: {
+          1: "Así los apilan los registros.",
+          2: "El orden es de los registros, no mi opinión.",
+          3: "Esa es la escalera tal como la ponen los registros.",
+          4: "Esas son las posiciones, tal cual la página."
+        },
+        comparison: {
+          1: "Ambas fichas son de los registros: saca tus conclusiones.",
+          2: "Ahí los tienes, campo por campo.",
+          3: "No hay nada escondido en esa tabla.",
+          4: "Júzgalo tú: los números están todos ahí."
+        },
+        farming: {
+          1: "Esas son las fuentes registradas, mejores probabilidades primero.",
+          2: "Los porcentajes son de los registros; el resto es tu suerte.",
+          3: "Ahí es donde cae, hasta donde llegan mis notas.",
+          4: "Suerte con la caza; ahí está todo lo anotado."
+        }
+      }
+    }
+  });
+
+
+  /* Argo's list answers. A collection, a ranking, a comparison and a farming question each open with
+     their own introduction and close with a remark about the list itself, rather than borrowing the
+     single-record wording. A collection's opener carries {count} and {label}, so the plain count
+     heading is not simply repeated after it. Mirrored as English fallbacks in shared/sao-argo.js. */
+  translations.fr = deepMerge(translations.fr, {
+    argo: {
+      lead: {
+        collection: {
+          1: "{label} ? J'en ai {count} au registre — voilà la liste complète.",
+          2: "Tout le rayon des {label}, hein ? {count} noms, et pas une supposition.",
+          3: "Le rayon des {label} ? {count} au total, tous vérifiés.",
+          4: "Tu veux la liste des {label}. {count} au total — je te les lis.",
+          5: "Tiens, tu fais le tour du rayon. {count} {label}, tout de suite.",
+          6: "Bon, je sors le dossier des {label}. {count} au total — regarde."
+        },
+        ranking: {
+          1: "Voyons qui arrive en tête.",
+          2: "Un classement ? Ça, c'est ma sorte de question.",
+          3: "Les chiffres ne discutent pas. Alignons-les.",
+          4: "Laisse-moi les trier comme le font les registres.",
+          5: "Tu veux le haut de la liste. Regardons ça.",
+          6: "Ho, on pèse le terrain. J'aime bien une bonne échelle."
+        },
+        comparison: {
+          1: "Côte à côte, alors. Voyons ce que ça donne.",
+          2: "Je mets ces deux-là ensemble — voilà le tableau.",
+          3: "Une comparaison ? Entendu, alignons-les.",
+          4: "Mettons-les en ligne et voyons qui cille le premier.",
+          5: "Deux fiches, un tableau. Regarde.",
+          6: "Tu veux les peser l'un contre l'autre. Voilà ce que disent les registres."
+        },
+        farming: {
+          1: "Tu veux le récolter ? Voyons tes meilleures chances.",
+          2: "Une question de récolte. C'est pratique, j'approuve.",
+          3: "Tu le veux en quantité, alors. Voilà d'où ça sort.",
+          4: "Voyons qui lâche ça, et à quelle fréquence.",
+          5: "Ah, une question d'approvisionnement. Mon commerce préféré.",
+          6: "Il te faut les sources, alors. Je vais les déterrer."
+        }
+      },
+      close: {
+        collection: {
+          1: "Ça, c'est l'ensemble, complet comme les registres l'ont.",
+          2: "Tous ceux-là sont au registre — rien de gonflé.",
+          3: "Si ce n'est pas dans cette liste, les registres ne le savent pas non plus.",
+          4: "Voilà le lot. Bonne chasse."
+        },
+        ranking: {
+          1: "Voilà comment les registres les empilent.",
+          2: "L'ordre vient des registres, pas de mon avis.",
+          3: "C'est l'échelle telle que les registres la posent.",
+          4: "Voilà le classement, tel quel."
+        },
+        comparison: {
+          1: "Les deux fiches viennent des registres — à toi de conclure.",
+          2: "Les voilà tous les deux, champ par champ.",
+          3: "Rien de caché dans ce tableau.",
+          4: "Juge par toi-même — les chiffres sont tous là."
+        },
+        farming: {
+          1: "Voilà les sources enregistrées, meilleures chances d'abord.",
+          2: "Les taux viennent des registres ; le reste, c'est ta chance.",
+          3: "C'est là que ça tombe, d'après mes notes.",
+          4: "Bonne chance ; voilà tout ce que mes notes contiennent."
+        }
+      }
+    }
+  });
+
+
+
   const characterBuildTranslations = {
     en: {
       page: {
@@ -2495,8 +3950,7 @@
           skillPoints: "{class} · {remaining} / {total} skill points",
           skillPointsUnlimited: "{class} · {spent} spent · Unlimited skill points",
           unlimitedSkillPoints: "Unlimited skill points",
-          unlimitedSkillPointsHint:
-            "Testing only: unlock skills without spending the skill points your level grants.",
+          unlimitedSkillPointsHint: "Testing only: unlock skills without spending the skill points your level grants.",
           deselectDependent: "Deselect dependent skills first.",
           noMatchingItems: "No {slot} items match these filters at level {level}.",
           weaponAlreadyEquipped: "This weapon is already equipped in the other weapon slot.",
@@ -3064,7 +4518,7 @@
     projectHeading: "Project",
     projectText: "Static fan-made SAO MC reference website hosted on GitHub Pages.",
     languagesHeading: "Languages",
-    languagesText: "English, Español, and Français are available through the shared language system.",
+    languagesText: "English, Español, Français, and Italiano are available through the shared language system.",
     commandReference: "Command Reference",
     commandReferenceText: "Search the existing command catalog by category, command, usage, or example.",
     loadingCommands: "Loading commands...",
@@ -3107,7 +4561,7 @@
     projectHeading: "Proyecto",
     projectText: "Sitio web de referencia de SAO MC, creado por fans y alojado en GitHub Pages.",
     languagesHeading: "Idiomas",
-    languagesText: "English, Español y Français están disponibles mediante el sistema de idiomas compartido.",
+    languagesText: "English, Español, Français e Italiano están disponibles mediante el sistema de idiomas compartido.",
     commandReference: "Referencia de comandos",
     commandReferenceText: "Busca el catálogo de comandos por categoría, comando, uso o ejemplo.",
     loadingCommands: "Cargando comandos...",
@@ -3151,7 +4605,7 @@
     projectHeading: "Projet",
     projectText: "Site de référence SAO MC créé par des fans et hébergé sur GitHub Pages.",
     languagesHeading: "Langues",
-    languagesText: "English, Español et Français sont disponibles via le système de langues partagé.",
+    languagesText: "English, Español, Français et Italiano sont disponibles via le système de langues partagé.",
     commandReference: "Référence des commandes",
     commandReferenceText: "Recherchez dans le catalogue des commandes par catégorie, commande, usage ou exemple.",
     loadingCommands: "Chargement des commandes...",
@@ -3337,6 +4791,12 @@
   Object.assign(translations.fr.page.patchnotes.entries.v020, { version: "v0.2.0 Alpha" });
 
   Object.assign(translations.en.page.patchnotes.entries, {
+    v190: {
+      version: "Content, Localization & Bug Fix Update - v1.9",
+      title: "Content, Localization & Bug Fix Update",
+      summary:
+        "NPCs & Equipment\n• Added \"Argo the Info Broker\".\n• Added new NPC locations, including Candelia, Nodachi Blacksmith, Local Miner, Wolf Accessories, and Bandit Accessories.\n• Added seven new accessories, including the Weakling Wolf Set and Bandit Set, with their set bonuses.\n• Updated the Oak/Birch Forest farming location.\n\nLocalization\n• Added Italian language support.\n• Expanded Italian translations for equipment, map locations, and other content.\n• Updated and corrected translations across the website.\n\nBug Fixes & Improvements\n• Fixed JourneyMap waypoint duplication when exporting and re-importing custom waypoints.\n• Improved waypoint identity handling to prevent duplicate imports without merging separate waypoints that share the same name and coordinates.\n• Fixed outdated Italian equipment-rendering test expectations.\n• Added regression tests for waypoint imports and equipment translations."
+    },
     v180: {
       version: "Character Build Equipment Update - v1.8",
       title: "Character Build Equipment Update",
@@ -3363,6 +4823,12 @@
     }
   });
   Object.assign(translations.es.page.patchnotes.entries, {
+    v190: {
+      version: "Actualización de contenido, localización y correcciones - v1.9",
+      title: "Actualización de contenido, localización y correcciones",
+      summary:
+        "PNJ y equipamiento\n• Se añadió \"Argo, la corredora de información\".\n• Se añadieron nuevas ubicaciones de PNJ, incluidas Candelia, Herrero de Nodachi, Local Minero, Accesorios de lobo y Accesorios de bandidos.\n• Se añadieron siete accesorios nuevos, incluidos el Conjunto del lobo débil y el Conjunto del bandido, con sus bonificaciones de conjunto.\n• Se actualizó la ubicación de recolección del Bosque de Robles/Abedules.\n\nLocalización\n• Se añadió compatibilidad con el idioma italiano.\n• Se ampliaron las traducciones al italiano para el equipamiento, las ubicaciones del mapa y otro contenido.\n• Se actualizaron y corrigieron traducciones en todo el sitio.\n\nCorrecciones y mejoras\n• Se corrigió la duplicación de puntos de ruta de JourneyMap al exportar y volver a importar puntos de ruta personalizados.\n• Se mejoró la gestión de la identidad de los puntos de ruta para evitar importaciones duplicadas sin fusionar puntos distintos que comparten el mismo nombre y las mismas coordenadas.\n• Se corrigieron expectativas obsoletas de las pruebas de renderizado del equipamiento en italiano.\n• Se añadieron pruebas de regresión para la importación de puntos de ruta y las traducciones del equipamiento."
+    },
     v180: {
       version: "Actualización del equipamiento del personaje - v1.8",
       title: "Actualización del equipamiento del personaje",
@@ -3389,6 +4855,12 @@
     }
   });
   Object.assign(translations.fr.page.patchnotes.entries, {
+    v190: {
+      version: "Mise à jour du contenu, de la localisation et des corrections - v1.9",
+      title: "Mise à jour du contenu, de la localisation et des corrections",
+      summary:
+        "PNJ et équipement\n• Ajout d'Argo, l'informatrice.\n• Ajout de nouveaux emplacements de PNJ, dont Candelia, Forgeron de Nodachi, Local Mineur, Accessoires de loup et Accessoires de bandits.\n• Ajout de sept nouveaux accessoires, dont l'Ensemble du loup chétif et l'Ensemble du bandit, avec leurs bonus d'ensemble.\n• Mise à jour de l'emplacement de récolte de la Forêt de chênes/bouleaux.\n\nLocalisation\n• Ajout de la prise en charge de la langue italienne.\n• Extension des traductions italiennes pour l'équipement, les lieux de la carte et d'autres contenus.\n• Mise à jour et correction de traductions dans tout le site.\n\nCorrections et améliorations\n• Correction de la duplication des points JourneyMap lors de l'exportation et de la réimportation de points de passage personnalisés.\n• Amélioration de la gestion de l'identité des points de passage pour éviter les imports en double sans fusionner des points distincts qui partagent le même nom et les mêmes coordonnées.\n• Correction d'attentes obsolètes des tests de rendu de l'équipement en italien.\n• Ajout de tests de régression pour l'importation des points de passage et les traductions de l'équipement."
+    },
     v180: {
       version: "Mise à jour de l'équipement du personnage - v1.8",
       title: "Mise à jour de l'équipement du personnage",
@@ -3511,7 +4983,23 @@
   /* Endonym label for a language code (English / Español / Français), read from the very
      same top-level languageName key the settings menu renders. */
   function getLanguageLabel(language) {
-    return lookup(getBundle(language), "languageName") || String(language || "").toUpperCase();
+    return getLanguageText(language, "languageName") || String(language || "").toUpperCase();
+  }
+
+  /* Reads one top-level language string (languageName, languageHint, ...) from a specific language's
+     bundle instead of the active one, so a picker can label an option in the language it offers.
+     The English bundle is the last resort, exactly like the active-language lookup in t(). */
+  function getLanguageText(language, key) {
+    const value = lookup(getBundle(language), key);
+    if (typeof value === "string" && value.trim() !== "") return value;
+    const englishValue = lookup(getBundle(DEFAULT_LANGUAGE), key);
+    return typeof englishValue === "string" && englishValue.trim() !== "" ? englishValue : "";
+  }
+
+  /* The supported languages in the site's user-facing order. Callers that need the list for a picker
+     read this instead of keeping their own copy. */
+  function getSupportedLanguages() {
+    return SUPPORTED_LANGUAGE_CHOICES.slice();
   }
 
   function getBundle(language) {
@@ -3525,16 +5013,6 @@
       (result, part) => (result && Object.prototype.hasOwnProperty.call(result, part) ? result[part] : undefined),
       bundle
     );
-
-    if (value === undefined && normalizedKey.endsWith(".translationNotice")) {
-      const noticeKey = normalizedKey.replace(/\.translationNotice$/, ".notice");
-      value = noticeKey
-        .split(".")
-        .reduce(
-          (result, part) => (result && Object.prototype.hasOwnProperty.call(result, part) ? result[part] : undefined),
-          bundle
-        );
-    }
 
     return value;
   }
@@ -4232,9 +5710,1536 @@
     syncMenuTranslations();
   }
 
+  /* ------------------------------------------------------------------------------------------------
+     Italian UI dictionary.
+
+     Written as one contiguous block rather than threaded through every per-language deepMerge above:
+     Italian is a new language, so there is nothing to merge into, and a single section is easier to
+     review and extend than twenty scattered ones. The key set is exactly the English key set - the
+     audit compares the two and reports any key Italian is missing.
+
+     Game-content names, identifiers and canonical terms stay as the data spells them: the content
+     glossaries still hold Spanish and French slots only, so Italian game content falls back to the
+     English source text by design (see shared/sao-content-translations.js).
+     ------------------------------------------------------------------------------------------------ */
+  translations.it = deepMerge({}, {
+    languageName: "Italiano",
+    languageHint: "Cambia la lingua qui!",
+    ui: {
+      settings: {
+        buttonLabel: "Apri le impostazioni",
+        title: "Impostazioni",
+        subtitle: "Personalizza le preferenze globali del sito.",
+        languageLabel: "Lingua",
+        languageHint: "Si applica a tutte le pagine.",
+        languageHintAria: "Suggerimento sulle impostazioni della lingua",
+        closeLabel: "Chiudi le impostazioni",
+        walkthroughLabel: "Tour guidato",
+        walkthroughHint: "Rivedi il tour guidato della pagina corrente.",
+        restartWalkthrough: "Riavvia il tour guidato",
+        warningReset: "Reimposta l'avviso",
+        warningResetHint:
+          "Solo per test. Reimposta la schermata di avviso per provare di nuovo l'esperienza del primo accesso. Serve davvero solo agli sviluppatori del sito.",
+        warningResetToast: "Sistema di avvisi reimpostato."
+      },
+      nav: {
+        maps: "Mappa",
+        bestiary: "Bestiario",
+        equipment: "Equipaggiamento",
+        quests: "Missioni",
+        patchnotes: "Aggiornamenti",
+        miscinfo: "Info. Varie",
+        menu: "Torna al menu",
+        sectionAria: "Navigazione della sezione",
+        primaryAria: "Navigazione principale",
+        islandAria: "Navigazione delle isole"
+      },
+      common: {
+        loading: "Caricamento...",
+        /* Italian marks the plural on the noun rather than with an -s, so the shared count messages
+           that append this suffix place the count at the end of the phrase and append a zero-width
+           space here: the message still reads correctly ("Comandi in Comunicazione: 5.") and the slot
+           stays filled, because an empty value would read as an untranslated entry to the audit. */
+        pluralSuffix: "\u200B"
+      },
+      walkthrough: {
+        skip: "Salta",
+        back: "Indietro",
+        next: "Avanti",
+        finish: "Fine",
+        step: "Passo {current} di {total}",
+        welcomeTitle: "Benvenuto",
+        welcomeBody: "Usa questa pagina per scegliere quale mondo o modulo di SAO MC vuoi aprire.",
+        modeCardsTitle: "Schede delle modalità",
+        modeCardsBody:
+          "Scegli Aincrad o Fractured Underworld per avviare un modulo. La scheda GGO è bloccata fino all'uscita.",
+        discordTitle: "Link",
+        discordBody:
+          "Apri i link rapidi al sito di supporto di SAO MC, al Discord di SAO MC e al mio profilo Discord.",
+        settingsTitle: "Impostazioni",
+        settingsBody:
+          "Usa l'ingranaggio per cambiare lingua e rivedere questo tour guidato quando vuoi.",
+        characterBuildTitle: "Build del personaggio",
+        characterBuildBody:
+          "Apri Build del personaggio per creare e personalizzare il tuo personaggio, l'equipaggiamento, le rune, le abilità e le altre impostazioni della build."
+      },
+      pageNotice:
+        "Alcune traduzioni possono essere incomplete, errate o contenere errori di grammatica. Gran parte di questo sito non è ancora tradotta. Il progetto è mantenuto da una sola persona, quindi tradurre ogni pagina richiede molto tempo.",
+      warning: {
+        kicker: "Avviso importante",
+        title: "Questo sito è in una fase delicata al momento.",
+        body: "Da quando è iniziata la Beta Test ho scoperto che molte informazioni sono cambiate e devono ancora essere aggiornate. Non c'è nemmeno la garanzia che tutto resti uguale per l'uscita completa.\n\nPer ora non prendere la maggior parte delle informazioni di questo sito come accurate al 100%. Le informazioni di cui mi fiderei di più sono la Mappa, i waypoint della missione principale e quali mostri lasciano determinati bottini. Le probabilità di drop sono sbagliate.\n\nSono un team di una sola persona, quindi faccio del mio meglio per progredire nel gioco, divertirmi e aggiornare il sito allo stesso tempo. Perdonami per eventuali informazioni errate o obsolete mentre lavoro per aggiornare tutto!",
+        languageLabel: "Lingua",
+        okay: "Ok",
+        okayCountdown: "Ok ({seconds})",
+        skip: "Salta",
+        explainer:
+          "Dopo aver visto questa schermata 3 volte, il pulsante “Ok” sarà sostituito da “Salta”. Non preoccuparti, non dovrai aspettare sempre 15 secondi."
+      }
+    },
+    dataset: {
+      betaLabel: "Dati di test beta",
+      currentLabel: "Dati attuali",
+      betaDescription:
+        "Informazioni sperimentali dalle prove beta. Alcuni dettagli possono essere incompleti o imprecisi.",
+      currentDescription:
+        "Il set di dati mantenuto attivamente. Se manca qualcosa, controlla i Dati di test beta finché l'informazione non sarà disponibile qui.",
+      betaBadge: "Legacy",
+      currentBadge: "Consigliati",
+      chooseTitle: "Scegli la versione dei dati",
+      cancel: "Annulla",
+      close: "Chiudi la selezione dei dati"
+    },
+    page: {
+      index: {
+        title: "SAO MC - Hub dei moduli",
+        eyebrow: "SAO MC / HUB DEI MONDI",
+        discordButton: "Link",
+        discordButtonAria: "Apri i link",
+        heading: "Scegli il tuo mondo",
+        subtitle: "Scegli un mondo per iniziare.",
+        disclaimerBody:
+          "Questo è un progetto personale.\nQuesto sito è pensato principalmente per un uso personale e per la gilda. Le informazioni continueranno ad essere aggiunte, aggiornate e migliorate finché ci sarà nuovo contenuto da documentare.\nTieni presente che questo progetto non è stato pensato fin dall'inizio come risorsa completamente pubblica, quindi alcune informazioni possono essere incomplete, mancanti o adattate al mio uso e alle esigenze della mia gilda.",
+        selectorAria: "Selettore della modalità di gioco",
+        aincradTitle: "Aincrad",
+        underworldTitle: "Fractured Underworld",
+        ggoTitle: "GunGaleOnline",
+        launchTag: "Avvia",
+        notReleasedTag: "Non disponibile",
+        aincradDesc:
+          "Apri l'hub della mappa per consultare la guida ai dungeon, le missioni, il bestiario e altro.",
+        underworldDesc:
+          "Apri l'hub della mappa di Fractured Underworld per iniziare a costruire e testare questo modulo.",
+        ggoDesc: "Il menu GGO non è ancora pubblicato, quindi non c'è nessun modulo da aprire.",
+        interactiveMode: "Modalità interattiva",
+        guildLabel: "Gilda: Moonlit Black Cats",
+        guildAria: "Omaggio alla gilda",
+        discordModalTitle: "Link",
+        discordModalCloseAria: "Chiudi il menu dei link",
+        discordModalBody: "Scegli dove vuoi andare adesso.",
+        creatorDiscord: "Discord del creatore del sito",
+        saoDiscord: "Discord di SAO MC",
+        supportWebsite: "Sito di supporto di SAO MC",
+        moonlitDiscord: "🌙 Unisciti ai Moonlit Black Cats",
+        ggoToast: "GGO non è ancora uscito! Nessuna informazione da mostrare."
+      },
+      bestiary: {
+        eyebrow: "AINCRAD / BESTIARIO",
+        title: "Bestiario di SAO",
+        heading: "Bestiario",
+        tablistAria: "Categorie del bestiario",
+        searchLabel: "Cerca mostri",
+        searchPlaceholder: "Cerca per nome...",
+        listTitleRegular: "Elenco mostri comuni",
+        listTitleBoss: "Elenco boss",
+        listTitleDungeonBoss: "Elenco boss dei dungeon",
+        listTitleDungeonMobs: "Elenco mostri dei dungeon",
+        statusShown: "{visible} di {total} mostri mostrati.",
+        statusShownBoss: "{visible} di {total} boss mostrati.",
+        statusShownDungeonBoss: "{visible} di {total} boss dei dungeon mostrati.",
+        statusShownDungeonMobs: "{visible} di {total} mostri dei dungeon mostrati.",
+        statusShownRegular: "{visible} di {total} mostri comuni mostrati.",
+        emptyCategory: "Non ci sono ancora voci per {category}.",
+        drops: "Bottino",
+        aggressiveness: "Aggressività",
+        aggressive: "Aggressivo",
+        neutral: "Neutrale",
+        passive: "Passivo",
+        xp: "XP",
+        na: "N/D",
+        translationNotice:
+          "Spiacente, la maggior parte di questa pagina non è ancora tradotta. Chi sviluppa questa pagina è una sola persona, senza abbastanza tempo per raccogliere i dati e tradurre tutto. Le traduzioni potrebbero arrivare in futuro, ma è improbabile.",
+        loadError: "Impossibile caricare i dati del bestiario. Aggiorna la pagina e riprova.",
+        loadUnavailable: "I dati del bestiario al momento non sono disponibili."
+      },
+      commands: {
+        title: "Comandi di SAO",
+        heading: "Comandi",
+        tablistAria: "Categorie di comandi",
+        searchLabel: "Cerca comandi",
+        searchPlaceholder: "Cerca per comando, utilizzo o esempio...",
+        emptyState: "Nessun comando corrisponde ai filtri attuali.",
+        colCommand: "Comando",
+        colUsage: "Utilizzo",
+        colExample: "Esempio",
+        statusShown: "Comandi in {category}: {count}{suffix}.",
+        categories: {
+          communication: "Comunicazione",
+          cosmetics: "Cosmetici e aspetto",
+          dungeons: "Dungeon",
+          economy: "Economia",
+          gameplay: "Gioco e progressione",
+          information: "Informazioni",
+          media: "Media e audio",
+          navigation: "Navigazione",
+          useless: "Comandi inutili"
+        },
+        translationNotice:
+          "Spiacente, la maggior parte di questa pagina non è ancora tradotta. Chi sviluppa questa pagina è una sola persona, senza abbastanza tempo per raccogliere i dati e tradurre tutto. Le traduzioni potrebbero arrivare in futuro, ma è improbabile.",
+        loadError: "Impossibile caricare i comandi in questo momento. Aggiorna la pagina e riprova.",
+        loadUnavailable: "I comandi al momento non sono disponibili."
+      },
+      ecompendium: {
+        eyebrow: "AINCRAD / COMPENDIO EQUIPAGGIAMENTO",
+        title: "Compendio equipaggiamento di SAO",
+        heading: "Compendio equipaggiamento",
+        searchLabel: "Cerca",
+        searchPlaceholder: "Cerca equipaggiamento...",
+        noEntriesFound: "Nessuna voce trovata.",
+        statusShown: "Mostrate {visible} voci su {total}.",
+        listTitles: {
+          weapon: "Armi",
+          armor: "Armature",
+          accessory: "Accessori",
+          rune: "Rune",
+          tool: "Strumenti",
+          food: "Cibo",
+          consumable: "Consumabili",
+          material: "Materiali",
+          quest_item: "Oggetti missione",
+          resource: "Risorse",
+          dungeon: "Dungeon",
+          currency: "Valuta"
+        },
+        labels: {
+          rarity: "Rarità",
+          level: "Livello",
+          set: "Set",
+          craftedAt: "Creato a",
+          description: "Descrizione",
+          statistics: "Statistiche",
+          resources: "Risorse"
+        },
+        unknownItem: "Oggetto sconosciuto",
+        translationNotice:
+          "Spiacente, la maggior parte di questa pagina non è ancora tradotta. Chi sviluppa questa pagina è una sola persona, senza abbastanza tempo per raccogliere i dati e tradurre tutto. Le traduzioni potrebbero arrivare in futuro, ma è improbabile.",
+        loadError: "Impossibile caricare i dati dell'equipaggiamento. Aggiorna la pagina e riprova.",
+        loadUnavailable: "I dati dell'equipaggiamento al momento non sono disponibili.",
+        categoriesAria: "Categorie del compendio"
+      },
+      quests: {
+        eyebrow: "AINCRAD / MISSIONI",
+        title: "Missioni di SAO",
+        heading: "Missioni",
+        logoAria: "Logo delle missioni",
+        searchLabel: "Cerca missioni",
+        searchPlaceholder: "Cerca in qualsiasi colonna...",
+        questTypeFilterAria: "Filtro tipo di missione",
+        questTypes: {
+          main: "Missioni principali",
+          side: "Missioni secondarie"
+        },
+        questFiltersAria: "Filtri delle missioni",
+        cityFilterLabel: "Città",
+        allCities: "Tutte le città",
+        completionFilterLabel: "Completamento",
+        allQuests: "Tutte le missioni",
+        completedOnly: "Solo completate",
+        incompleteOnly: "Non completate",
+        noFilterMatch: "Nessuna missione corrisponde ai filtri attuali.",
+        tableCols: {
+          npcName: "Nome PNG",
+          city: "Città",
+          coordinates: "Coordinate",
+          requirements: "Requisiti / Risorse",
+          questName: "Nome missione",
+          xpReward: "XP",
+          colReward: "Col",
+          bonusItems: "Oggetti bonus",
+          completed: "Completata"
+        },
+        markCompleted: "Segna come completata",
+        completed: "Completata",
+        questNumber: "Missione {number}",
+        floorText: "Piano",
+        titleWithFloor: "Missioni - {floor}",
+        noQuestData: "Nessun dato sulle missioni è ancora stato aggiunto per {floor}.",
+        noQuestMatchFloor: "Nessuna missione corrisponde alla tua ricerca su {floor}. {completed} completate.",
+        shownStatus: "{visible} di {total} missioni mostrate per {floor} || {completed} completate.",
+        loadedStatus: "{count} missioni caricate per {floor}.",
+        translationNotice:
+          "Spiacente, la maggior parte di questa pagina non è ancora tradotta. Chi sviluppa questa pagina è una sola persona, senza abbastanza tempo per raccogliere i dati e tradurre tutto. Le traduzioni potrebbero arrivare in futuro, ma è improbabile.",
+        emptyState: "Nessuna missione da mostrare."
+      },
+      miscinfo: {
+        eyebrow: "AINCRAD / INFO. VARIE",
+        title: "Info. Varie",
+        heading: "Info. Varie",
+        back: "Torna al menu",
+        playerLevels: "Livelli del giocatore",
+        playerLevelsDetails:
+          "Livello 1 -> 2: 150 XP\nLivello 2 -> 3: 300 XP\nLivello 3 -> 4: 600 XP\nLivello 4 -> 5: 1.350 XP\nLivello 5 -> 6: 2.700 XP\nLivello 6 -> 7: 5.100 XP\nLivello 7 -> 8: 9.000 XP\nLivello 8 -> 9: 15.000 XP\nLivello 9 -> 10: 24.000 XP",
+        translationNotice:
+          "Spiacente, la maggior parte di questa pagina non è ancora tradotta. Chi sviluppa questa pagina è una sola persona, senza abbastanza tempo per raccogliere i dati e tradurre tutto. Le traduzioni potrebbero arrivare in futuro, ma è improbabile.",
+        notice:
+          "La maggior parte del contenuto di questa pagina non è ancora tradotta, perché il sito è mantenuto da una sola persona con poco tempo.",
+        classesHeading: "Classi",
+        classesDescription: "Riferimenti alle classi disponibili da Build del personaggio.",
+        equipmentSlotsHeading: "Slot dell'equipaggiamento",
+        equipmentSlotsDescription: "Slot gestiti dal pianificatore della build.",
+        currentLevel: "Livello attuale",
+        nextLevel: "Livello successivo",
+        xpToNextLevel: "XP al livello successivo",
+        subtitle: "Informazioni di riferimento utili su Aincrad, la progressione, i sistemi e il sito.",
+        referenceHub: "Hub di riferimento",
+        noCurrentData: "Per questa sezione non sono ancora stati aggiunti Dati attuali.",
+        progression: "Progressione",
+        playerProgression: "Progressione del giocatore",
+        xpThresholds: "Soglie di XP",
+        characterSystems: "Sistemi del personaggio",
+        aincradSystems: "Sistemi di Aincrad",
+        gameSystems: "Sistemi di gioco",
+        worldReference: "Riferimenti sul mondo",
+        worldAincradReference: "Riferimenti sul mondo / Aincrad",
+        mapLayers: "Livelli della mappa",
+        mapLayersText:
+          "Il modulo mappa offre il Piano 1 - The Town of Beginnings, il Piano 2 - Arid Desert e il Piano 3 - The Forest of Wandering, con immagini della mappa di superficie e sotterranea.",
+        coordinatesHeading: "Coordinate",
+        coordinatesText:
+          "I marker della mappa espongono le coordinate X e Z, e il runtime della mappa offre la conversione delle coordinate per ogni piano.",
+        markerSystems: "Sistemi dei marker",
+        markerSystemsText:
+          "Le categorie esistenti della mappa includono biomi, dungeon, boss, missioni, mercanti, stazioni di creazione e aree dei mostri.",
+        projectReference: "Riferimenti sul progetto",
+        projectInformation: "Informazioni sul sito / progetto",
+        projectHeading: "Progetto",
+        projectText: "Sito di riferimento statico su SAO MC, creato da fan e ospitato su GitHub Pages.",
+        languagesHeading: "Lingue",
+        languagesText: "English, Español, Français e Italiano sono disponibili tramite il sistema di lingue condiviso.",
+        commandReference: "Riferimenti sui comandi",
+        commandReferenceText:
+          "Cerca nel catalogo dei comandi esistente per categoria, comando, utilizzo o esempio.",
+        loadingCommands: "Caricamento comandi...",
+        questsCardText:
+          "Cerca le missioni per PNG, luogo, requisiti, ricompense e stato di completamento.",
+        equipmentCardText:
+          "Sfoglia le categorie di equipaggiamento, i livelli, la rarità, le descrizioni, le statistiche e le risorse di creazione.",
+        bestiaryCardText:
+          "Consulta boss, mostri dei dungeon, mostri comuni, aggressività, XP e bottino.",
+        mapsCardText:
+          "Esplora le mappe dei piani con marker ricercabili, categorie, coordinate e livelli sotterranei.",
+        skillsHeading: "Abilità",
+        skillsUnavailable: "Le informazioni sulle abilità non sono ancora disponibili."
+      },
+      uwcompendium: {
+        eyebrow: "FRACTURED UNDERWORLD / COMPENDIO",
+        title: "Compendio di Fractured Underworld",
+        map: "Torna alla mappa",
+        searchLabel: "Cerca",
+        searchPlaceholder: "Cerca nel compendio...",
+        statusShown: "Mostrate {visible} voci su {total}.",
+        noEntries: "Nessuna voce del compendio trovata.",
+        unavailable: "I dati del Compendio di test beta non sono ancora disponibili.",
+        insufficientInfo: "Non ci sono ancora abbastanza informazioni pubblicate per creare una pagina!",
+        categoriesAria: "Categorie del compendio",
+        category: "Categoria",
+        costRequirement: "Costo / requisito",
+        description: "Descrizione",
+        details: "Dettagli",
+        entries: "Voci del compendio",
+        statistics: "Statistiche",
+        type: "Tipo",
+        unknown: "Oggetto sconosciuto"
+      },
+      mainui: {
+        towerDefenseNav: "Difesa delle torri",
+        compendiumNav: "Compendio",
+        compendiumToast: "Non ci sono ancora abbastanza informazioni pubblicate per creare una pagina!",
+        title: "Mappa interattiva di SAO",
+        mapDataUnavailableTitle: "MAPPA DI FRACTURED UNDERWORLD",
+        mapDataUnavailableBody: "I dati della mappa sono attualmente in fase di sviluppo.",
+        mapDataUnavailableFooter:
+          "I dati dei PNG e della mappa saranno aggiunti man mano che questo modulo procede.",
+        translationNotice:
+          "Spiacente, la maggior parte di questa pagina non è ancora tradotta. Chi sviluppa questa pagina è una sola persona, senza abbastanza tempo per raccogliere i dati e tradurre tutto. Le traduzioni potrebbero arrivare in futuro, ma è improbabile.",
+        searchPlaceholder: "Cerca marker...",
+        clearFilters: "Cancella i filtri",
+        resetView: "Reimposta la vista",
+        defaultInfoTitle: "Seleziona un marker",
+        defaultInfoBody: "Scegli un marker sulla mappa per vedere i dettagli qui.",
+        chooseCategoryTitle: "Scegli una categoria",
+        chooseCategoryBody:
+          "Attiva una o più categorie nella barra laterale per mostrare i marker di questa isola.",
+        noSearchTitle: "Nessun risultato",
+        noSearchBody: "Nessun marker corrisponde alla ricerca attuale su questa isola.",
+        noMarkersTitle: "Nessun marker disponibile",
+        noMarkersBody:
+          "Non ci sono marker disponibili per le categorie selezionate su questa isola.",
+        noMobEntries: "Non ci sono ancora voci sui mostri per questa zona.",
+        mapSuffix: "mappa",
+        undergroundSuffix: "sovrapposizione sotterranea",
+        runtimeError: "Impossibile caricare la mappa in questo momento. Aggiorna la pagina e riprova.",
+        runtimeTitle: "Mappa non disponibile",
+        coordinatesPlaceholder: "X: -- Z: --",
+        mapContextMenu: {
+          title: "AZIONI MAPPA",
+          createCustomMarker: "Crea marker personalizzato",
+          distancePoint1: "Punto 1 del calcolatore di distanza",
+          distancePoint2: "Punto 2 del calcolatore di distanza",
+          resetDistance: "Reimposta il calcolatore di distanza",
+          exportJourneyMap: "Esporta waypoint di JourneyMap",
+          importJourneyMap: "Importa waypoint di JourneyMap",
+          waypointTutorial: "Tutorial: come importare/esportare i waypoint",
+          exportSuccess: "Esportati {countLabel}.",
+          exportWaypointOne: "1 waypoint",
+          exportWaypointMany: "{count} waypoint",
+          exportNoWaypoints: "Attiva almeno una categoria di waypoint da esportare.",
+          exportEmptyCategories: "Le categorie attive non contengono waypoint da esportare.",
+          exportFailure: "Esportazione di JourneyMap non riuscita.",
+          importSuccess: "Importati {waypoints} {waypointLabel} da {categories} {categoryLabel}.",
+          importWaypointOne: "waypoint",
+          importWaypointMany: "waypoint",
+          importCategoryOne: "categoria",
+          importCategoryMany: "categorie",
+          importNoWaypoints: "In questo file non sono stati trovati waypoint validi.",
+          importInvalid: "Questo file di JourneyMap non è valido.",
+          importUnsupported:
+            "Questo file di JourneyMap usa un formato o una dimensione non supportati.",
+          importFailure: "Importazione di JourneyMap non riuscita. Nessun waypoint è stato aggiunto.",
+          importPartial: "Importati {newLabel}; ignorati {duplicateLabel}.",
+          importNewOne: "1 nuovo waypoint",
+          importNewMany: "{count} nuovi waypoint",
+          importDuplicateOne: "1 waypoint duplicato",
+          importDuplicateMany: "{count} waypoint duplicati",
+          importDuplicatesOne: "Questo waypoint di JourneyMap era già stato importato.",
+          importDuplicatesMany: "{count} waypoint di JourneyMap erano già stati importati."
+        },
+        categories: {
+          custom: "Marker personalizzati",
+          npc: "PNG",
+          mainQuests: "Missioni principali",
+          rulid: "Zona del grano",
+          fishingSpot: "Punto di pesca",
+          oakWood: "Legno di quercia",
+          copper: "Rame",
+          iron: "Ferro",
+          coal: "Carbone"
+        },
+        islandOptions: {
+          playerIsland: "Isola del giocatore",
+          gigasCedar: "Gigas Cedar",
+          iceCave: "Grotta di ghiaccio",
+          rulid: "Rulid",
+          fishingIsland: "Isola della pesca"
+        },
+        walkthrough: {
+          step1Title: "Navigazione",
+          step1Body:
+            "Usa la riga in alto per aprire Difesa delle torri, aprire il Compendio o tornare al Menu.",
+          step2Title: "Controlli dell'isola",
+          step2Body: "Scegli un'isola, cerca i marker e cancella i filtri attuali da qui.",
+          step3Title: "Filtri",
+          step3Body:
+            "Usa i filtri delle categorie per decidere quali marker appaiono sull'isola selezionata. I filtri attivi restano evidenziati, così vedi cosa è abilitato.",
+          step4Title: "Area della mappa",
+          step4Body:
+            "Questa area mostra l'isola selezionata e i dati della mappa attualmente disponibili. Alcune isole dell'Underworld mostrano ancora lo stato di dati non disponibili.",
+          step5Title: "Menu della mappa con clic destro",
+          step5Body:
+            "Fai clic destro sulla mappa per aprire il menu delle azioni. Questo menu contiene le azioni e gli strumenti disponibili per la mappa.",
+          step6Title: "Argo, l'informatrice",
+          step6Body:
+            "Trovi il pulsante di Argo, l'informatrice, nell'angolo in basso a sinistra della mappa. Fai clic su di esso per aprire Argo e fare domande sul gioco.\n\nNota importante: Argo non è un sistema di IA.\n\nUsa un sistema basato su regole che analizza i tuoi messaggi, cerca parole chiave e schemi, e consulta i dati reali del gioco per trovare le informazioni pertinenti. Le sue risposte derivano da logica programmata e dialoghi scritti, non da un modello di IA che genera risposte.\n\nPer questo può essere un po' pignola su come formuli le cose. Un testo poco chiaro, una frase insolita o una domanda troppo complessa possono produrre risultati imprecisi o inattesi. Se non capisce cosa stai cercando, prova a usare parole chiave specifiche, come nomi di mostri, oggetti, PNG o luoghi.\n\nOra è tutto pronto! Buona esplorazione!"
+        },
+        mapDataUnavailable: "Dati della mappa non disponibili",
+        categorySectionHeader: "ISOLA DEL GIOCATORE"
+      },
+      towerdefense: {
+        eyebrow: "FRACTURED UNDERWORLD / DIFESA DELLE TORRI",
+        title: "Fractured Underworld - Difesa delle torri",
+        heading: "Difesa delle torri di Fractured Underworld",
+        back: "Torna indietro",
+        sectionsAria: "Sezioni di Difesa delle torri",
+        chapterOverviewAria: "Panoramica dei capitoli di Difesa delle torri",
+        chapterListAria: "Elenco dei capitoli di Difesa delle torri",
+        chapterSelect: "Selezione capitolo",
+        chapter: "Capitolo {number}",
+        shopSectionAria: "Sezione negozio di Difesa delle torri",
+        shopListAria: "Elenco negozio di Difesa delle torri",
+        shopTitle: "Negozio di Difesa delle torri",
+        infoSheetTitle: "Scheda informativa di Difesa delle torri",
+        closeInfoSheet: "Chiudi la scheda informativa",
+        insufficientInfo: "Non ci sono ancora abbastanza informazioni pubblicate per creare una pagina!",
+        rewardsHead: "Ricompense",
+        wavesHead: "Ondate",
+        arcHead: "Arco",
+        levelProgression: "Progressione dei livelli",
+        currentStats: "Attuali",
+        translationNotice:
+          "Spiacente, la maggior parte di questa pagina non è ancora tradotta. Chi sviluppa questa pagina è una sola persona, senza abbastanza tempo per raccogliere i dati e tradurre tutto. Le traduzioni potrebbero arrivare in futuro, ma è improbabile.",
+        arc1Title: "Arco 1 - Tutorial (Boar Planes)",
+        arc1Rewards:
+          "Sacchetto da 100 Col (100%), Cristallo di utilità (25%), Runa PvE minore (8%), Chiave del dungeon (4%), Felce (oggetto habitat) (30%), Lanterna brinata (oggetto habitat) (20%), Falò (oggetto habitat) (20%)",
+        arc1Waves: "5 ondate. Alla quinta ondata appare un pumba con skin modificata come boss.",
+        arc2Title: "Arco 2 - Intermedio (Boar Zones)",
+        arc2Rewards:
+          "Borsa da 500 Col (100%), Cristallo di utilità (40%), Runa PvE minore (18%), Chiave del dungeon (12%), Felce (habitat) (30%), Balla di fieno (habitat) (20%)",
+        arc2Waves: "6 ondate. Alla sesta ondata appare un pumba con skin modificata come boss.",
+        sectionEyebrow: "Difesa delle torri",
+        progressionEyebrow: "Progressione",
+        chapterInformation: "Informazioni sul capitolo",
+        shopItemUnit: "Unità",
+        shopItemInvocation: "Evocazione",
+        shopItemUnlockRequirement: "Requisito di sblocco",
+        shopItemBaseStats: "Statistiche base",
+        shopItemUpgradeCosts: "Costi di potenziamento",
+        shopItems: {
+          mageSkeleton: {
+            name: "Scheletro mago",
+            unlockRequirement: "5 pergamene del mago",
+            invocationCost: "200 costo di evocazione",
+            levelOne: "Liv. 1: 1,1 velocità d'attacco, 7 portata, 5 danno",
+            progression: {
+              one: "Liv. 1 -> 2: +0,1 velocità d'attacco, +2 portata, +2 danno (1,2 velocità d'attacco, 9 portata, 7 danno)",
+              two: "Liv. 2 -> 3: +0,2 velocità d'attacco, +2 portata, +2 danno (1,4 velocità d'attacco, 11 portata, 9 danno)",
+              three:
+                "Liv. 3 -> 4: +0,3 velocità d'attacco, +2 portata, +3 danno (1,7 velocità d'attacco, 13 portata, 12 danno)",
+              four: "Liv. 4 -> 5 (max): +0,3 velocità d'attacco, +2 portata, +3 danno (2 velocità d'attacco, 15 portata, 15 danno)"
+            },
+            upgradeCosts: "Costo di potenziamento: Liv.2 80, Liv.3 150, Liv.4 250, Liv.5 400"
+          },
+          archerSkeleton: {
+            name: "Scheletro arciere",
+            unlockRequirement: "5 pergamene dell'arciere",
+            invocationCost: "150 costo di evocazione",
+            levelOne: "Liv. 1: 0,4 velocità d'attacco, 10 portata, 6 danno",
+            progression: {
+              one: "Liv. 1 -> 2: +0,1 velocità d'attacco, +3 portata, +3 danno (0,5 velocità d'attacco, 13 portata, 9 danno)",
+              two: "Liv. 2 -> 3: +3 portata, +4 danno (0,5 velocità d'attacco, 16 portata, 13 danno)",
+              three: "Liv. 3 -> 4: N/D (N/D)",
+              four: "Liv. 4 -> 5: N/D (N/D)"
+            },
+            upgradeCosts: "Costo di potenziamento: Liv.2 80, Liv.3 150, Liv.4 250, Liv.5 400"
+          },
+          swordsmanSkeleton: {
+            name: "Scheletro spadaccino",
+            unlockRequirement: "5 pergamene dello spadaccino",
+            invocationCost: "100 costo di evocazione",
+            levelOne: "Liv. 1: 0,7 velocità d'attacco, 4 portata, 8 danno",
+            progression: {
+              one: "Liv. 1 -> 2: +4 danno (0,7 velocità d'attacco, 4 portata, 12 danno)",
+              two: "Liv. 2 -> 3: +0,1 velocità d'attacco, +1 portata, +5 danno (0,8 velocità d'attacco, 5 portata, 17 danno)",
+              three: "Liv. 3 -> 4: +7 danno (0,8 velocità d'attacco, 5 portata, 24 danno)",
+              four: "Liv. 4 -> 5 (max): +0,1 velocità d'attacco, +1 portata, +8 danno"
+            },
+            upgradeCosts: "Costo di potenziamento: Liv.2 80, Liv.3 150, Liv.4 250, Liv.5 400"
+          }
+        }
+      },
+      maps: {
+        title: "Mappa interattiva di SAO",
+        floorLabel: "Piano:",
+        undergroundLabel: "Sotterraneo:",
+        searchPlaceholder: "Cerca marker...",
+        clearFilters: "Cancella i filtri",
+        mapAlt: "Mappa del piano",
+        undergroundAlt: "Sovrapposizione sotterranea",
+        resetView: "Reimposta la vista",
+        defaultInfoTitle: "Seleziona un marker",
+        defaultInfoBody: "Scegli un marker sulla mappa per vedere i dettagli qui.",
+        chooseCategoryTitle: "Scegli una categoria",
+        chooseCategoryBody:
+          "Attiva una o più categorie nella barra laterale per mostrare i marker di questa isola.",
+        noSearchTitle: "Nessun risultato",
+        noSearchBody: "Nessun marker corrisponde alla ricerca attuale su questa isola.",
+        noMarkersTitle: "Nessun marker disponibile",
+        noMarkersBody:
+          "Non ci sono marker disponibili per le categorie selezionate su questa isola.",
+        noMobEntries: "Non ci sono ancora voci sui mostri per questa zona.",
+        mobType: "Tipo",
+        mobAreaType: "Area dei mostri",
+        availableMobs: "Mostri disponibili",
+        floorText: "Piano",
+        tutorial: "Tutorial",
+        coordinates: "Coordinate",
+        mobs: "Mostri",
+        sharedQuests: "Missioni in questa posizione",
+        viewWaypointInfo: "Vedi info sul waypoint",
+        clusterTitle: "{count} waypoint",
+        clusterBody:
+          "Questi {count} waypoint sono vicini a questo livello di zoom. Aprine uno per vedere i dettagli.",
+        visitedDefeated: "Sconfitto",
+        visitedCompleted: "Completata",
+        visitedVisited: "Visitato",
+        walkthrough: {
+          step1Title: "Navigazione",
+          step1Body:
+            "Usa la riga in alto per passare tra Bestiario, Equipaggiamento, Missioni, Aggiornamenti, Info. Varie e il Menu.",
+          step2Title: "Controlli della mappa",
+          step2Body:
+            "Scegli il piano, attiva la modalità sotterranea, cerca i marker e cancella i filtri attuali da qui.",
+          step3Title: "Filtri",
+          step3Body:
+            "Usa i filtri delle categorie per decidere quali marker appaiono sulla mappa. I filtri attivi restano evidenziati, così vedi cosa è abilitato.",
+          step4Title: "Mappa interattiva",
+          step4Body:
+            "Trascina per spostarti e usa la rotella per lo zoom. Seleziona un marker per aprire i dettagli e le scorciatoie nel pannello informativo.",
+          step5Title: "Menu della mappa con clic destro",
+          step5Body:
+            "Fai clic destro sulla mappa per aprire il menu delle azioni. Questo menu contiene le azioni e gli strumenti disponibili per la mappa.",
+          step6Title: "Argo, l'informatrice",
+          step6Body:
+            "Trovi il pulsante di Argo, l'informatrice, nell'angolo in basso a sinistra della mappa. Fai clic su di esso per aprire Argo e fare domande sul gioco.\n\nNota importante: Argo non è un sistema di IA.\n\nUsa un sistema basato su regole che analizza i tuoi messaggi, cerca parole chiave e schemi, e consulta i dati reali del gioco per trovare le informazioni pertinenti. Le sue risposte derivano da logica programmata e dialoghi scritti, non da un modello di IA che genera risposte.\n\nPer questo può essere un po' pignola su come formuli le cose. Un testo poco chiaro, una frase insolita o una domanda troppo complessa possono produrre risultati imprecisi o inattesi. Se non capisce cosa stai cercando, prova a usare parole chiave specifiche, come nomi di mostri, oggetti, PNG o luoghi.\n\nOra è tutto pronto! Buona esplorazione!"
+        },
+        runtimeError: "Impossibile caricare la mappa in questo momento. Aggiorna la pagina e riprova.",
+        runtimeTitle: "Mappa non disponibile",
+        coordinatesPlaceholder: "X: -- Z: --",
+        categories: {
+          custom: "Marker personalizzati",
+          main: "Missioni principali",
+          biomes: "Biomi",
+          bossSpawns: "Aree dei boss",
+          dungeons: "Dungeon",
+          farmingSpots: "Punti di raccolta",
+          mobAreas: "Aree dei mostri",
+          worldEvents: "Evento mondiale",
+          sideQuests: "Missioni secondarie",
+          alchemist: "Alchimista",
+          lumberjack: "Taglialegna",
+          accessoriesMerchants: "Mercante di accessori",
+          consumablesMerchants: "Mercante di consumabili",
+          equipmentMerchants: "Mercante di equipaggiamento",
+          lootBuyers: "Acquirenti di bottino",
+          occultMerchants: "Mercante occulto",
+          toolMerchants: "Mercante di strumenti",
+          travelingMerchants: "Mercanti itineranti",
+          weaponSellers: "Venditori di armi",
+          accessoriesBlacksmith: "Fabbro di accessori",
+          equipmentBlacksmith: "Fabbro di equipaggiamento",
+          secretAccessoryBlacksmith: "Fabbro di accessori segreti",
+          armorBlacksmith: "Fabbro di armature",
+          ingotBlacksmith: "Fabbro di lingotti",
+          keyBlacksmith: "Fabbro di chiavi",
+          materialsBlacksmith: "Fabbro di materiali",
+          refaire: "Refaire",
+          runeCraftsmen: "Artigiani di rune",
+          weaponsmith: "Fabbro di armi"
+        },
+        floorOptions: {
+          floor1: "Piano 1 - The Town of Beginnings",
+          floor2: "Piano 2 - Arid Desert",
+          floor3: "Piano 3 - The Forest of Wandering"
+        },
+        categoryMainTitle: "Principali",
+        categoryQuestsTitle: "Missioni",
+        categoryJourneymenTitle: "Mestieri",
+        categoryMarketTitle: "Mercato",
+        categoryCraftsmenTitle: "Artigiani",
+        mapContextMenu: {
+          title: "AZIONI MAPPA",
+          createCustomMarker: "Crea marker personalizzato",
+          distancePoint1: "Punto 1 del calcolatore di distanza",
+          distancePoint2: "Punto 2 del calcolatore di distanza",
+          resetDistance: "Reimposta il calcolatore di distanza",
+          exportJourneyMap: "Esporta waypoint di JourneyMap",
+          importJourneyMap: "Importa waypoint di JourneyMap",
+          waypointTutorial: "Tutorial: come importare/esportare i waypoint",
+          exportSuccess: "Esportati {countLabel}.",
+          exportWaypointOne: "1 waypoint",
+          exportWaypointMany: "{count} waypoint",
+          exportNoWaypoints: "Attiva almeno una categoria di waypoint da esportare.",
+          exportEmptyCategories: "Le categorie attive non contengono waypoint da esportare.",
+          exportFailure: "Esportazione di JourneyMap non riuscita.",
+          importSuccess: "Importati {waypoints} {waypointLabel} da {categories} {categoryLabel}.",
+          importWaypointOne: "waypoint",
+          importWaypointMany: "waypoint",
+          importCategoryOne: "categoria",
+          importCategoryMany: "categorie",
+          importNoWaypoints: "In questo file non sono stati trovati waypoint validi.",
+          importInvalid: "Questo file di JourneyMap non è valido.",
+          importUnsupported: "Questo file di JourneyMap usa un formato o una dimensione non supportati.",
+          importFailure: "Importazione di JourneyMap non riuscita. Nessun waypoint è stato aggiunto.",
+          importPartial: "Importati {newLabel}; ignorati {duplicateLabel}.",
+          importNewOne: "1 nuovo waypoint",
+          importNewMany: "{count} nuovi waypoint",
+          importDuplicateOne: "1 waypoint duplicato",
+          importDuplicateMany: "{count} waypoint duplicati",
+          importDuplicatesOne: "Questo waypoint di JourneyMap era già stato importato.",
+          importDuplicatesMany: "{count} waypoint di JourneyMap erano già stati importati."
+        },
+        distanceCalculator: {
+          distance: "Distanza: {value}"
+        },
+        dataModeBanner: {
+          beta: "Questi sono Dati di test beta! Molte informazioni sono imprecise, quindi non venire da me se qualcosa qui è sbagliato. Consiglio di guardare questo tipo di dati solo se non riesci a trovare quello che cerchi nei Dati attuali.",
+          current:
+            "Questi sono Dati attuali. Se qualche informazione qui è sbagliata, scrivimi in DM e la correggerò il prima possibile. Se non riesci a trovare qualcosa, controlla i Dati di test beta. Tieni solo presente che molte di quelle informazioni sono sbagliate, quindi non prenderle come verità al 100%."
+        },
+        customWaypoint: {
+          category: "Marker personalizzati",
+          createTitle: "Crea waypoint personalizzato",
+          nameLabel: "Nome del waypoint",
+          descriptionLabel: "Descrizione del waypoint",
+          coordinatesLabel: "Coordinate",
+          xLabel: "X",
+          zLabel: "Z",
+          buttonLabel: "Pulsante",
+          buttonDefault: "Predefinito",
+          createButton: "Crea un pulsante",
+          buttonNameLabel: "Nome del pulsante",
+          logoLabel: "Logo personalizzato",
+          logoPin: "Puntina",
+          logoStar: "Stella",
+          logoFlag: "Bandiera",
+          logoHome: "Casa",
+          logoChest: "Baule",
+          logoSword: "Spada",
+          logoShield: "Scudo",
+          logoSkull: "Teschio",
+          logoDiamond: "Diamante",
+          logoTarget: "Bersaglio",
+          colorSelectorLabel: "Selettore colore per l'esportazione di \"JourneyMap\"",
+          colorHint: "Clicca per scegliere un colore",
+          colorHintBiomes: "Il colore dei Biomi è bloccato sul bianco",
+          colorPickerAria: "Scegli il colore della categoria JourneyMap",
+          colorHexAria: "Colore HEX della categoria JourneyMap",
+          colorHexPlaceholder: "#RRGGBB",
+          invalidHex: "Colore HEX non valido",
+          confirm: "Conferma creazione",
+          cancel: "Annulla creazione",
+          confirmAction: "Conferma",
+          cancelAction: "Annulla",
+          copy: "Copia le coordinate",
+          copySuccess: "Coordinate copiate.",
+          copyError: "Impossibile copiare le coordinate.",
+          nameRequired: "Inserisci un nome per il waypoint.",
+          coordinatesRequired: "Inserisci coordinate X e Z valide.",
+          manualCoordinates:
+            "Inserisci X e Z manualmente; questa mappa non ha ancora una calibrazione delle coordinate.",
+          performanceWarning:
+            "Più waypoint personalizzati possono ridurre le prestazioni della mappa. Un numero elevato di waypoint può rallentarla, soprattutto durante lo zoom o gli spostamenti.",
+          delete: "Elimina waypoint personalizzato",
+          deleteButton: "Elimina pulsante",
+          deleteAction: "Elimina",
+          deleteButtonWarning:
+            "Tutti i waypoint di questo pulsante verranno rimossi insieme al pulsante",
+          areYouSure: "Sei sicuro?",
+          confirmDelete: "Conferma eliminazione",
+          deleteConfirm: "Eliminare questo waypoint personalizzato?"
+        },
+        sidebarResizeAria: "Ridimensiona la barra laterale",
+        zoomIn: "Zoom avanti",
+        zoomOut: "Zoom indietro"
+      },
+      patchnotes: {
+        eyebrow: "AINCRAD / NOTE DI AGGIORNAMENTO",
+        title: "Note di aggiornamento di SAO",
+        heading: "Note di aggiornamento",
+        searchLabel: "Cerca nelle note",
+        searchPlaceholder: "Filtra per versione, oggetto o aggiornamento",
+        noMatches: "Nessuna nota di aggiornamento corrisponde a questo filtro.",
+        noEntries: "Nessuna voce di changelog corrispondente trovata.",
+        statusShowing: "Note di aggiornamento: {count}{suffix}.",
+        translationNotice:
+          "Spiacente, la maggior parte di questa pagina non è ancora tradotta. Chi sviluppa questa pagina è una sola persona, senza abbastanza tempo per raccogliere i dati e tradurre tutto. Le traduzioni potrebbero arrivare in futuro, ma è improbabile.",
+        entries: {
+          v190: {
+            title: "Aggiornamento di contenuti, localizzazione e correzioni",
+            version: "Aggiornamento di contenuti, localizzazione e correzioni - v1.9",
+            summary:
+              "PNG ed equipaggiamento\n• Aggiunto \"Argo, l'informatrice\".\n• Aggiunte nuove posizioni di PNG, tra cui Candelia, Fabbro di Nodachi, Local Minatore, Accessori del lupo e Accessori dei banditi.\n• Aggiunti sette nuovi accessori, tra cui il Set del lupo debole e il Set del bandito, con i loro bonus di set.\n• Aggiornata la posizione di raccolta della Foresta di querce/betulle.\n\nLocalizzazione\n• Aggiunto il supporto per la lingua italiana.\n• Ampliate le traduzioni italiane per equipaggiamento, luoghi della mappa e altri contenuti.\n• Aggiornate e corrette le traduzioni in tutto il sito.\n\nCorrezioni e miglioramenti\n• Corretta la duplicazione dei waypoint di JourneyMap durante l'esportazione e la reimportazione dei waypoint personalizzati.\n• Migliorata la gestione dell'identità dei waypoint per evitare importazioni duplicate senza unire waypoint distinti che condividono lo stesso nome e le stesse coordinate.\n• Corrette aspettative obsolete dei test di rendering dell'equipaggiamento in italiano.\n• Aggiunti test di regressione per l'importazione dei waypoint e le traduzioni dell'equipaggiamento."
+          },
+          v180: {
+            title: "Aggiornamento equipaggiamento di Build del personaggio",
+            version: "Aggiornamento equipaggiamento di Build del personaggio - v1.8",
+            summary:
+              "Build del personaggio\n• Aggiunta una grande raccolta di nuove armi e armature per tutte e cinque le classi.\n• Ampliato l'equipaggiamento disponibile in Build del personaggio e nel Compendio equipaggiamento.\n• Aggiornati la formattazione e le icone usate per statistiche, potenziamenti e bonus degli oggetti.\n• Migliorata la presentazione degli effetti dell'equipaggiamento e dei bonus alle statistiche per renderli più leggibili."
+          },
+          v170: {
+            title: "Aggiornamento albero delle abilità di Build del personaggio",
+            version: "Aggiornamento albero delle abilità di Build del personaggio - v1.7",
+            summary:
+              "Build del personaggio\n• Ricostruito l'albero delle abilità, passando da 9 a 77 abilità, con prerequisiti e percorsi ramificati aggiornati.\n• Aggiunti punti abilità basati sul livello, un interruttore per punti abilità illimitati e uno sblocco delle abilità migliorato.\n• Aggiunti il trascinamento e lo zoom dell'albero delle abilità e correzioni al layout mobile.\n• Corretti i valori base del personaggio e il calcolo delle statistiche delle abilità.\n\nMappe e waypoint\n• Aumentato lo zoom della mappa da 30x a 45x e migliorata la nitidezza con lo zoom.\n• Migliorata la precisione delle coordinate.\n• Aggiornata l'esportazione dei waypoint di JourneyMap per includere le Aree dei mostri.\n\nDati e interfaccia\n• Ampliati e aggiornati i Dati attuali per equipaggiamento, bestiario e waypoint della mappa.\n• Aggiornata l'interfaccia di selezione della versione dei dati e cambiato il badge dei Dati di test beta in LEGACY.\n• Aggiunto un link al Discord dei Moonlit Black Cats nel menu dell'hub.\n\nLocalizzazione e correzioni\n• Corrette le traduzioni spagnole e francesi delle descrizioni della mappa.\n• Aggiornate le traduzioni per il nuovo equipaggiamento e per i mostri rinominati.\n• Corretti i prerequisiti delle abilità di Build del personaggio e il ritaglio su mobile."
+          },
+          v160: {
+            title: "Aggiornamento strumenti mappa e waypoint",
+            version: "Aggiornamento strumenti mappa e waypoint - v1.6",
+            summary:
+              "• Aggiunti i waypoint personalizzati, che permettono di creare categorie e waypoint propri, scegliere i colori delle categorie e gestire i punti direttamente dalla mappa. Più punti personalizzati possono aumentare il rallentamento del sito.\n• Aggiunti importazione ed esportazione dei waypoint di JourneyMap, organizzate in categorie per tipo e categoria di waypoint, più un pulsante tutorial nelle Azioni mappa che apre direttamente il tutorial su YouTube.\n• Aggiunto un calcolatore di distanza al menu con clic destro della mappa. Imposta il Punto 1 e il Punto 2 per calcolare la distanza dalle coordinate X/Z convertite del mondo Minecraft; i risultati restano corretti durante zoom, spostamenti e ridimensionamenti.\n• Aggiunti link a tutorial esterni nei popup informativi dei dungeon, incluso un tutorial di prova per il Dungeon Fallen Labyrinth, senza modificare le coordinate dei dungeon né i dati dei piani già esistenti.\n• Aggiunto il Passo 5 ai tour guidati di Aincrad e Fractured Underworld, che apre temporaneamente il vero menu Azioni mappa al centro ed evidenziato; alla fine del passo si chiude e torna al comportamento normale.\n• Aggiunto un separatore prima del pulsante del tutorial delle Azioni mappa e lasciato crescere il menu naturalmente, così il pulsante resta nei suoi limiti.\n• Rimossa la strana tilde dalla schermata di benvenuto dell'Hub dei mondi."
+          },
+          v150: {
+            title: "Mappe, Build del personaggio e miglioramenti del sito",
+            version: "Mappe, Build del personaggio e miglioramenti del sito - v1.5",
+            summary:
+              "• Corretti il posizionamento delle coordinate sulla mappa e la posizione dei waypoint.\n• Migliorati i calcoli di Build del personaggio, la visualizzazione di equipaggiamento e statistiche, la selezione della build e i controlli di ripristino.\n• Ampliate le traduzioni francesi e spagnole e corretti i testi con lingue mescolate.\n• Aggiornati i tour guidati, inclusi i controlli di livello di Build del personaggio, e migliorato l'avviso del Welcome Mat con un'opzione Salta dopo visite ripetute e un layout adattivo.\n• Rifiniti i layout delle pagine e corretti altri problemi visivi."
+          },
+          v140: {
+            title: "Build del personaggio e aggiornamento importante dell'interfaccia",
+            version: "Build del personaggio e aggiornamento importante dell'interfaccia - v1.4",
+            summary:
+              "• Aggiunto il sistema completo di Build del personaggio con supporto ai Dati attuali e ai Dati di test beta.\n• Aggiunti miglioramenti importanti e una revisione completa dell'interfaccia e della reattività del sito.\n• Ridisegnate le sezioni Equipaggiamento, Missioni, Note di aggiornamento, Info. Varie, Difesa delle torri e Compendio.\n• Aggiunte e ampliate le traduzioni in tutto il sito.\n• Migliorate reattività, prestazioni, caricamento e compatibilità con i browser.\n• Corrette statistiche dell'equipaggiamento mancanti o errate e vari problemi dell'interfaccia.\n• Aggiornato e migliorato il tour guidato del sito.\n• Aggiunti i Dati di test beta e le relative informazioni di caricamento.\n• Effettuate numerose correzioni minori, miglioramenti e modifiche di qualità della vita in tutto il sito."
+          },
+          v130: {
+            title: "Aggiornamento lingue e compatibilità",
+            version: "Aggiornamento lingue e compatibilità - v1.3",
+            summary:
+              "• Aggiunto il supporto alle lingue Français ed Español. Al momento di questa versione la copertura delle traduzioni era ancora incompleta.\n• Aggiunto un tour guidato del sito.\n• Migliorata la compatibilità con più browser.\n• Ottimizzato e riorganizzato il codice per rendere più facili gli aggiornamenti e la manutenzione futuri.\n\n• Questo dovrebbe essere l'ultimo aggiornamento del sito finché il server non torna online."
+          },
+          v120: {
+            title: "Correzione di bug molto piccola",
+            version: "Correzione di bug molto piccola - v1.2",
+            summary:
+              "• Corretto il caricamento infinito del Menu dei comandi.\n• Corretto l'ordine delle note di aggiornamento, dalla data più vecchia alla più recente."
+          },
+          v111: {
+            title: "Rifiniture finali",
+            version: "Rifiniture finali fino al rilascio completo - v1.1",
+            summary:
+              "• Aggiunta una scheda Comandi.\n• Aggiunta una sezione Info. Varie per le informazioni che non trovano posto altrove.\n• Aggiunti pulsanti Torna al menu in tutto il sito.\n• Aggiunta la sezione Fractured Underworld, anche se è ancora nelle prime fasi di sviluppo.\n• Iniziato il lavoro sul supporto e sulle informazioni di Difesa delle torri dentro Fractured Underworld.\n• Aggiunto un piccolo avviso nel Welcome Mat.\n• Corretto un bug dei waypoint.\n• Corretto un bug dell'interfaccia"
+          },
+          v100: {
+            title: "Rilascio completo",
+            version: "Rilascio completo - v1.0",
+            summary:
+              "• Aggiunti il Piano 3 e i suoi waypoint disponibili.\n• Le informazioni sulla missione principale dei Piani da 1 a 3 al momento mancano, quindi non sono ancora state aggiunte.\n• Alcuni waypoint del Piano 3 non funzionano di proposito, per mancanza di informazioni al momento.\n• Ottimizzato il codice in tutto il sito.\n• Iniziato e completato il Compendio equipaggiamento.\n• La maggior parte dei pulsanti è ora ordinata alfabeticamente.\n• Aggiornata e migliorata l'interfaccia del sito.\n• Ridisegnata la pagina iniziale del sito.\n• Aggiunti pulsanti che rimandano al Discord di SAO MC, al Discord di supporto e al mio profilo Discord personale.\n• Contattami su Discord per suggerimenti o segnalazioni di bug"
+          },
+          v010: {
+            title: "Rilascio del sito",
+            version: "v0.1.0 Alpha",
+            summary:
+              "Rilascio iniziale del sito. Aggiunti il Piano 1, le posizioni delle missioni secondarie, le posizioni dei biomi, le posizioni dei dungeon, il Menu delle missioni e il Menu del bestiario."
+          },
+          v020: {
+            title: "Nuove mappe",
+            version: "v0.2.0 Alpha",
+            summary:
+              "Aggiunti il Piano 2, i waypoint principali dei punti di interesse per il Piano 1 e il Piano 2, le interazioni con i waypoint che possono aprire il Bestiario o il Menu delle missioni, e la schermata del menu principale del sito."
+          }
+        },
+        tags: {
+          bugFixes: "Correzioni di bug",
+          betaTestData: "Dati di test beta",
+          characterBuild: "Build del personaggio",
+          uiOverhaul: "Revisione dell'interfaccia",
+          commands: "Comandi",
+          maps: "Mappe",
+          release: "Rilascio",
+          localization: "Localizzazione",
+          performance: "Prestazioni",
+          compatibility: "Compatibilità",
+          maintenance: "Manutenzione",
+          miscInfo: "Info. Varie",
+          fracturedUnderworld: "Fractured Underworld",
+          towerDefense: "Difesa delle torri",
+          welcomeMat: "Welcome Mat",
+          floor3: "Piano 3",
+          equipment: "Equipaggiamento",
+          ui: "Interfaccia",
+          discord: "Discord",
+          contact: "Contatti",
+          floor1: "Piano 1",
+          quests: "Missioni",
+          biomes: "Biomi",
+          dungeons: "Dungeon",
+          bestiary: "Bestiario",
+          npcs: "PNG",
+          floor2: "Piano 2",
+          poi: "POI",
+          waypoints: "Waypoint",
+          mainMenu: "Menu principale",
+          compendium: "Compendio"
+        },
+        loadError: "Impossibile caricare le note di aggiornamento. Aggiorna la pagina e riprova.",
+        loadUnavailable: "Le note di aggiornamento al momento non sono disponibili."
+      },
+      characterBuild: {
+        navBack: "Torna al menu",
+        eyebrow: "AINCRAD / LABORATORIO DELLE BUILD",
+        title: "Modalità Build del personaggio",
+        browserTitle: "Modalità Build del personaggio | SAO MC Interactive Map",
+        metaDescription:
+          "Crea e visualizza in anteprima un personaggio di Aincrad con equipaggiamento e abilità di esempio.",
+        subtitle:
+          "Componi una dotazione, esamina le sue statistiche di combattimento ed esplora alberi delle abilità prototipo.",
+        resetBuild: "Reimposta la build",
+        configuration: "Configurazione della build",
+        dataSource: "Fonte dei dati",
+        currentData: "Dati attuali",
+        betaData: "Dati di test beta",
+        readingCurrent: "Lettura dal Compendio equipaggiamento dei Dati attuali.",
+        buildSlot: "Slot della build",
+        buildNumber: "Build {number}",
+        level: "Livello",
+        class: "Classe",
+        loadout: "DOTAZIONE",
+        equipment: "Equipaggiamento",
+        slots: "{count} slot",
+        armor: "Armature",
+        accessories: "Accessori",
+        weaponsOffhand: "Armi / Mano secondaria",
+        characterSheet: "SCHEDA DEL PERSONAGGIO",
+        stats: "Statistiche",
+        statGroups: {
+          itemStats: "Statistiche oggetto"
+        },
+        base: "Base statistica: {level}",
+        placeholderPreview: "ANTEPRIMA PROTOTIPO",
+        skillTree: "Albero delle abilità",
+        sampleSkills: "Abilità prototipo",
+        sampleSkillTree: "Albero delle abilità prototipo",
+        placeholderNote:
+          "Questi nodi prototipo mostrano una possibile progressione di classe; non sono dati definitivi sulle abilità.",
+        equipmentSelector: "SELEZIONE EQUIPAGGIAMENTO",
+        selectEquipment: "Seleziona equipaggiamento",
+        closeEquipmentSelector: "Chiudi la selezione dell'equipaggiamento",
+        searchItems: "Cerca oggetti",
+        searchPlaceholder: "Cerca per nome o effetto...",
+        rarity: "Rarità",
+        allRarities: "Tutte le rarità",
+        rune: "Runa",
+        selected: "Selezionato",
+        locked: "Bloccato",
+        available: "Disponibile",
+        selectSlot: "Seleziona {slot}",
+        selectRune: "Seleziona la runa {number} di {slot}",
+        runeSlots: "Slot runa di {slot}",
+        equipped: "Equipaggiato",
+        unavailable: "Non disponibile nei dati selezionati",
+        emptySlot: "Slot vuoto",
+        prototypeTree: "Albero prototipo",
+        prototypeDataOnly: "Solo dati prototipo",
+        requires: "Richiede: {value}",
+        requiresAny: "Richiede almeno uno tra: {value}",
+        effect: "Effetto: {value}",
+        state: "Stato: {value}",
+        none: "Nessuno",
+        alreadyUnlocked: "Già sbloccata",
+        readyToUnlock: "Pronta da sbloccare",
+        requiresSkills: "Richiede {value}",
+        requiresMorePoints: "Richiede {value}",
+        skillPoints: "{class} · {remaining} / {total} punti abilità",
+        skillPointsUnlimited: "{class} · {spent} spesi · Punti abilità illimitati",
+        unlimitedSkillPoints: "Punti abilità illimitati",
+        unlimitedSkillPointsHint:
+          "Solo per test: sblocca le abilità senza spendere i punti abilità concessi dal tuo livello.",
+        deselectDependent: "Deseleziona prima le abilità dipendenti.",
+        noMatchingItems: "Nessun oggetto di tipo {slot} corrisponde a questi filtri al livello {level}.",
+        weaponAlreadyEquipped: "Quest'arma è già equipaggiata nell'altro slot arma.",
+        twoHanded: "A due mani",
+        removeItem: "Rimuovi",
+        offhandLocked: "Arma a due mani equipaggiata",
+        removeOffhandFirst: "Rimuovi prima l'oggetto equipaggiato nella mano secondaria.",
+        selectRuneFor: "Seleziona la runa {number} per {slot}",
+        itemLevel: "Livello {level}",
+        branchCore: "base",
+        branchA: "ramo A",
+        branchB: "ramo B",
+        select: "Seleziona",
+        walkthrough: {
+          step1Title: "Build del personaggio",
+          step1Body:
+            "Configura qui un personaggio, l'equipaggiamento, il livello, la classe, le statistiche, le abilità e le altre informazioni della build.",
+          step2Title: "Livello del personaggio",
+          step2Body:
+            "Cambiando il livello si aggiorna il livello mostrato e si ricalcolano le statistiche della build. Influisce anche su quale equipaggiamento è disponibile al livello scelto.",
+          step3Title: "Equipaggiamento",
+          step3Body:
+            "Usa questa sezione della dotazione per scegliere l'equipaggiamento del personaggio tra i gruppi disponibili.",
+          step4Title: "Slot dell'equipaggiamento",
+          step4Body:
+            "Ogni slot rappresenta un tipo di equipaggiamento, come armature, accessori, un'arma principale o un oggetto per la mano secondaria. Seleziona uno slot per sfogliare gli oggetti corrispondenti.",
+          step5Title: "Selezione dell'equipaggiamento",
+          step5Body:
+            "La selezione elenca gli oggetti che corrispondono allo slot scelto. Usa la ricerca o seleziona un oggetto per equipaggiarlo; il tour guidato ha aperto questa finestra temporaneamente.",
+          step6Title: "Filtro rarità",
+          step6Body:
+            "Usa Rarità per limitare gli oggetti mostrati nella selezione dell'equipaggiamento a una rarità specifica.",
+          step7Title: "Statistiche",
+          step7Body:
+            "Statistiche mostra i valori calcolati per la build attuale, raggruppati in sezioni come Offensive e Difensive. Lo stato attuale delle sezioni pieghevoli resta invariato.",
+          step8Title: "Albero delle abilità",
+          step8Body:
+            "Questo albero delle abilità prototipo mostra le abilità disponibili della classe, le loro relazioni, gli effetti e lo stato di sblocco attuale. I nodi delle abilità sono interattivi.",
+          step9Title: "Slot della build",
+          step9Body:
+            "Scegli uno degli slot della build per lavorare su una configurazione separata. Build del personaggio salva automaticamente le modifiche nel browser.",
+          step10Title: "Fonte dei dati",
+          step10Body:
+            "Dati attuali usa la fonte di equipaggiamento attuale. Dati di test beta è una fonte di dati beta separata e non è attiva finché non la selezioni.",
+          step11Title: "Pronto per creare la build",
+          step11Body:
+            "Ora conosci le parti principali di Build del personaggio. Inizia a configurare il tuo personaggio quando vuoi."
+        },
+        classes: {
+          archer: "Arciere / Ranger",
+          assassin: "Assassino / DPS",
+          guerrier: "Guerriero / Tank",
+          mage: "Mago / Magia a distanza",
+          "martial-artist": "Artista marziale / Mischia",
+          shaman: "Sciamano / Supporto"
+        },
+        slotNames: {
+          helmet: "Elmo",
+          chestplate: "Corazza",
+          leggings: "Gambali",
+          boots: "Stivali",
+          amulet: "Amuleto",
+          "ring-1": "Anello 1",
+          "ring-2": "Anello 2",
+          bracelet: "Bracciale",
+          glove: "Guanto",
+          "artifact-1": "Artefatto 1",
+          "artifact-2": "Artefatto 2",
+          "artifact-3": "Artefatto 3",
+          offhand: "Mano secondaria",
+          "main-weapon": "Arma principale"
+        },
+        groupNames: {
+          offensive: "Offensive",
+          defensive: "Difensive",
+          mobilityStamina: "Mobilità e stamina",
+          healthRegeneration: "Salute e rigenerazione",
+          specialEffects: "Effetti speciali"
+        },
+        statNames: {
+          damage: "Danno",
+          physicalDamage: "Danno fisico",
+          weaponDamage: "Danno dell'arma",
+          magicDamage: "Danno magico",
+          skillDamage: "Danno delle abilità",
+          projectileDamage: "Danno dei proiettili",
+          attackSpeed: "Velocità d'attacco",
+          criticalHitChance: "Probabilità di critico",
+          criticalHitDamage: "Danno critico",
+          skillCriticalHitChance: "Probabilità di critico delle abilità",
+          skillCriticalHitDamage: "Danno critico delle abilità",
+          defense: "Difesa",
+          blockProficiency: "Competenza nella parata",
+          blockPower: "Potenza di blocco",
+          health: "Salute",
+          evasion: "Evasione",
+          damageReduction: "Riduzione del danno",
+          fallDamageReduction: "Riduzione del danno da caduta",
+          tenacity: "Tenacia",
+          knockbackResistance: "Resistenza al contraccolpo",
+          parryChance: "Probabilità di parata",
+          haste: "Celerità",
+          movementSpeed: "Velocità di movimento",
+          crouchingSpeed: "Velocità accovacciato",
+          mana: "Mana",
+          stamina: "Stamina",
+          lifeSteal: "Furto di vita",
+          omnivamp: "Vampirismo totale",
+          bonusHealing: "Cura bonus",
+          healingPower: "Potenza di cura",
+          healthRegeneration: "Rigenerazione della salute",
+          manaRegeneration: "Rigenerazione del mana",
+          staminaRegeneration: "Rigenerazione della stamina",
+          flightOfLife: "Volo della vita"
+        }
+      }
+    },
+    argo: {
+      launcherLabel: "Apri Argo, l'informatrice",
+      title: "Argo, l'informatrice",
+      closeLabel: "Chiudi Argo, l'informatrice",
+      logLabel: "Conversazione con Argo",
+      inputLabel: "Chiedi ad Argo informazioni sul gioco",
+      inputPlaceholder: "Chiedi di mostri, bottino, oggetti, ricette, PNG, missioni o luoghi...",
+      sendLabel: "Invia",
+      dragHint: "Trascina la barra del titolo per spostare questa finestra",
+      whoArgo: "Argo",
+      whoYou: "Tu",
+      intro: {
+        1: "Ehi! Che informazioni ti servono? Chiedimi di oggetti, mostri, bottino, creazione, missioni, PNG o luoghi della mappa.",
+        2: "Sono Argo. Dammi un nome - un oggetto, un mostro, una missione, un mercante - e frugherò nei registri.",
+        3: "Di nuovo qui? Bene. Nomina qualcosa e ti dirò quello che so.",
+        4: "L'informazione è un mestiere e io sono aperta. Cosa stai cercando?",
+        5: "Beh, un cliente. Oggetti, mostri, bottino, missioni: tengo appunti su tutto.",
+        6: "Argo mi chiamo e le risposte sono il mio mestiere. Chiedi pure.",
+        7: "Hai un nome per me? Un luogo, un mostro, un pezzo di equipaggiamento: qualsiasi cosa abbia un registro dietro.",
+        8: "Hm? Oh, sei tu. Vieni a comprare qualcosa o solo a chiacchierare? In ogni caso, chiedi.",
+        9: "Tutto quello che vale la pena sapere ad Aincrad prima o poi passa dalle mie mani. Di cosa hai bisogno?",
+        10: "Tu hai le domande e io ho gli appunti. Vediamo se combaciano."
+      },
+      facts: {
+        item: {
+          1: "Ecco cosa c'è scritto:",
+          2: "Ecco cosa ho su questo:",
+          3: "I registri dicono questo:"
+        },
+        recipe: {
+          1: "Ecco la lista:",
+          2: "Cosa serve:",
+          3: "Ecco cosa è registrato:"
+        },
+        mob: {
+          1: "Ecco cosa ho:",
+          2: "La pagina dice questo:",
+          3: "La voce recita così:"
+        },
+        mobDrops: {
+          1: "Ecco la lista del bottino:",
+          2: "Ecco cosa c'è annotato:",
+          3: "Quello che ho dice questo:"
+        },
+        drop: {
+          1: "Ecco chi lo tiene:",
+          2: "Le liste dicono questo:",
+          3: "Ecco cosa ho trovato:"
+        },
+        npc: {
+          1: "Ecco cosa so:",
+          2: "Ecco cosa c'è annotato:",
+          3: "Gli appunti dicono questo:"
+        },
+        quest: {
+          1: "Ecco il foglio:",
+          2: "Ecco cosa c'è sopra:",
+          3: "Il foglio dice questo:"
+        },
+        location: {
+          1: "Ecco cosa è segnato:",
+          2: "Ecco cosa ho:",
+          3: "Gli appunti della mappa dicono questo:"
+        }
+      },
+      type: {
+        item: "Oggetto",
+        mob: "Mostro",
+        boss: "Boss",
+        npc: "PNG",
+        merchant: "Mercante",
+        location: "Luogo",
+        dungeon: "Dungeon",
+        quest: "Missione"
+      },
+      help: {
+        body: {
+          1: "Chiedimi di oggetti ed equipaggiamento, mostri e boss, chi lascia cosa, ricette di creazione, missioni, PNG e mercanti, o luoghi della mappa. Dammi un nome e frugherò nei registri.",
+          2: "Io tratto nomi: oggetti, equipaggiamento, mostri, boss, bottino, ricette, missioni, bottegai, luoghi. Dammene uno e ti dirò cosa so.",
+          3: "Portami un nome - un mostro, un oggetto, una missione, un mercante, un punto sulla mappa - e controllerò i miei appunti.",
+          4: "Mostri, bottino, oggetti, ricette, missioni, PNG, luoghi. Nomina uno di questi e lo cercherò per te."
+        }
+      },
+      label: {
+        floor: "Piano {floor}",
+        level: "Liv. {level}",
+        stats: "Statistiche",
+        craftingLocation: "Luogo di creazione",
+        craftingResources: "Risorse di creazione",
+        droppedBy: "Lasciato da",
+        drops: "Bottino",
+        spawnArea: "Area di comparsa",
+        mobs: "Mostri",
+        rewards: "Ricompense",
+        requirements: "Requisiti",
+        npc: "PNG",
+        sells: "Vende",
+        quests: "Missioni",
+        unknown: "sconosciuto",
+        recordsFound: "{label}: {count}",
+        moreRecords: "e altri {count} (su {total})",
+        rankedBy: "{label} per {field}, {direction}:",
+        highestFirst: "dal più alto",
+        lowestFirst: "dal più basso",
+        bestSource: "Miglior fonte registrata: {mob} ({chance}%)",
+        levelField: "Livello",
+        typeField: "Tipo",
+        categoryField: "Categoria",
+        questType: "Tipo di missione",
+        bestiaryTab: "Elenco del bestiario",
+        target: {
+          quest: "Missioni",
+          boss: "Boss",
+          mob: "Mostri",
+          item: "Oggetti",
+          npc: "PNG",
+          location: "Luoghi",
+          dungeon: "Dungeon",
+          area: "Aree"
+        }
+      },
+      note: {
+        itemRecordMissing: {
+          1: "Su questo c'è più di quello che ho nei miei appunti. Per ora posso darti solo questo.",
+          2: "È tutto quello che ho - i miei appunti su questo sono scarni.",
+          3: "Ti ho dato quello che ho. Il resto non è scritto da nessuna parte che possa raggiungere."
+        },
+        bestiaryRecordMissing: {
+          1: "Non ho nessuna pagina su questo nei miei appunti - solo quello che vedi qui.",
+          2: "I miei appunti su questo iniziano e finiscono con quello che vedi.",
+          3: "Quello è appena abbozzato. Quello che c'è sopra è tutto."
+        },
+        noDropRecord: {
+          1: "Nessuno ha scritto cosa lascia, quindi non tiro a indovinare.",
+          2: "Nessuna lista di bottino su questo - e non me le invento.",
+          3: "Non ho nessuna lista di bottino per quello. Preferisco non dire niente che inventarmi qualcosa."
+        },
+        noRecipe: {
+          1: "Non c'è nessuna ricetta scritta, quindi non posso dartene una.",
+          2: "Non ho nessuna ricetta per quello.",
+          3: "Nessuno ha registrato come si fa, e io non invento ricette."
+        },
+        noCraftingLocation: {
+          1: "I miei appunti non dicono dove si crea o si vende.",
+          2: "Nessuna bottega o mercante è annotato accanto a quello.",
+          3: "Non posso dirti dove crearlo - quella parte è vuota nei miei appunti."
+        },
+        noStats: {
+          1: "Non ci sono numeri scritti per questo.",
+          2: "Nessuno ha registrato le sue statistiche.",
+          3: "Non ho nessun valore per quello."
+        },
+        noSpawnArea: {
+          1: "Non è annotata nessuna area di comparsa per questo.",
+          2: "I miei appunti non dicono dove compare.",
+          3: "Dove vive non è registrato."
+        },
+        markerNotFound: {
+          1: "Non sono riuscita a individuarlo sulla mappa.",
+          2: "Quel nome non è segnato da nessuna parte che riesca a vedere.",
+          3: "Nessun segno sulla mappa per quello, quindi non posso indicarti la strada."
+        },
+        questMarkerOnly: {
+          1: "Tutto quello che ho è il suo segno sulla mappa, non i dettagli della missione.",
+          2: "È scritta solo la sua posizione, non il resto del lavoro.",
+          3: "La mappa lo conosce. I miei appunti sulla missione in sé sono vuoti."
+        },
+        absenceNotProof: {
+          1: "Non è una prova che non sia nel gioco - solo che non ce l'ho nei miei appunti.",
+          2: "Non prenderlo come prova che non esista. Significa solo che non l'ho annotato.",
+          3: "Che io non lo conosca non è la stessa cosa che non esista."
+        },
+        otherIsland: {
+          1: "Quello è su un'isola diversa da quella che stai guardando.",
+          2: "Quello appartiene a un'altra isola - tu ne stai vedendo una diversa.",
+          3: "Un'isola del tutto diversa, quello."
+        },
+        englishOnly: {
+          1: "Avviso: io leggo le domande in inglese, con qualche parola di spagnolo e francese - tieni i nomi in inglese e ci capiremo.",
+          2: "Leggo la domanda in inglese e riconosco qualche parola spagnola o francese, ma i nomi è meglio tenerli in inglese.",
+          3: "Le domande le leggo in inglese e raccolgo un po' di spagnolo e francese, ma con i nomi è più sicuro l'inglese."
+        },
+        floorInferred: {
+          1: "Quel registro è al Piano {floor}.",
+          2: "Quello l'ho annotato sotto il Piano {floor}.",
+          3: "Lo trovi al Piano {floor} nei miei appunti."
+        },
+        otherFloorRecords: {
+          1: "Altri {count} sono registrati su {floors}.",
+          2: "Ce ne sono altri {count} su {floors}, se mai andrai da quelle parti.",
+          3: "I miei appunti ne tengono altri {count} su {floors}."
+        },
+        rankingUnknown: {
+          1: "{count} di questi non hanno un valore registrato, quindi non li metto in classifica.",
+          2: "Altri {count} non hanno nessun numero annotato, quindi li ho lasciati fuori invece di indovinare.",
+          3: "Altri {count} non hanno niente di registrato, quindi non sono nella lista."
+        },
+        chanceNotRecorded: {
+          1: "Alcune di quelle percentuali non sono scritte da nessuna parte.",
+          2: "Non tutte le fonti hanno una percentuale registrata - io passo solo quello che è scritto.",
+          3: "Dove la percentuale non è registrata, l'ho lasciata fuori invece di indovinare."
+        },
+        noRecordedRate: {
+          1: "Nessuno ha scritto una probabilità di drop per nessuna di quelle fonti.",
+          2: "Ho le fonti, ma nemmeno una percentuale, quindi non posso dire che una sia la migliore.",
+          3: "Le fonti sono registrate; le percentuali no."
+        },
+        comparisonTruncated: {
+          1: "Non sono tutti i campi - in totale sono {count}.",
+          2: "Ci sono {count} campi in tutto; ho mostrato i primi.",
+          3: "La lista completa arriva a {count} campi."
+        }
+      },
+      status: {
+        ambiguous: {
+          1: "Hm, potrebbero essere diverse cose. Quale intendevi?",
+          2: "Aspetta - ho più di una corrispondenza per questo:",
+          3: "Quel nome fa doppio servizio. Quale?",
+          4: "Hm, mi hai dato un nome che va bene per più di una cosa:",
+          5: "Attenzione - potrebbe essere uno di questi:",
+          6: "Ho diverse voci sotto quel nome. Scegli tu:",
+          7: "Non è abbastanza preciso per i miei appunti. Quale di questi?",
+          8: "Più di una cosa risponde a quel nome. Quale?"
+        },
+        missing: {
+          1: "Hm, ho trovato il nome ma non i dettagli.",
+          2: "Ne ho solo una parte.",
+          3: "Il nome lo conosco, ma i miei appunti finiscono lì.",
+          4: "Quello è scritto solo a metà nel mio libro.",
+          5: "Ho il nome e poco altro.",
+          6: "Hm, quello è scarno. Ecco cosa ho.",
+          7: "Ne ho un pezzo, non tutto.",
+          8: "I miei appunti su quello sono incompleti. Ecco cosa c'è."
+        },
+        unsupported: {
+          1: "Hm, non ho ancora una pista affidabile su quello.",
+          2: "Quello è fuori dai miei registri, mi dispiace.",
+          3: "Non è il tipo di cosa su cui tengo appunti.",
+          4: "Non posso aiutarti con quello - non è nel mio campo.",
+          5: "Hm, va oltre quello che tratto.",
+          6: "Su quello non ho niente, e non me lo invento.",
+          7: "Quello è fuori dal mio mestiere, temo.",
+          8: "Nessun registro su quello. Prova con qualcosa del gioco."
+        },
+        candidates: {
+          1: "Candidati:",
+          2: "Ecco cosa è saltato fuori:",
+          3: "Possibili corrispondenze:"
+        },
+        emptySet: {
+          1: "Su questo piano non c'è niente che corrisponda.",
+          2: "Quella lista è rimasta vuota, temo.",
+          3: "Ho passato in rassegna tutta la lista - qui non c'è niente che corrisponda."
+        },
+        sourcesAvailable: "Su questa pagina riesco a vedere solo: {sources}.",
+        noSources: "Non riesco ancora a vedere nessun registro di gioco su questa pagina.",
+        engineMissing: {
+          1: "I miei registri non sono ancora caricati su questa pagina, quindi qui non posso cercare niente.",
+          2: "Non ho appunti con me su questa pagina. Prova dove sono caricati i miei registri.",
+          3: "Il mio libro non è su questa pagina, quindi non c'è niente da controllare.",
+          4: "Qui non c'è niente con cui lavorare - i miei registri non sono ancora caricati su questa pagina."
+        },
+        datasetUnsupported: {
+          1: "Eh, ormai tratto solo i Dati attuali. Passa il set di dati ai Dati attuali e vedrò cosa posso trovarti.",
+          2: "I miei appunti ora coprono solo i Dati attuali. Passa ai Dati attuali e chiedimi di nuovo.",
+          3: "Solo Dati attuali - questa è la mia regola. Cambia il set di dati e frugherò in quello che ho.",
+          4: "Da me non avrai risposte sui Dati di test beta; io lavoro sui Dati attuali. Cambia il set di dati e darò un'altra occhiata."
+        },
+        error: {
+          1: "Qualcosa si è inceppato nei miei archivi. Prova a chiedermelo di nuovo?",
+          2: "Hm, i miei appunti si sono sparpagliati. Chiedimelo di nuovo?",
+          3: "Quello si è perso per strada verso la mia scrivania. Riprova?",
+          4: "Qualcosa si è ingarbugliato nei miei appunti. Riprova?"
+        }
+      },
+      close: {
+        1: "Questo viene dritto dai registri.",
+        2: "Tutto solido - l'ho controllato.",
+        3: "Qui dentro non c'è niente di indovinato.",
+        4: "Su questo puoi metterci la mano sul fuoco.",
+        5: "Ogni riga è scritta da qualche parte.",
+        6: "Questo è tutto quello che è registrato.",
+        7: "Affidabile, questo. Io non passo pettegolezzi.",
+        8: "Questo viene dalla fonte, non dalle chiacchiere.",
+        9: "Buona informazione, questa. Vale il prezzo.",
+        10: "Questo dicono i registri, e loro non mi mentono.",
+        11: "Informazione pulita. Goditela.",
+        12: "Questo è confermato, non sentito dire.",
+        collection: {
+          1: "Questo è l'insieme, completo come lo hanno i registri.",
+          2: "Ognuno di quelli è annotato - niente aggiunto.",
+          3: "Se non è in quella lista, nemmeno i registri lo conoscono.",
+          4: "Questi sono tutti. Buona caccia."
+        },
+        ranking: {
+          1: "Ecco come i registri li mettono in fila.",
+          2: "L'ordine è quello dei registri, non la mia opinione.",
+          3: "Ecco la classifica come la mettono i registri.",
+          4: "Queste sono le posizioni, dritte dalla pagina."
+        },
+        comparison: {
+          1: "Entrambe le voci sono dei registri - trai tu le conclusioni.",
+          2: "Eccoli entrambi, campo per campo.",
+          3: "Niente di nascosto in quella tabella.",
+          4: "Giudica da te - i numeri sono tutti lì."
+        },
+        farming: {
+          1: "Quelle sono le fonti registrate, con le probabilità migliori per prime.",
+          2: "Le percentuali sono dei registri; il resto è la tua fortuna.",
+          3: "Ecco dove lascia il bottino, per quanto ne sanno i miei appunti.",
+          4: "Buona fortuna là fuori - questo è tutto quello che tengono gli appunti."
+        }
+      },
+      lead: {
+        item: {
+          1: "Oho, ho trovato una pista!",
+          2: "Vediamo cosa dicono i registri su questo.",
+          3: "Ho il fascicolo proprio qui.",
+          4: "Quello mi dice qualcosa. Dammi un momento.",
+          5: "Le domande sull'equipaggiamento sono il mio pane.",
+          6: "Hm, fammi controllare i miei appunti su questo.",
+          7: "Sei fortunato - ho una pagina su questo.",
+          8: "Un oggetto, eh? Mi piace quando la gente chiede cose che posso davvero nominare.",
+          9: "Scaviamo. Gli oggetti lasciano tracce di carta, e la carta la tengo io.",
+          10: "Ho venduto informazioni peggiori per dei buoni Col. Questa è gratis.",
+          11: "Bene, quel nome mi è familiare.",
+          12: "Vediamo cosa ho scritto.",
+          13: "Oho, chiedi della roba buona.",
+          14: "Aspettavo che qualcuno me lo chiedesse.",
+          15: "Certo, quello lo conosco.",
+          16: "Hm, quel nome è da qualche parte nel mio libro.",
+          17: "Fammi girare alla pagina giusta.",
+          18: "Vuoi i dettagli? Io ho i dettagli.",
+          19: "Questo sì che è un nome che vale la pena cercare.",
+          20: "Vediamo quanto posso dirti."
+        },
+        recipe: {
+          1: "Ah, una domanda da artigiano. Mi piace.",
+          2: "Fammi scovare quella ricetta.",
+          3: "Ecco cosa elencano i registri per questo.",
+          4: "Stai creando qualcosa, eh? Fammi controllare.",
+          5: "Hm, le ricette le tengo in ordine.",
+          6: "Vediamo cosa serve per quello.",
+          7: "Bene, troviamo i materiali.",
+          8: "Un artigiano con Col da spendere. Bene.",
+          9: "Fammi vedere cosa dicono i registri che serve.",
+          10: "Quello ha una ricetta, ne sono quasi sicura.",
+          11: "Fammi tirare su la lista.",
+          12: "Hm, fammi controllare cosa serve per quello."
+        },
+        mob: {
+          1: "Oho, una domanda da cacciatore.",
+          2: "Vediamo cosa dice il Bestiario.",
+          3: "Ho una pagina su questo.",
+          4: "Un mostro, hm? Quelli lasciano un sacco di tracce.",
+          5: "Sei a caccia, eh? Fammi controllare.",
+          6: "Quello ha una brutta reputazione, se ricordo bene.",
+          7: "Vediamo cosa dicono i registri su quella bestia.",
+          8: "In molti me lo chiedono. Fammi prendere gli appunti.",
+          9: "Hm, quel nome lo conosco.",
+          10: "Fammi cercare cosa ho su questo.",
+          11: "Una domanda da cacciatore. La mia preferita.",
+          12: "Bene, quello. Dammi un secondo.",
+          13: "Vediamo dove vive e con cosa colpisce.",
+          14: "Tengo appunti su tutto quello che ha i denti. Fammi controllare.",
+          15: "Questo è un nome che ho sentito più di una volta.",
+          16: "Fammi vedere cosa ho scritto su questo.",
+          17: "Attenzione con quello - o no, è il tuo collo. Ecco cosa so.",
+          18: "Hm, fammi frugare tra le pagine del Bestiario.",
+          19: "I mostri sono affari facili. Sono sempre da qualche parte.",
+          20: "Vediamo se è cattivo come dicono."
+        },
+        mobDrops: {
+          1: "Ah, una domanda da saccheggiatore!",
+          2: "Vediamo cosa lascia.",
+          3: "Ecco la lista del bottino che ho.",
+          4: "Vuoi frugargli le tasche, eh? Sensato.",
+          5: "Vediamo cosa cade da quello.",
+          6: "Hm, le liste del bottino le tengo.",
+          7: "Vuoi sapere cosa porta addosso. Giusto.",
+          8: "Fammi controllare la lista. Queste non le indovino.",
+          9: "Quello vale la pena cacciarlo per un motivo.",
+          10: "Bene, vediamo cosa lascia dietro di sé.",
+          11: "Uccidilo, prendi le sue cose. Sono affari.",
+          12: "Fammi vedere cosa ho registrato per quello.",
+          13: "Hm, fammi controllare cosa c'è nella lista.",
+          14: "Vediamo se vale il tuo tempo."
+        },
+        drop: {
+          1: "Oho, segui una pista di bottino?",
+          2: "Vediamo chi lo tiene.",
+          3: "Ho frugato nelle liste del bottino per quello.",
+          4: "Cerchi da dove viene? Intelligente.",
+          5: "Fammi controllare chi lo porta.",
+          6: "Hm, quello è un bottino, eh?",
+          7: "Qualcuno ce l'ha. Scopriamo chi.",
+          8: "Le liste del bottino le tengo in ordine. Dammi un momento.",
+          9: "Bene, risaliamo la pista.",
+          10: "Fammi vedere quali mostri lo tengono.",
+          11: "Dai la caccia a un bottino, eh? Farei lo stesso.",
+          12: "Hm, fammi vedere cosa è registrato.",
+          13: "Quello non cresce sugli alberi. Fammi guardare.",
+          14: "Vediamo chi è abbastanza generoso da mollarlo."
+        },
+        npc: {
+          1: "Chiedi in giro e trovi gente. Fammi controllare.",
+          2: "Vediamo dove puoi trovarli.",
+          3: "Ho una pista su quello.",
+          4: "Cerchi qualcuno? Fammi controllare i miei appunti.",
+          5: "Hm, la gente si sposta. Fammi guardare.",
+          6: "Bene, vediamo dove hanno aperto bottega.",
+          7: "Conosco quasi tutti i bottegai. Fammi guardare.",
+          8: "Fammi vedere cosa ho su di loro.",
+          9: "Hm, fammi controllare dove sono.",
+          10: "Mercanti e girovaghi: tengo traccia di entrambi.",
+          11: "Fammi vedere se posso indirizzarti da loro.",
+          12: "Bene, troviamoli."
+        },
+        quest: {
+          1: "Ah, una pista per una missione.",
+          2: "Diamo un'occhiata al foglio della missione.",
+          3: "Ecco cosa ho su quella missione.",
+          4: "Lavoro, eh? Fammi controllare il tabellone.",
+          5: "Hm, quello è in giro a chiedere aiuto.",
+          6: "Fammi vedere cosa ho scritto.",
+          7: "Una missione, hm? Su quelle tengo appunti accurati.",
+          8: "Bene, vediamo chi la assegna.",
+          9: "Qualcuno vuole che si faccia qualcosa. Fammi controllare.",
+          10: "Ho appunti su quasi tutte queste.",
+          11: "Vediamo i dettagli prima che tu accetti il lavoro.",
+          12: "Hm, fammi tirare fuori quel foglio.",
+          13: "Il lavoro paga. Vediamo quanto vale.",
+          14: "Vediamo la ricompensa prima di impegnarti."
+        },
+        location: {
+          1: "Oho, vuoi orientarti sul territorio?",
+          2: "Vediamo dove si trova.",
+          3: "Quello ce l'ho segnato sulla mappa.",
+          4: "Indicazioni, eh? Le indicazioni le so fare.",
+          5: "Fammi controllare gli appunti della mappa.",
+          6: "Hm, quello è un luogo, eh? Fammi guardare.",
+          7: "Immagino che vorrai le coordinate.",
+          8: "Bene, troviamolo sulla mappa.",
+          9: "Conosco questi piani meglio di molti altri.",
+          10: "Fammi vedere cosa è segnato laggiù.",
+          11: "I luoghi di solito riesco a individuarli. Proviamo.",
+          12: "Hm, fammi controllare i miei appunti sulla mappa.",
+          13: "Abbastanza facile - se i miei appunti sono giusti.",
+          14: "Vediamo cosa c'è da quelle parti."
+        },
+        collection: {
+          1: "{label}? Ne ho {count} registrati - eccoli tutti.",
+          2: "Una rassegna completa di {label}, eh? {count} nomi, e nemmeno uno indovinato.",
+          3: "Lo scaffale dei {label}, eh? {count}, tutti controllati.",
+          4: "Cerchi la lista dei {label}. {count} - leggiamoli.",
+          5: "Ah, sfogli tutto lo scaffale. {count} {label}, arrivano subito.",
+          6: "Bene, fammi tirare fuori il fascicolo dei {label}. {count} - dai un'occhiata."
+        },
+        ranking: {
+          1: "Vediamo chi viene fuori in testa.",
+          2: "Una classifica, eh? Questo è il mio tipo di domanda.",
+          3: "I numeri non discutono. Mettiamoli in fila.",
+          4: "Fammeli ordinare come fanno i registri.",
+          5: "Vuoi la cima della lista. Diamo un'occhiata.",
+          6: "Oho, soppesiamo il campo. Le classifiche mi piacciono."
+        },
+        comparison: {
+          1: "Uno accanto all'altro, allora. Vediamo come si misurano.",
+          2: "Mettiamo quei due vicini - ecco il quadro.",
+          3: "Un confronto? Giusto, mettiamoli in fila.",
+          4: "Stendiamoli e vediamo chi cede per primo.",
+          5: "Due registri, una tabella. Dai un'occhiata.",
+          6: "Vuoi pesarli uno contro l'altro. Ecco cosa tengono i registri."
+        },
+        farming: {
+          1: "Lo stai cacciando, eh? Troviamo le probabilità migliori.",
+          2: "Una domanda da raccolta. È il tipo pratico - approvo.",
+          3: "Quindi lo vuoi in quantità. Ecco da dove viene.",
+          4: "Vediamo chi lo lascia e con che frequenza.",
+          5: "Ah, una domanda sulle scorte. Il mio tipo di affare preferito.",
+          6: "Allora ti servono le fonti. Fammi scovarle."
+        }
+      }
+    }
+  });
+
   const api = {
     DEFAULT_LANGUAGE,
     SUPPORTED_LANGUAGES,
+    SUPPORTED_LANGUAGE_CHOICES,
+    getSupportedLanguages,
     getSettings: () => Object.assign({}, settingsState),
     updateSettings(patch) {
       saveSettings(patch);
@@ -4247,6 +7252,7 @@
     },
     getLanguage,
     getLanguageLabel,
+    getLanguageText,
     setLanguage,
     t,
     content,

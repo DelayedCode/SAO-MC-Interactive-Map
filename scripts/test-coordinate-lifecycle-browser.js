@@ -10,7 +10,7 @@
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
 const { attachDiagnostics, ensureStaticServer } = require("./harness-helpers");
-const { parseJourneyMapDat } = require("../shared/sao-journeymap-export.js");
+const { parseJourneyMapDat, buildJourneyMapExport } = require("../shared/sao-journeymap-export.js");
 
 const rootUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const AINCRAD_URL = "/Aincrad/Map/maps.html?floor=floor1";
@@ -636,6 +636,38 @@ async function run() {
     assert.ok(
       renderedCurrentMarker.deltaLeft < 1.5 && renderedCurrentMarker.deltaTop < 1.5,
       `the Current marker stays on its physical map location (${renderedCurrentMarker.deltaLeft}px / ${renderedCurrentMarker.deltaTop}px)`
+    );
+
+    /* --- Identity, not name or coordinates, decides what a duplicate is ------------
+       The round trip above proves a file this site exported still names the waypoint it was exported
+       from. A file describing a *different* waypoint - same name, same coordinates, its own identity -
+       must still be imported, so the check can never be passing by merging waypoints that only look
+       alike. */
+    const distinctFile = buildJourneyMapExport({
+      world: "aincrad",
+      categories: {
+        Default: [{ name: WAYPOINT_NAME, x: expectedCoordinate.x, y: -30, z: expectedCoordinate.z }]
+      }
+    }).toUint8Array();
+    const countBeforeDistinctImport = (await readRecords(page)).length;
+    await importJourneyMap(page, Buffer.from(distinctFile));
+    await page.waitForFunction(
+      (count) => JSON.parse(localStorage.getItem("sao.customWaypoints.aincrad") || "[]").length === count,
+      countBeforeDistinctImport + 1
+    );
+    const afterDistinctImport = await readRecords(page);
+    assert.equal(
+      afterDistinctImport.length,
+      countBeforeDistinctImport + 1,
+      "a distinct waypoint with the same name and coordinates is still imported"
+    );
+    const sameNamedRecords = afterDistinctImport.filter((record) => record.name === WAYPOINT_NAME);
+    assert.equal(sameNamedRecords.length, 2, "the two same-named waypoints coexist");
+    const distinctRecord = sameNamedRecords.find((record) => record.id !== created.id);
+    assert.deepEqual(
+      { x: distinctRecord.x, z: distinctRecord.z },
+      expectedCoordinate,
+      "the distinct waypoint keeps the coordinate the file carries"
     );
 
     assert.deepEqual(diagnostics.errors, [], "the coordinate lifecycle raises no console errors");

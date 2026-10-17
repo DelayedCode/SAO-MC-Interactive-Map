@@ -1,5 +1,6 @@
 const { chromium } = require("playwright");
 const { ensureStaticServer } = require("./harness-helpers");
+const { uiLanguages } = require("./localization-languages");
 
 const baseUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const viewports = [
@@ -22,7 +23,7 @@ const pages = [
   { name: "Fractured Underworld Compendium", url: "/Fractured%20Underworld/Compendium/compendium.html" }
 ];
 
-const languages = ["en", "es", "fr"];
+const languages = uiLanguages();
 
 async function verifyPage(page, pageInfo, viewport, language) {
   const errors = [];

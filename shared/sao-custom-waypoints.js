@@ -283,12 +283,19 @@
           requestedButton;
 
         if (!id || !name.trim() || !floorIds.has(floor) || !Number.isFinite(x) || !Number.isFinite(z)) return null;
-        if (seenIds.has(id)) {
+        /* The file's own waypoint identity, when it carries one. A file this site exported names a
+           custom waypoint by the identity the store gave it, so importing that file back finds the
+           waypoint already here instead of adding a second copy of it. Only an exact identity match
+           counts: distinct waypoints keep distinct identities and are never merged, however alike
+           their names or coordinates are. The hint is used for the check and never stored. */
+        const sourceGuid = typeof input.sourceGuid === "string" ? input.sourceGuid.trim() : "";
+        if (seenIds.has(id) || (sourceGuid && seenIds.has(sourceGuid))) {
           duplicateCount += 1;
           continue;
         }
 
         seenIds.add(id);
+        if (sourceGuid) seenIds.add(sourceGuid);
         prepared.push({
           id,
           name,

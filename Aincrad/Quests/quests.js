@@ -268,8 +268,17 @@ function initQuestsRuntime() {
   const savedCompletionByFloor = questUiState.completionByFloor || {};
   const initialSearch =
     params.get("search") || params.get("npc") || params.get("q") || savedSearchByFloor[activeFloor] || "";
+  /* A map waypoint carries its own quest type in the link (`?type=main` / `?type=side`), so a Main
+     Quest marker opens the Main tab instead of the remembered one. Without the parameter the
+     remembered type is kept, exactly as before. */
+  const requestedQuestType = String(params.get("type") || params.get("questType") || "")
+    .trim()
+    .toLowerCase();
   const questEntries = getQuestEntries();
   let activeQuestType = savedQuestTypeByFloor[activeFloor] === QUEST_TYPES.main ? QUEST_TYPES.main : QUEST_TYPES.side;
+  if (Object.values(QUEST_TYPES).includes(requestedQuestType)) {
+    activeQuestType = requestedQuestType;
+  }
   let activeCity = savedCityByFloor[activeFloor] || "";
   let activeCompletion = savedCompletionByFloor[activeFloor] || "";
   let renderRafId = null;

@@ -319,7 +319,9 @@
     "armorBlacksmith",
     "ingotBlacksmith",
     "keyBlacksmith",
+    "materialsBlacksmith",
     "accessoriesBlacksmith",
+    "equipmentBlacksmith",
     "secretAccessoryBlacksmith",
     "runeCraftsmen",
     "refaire"
@@ -424,6 +426,26 @@
       <path d="M12 4.8v1.8M12 17.8v1.4M4.6 12.2h1.8M17.6 12.2h1.8" stroke="#fff6de" stroke-width="1.2" stroke-linecap="round"/>
     </svg>
   `,
+    /* The Materials Blacksmith the Current-Data update adds: a mallet over two stacked material
+       bars, so it reads as "materials worked here" rather than repeating the ingot or accessory
+       glyphs. */
+    materialsBlacksmith: `
+    <svg class="craftsman-icon materials-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12.9 9.2 16.4 5.7l2.2 2.2-3.5 3.5Z" fill="#d7e4f2" stroke="#4f6478" stroke-width="1"/>
+      <path d="M15.6 5.9 18.9 2.6l2.5 2.5-3.3 3.3Z" fill="#e7c58a" stroke="#8b6335" stroke-width="1"/>
+      <path d="M12.2 9.9 4.6 17.5a1.4 1.4 0 0 0 2 2l7.6-7.6Z" fill="#c99a63" stroke="#7a4b28" stroke-width="1"/>
+      <rect x="3.2" y="18.9" width="7.4" height="2.2" rx="0.7" fill="#f0d2a2" stroke="#8b6335" stroke-width="0.9"/>
+    </svg>
+  `,
+    /* The Equipment Blacksmith this Current-Data update adds: a sword over an anvil, so it reads as
+       "equipment forged here" rather than repeating the armor or accessory glyphs. */
+    equipmentBlacksmith: `
+    <svg class="craftsman-icon equipment-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M13.4 3.2 20.8 10.6l-1.9 1.9-1.5-1.5-4.6 4.6 1.5 1.5-1.9 1.9L5 11.6l1.9-1.9 1.5 1.5 4.6-4.6-1.5-1.5Z" fill="#dce7f5" stroke="#53657d" stroke-width="1"/>
+      <path d="M4.2 18.4h15.6c.6 0 1.1.5 1.1 1.1v1.1H3.1v-1.1c0-.6.5-1.1 1.1-1.1Z" fill="#f0d2a2" stroke="#8b6335" stroke-width="1"/>
+      <path d="M8.6 18.4c.6-1.4 1.4-2.2 2.4-2.2s1.8.8 2.4 2.2Z" fill="#c99a63" stroke="#7a4b28" stroke-width="0.9"/>
+    </svg>
+  `,
     secretAccessoryBlacksmith: `
     <svg class="craftsman-icon secret-accessory-blacksmith-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <circle cx="12" cy="13.6" r="5.3" fill="#e6d6ff" stroke="#5b3f86" stroke-width="1.1"/>
@@ -504,6 +526,14 @@
           <path d="M15 12.5c2.2 0 3.7 1.4 3.7 2.9s-1.5 2.9-3.7 2.9" fill="#c98f4f" stroke="#8d6130" stroke-width="1.1"/>
           <path d="M6.5 10.5 16.8 4.5l1.2 2.1L7.7 12.6Z" fill="#d8e4eb" stroke="#5b6d78" stroke-width="1"/>
           <path d="M16.3 4.8 19.8 6.9 21.1 5 17.4 2.9Z" fill="#6a3f24"/>
+        </svg>
+      `,
+    /* The World Event marker the Current-Data update adds: a star burst, the glyph the map already
+       uses for event-flavoured things, kept here so both controllers render one shared artwork. */
+    worldEvent: `
+        <svg class="world-event-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="m12 3.1 2.4 5.6 6 .5-4.6 3.9 1.4 5.9L12 15.8l-5.2 3.2 1.4-5.9-4.6-3.9 6-.5Z" fill="#ffe6a2" stroke="#a87c1f" stroke-width="1.1" stroke-linejoin="round"/>
+          <circle cx="12" cy="11.4" r="1.9" fill="#c08b22"/>
         </svg>
       `,
     mobArea: `

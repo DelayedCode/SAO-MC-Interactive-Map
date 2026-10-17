@@ -5,8 +5,11 @@
 // `mainQuests` category for the same purpose. The regular accessory blacksmiths reuse the map's
 // existing Accessories Blacksmith category, the Occult Merchant locations reuse the existing Occult
 // Merchant category, and the secret accessory locations have their own Secret Accessory Blacksmith
-// category so they are never mixed into the regular Accessories Blacksmith button. The Current Data
-// side quests reuse the map's existing Side Quest category, exactly like the Beta-Test side quests.
+// category so they are never mixed into the regular Accessories Blacksmith button. The Materials
+// Blacksmith locations (the Sewer Reshaper and the Cabinetmaker) and the Floor 1 World Event use the
+// two categories this update adds to the map - the same way the Accessories Blacksmith, the Occult
+// Merchant and the Secret Accessory Blacksmith categories are reused - and the Current Data side
+// quests reuse the map's existing Side Quest category, exactly like the Beta-Test side quests.
 //
 // Coordinates are exactly the ones supplied for Current Data; nothing here is guessed.
 
@@ -124,6 +127,55 @@ Object.assign(DATA, {
     drops: ["N/A"],
     description: "Accessories Blacksmith"
   },
+  /* The Sylve Accessories blacksmith, the one accessory set this update adds. It keeps the
+     Accessories Blacksmith category, the Current Data dataset, floor 1 and the description the
+     eleven accessory blacksmiths above use, with exactly the supplied name and coordinates. */
+  "current-accessories-blacksmith-sylve": {
+    title: "Sylve Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1538, z: 3525 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  /* The two accessory blacksmiths this update adds, one per accessory set, in exactly the shape of
+     the twelve accessory blacksmiths above: the map's existing Accessories Blacksmith category,
+     Current Data only, floor 1, and precisely the supplied names and coordinates. */
+  "current-accessories-blacksmith-wolf": {
+    title: "Wolf Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2397, z: 3568 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  "current-accessories-blacksmith-bandit": {
+    title: "Bandit Accessories",
+    type: "NPC",
+    category: "accessoriesBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 4169, z: 3933 },
+    drops: ["N/A"],
+    description: "Accessories Blacksmith"
+  },
+  /* The Equipment Blacksmith this update adds. It is the first marker behind the Equipment
+     Blacksmith category this update declares, so it carries that category, Current Data only, floor
+     1 and the supplied name and coordinates. */
+  "current-equipment-blacksmith-nodachi": {
+    title: "Nodachi Blacksmith",
+    type: "NPC",
+    category: "equipmentBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 3226, z: 1456 },
+    drops: ["N/A"],
+    description: "Equipment Blacksmith"
+  },
   "current-secret-accessory-blacksmith-ice-bracelet": {
     title: "Bracelet of Ice",
     type: "NPC",
@@ -145,7 +197,7 @@ Object.assign(DATA, {
     description: "Secret Accessory Blacksmith"
   },
   "current-secret-accessory-blacksmith-sticky-ring": {
-    title: "Sticky Ring",
+    title: "Secret Sticky Ring Merchant",
     type: "NPC",
     category: "secretAccessoryBlacksmith",
     dataset: "current",
@@ -165,7 +217,7 @@ Object.assign(DATA, {
     description: "Secret Accessory Blacksmith"
   },
   "current-secret-accessory-blacksmith-deer-belt": {
-    title: "Belt of the Stags",
+    title: "Secret Deer Belt Merchant",
     type: "NPC",
     category: "secretAccessoryBlacksmith",
     dataset: "current",
@@ -196,6 +248,21 @@ Object.assign(DATA, {
     dataset: "current",
     floor: "floor1",
     coords: { x: 2494, z: 3700 },
+    drops: ["N/A"],
+    description: "Secret Accessory Blacksmith"
+  },
+  /* The secret equipment location this update adds, in exactly the shape of the seven secret
+     accessory blacksmiths above: the Secret Accessory Blacksmith category, Current Data only,
+     floor 1, and the underground classification the map needs to render it on the underground
+     layer. The supplied name and coordinates are carried unchanged. */
+  "current-secret-accessory-blacksmith-gelatinous-cloak": {
+    title: "Secret Gelatinous Cloak",
+    type: "NPC",
+    category: "secretAccessoryBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2854, z: 4657 },
+    underground: true,
     drops: ["N/A"],
     description: "Secret Accessory Blacksmith"
   },
@@ -379,6 +446,44 @@ Object.assign(DATA, {
     drops: ["N/A"],
     description: "Loot Buyer"
   },
+  /* The Local Lumberjack this update supplies. It uses the map's existing Loot Buyer category and
+     the loot buyer marker shape, exactly like the thirteen Current Data loot buyers above, with
+     the supplied name and coordinates. The Beta-Test Loot Buyer of the same name lives in
+     Aincrad/Map/maps_floor1.js and is left untouched: Current Data ships its own copy. */
+  "current-loot-buyer-local-lumberjack": {
+    title: "Local Lumberjack",
+    type: "NPC",
+    category: "lootBuyers",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2467, z: 4320 },
+    drops: ["N/A"],
+    description: "Loot Buyer"
+  },
+  /* The two loot buyers this update adds, in the loot buyer shape the fourteen Current Data loot
+     buyers above already use: the map's existing Loot Buyer category, Current Data only, floor 1,
+     the supplied names and the supplied coordinates. The Local Miner is the one the request places
+     near the Starting Town, which is where its coordinates (2400, 3560) put it; it is added once. */
+  "current-loot-buyer-candelia": {
+    title: "Candelia",
+    type: "NPC",
+    category: "lootBuyers",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2029, z: 790 },
+    drops: ["N/A"],
+    description: "Loot Buyer"
+  },
+  "current-loot-buyer-local-miner": {
+    title: "Local Miner",
+    type: "NPC",
+    category: "lootBuyers",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2400, z: 3560 },
+    drops: ["N/A"],
+    description: "Loot Buyer"
+  },
   "current-starting-merchant": {
     title: "Starting Merchant",
     type: "NPC",
@@ -398,6 +503,20 @@ Object.assign(DATA, {
     coords: { x: 1787, z: 4161 },
     drops: ["N/A"],
     description: "Tool Merchant"
+  },
+  /* The Alchemist of the starting town, supplied as its own NPC at (1771, 4097). Beta-Test Data
+     keeps its own combined Alchemist marker; Current Data ships this one instead, in the same
+     alchemist category and shape the Beta alchemist markers use. The Assistant (1772, 4102) and
+     the Crystallographer stay separate NPCs and are not represented by this marker. */
+  "current-alchemist": {
+    title: "Alchemist",
+    type: "NPC",
+    category: "alchemist",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1771, z: 4097 },
+    drops: ["N/A"],
+    description: "Alchemist"
   },
   "current-consumables-merchant-purification-alchemist": {
     title: "F1 - PvP Purification Alchemist",
@@ -463,6 +582,47 @@ Object.assign(DATA, {
     coords: { x: 3396, z: 1081 },
     drops: ["N/A"],
     description: "Key Blacksmith"
+  },
+
+  /* The Floor 1 World Event this update adds. It sits behind the map's World Event category, the
+     same way the merchant, craftsman and quest locations sit behind theirs, and carries exactly the
+     supplied name and coordinates. Current Data ships this one World Event and no other. */
+  "current-world-event-floor-1": {
+    title: "Floor 1 World Event",
+    type: "NPC",
+    category: "worldEvents",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 1947, z: 1990 },
+    drops: ["N/A"],
+    description: "World Event"
+  },
+
+  /* The Materials Blacksmith locations this update supplies: the Sewer Reshaper, which turns the
+     supplied slime materials into Slime Essence and Slime Tear, and the Cabinetmaker. Both use the
+     map's Materials Blacksmith category and the merchant marker shape, are Current Data only and sit
+     on floor 1. The Sewer Reshaper is supplied as an underground location, so it carries the same
+     `underground` flag the map's other underground Current waypoints use. */
+  "current-materials-blacksmith-sewer-reshaper": {
+    title: "Sewer Reshaper",
+    type: "NPC",
+    category: "materialsBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2864, z: 4740 },
+    underground: true,
+    drops: ["N/A"],
+    description: "Materials Blacksmith"
+  },
+  "current-materials-blacksmith-cabinetmaker": {
+    title: "Cabinetmaker",
+    type: "NPC",
+    category: "materialsBlacksmith",
+    dataset: "current",
+    floor: "floor1",
+    coords: { x: 2461, z: 4301 },
+    drops: ["N/A"],
+    description: "Materials Blacksmith"
   },
 
   /* Current Data biome waypoints.
@@ -1456,7 +1616,7 @@ Object.assign(DATA, {
     description: "A cursed entity emerging from ancient darkness, it prowls, invisible, ready to tear the souls of the living."
   },
   "current-narax-cursed-skeleton-underground": {
-    title: "Narax Cursed Skeleton",
+    title: "Narax the Cursed Skeleton",
     type: "Boss",
     category: "bossSpawns",
     dataset: "current",
@@ -1795,8 +1955,8 @@ Object.assign(DATA, {
     dataset: "current",
     floor: "floor1",
     coords: { x: 986, z: 3491 },
-    drops: ["Coal", "Copper", "Iron"],
-    description: "West Mines — Coordinates X: 986 Z: 3491. Gather Coal, Copper, and Iron."
+    drops: ["Coal Ore", "Copper Ingot", "Iron Ingot"],
+    description: "West Mines — Coordinates X: 986 Z: 3491. Gather Coal Ore, Copper Ingot, and Iron Ingot."
   },
   "current-east-mines": {
     title: "East Mines",
@@ -1805,29 +1965,23 @@ Object.assign(DATA, {
     dataset: "current",
     floor: "floor1",
     coords: { x: 2399, z: 3510 },
-    drops: ["Coal", "Copper", "Iron"],
-    description: "East Mines — Coordinates X: 2399 Z: 3510. Gather Coal, Copper, and Iron."
+    drops: ["Coal Ore", "Copper Ingot", "Iron Ingot"],
+    description: "East Mines — Coordinates X: 2399 Z: 3510. Gather Coal Ore, Copper Ingot, and Iron Ingot."
   },
   "current-oak-forest": {
-    title: "Oak Forest",
+    title: "Oak/Birch Forest",
     type: "Biome",
     category: "farmingSpots",
     dataset: "current",
     floor: "floor1",
     coords: { x: 2459, z: 4320 },
-    drops: ["Oak Wood"],
-    description: "Oak Forest — Coordinates X: 2459 Z: 4320. Gather Oak Wood."
+    drops: ["Oak Log"],
+    description: "Oak/Birch Forest — Coordinates X: 2459 Z: 4320. Gather Oak Log."
   },
-  "current-birch-forest": {
-    title: "Birch Forest",
-    type: "Biome",
-    category: "farmingSpots",
-    dataset: "current",
-    floor: "floor1",
-    coords: { x: 1788, z: 1196 },
-    drops: ["Birch Wood"],
-    description: "Birch Forest — Coordinates X: 1788 Z: 1196. Gather Birch Wood."
-  },
+  /* Birch Forest is not a separate Current-Data farming spot any more: this update merges it into
+     the Oak Forest marker above, which keeps its own id, coordinates, drops and marker shape and
+     only takes the supplied Oak/Birch Forest name. No second forest marker is created, and the
+     Beta-Test Birch Forest in Aincrad/Map/maps_floor1.js is left untouched. */
   "current-farm": {
     title: "Farm",
     type: "Biome",
@@ -1835,8 +1989,8 @@ Object.assign(DATA, {
     dataset: "current",
     floor: "floor1",
     coords: { x: 2351, z: 3662 },
-    drops: ["Allium", "Wheat"],
-    description: "Farm — Coordinates X: 2351 Z: 3662. Gather Allium and Wheat."
+    drops: ["Allium Flower", "Wheat"],
+    description: "Farm — Coordinates X: 2351 Z: 3662. Gather Allium Flower and Wheat."
   }
 });
 
@@ -2252,3 +2406,32 @@ const CURRENT_MOB_AREAS = [
 ];
 
 if (typeof window !== "undefined") window.SAO_CURRENT_MOB_AREAS = CURRENT_MOB_AREAS;
+
+/* CURRENT DATA MOB-AREA MOB CORRECTIONS
+//
+// The Current-Data mob-area rows are corrected here rather than in the shared MOB_AREA_MOBS table,
+// which lives in the Beta-Test floor files and is never edited. This table is read only while
+// Current Data is active (Aincrad/Map/adapter.js), it copies the shared rows instead of mutating
+// them, and Beta-Test Data therefore keeps its own wording, rows and order.
+//   - Snow Citadel lists "Ice Spiritist"; the Current floor 1 Bestiary names that mob "Ice Spirit".
+//   - Cursed Ruins is a surface area and must not list "Skeleton Sorcerer", which lives in the
+//     dungeonMobs tab; that row moves to the Skeleton Dungeon area below.
+//   - Skeleton Dungeon therefore gains "Skeleton Sorcerer", and its "Skeleton Archer" row keeps its
+//     search term while naming the regular tab the Current Bestiary holds that mob in.
+//
+// `replace` swaps a row in place, `remove` drops rows, `add` appends rows and `update` merges fields
+// into an existing row. Every other row keeps its position and its Beta-Test wording. */
+const CURRENT_MOB_AREA_MOB_LINKS = {
+  "snow-citadel-mobs": {
+    replace: { "Ice Spiritist": { name: "Ice Spirit" } }
+  },
+  "cursed-ruins": {
+    remove: ["Skeleton Sorcerer"]
+  },
+  "skeleton-dungeon-underground-mobs": {
+    add: [{ name: "Skeleton Sorcerer" }],
+    update: { "Archer Skeleton": { search: "Skeleton Archer", category: "regular" } }
+  }
+};
+
+if (typeof window !== "undefined") window.SAO_CURRENT_MOB_AREA_MOB_LINKS = CURRENT_MOB_AREA_MOB_LINKS;

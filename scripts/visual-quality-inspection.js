@@ -1,5 +1,6 @@
 const { chromium } = require("playwright");
 const { ensureStaticServer } = require("./harness-helpers");
+const { uiLanguages } = require("./localization-languages");
 
 const baseUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const viewports = [
@@ -22,23 +23,22 @@ const pages = [
   { name: "Fractured Underworld Compendium", url: "/Fractured%20Underworld/Compendium/compendium.html" }
 ];
 
-const languages = ["en", "es", "fr"];
+const languages = uiLanguages();
 
 async function inspectWelcomeMat(page, viewport, language) {
   const issues = [];
   const observations = [];
 
-  // Check GGO button exists and has "Not Released" indicator
+  // Check GGO button exists and carries the "not released" tag
   const ggoButton = await page.locator("#ggoButton").count();
   if (ggoButton === 0) {
     issues.push("GGO button missing");
   } else {
-    const ggoText = await page.locator("#ggoButton").textContent();
-    if (
-      !ggoText.toLowerCase().includes("not released") &&
-      !ggoText.toLowerCase().includes("no disponible") &&
-      !ggoText.toLowerCase().includes("pas encore")
-    ) {
+    /* The indicator's wording belongs to the UI dictionary, so the page is asked for it rather than
+       matching a hardcoded per-language list that a new language would silently fall out of. */
+    const expectedTag = await page.evaluate(() => window.SAOI18n?.t?.("page.index.notReleasedTag") || "");
+    const ggoText = (await page.locator("#ggoButton").textContent()) || "";
+    if (!expectedTag || !ggoText.toLowerCase().includes(expectedTag.toLowerCase())) {
       issues.push("GGO button missing 'Not Released' indicator");
     }
     observations.push("GGO button present with Not Released indicator");
@@ -200,7 +200,8 @@ async function inspectBestiary(page, viewport, language) {
     const categoryTerms = {
       en: ["boss", "dungeon", "regular"],
       es: ["jefe", "mazmorra", "regular"],
-      fr: ["boss", "donjon", "régulier"]
+      fr: ["boss", "donjon", "régulier"],
+      it: ["boss", "dungeon", "mostri"]
     };
 
     const terms = categoryTerms[language] || categoryTerms.en;
@@ -243,7 +244,9 @@ async function inspectEquipmentCompendium(page, viewport, language) {
   const locationKeywords = {
     en: ["town of beginnings", "beginnings"],
     es: ["pueblo de los comienzos", "comienzos"],
-    fr: ["ville des débuts", "débuts"]
+    fr: ["ville des débuts", "débuts"],
+    /* Place names are game content: Italian has no content-translation slot yet, so they stay English. */
+    it: ["town of beginnings", "beginnings"]
   };
 
   const keywords = locationKeywords[language] || locationKeywords.en;
@@ -290,7 +293,8 @@ async function inspectQuests(page, viewport, language) {
     const locationKeywords = {
       en: ["town of beginnings", "beginnings"],
       es: ["pueblo de los comienzos", "comienzos"],
-      fr: ["ville des débuts", "débuts"]
+      fr: ["ville des débuts", "débuts"],
+      it: ["town of beginnings", "beginnings"]
     };
 
     const keywords = locationKeywords[language] || locationKeywords.en;
@@ -380,7 +384,8 @@ async function inspectFracturedUnderworldMap(page, viewport, language) {
     const developmentKeywords = {
       en: ["being developed", "currently", "development"],
       es: ["desarrollo", "actualmente", "en curso"],
-      fr: ["développement", "actuellement", "en cours"]
+      fr: ["développement", "actuellement", "en cours"],
+      it: ["sviluppo", "attualmente", "in fase"]
     };
 
     const keywords = developmentKeywords[language] || developmentKeywords.en;

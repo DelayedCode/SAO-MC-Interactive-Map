@@ -15,6 +15,9 @@
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
 const { attachDiagnostics, ensureStaticServer } = require("./harness-helpers");
+const { uiLanguages } = require("./localization-languages");
+/* The languages the shared settings picker is expected to offer (scripts/localization-languages.js). */
+const SUPPORTED_LANGUAGES = uiLanguages();
 
 const rootUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const hubUrl = `${rootUrl}/index.html`;
@@ -67,6 +70,9 @@ function readMenu(page) {
       ariaHidden: menu.getAttribute("aria-hidden"),
       pointerEvents: getComputedStyle(menu).pointerEvents,
       focusedLanguage: active && active.dataset ? active.dataset.language || null : null,
+      languages: Array.from(document.querySelectorAll("#sao-settings-menu button[data-language]")).map(
+        (button) => button.dataset.language
+      ),
       pressed: Array.from(document.querySelectorAll("#sao-settings-menu button[data-language]"))
         .filter((button) => button.getAttribute("aria-pressed") === "true")
         .map((button) => button.dataset.language)
@@ -210,8 +216,11 @@ async function verifyWarningReset(browser) {
     results.push({ scope: "settings-menu-open", status: "passed" });
 
     /* --- language switch keeps the menu open and keeps focus on the option --- */
+    /* The picker is built from the shared supported-language list, so the menu is compared with that
+       list instead of asserting a count that has to be edited whenever a language is added. */
     const languageButtons = await page.locator("#sao-settings-menu button[data-language]").count();
-    assert.equal(languageButtons, 3, "the menu offers the three supported languages");
+    assert.equal(languageButtons, SUPPORTED_LANGUAGES.length, "the menu offers every supported language");
+    assert.deepEqual(opened.languages, SUPPORTED_LANGUAGES, "the menu lists the supported languages in order");
 
     await page.locator('#sao-settings-menu button[data-language="fr"]').click();
     await page.waitForTimeout(500);

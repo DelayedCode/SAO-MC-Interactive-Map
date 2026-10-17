@@ -19,6 +19,10 @@
   const STYLE_ID = "sao-warning-style";
   const DEFAULT_LOCK_SECONDS = 15;
   const LOCK_TICK_MS = 500;
+  /* Last-resort language list for a page that never loaded shared/sao-i18n.js. The shared language
+     system is the only real source of the available languages (see getLanguages below), so this list
+     is never what a normal page shows. */
+  const FALLBACK_LANGUAGES = Object.freeze(["en", "es", "fr"]);
 
   const STYLE_TEXT = `
     html.sao-warning-locked {
@@ -254,7 +258,18 @@
         : DEFAULT_LOCK_SECONDS;
     const getLanguage = typeof config.getLanguage === "function" ? config.getLanguage : () => "en";
     const setLanguage = typeof config.setLanguage === "function" ? config.setLanguage : () => {};
-    const getLanguages = typeof config.getLanguages === "function" ? config.getLanguages : () => ["en", "es", "fr"];
+    /* The shared language system owns the supported list, so a page only has to pass its own
+       getLanguages when it needs something different. The literal list is the fallback for a page
+       where shared/sao-i18n.js never loaded. */
+    const getLanguages =
+      typeof config.getLanguages === "function"
+        ? config.getLanguages
+        : () => {
+            const i18n = globalObject && globalObject.SAOI18n;
+            if (i18n && typeof i18n.getSupportedLanguages === "function") return i18n.getSupportedLanguages();
+            if (i18n && Array.isArray(i18n.SUPPORTED_LANGUAGES)) return i18n.SUPPORTED_LANGUAGES.slice();
+            return FALLBACK_LANGUAGES.slice();
+          };
     const getLanguageLabel =
       typeof config.getLanguageLabel === "function"
         ? config.getLanguageLabel
@@ -483,7 +498,10 @@
         : null;
       const focusedLanguage = focusedButton?.dataset?.language || "";
       languageOptions.replaceChildren();
-      (getLanguages() || []).forEach((language) => {
+      /* A caller that supplies an empty list (no shared language system yet) still gets the fallback
+         instead of a warning panel with no way to pick a language. */
+      const languages = getLanguages() || [];
+      (languages.length ? languages : FALLBACK_LANGUAGES).forEach((language) => {
         const button = documentObject.createElement("button");
         button.type = "button";
         button.className = "sao-language-option";

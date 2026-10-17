@@ -4,13 +4,17 @@ const { readFile } = require("./harness-helpers");
 const mapScript = readFile("Aincrad/Map/maps.js");
 const mainUiScript = readFile("Fractured Underworld/Main UI/mainui.js");
 const questsScript = readFile("Aincrad/Quests/quests.js");
+const bestiaryScript = readFile("Aincrad/Bestiary/bestiary.js");
 const characterBuildScript = readFile("Aincrad/Character Build/character-build.js");
 const characterBuildHtml = readFile("Aincrad/Character Build/character-build.html");
 const ecompendiumScript = readFile("Aincrad/eCompendium/ecompendium.js");
 const patchnotesScript = readFile("Aincrad/Patchnotes/patchnotes.js");
 const i18nScript = readFile("shared/sao-i18n.js");
+const contentTranslationsScript = readFile("shared/sao-content-translations.js");
 const miscInfoScript = readFile("Aincrad/Misc Info/miscinfo.js");
 const miscInfoHtml = readFile("Aincrad/Misc Info/miscinfo.html");
+const hubHtml = readFile("index.html");
+const welcomeWarningScript = readFile("shared/sao-welcome-warning.js");
 const auditScript = readFile("scripts/check-localization.js");
 const currentDataSources = [
   "Aincrad/Bestiary/bestiary_current.js",
@@ -133,5 +137,159 @@ assert.match(
 );
 assert.match(i18nScript, /v130\s*:\s*\{/, "The v1.3 patch note must be present in the locale mapping.");
 assert.match(patchnotesScript, /"v1\.3"\s*:\s*"v130"/, "Patch notes must map the v1.3 version to the v130 locale key.");
+
+/* The language list and its user-facing order live in the shared language system only. The hub's
+   first-visit hint rows and the Welcome Warning's language buttons both read them from there, so no
+   page can drift from the supported set (and adding a language stays a dictionary-only change). */
+assert.match(
+  i18nScript,
+  /const SUPPORTED_LANGUAGE_CHOICES = Object\.freeze\(/,
+  "The shared language system must derive the user-facing language order from SUPPORTED_LANGUAGES."
+);
+assert.match(
+  i18nScript,
+  /function getSupportedLanguages\(\)/,
+  "The shared language system must expose the supported languages for pickers to read."
+);
+assert.match(
+  i18nScript,
+  /function getLanguageText\(language, key\)/,
+  "The shared language system must expose per-language labels so no caller hardcodes them."
+);
+assert.doesNotMatch(
+  hubHtml,
+  /Change Language Here!|Changez de langue ici|Cambia el idioma aqu/,
+  "The hub's language hint sentences must come from the dictionaries, not from hardcoded markup."
+);
+assert.doesNotMatch(
+  hubHtml,
+  /\["en", "fr", "es"\]/,
+  "The hub must read the language order from the shared configuration instead of its own list."
+);
+assert.match(
+  hubHtml,
+  /getLanguageText\?\.\(language, "languageHint"\)/,
+  "The hub's language hint rows must be rendered from the shared per-language labels."
+);
+assert.match(
+  hubHtml,
+  /getLanguages: \(\) => i18n\?\.getSupportedLanguages\?\.\(\)/,
+  "The Welcome Warning must take its languages from the shared language system."
+);
+assert.doesNotMatch(
+  welcomeWarningScript,
+  /: \(\) => \["en", "es", "fr"\];/,
+  "The Welcome Warning must read the supported languages from the shared language system."
+);
+assert.match(
+  welcomeWarningScript,
+  /i18n\.getSupportedLanguages\(\)/,
+  "The Welcome Warning must fall back through the shared language system."
+);
+/* The six page notices and the legacy .translationNotice -> .notice lookup they were read through
+   are gone: nothing rendered them, and English never had them. */
+assert.doesNotMatch(
+  i18nScript,
+  /endsWith\("\.translationNotice"\)/,
+  "The unused legacy .translationNotice -> .notice lookup fallback must stay removed."
+);
+assert.doesNotMatch(
+  i18nScript,
+  /\n\s+notice:\n\s+"La mayor parte del contenido/,
+  "The dead Spanish page notices must stay removed."
+);
+assert.doesNotMatch(
+  i18nScript,
+  /\n\s+notice:\n\s+"La majeure partie du contenu/,
+  "The dead French page notices must stay removed."
+);
+
+/* The content-translation glossaries are positional [spanish, french] pairs. Every lookup resolves
+   its slot through the shared resolver instead of treating every non-French language as Spanish, and
+   the public APIs accept a language code or the historical numeric slot. */
+assert.match(
+  contentTranslationsScript,
+  /const TRANSLATION_SLOT_LANGUAGES = Object\.freeze\(\["es", "fr", "it"\]\)/,
+  "The content translations must declare the positional slot order in one place."
+);
+assert.match(
+  contentTranslationsScript,
+  /window\.SAOContentTranslations\.translationSlot = translationSlot;/,
+  "The content translations must expose the language-to-slot resolver."
+);
+assert.match(
+  contentTranslationsScript,
+  /const languageKeyed = spanish !== null && typeof spanish === "object"/,
+  "register() must accept the language-keyed form alongside the positional one."
+);
+assert.doesNotMatch(
+  contentTranslationsScript,
+  /language === "fr" \? 1 : 0/,
+  "No content-translation helper may treat every non-French language as Spanish."
+);
+assert.doesNotMatch(
+  contentTranslationsScript,
+  /languageIndex/,
+  "Content translations must not reach a slot through a bare language index."
+);
+assert.doesNotMatch(
+  ecompendiumScript,
+  /language === "fr" \? 1 : 0/,
+  "The Equipment Compendium must pass its language code, not a positional index."
+);
+assert.match(
+  ecompendiumScript,
+  /translateEquivalentLabel\(text, language\)/,
+  "The Equipment Compendium must resolve its equivalent label by language code."
+);
+
+/* The pair layout is data, not a code assumption: one adapter reads a positional pair by language code
+   and one collects a producer's values for every language that has a slot. No producer destructures
+   exactly two translations, indexes a pair by slot or passes a slot index where a code belongs. */
+assert.match(
+  contentTranslationsScript,
+  /function pairValue\(pair, language\)/,
+  "The content translations must read a positional pair through one language-code reader."
+);
+assert.match(
+  contentTranslationsScript,
+  /function translationsByLanguage\(valueFor\)/,
+  "The content translations must build a producer's per-language values through one adapter."
+);
+assert.match(
+  contentTranslationsScript,
+  /window\.SAOContentTranslations\.translationsByLanguage = translationsByLanguage;/,
+  "The adapter must be part of the module's surface for the pages that register content."
+);
+assert.doesNotMatch(
+  contentTranslationsScript,
+  /\[english, \[spanish, french\]\]/,
+  "No content registrar may destructure exactly two translations."
+);
+assert.doesNotMatch(
+  contentTranslationsScript,
+  /curated\?\.\[0\]|curated\[0\]|typeTranslation\?\.\[0\]|location\?\.\[0\]/,
+  "No content producer may index a glossary pair by slot."
+);
+assert.doesNotMatch(
+  contentTranslationsScript,
+  /translateEquipmentTermValue\([^)]*,\s*[01]\)|translateEquivalentLabel\([^)]*,\s*[01]\)/,
+  "No content producer may pass a numeric slot where a language code belongs."
+);
+assert.doesNotMatch(
+  contentTranslationsScript,
+  /SAOContentTranslations\.(?:es|fr)\[/,
+  "No content producer may reach a language dictionary through a hardcoded language code."
+);
+assert.match(
+  bestiaryScript,
+  /contentRegistry\.translationsByLanguage\(/,
+  "The Bestiary page must register every slot language through the shared adapter."
+);
+assert.doesNotMatch(
+  bestiaryScript,
+  /contentRegistry\.(?:es|fr)\[/,
+  "The Bestiary page must not name a content language when it registers its records."
+);
 
 console.log("Localization render-path regression checks passed.");

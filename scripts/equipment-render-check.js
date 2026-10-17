@@ -1,6 +1,7 @@
 const { chromium } = require("playwright");
 const assert = require("node:assert/strict");
 const { ensureStaticServer } = require("./harness-helpers");
+const { uiLanguages } = require("./localization-languages");
 
 const rootUrl = process.env.SAO_BASE_URL || "http://127.0.0.1:8080";
 const equipmentCategories = ["accessory", "armor", "tool", "weapon"];
@@ -174,13 +175,16 @@ async function verifyBraceletCompendium(page, language, itemName, set, expectedS
           .replace(/^-+|-+$/g, "") || "unknown";
       const id = entry.id || slug(entry.name);
       const translations = window.SAOContentTranslations;
+      /* The registry holds the source language and the content languages, and every non-source UI
+         language has a content slot, so the page localizes its equipment from the registry. */
+      const bundle = translations[language] || {};
       const nameKey = `equipment.${id}.name`;
       const localizedStats = stats.map(([name, value]) => {
         const statKey = `equipment.${id}.stat.${slug(name)}`;
-        return [translations[language][statKey] || translations.translateKnownTerms(name, language), String(value)];
+        return [bundle[statKey] || translations.translateKnownTerms(name, language), String(value)];
       });
       return {
-        localizedName: translations[language][nameKey] || translations.translateKnownTerms(entry.name, language),
+        localizedName: bundle[nameKey] || translations.translateKnownTerms(entry.name, language),
         setLabel: window.SAOI18n.t("page.ecompendium.labels.set"),
         localizedSet: translations.translateKnownTerms(entry.set, language),
         localizedStats
@@ -189,16 +193,28 @@ async function verifyBraceletCompendium(page, language, itemName, set, expectedS
     { language, itemName, set, stats: expectedStats }
   );
   assert.ok(expected, `${language}: ${itemName} source record exists with ${set}`);
+  /* The tables pin the wording every supported language is expected to render. The value they are
+     compared against is read from the authoritative registry the page localizes from, so the tables
+     have to agree with the shipped glossary: a translation that changes there, or a language that
+     falls back to English while it has a content slot, fails here instead of passing silently. */
   const expectedNames = {
     en: { "Thief's Bracelet": "Thief's Bracelet", "Amethyst Bracelet": "Amethyst Bracelet" },
     es: { "Thief's Bracelet": "Brazalete del ladr\u00f3n", "Amethyst Bracelet": "Brazalete de amatista" },
-    fr: { "Thief's Bracelet": "Bracelet du voleur", "Amethyst Bracelet": "Bracelet d'am\u00e9thyste" }
+    fr: { "Thief's Bracelet": "Bracelet du voleur", "Amethyst Bracelet": "Bracelet d'am\u00e9thyste" },
+    it: { "Thief's Bracelet": "Bracciale del ladro", "Amethyst Bracelet": "Bracciale di ametista" }
   };
   const expectedSets = {
     en: { "Thief Set": "Thief Set", "Amethyst Set": "Amethyst Set" },
     es: { "Thief Set": "Conjunto del ladr\u00f3n", "Amethyst Set": "Conjunto de amatista" },
-    fr: { "Thief Set": "Ensemble du voleur", "Amethyst Set": "Ensemble d'am\u00e9thyste" }
+    fr: { "Thief Set": "Ensemble du voleur", "Amethyst Set": "Ensemble d'am\u00e9thyste" },
+    it: { "Thief Set": "Set del ladro", "Amethyst Set": "Set di ametista" }
   };
+  /* The tables above hold the expected wording per supported language, so a language added to the
+     shared configuration without entries here fails with this message instead of a type error. */
+  assert.ok(
+    expectedNames[language] && expectedSets[language],
+    `${language}: the bracelet expectation tables must cover every supported language`
+  );
   assert.equal(
     expected.localizedName,
     expectedNames[language][itemName],
@@ -235,17 +251,20 @@ async function verifyOccultBonusRows(page, language) {
   const targetName = {
     en: "Occult Amulet",
     es: "Amuleto oculto",
-    fr: "Amulette occulte"
+    fr: "Amulette occulte",
+    it: "Amuleto occulto"
   }[language];
   const tierNames = {
     en: Array.from({ length: 6 }, (_, index) => `${index + 2} Piece Set Bonus`),
     es: Array.from({ length: 6 }, (_, index) => `Bonus de conjunto de ${index + 2} piezas`),
-    fr: Array.from({ length: 6 }, (_, index) => `Bonus d'ensemble de ${index + 2} pi\u00e8ces`)
+    fr: Array.from({ length: 6 }, (_, index) => `Bonus d'ensemble de ${index + 2} pi\u00e8ces`),
+    it: Array.from({ length: 6 }, (_, index) => `Bonus set da ${index + 2} pezzi`)
   }[language];
   const localizedBonus = {
     en: "+1.5/s Health Regeneration",
     es: "+1.5/s de regeneraci\u00f3n de salud",
-    fr: "+1.5/s de r\u00e9g\u00e9n\u00e9ration de sant\u00e9"
+    fr: "+1.5/s de r\u00e9g\u00e9n\u00e9ration de sant\u00e9",
+    it: "+1.5/s di rigenerazione della salute"
   }[language];
   await page.waitForFunction(
     ({ name, labels, value }) => {
@@ -255,7 +274,7 @@ async function verifyOccultBonusRows(page, language) {
       if (!card) return false;
       const rows = Array.from(card.querySelectorAll(".stat-list li"))
         .map((row) => [row.children[0].textContent.trim(), row.children[1].textContent.trim()])
-        .filter(([label]) => /(?:Piece Set Bonus|Bonus de conjunto|Bonus d'ensemble)/.test(label));
+        .filter(([label]) => /(?:Piece Set Bonus|Bonus de conjunto|Bonus d'ensemble|Bonus set da)/.test(label));
       return labels.every((label, index) => rows[index]?.[0] === label && rows[index]?.[1] === value);
     },
     { name: targetName, labels: tierNames, value: localizedBonus }
@@ -264,7 +283,7 @@ async function verifyOccultBonusRows(page, language) {
     const card = cards.find((candidate) => candidate.querySelector(".ecompendium-name")?.textContent.trim() === name);
     return Array.from(card?.querySelectorAll(".stat-list li") || [])
       .map((row) => [row.children[0].textContent, row.children[1].textContent])
-      .filter(([label]) => /(?:Piece Set Bonus|Bonus de conjunto|Bonus d'ensemble)/.test(label));
+      .filter(([label]) => /(?:Piece Set Bonus|Bonus de conjunto|Bonus d'ensemble|Bonus set da)/.test(label));
   }, targetName);
   assert.deepEqual(
     rows,
@@ -294,7 +313,7 @@ async function verifyOccultBonusRows(page, language) {
       for (const category of equipmentCategories) renderedEquipment += await verifyCategory(page, floor, category);
     }
 
-    for (const language of ["en", "es", "fr"]) {
+    for (const language of uiLanguages()) {
       await page.evaluate((nextLanguage) => window.SAOI18n.setLanguage(nextLanguage), language);
       const localeState = await page.evaluate(() => ({
         language: document.documentElement.lang,
@@ -306,7 +325,7 @@ async function verifyOccultBonusRows(page, language) {
     }
 
     await page.setViewportSize({ width: 390, height: 844 });
-    for (const language of ["en", "es", "fr"]) {
+    for (const language of uiLanguages()) {
       await page.evaluate((nextLanguage) => window.SAOI18n.setLanguage(nextLanguage), language);
       const mobileLocale = await page.evaluate(() => ({
         language: document.documentElement.lang,
@@ -321,7 +340,7 @@ async function verifyOccultBonusRows(page, language) {
 
     for (const pagePath of ["/Aincrad/Map/maps.html", "/Fractured%20Underworld/Main%20UI/mainui.html"]) {
       await page.goto(`${rootUrl}${pagePath}?dataset=beta`, { waitUntil: "networkidle", timeout: 120000 });
-      for (const language of ["en", "es", "fr"]) {
+      for (const language of uiLanguages()) {
         await page.evaluate((nextLanguage) => window.SAOI18n.setLanguage(nextLanguage), language);
         const altLabels = await page.evaluate((isUnderworld) => {
           const expectedMap = isUnderworld
@@ -363,7 +382,7 @@ async function verifyOccultBonusRows(page, language) {
         ["Requirement: Vitality", "2"]
       ]
     };
-    for (const language of ["en", "es", "fr"]) {
+    for (const language of uiLanguages()) {
       await verifyBraceletCompendium(
         page,
         language,
@@ -418,7 +437,7 @@ async function verifyOccultBonusRows(page, language) {
           renderedEquipment,
           categories: equipmentCategories,
           floors: ["floor1", "floor2", "floor3"],
-          languages: ["en", "es", "fr"],
+          languages: uiLanguages(),
           mobile: "passed",
           currentEquipment: {
             emptyWeaponCategory: true,

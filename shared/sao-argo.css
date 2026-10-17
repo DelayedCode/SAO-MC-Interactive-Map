@@ -1,0 +1,370 @@
+/* Argo the Info Broker - shared launcher and chat window chrome.
+   Stage 1: interface infrastructure only. There is no game-data answer engine and no
+   persistence here; the conversation lives in memory and is dropped when the window closes.
+
+   Loaded by every page after shared/sao-polish.css. The two interactive map pages add a
+   small offset override in shared/sao-map-ui.css so the launcher sits above the map's zoom
+   bar instead of on top of it (that stylesheet is linked before this one, so it uses a
+   slightly more specific selector to win regardless of order).
+
+   Stacking: the launcher and window stay above ordinary page chrome but below the
+   walkthrough overlay (120), the welcome warning (140), the map context menu (1200) and the
+   dataset dialog (10000). */
+
+#argo-launcher {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 86;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(115, 185, 255, 0.45);
+  border-radius: 50%;
+  background: rgba(9, 16, 28, 0.92);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.16s ease,
+    visibility 0.16s ease;
+}
+
+#argo-launcher:hover {
+  transform: translateY(-2px);
+  border-color: rgba(115, 185, 255, 0.85);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+#argo-launcher:active {
+  transform: translateY(0) scale(0.97);
+}
+
+#argo-launcher:focus-visible {
+  outline: 2px solid #8bb7ff;
+  outline-offset: 3px;
+}
+
+/* Hidden while the window is open. visibility (not display) keeps the box measurable so the
+   closing sphere can still travel to it. */
+#argo-launcher.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#argo-launcher .argo-launcher-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+#argo-window {
+  position: fixed;
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, calc(100vw - 32px));
+  height: min(420px, calc(100vh - 120px));
+  min-width: 232px;
+  min-height: 220px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  border: 1px solid rgba(130, 190, 255, 0.3);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(18, 28, 41, 0.98), rgba(9, 15, 24, 0.98));
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: #eef4ff;
+  font-family: inherit;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px) scale(0.96);
+  transition:
+    opacity 0.17s ease,
+    transform 0.17s ease;
+}
+
+/* The id rule above would beat the user-agent [hidden] rule, so the closed state is explicit. */
+#argo-window[hidden] {
+  display: none;
+}
+
+/* Used only for the one frame needed to measure the window before it is positioned. */
+#argo-window.is-measuring {
+  visibility: hidden;
+}
+
+#argo-window.is-open {
+  opacity: 1;
+  transform: none;
+}
+
+#argo-window .argo-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 8px 8px 10px;
+  border-bottom: 1px solid rgba(130, 190, 255, 0.18);
+  background: rgba(11, 18, 29, 0.6);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#argo-window .argo-titlebar:active {
+  cursor: grabbing;
+}
+
+#argo-window .argo-titlebar:focus-visible {
+  outline: 2px solid #8bb7ff;
+  outline-offset: -2px;
+}
+
+#argo-window .argo-titlebar-image {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(115, 185, 255, 0.45);
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+#argo-window .argo-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: #eef4ff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+}
+
+#argo-window .argo-close {
+  flex: none;
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(136, 183, 255, 0.3);
+  border-radius: 50%;
+  background: rgba(10, 17, 27, 0.9);
+  color: #b9cce3;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+/* The cross itself: two bars centred on the button and rotated into an X. Drawing it instead of
+   rendering a glyph keeps the icon exactly centred - horizontally and vertically - at every size,
+   and keeps it there when the visitor's system substitutes a different font. It inherits the
+   button's color, so the hover and focus colors above still apply. */
+#argo-window .argo-close::before,
+#argo-window .argo-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+#argo-window .argo-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+#argo-window .argo-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+#argo-window .argo-close:hover {
+  border-color: rgba(115, 185, 255, 0.62);
+  background: rgba(17, 29, 43, 0.98);
+  color: #eef4ff;
+}
+
+#argo-window .argo-close:focus-visible {
+  outline: 2px solid #8bb7ff;
+  outline-offset: 2px;
+}
+
+#argo-window .argo-log {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+#argo-window .argo-message {
+  max-width: 92%;
+  margin: 0;
+  padding: 7px 9px;
+  border: 1px solid rgba(130, 190, 255, 0.16);
+  border-radius: 10px;
+  background: rgba(12, 19, 31, 0.72);
+  color: #c8d8ea;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+#argo-window .argo-message.is-user {
+  align-self: flex-end;
+  max-width: 85%;
+  border-color: rgba(115, 185, 255, 0.34);
+  background: rgba(20, 32, 48, 0.9);
+  color: #eef4ff;
+}
+
+#argo-window .argo-message-who {
+  display: block;
+  margin-bottom: 3px;
+  color: #8fb2d6;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* A link to one of the site's own pages, offered under the facts it belongs to. */
+#argo-window .argo-link {
+  color: #9ecbff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+#argo-window .argo-link:focus-visible {
+  outline: 2px solid rgba(130, 190, 255, 0.7);
+  outline-offset: 2px;
+}
+
+#argo-window .argo-form {
+  flex: none;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  border-top: 1px solid rgba(130, 190, 255, 0.18);
+  background: rgba(11, 18, 29, 0.6);
+}
+
+#argo-window .argo-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid rgba(174, 198, 223, 0.24);
+  border-radius: 9px;
+  background: rgba(10, 17, 27, 0.9);
+  color: #eef4ff;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+#argo-window .argo-input::placeholder {
+  color: rgba(185, 204, 227, 0.66);
+}
+
+#argo-window .argo-input:focus-visible {
+  outline: 2px solid #8bb7ff;
+  outline-offset: 1px;
+}
+
+#argo-window .argo-send {
+  flex: none;
+  padding: 8px 12px;
+  border: 1px solid rgba(130, 190, 255, 0.34);
+  border-radius: 9px;
+  background: rgba(12, 19, 31, 0.92);
+  color: #eaf2ff;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease;
+}
+
+#argo-window .argo-send:hover {
+  border-color: rgba(115, 185, 255, 0.62);
+  background: rgba(24, 38, 58, 0.96);
+}
+
+#argo-window .argo-send:focus-visible {
+  outline: 2px solid #8bb7ff;
+  outline-offset: 2px;
+}
+
+/* Temporary element for the closing animation: it travels from the window's centre to the
+   launcher's centre and is removed as soon as the animation settles. */
+.argo-sphere {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 111;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(163, 216, 255, 0.95), rgba(56, 120, 190, 0.92));
+  box-shadow: 0 0 12px rgba(115, 185, 255, 0.5);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@media (max-width: 480px) {
+  #argo-window {
+    height: min(420px, calc(100vh - 96px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #argo-launcher,
+  #argo-window {
+    transition: none;
+  }
+
+  #argo-launcher:hover,
+  #argo-launcher:active {
+    transform: none;
+  }
+
+  .argo-sphere {
+    display: none;
+  }
+}

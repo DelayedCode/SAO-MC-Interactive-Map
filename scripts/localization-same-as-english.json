@@ -5,46 +5,85 @@
       "values": ["."],
       "reason": "Punctuation-only source value has no language-specific lexical content.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "equipment.resource",
       "values": ["Allium", "Col"],
       "reason": "Allium is a botanical genus name and Col is the canonical in-game currency name; both are intentionally retained in the application glossary.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "equipment.resource",
       "values": [
         "Andalousite",
         "Anthracite",
-        "Azurite",
         "Carapace d'Ika",
         "Ficelle de bauxite",
         "Glycine",
         "Grenat",
         "Jais",
-        "Malachite",
         "Turquoise"
       ],
       "reason": "The source is already the established French lexical or canonical item form; Spanish has an existing distinct counterpart.",
       "spanishStatus": "translated",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "translated"
+      }
+    },
+    {
+      "field": "equipment.resource",
+      "values": ["Azurite", "Malachite"],
+      "reason": "The shared equipment glossary defines Azurite and Malachite with the same French and Italian values; Spanish has an existing distinct counterpart.",
+      "spanishStatus": "translated",
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "equipment.stat",
-      "values": ["Mana", "Unique"],
-      "reason": "Verified French UI terminology uses these exact forms; Spanish has an existing distinct counterpart.",
+      "values": ["Unique"],
+      "reason": "Verified French UI terminology uses this exact form; Spanish and Italian have an existing distinct counterpart.",
       "spanishStatus": "translated",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "translated"
+      }
+    },
+    {
+      "field": "equipment.stat",
+      "values": ["Mana"],
+      "reason": "Mana is the form the shared equipment glossary defines for French and Italian; Spanish has an existing distinct counterpart.",
+      "spanishStatus": "translated",
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
+    },
+    {
+      "field": "equipment.stat",
+      "values": ["Stamina"],
+      "reason": "Stamina is the form the shared equipment glossary defines for Italian (\"Stamina massima\", \"Rigenerazione della stamina\"); Spanish and French have their own distinct counterparts.",
+      "spanishStatus": "translated",
+      "frenchStatus": "translated",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "equipment.name",
       "values": [
         "Andalousite",
         "Anthracite",
-        "Azurite",
         "Basalte",
         "Bracelet de Kazor",
         "Bracelet Gluant",
@@ -53,9 +92,7 @@
         "Corindon",
         "Dard",
         "Ficelle de bauxite",
-        "Fluorite",
         "Lien de la Sylve",
-        "Malachite",
         "Onyx",
         "Pyrite",
         "Rune d'Halloween",
@@ -64,21 +101,70 @@
       ],
       "reason": "Verified French mineral, weapon, or canonical proper-name form; Spanish has an existing distinct counterpart.",
       "spanishStatus": "translated",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "translated"
+      }
+    },
+    {
+      "field": "equipment.name",
+      "values": ["Azurite", "Fluorite", "Malachite"],
+      "reason": "The shared equipment glossary defines these mineral names with the same French and Italian values; Spanish has an existing distinct counterpart.",
+      "spanishStatus": "translated",
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
+    },
+    {
+      "field": "equipment.name",
+      "values": ["Lepidolite"],
+      "reason": "Lepidolite is the form the shared equipment glossary defines for Italian; Spanish and French have their own distinct counterparts.",
+      "spanishStatus": "translated",
+      "frenchStatus": "translated",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "equipment.name",
       "values": ["Nodachi"],
-      "reason": "Nodachi is the established name of this Japanese weapon and is intentionally unchanged in both language glossaries.",
+      "reason": "Nodachi is the established name of this Japanese weapon and is intentionally unchanged in every language glossary.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "map.type",
-      "values": ["Biome", "Boss"],
-      "reason": "The shared map glossary explicitly defines the French UI forms as Biome and Boss.",
+      "values": ["Biome"],
+      "reason": "The shared map glossary explicitly defines the French and Italian UI forms as Biome and Bioma; Spanish has an existing distinct counterpart.",
       "spanishStatus": "translated",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "translated"
+      }
+    },
+    {
+      "field": "map.type",
+      "values": ["Boss"],
+      "reason": "The shared map glossary explicitly defines the French and Italian UI form as Boss; Spanish has an existing distinct counterpart.",
+      "spanishStatus": "translated",
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
+    },
+    {
+      "field": "map.type",
+      "values": ["Dungeon"],
+      "reason": "The shared map glossary explicitly defines the Italian UI form as Dungeon (\"Dungeon dell'Alveare di Melliona\"); Spanish and French have their own distinct counterparts.",
+      "spanishStatus": "translated",
+      "frenchStatus": "translated",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "bestiary.mobName",
@@ -97,23 +183,52 @@
         "Vyrmos",
         "Yula"
       ],
-      "reason": "The shared bestiary glossary explicitly defines these canonical mob names with the same Spanish and French values.",
+      "reason": "The shared bestiary glossary explicitly defines these canonical mob names with the same value in every language.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
+    },
+    {
+      "field": "bestiary.mobName",
+      "values": ["Nymbréa"],
+      "reason": "The shared bestiary glossary defines this canonical mob name with the same value in every language.",
+      "spanishStatus": "SAME_AS_ENGLISH",
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
+    },
+    {
+      "field": "bestiary.mobName",
+      "values": ["Nephentes"],
+      "reason": "Nephentes is the form the shared bestiary glossary defines for Italian; Spanish and French keep their own accented spellings.",
+      "spanishStatus": "translated",
+      "frenchStatus": "translated",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "equipment.resource",
       "values": ["Flearvae"],
-      "reason": "The shared equipment glossary explicitly defines Flearvae as the canonical unchanged resource name in both languages.",
+      "reason": "The shared equipment glossary explicitly defines Flearvae as the canonical unchanged resource name in every language.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "map.mobAreaTitle",
       "values": ["Arakh'Nol", "Vallhat"],
-      "reason": "Translated map descriptions preserve these canonical area names verbatim in both languages.",
+      "reason": "Translated map descriptions preserve these canonical area names verbatim in every language.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "quest.city",
@@ -130,9 +245,12 @@
         "Virelune",
         "Zumfut"
       ],
-      "reason": "Existing translated quest and map descriptions preserve these canonical location names verbatim in Spanish and French.",
+      "reason": "Existing translated quest and map descriptions preserve these canonical location names verbatim in every language.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "map.title",
@@ -168,28 +286,50 @@
       ],
       "reason": "The project preserves these canonical names inside localized bestiary, boss, item, and description entries.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
+    },
+    {
+      "field": "map.title",
+      "values": ["Nymbréa"],
+      "reason": "The shared map and bestiary glossaries define this canonical name with the same value in every language.",
+      "spanishStatus": "SAME_AS_ENGLISH",
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "quest.questName",
       "values": ["N/A"],
-      "reason": "Standard null/absence notation intentionally remains N/A in both languages.",
+      "reason": "Standard null/absence notation intentionally remains N/A in every language.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "quest.questName",
       "values": ["Hater du Vert"],
-      "reason": "The French title is intentionally retained as the canonical title; Spanish has an explicit translated counterpart.",
+      "reason": "The French title is intentionally retained as the canonical title in French and Italian; Spanish has an explicit translated counterpart.",
       "spanishStatus": "translated",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "equipment.name",
       "values": ["Champignono", "Flarevae"],
       "reason": "The supplied counterparts are identical to the established source names.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "map.title",
@@ -245,14 +385,20 @@
       ],
       "reason": "The supplied counterparts are identical to the established source names.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "quest.city",
       "values": ["Hanaka", "Marome", "Weisslum", "Lysaat", "Sylinga"],
-      "reason": "The supplied counterparts are identical to the established source city names.",
+      "reason": "The supplied counterparts are identical to the established source city names in every language.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     },
     {
       "field": "quest.npcName",
@@ -335,9 +481,22 @@
         "Zik",
         "Zilda"
       ],
-      "reason": "The supplied counterparts are identical to the established source names or handles.",
+      "reason": "The supplied counterparts are identical to the established source names or handles in every language.",
       "spanishStatus": "SAME_AS_ENGLISH",
-      "frenchStatus": "SAME_AS_ENGLISH"
+      "frenchStatus": "SAME_AS_ENGLISH",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
+    },
+    {
+      "field": "quest.npcName",
+      "values": ["Timer"],
+      "reason": "Timer is the handle the shared glossary keeps unchanged for Italian; Spanish and French have distinct counterparts.",
+      "spanishStatus": "translated",
+      "frenchStatus": "translated",
+      "statuses": {
+        "it": "SAME_AS_ENGLISH"
+      }
     }
   ]
 }

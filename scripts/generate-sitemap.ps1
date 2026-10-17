@@ -7,7 +7,9 @@ Set-Location $RootPath
 $workspaceRoot = (Resolve-Path ".").Path
 
 $htmlFiles = Get-ChildItem -Recurse -File -Filter *.html |
-  Where-Object { $_.FullName -notmatch "[\\/](\.git|\.venv|\.devin|node_modules|dist|coverage)[\\/]" }
+  Where-Object { $_.FullName -notmatch "[\\/](\.git|\.venv|\.devin|node_modules|dist|coverage)[\\/]" } |
+  # Argo's data frame is a hidden helper document, not a page: it is never linked, never indexed.
+  Where-Object { $_.Name -ne "sao-argo-data-frame.html" }
 
 function Convert-ToUrlPath {
   param([string]$Path)

@@ -2,14 +2,21 @@
 
    Current Data ships the Accessory Blacksmith (one smith per accessory set), the Secret Accessory
    Blacksmith and Occult Merchant
-   waypoints on floor 1, plus a copy of every Beta Biome-category waypoint and of every Beta Boss
-   Spawn, Dungeon and Farming Spot. Aincrad/Map/maps_current.js is their single source and every
+   waypoints on floor 1, the Materials Blacksmith locations (the Sewer Reshaper and the Cabinetmaker),
+   the Floor 1 World Event, the Local Lumberjack loot buyer, the two accessory blacksmiths and the
+   Equipment Blacksmith the accessory update adds (the Wolf and Bandit Accessories and the Nodachi
+   Blacksmith) and the Candelia and Local Miner loot buyers, plus a copy of every Beta
+   Biome-category waypoint and of every Beta Boss
+   Spawn, Dungeon and Farming Spot - except the Birch Forest farming spot, which the accessory update
+   merges into the renamed Oak/Birch Forest. Aincrad/Map/maps_current.js is their single source and
+   every
    marker carries `dataset: "current"`, which shared/sao-datasets.js uses to keep them out of Beta
    mode. The same file carries the eight Current Data side quest markers (`sq-1` .. `sq-8`), which
    keep the map's existing Side Quest category. These checks pin the supplied
    coordinates and categories, the copied biome/boss/dungeon/farming waypoints, the three supplied
-   boss-spawn corrections (the added Corrupted Pumba, the moved Albal, the removed Kazor), the two
-   underground equipment locations, the category buttons behind them, and the Beta/Current split. */
+   boss-spawn corrections (the added Corrupted Pumba, the moved Albal, the removed Kazor), the three
+   underground equipment locations, the category buttons behind them, the three merchant categories
+   Current Data no longer carries, and the Beta/Current split. */
 "use strict";
 
 const assert = require("node:assert/strict");
@@ -17,8 +24,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const { readFile } = require("./harness-helpers");
+const { uiLanguages } = require("./localization-languages");
 
 const root = path.resolve(__dirname, "..");
+/* The map category labels live in the UI dictionary, so every supported UI language has to carry one.
+   The list is read from the shared configuration (scripts/localization-languages.js) so a new
+   language is covered here without editing this file. */
+const UI_LANGUAGES = uiLanguages();
 
 /* Load the Aincrad map data the way the page does: one shared DATA object created by mapData.js and
    filled in by the floor files, the Main Questline file and the Current Data file. */
@@ -54,9 +66,9 @@ const EXPECTED_WAYPOINTS = [
   { id: "current-accessories-blacksmith-skeleton", title: "Skeleton Accessories", category: "accessoriesBlacksmith", x: 1226, z: 3601 },
   { id: "current-secret-accessory-blacksmith-ice-bracelet", title: "Bracelet of Ice", category: "secretAccessoryBlacksmith", x: 2416, z: 1800 },
   { id: "current-secret-accessory-blacksmith-aragorn-necklace", title: "Necklace of Aragorn", category: "secretAccessoryBlacksmith", x: 1114, z: 1172 },
-  { id: "current-secret-accessory-blacksmith-sticky-ring", title: "Sticky Ring", category: "secretAccessoryBlacksmith", x: 390, z: 3064 },
+  { id: "current-secret-accessory-blacksmith-sticky-ring", title: "Secret Sticky Ring Merchant", category: "secretAccessoryBlacksmith", x: 390, z: 3064 },
   { id: "current-secret-accessory-blacksmith-skeleton-skull", title: "Skeleton Skull", category: "secretAccessoryBlacksmith", x: 1163, z: 3546 },
-  { id: "current-secret-accessory-blacksmith-deer-belt", title: "Belt of the Stags", category: "secretAccessoryBlacksmith", x: 3650, z: 1331 },
+  { id: "current-secret-accessory-blacksmith-deer-belt", title: "Secret Deer Belt Merchant", category: "secretAccessoryBlacksmith", x: 3650, z: 1331 },
   { id: "current-secret-accessory-blacksmith-leviathan-ring", title: "Ring of the Leviathan", category: "secretAccessoryBlacksmith", x: 1316, z: 2096 },
   { id: "current-secret-accessory-blacksmith-gloves-of-the-wolves", title: "Secret Accessory Blacksmith", category: "secretAccessoryBlacksmith", x: 2494, z: 3700 },
   { id: "current-occult-merchant-gloves", title: "Occult Merchant - Gloves", category: "occultMerchants", x: 3371, z: 1698 },
@@ -77,6 +89,7 @@ const EXPECTED_WAYPOINTS = [
   { id: "current-loot-buyer-fallen-labyrinth", title: "Labyrinth of the Fallen - Loot Buyer", category: "lootBuyers", x: 2403, z: 2385 },
   { id: "current-loot-buyer-fallen-labyrinth-2", title: "Labyrinth of the Fallen (2) - Loot Buyer", category: "lootBuyers", x: 2389, z: 2408 },
   { id: "current-loot-buyer-aragorn", title: "Aragorn's Lair - Loot Buyer", category: "lootBuyers", x: 1020, z: 1176 },
+  { id: "current-alchemist", title: "Alchemist", category: "alchemist", x: 1771, z: 4097 },
   { id: "current-starting-merchant", title: "Starting Merchant", category: "toolMerchants", x: 1787, z: 4179 },
   { id: "current-starting-town-tools", title: "F1 - Starting Town - Tools", category: "toolMerchants", x: 1787, z: 4161 },
   { id: "current-consumables-merchant-purification-alchemist", title: "F1 - PvP Purification Alchemist", category: "consumablesMerchants", x: 1813, z: 4180 },
@@ -84,7 +97,23 @@ const EXPECTED_WAYPOINTS = [
   { id: "current-dungeon-guard-geldorack", title: "F1 - Geldorack Dungeon Guard - Starting Town", category: "keyBlacksmith", x: 4281, z: 3893 },
   { id: "current-dungeon-guard-fallen-labyrinth", title: "F1 - Fallen Labyrinth Dungeon Guard - Tolbana", category: "keyBlacksmith", x: 2378, z: 2410 },
   { id: "current-dungeon-guard-xal-zirith", title: "F1 - Xal'Zirith Dungeon Guard - Candelia", category: "keyBlacksmith", x: 1013, z: 1189 },
-  { id: "current-key-blacksmith-kobold", title: "Key Blacksmith", category: "keyBlacksmith", x: 3396, z: 1081 }
+  { id: "current-key-blacksmith-kobold", title: "Key Blacksmith", category: "keyBlacksmith", x: 3396, z: 1081 },
+  /* The waypoints the later Current-Data update adds: the Sylve Accessories blacksmith, the secret
+     Gelatinous Cloak location, the Local Lumberjack loot buyer, the two Materials Blacksmith
+     locations (the underground Sewer Reshaper and the Cabinetmaker) and the Floor 1 World Event. */
+  { id: "current-accessories-blacksmith-sylve", title: "Sylve Accessories", category: "accessoriesBlacksmith", x: 1538, z: 3525 },
+  { id: "current-secret-accessory-blacksmith-gelatinous-cloak", title: "Secret Gelatinous Cloak", category: "secretAccessoryBlacksmith", x: 2854, z: 4657 },
+  { id: "current-loot-buyer-local-lumberjack", title: "Local Lumberjack", category: "lootBuyers", x: 2467, z: 4320 },
+  /* The waypoints the accessory update adds: the Wolf and Bandit accessory blacksmiths, the first
+     Equipment Blacksmith (the Nodachi Blacksmith) and the Candelia and Local Miner loot buyers. */
+  { id: "current-accessories-blacksmith-wolf", title: "Wolf Accessories", category: "accessoriesBlacksmith", x: 2397, z: 3568 },
+  { id: "current-accessories-blacksmith-bandit", title: "Bandit Accessories", category: "accessoriesBlacksmith", x: 4169, z: 3933 },
+  { id: "current-equipment-blacksmith-nodachi", title: "Nodachi Blacksmith", category: "equipmentBlacksmith", x: 3226, z: 1456 },
+  { id: "current-loot-buyer-candelia", title: "Candelia", category: "lootBuyers", x: 2029, z: 790 },
+  { id: "current-loot-buyer-local-miner", title: "Local Miner", category: "lootBuyers", x: 2400, z: 3560 },
+  { id: "current-materials-blacksmith-sewer-reshaper", title: "Sewer Reshaper", category: "materialsBlacksmith", x: 2864, z: 4740 },
+  { id: "current-materials-blacksmith-cabinetmaker", title: "Cabinetmaker", category: "materialsBlacksmith", x: 2461, z: 4301 },
+  { id: "current-world-event-floor-1", title: "Floor 1 World Event", category: "worldEvents", x: 1947, z: 1990 }
 ];
 
 /* The eight Current Data side quests ship as map markers in the same file: the `sq-` id, the
@@ -185,11 +214,30 @@ assert.equal(
   betaDungeons.length,
   "Current Data ships exactly the seven transferred dungeons, with the Kobold key blacksmith moved out of the category"
 );
-assert.equal(currentFarmingSpots.length, 5, "Current Data ships all 5 supplied farming spots");
+assert.equal(currentFarmingSpots.length, 4, "Current Data ships the four supplied farming spots");
 
 const REMOVED_BOSS = { title: "Kazor", x: 2442, z: 957 };
 const MOVED_BOSS = { title: "Albal", fromX: 2392, fromZ: 3832, toX: 2513, toZ: 3722 };
 const ADDED_BOSS = { title: "Corrupted Pumba", x: 1987, z: 3636 };
+/* The supplied boss-name correction: the Current copy of the ruins dungeon boss carries the exact
+   bestiary name "Narax the Cursed Skeleton", while Beta-Test Data keeps its own spelling, so the
+   copy is recognised by its coordinates instead of its title. */
+const RENAMED_BOSS = {
+  betaTitle: "Narax Cursed Skeleton",
+  currentTitle: "Narax the Cursed Skeleton",
+  x: 2722,
+  z: 4332
+};
+/* The supplied resource-name corrections for the four Current farming spots: the Beta-Test copies
+   keep their own wording, the Current copies use the confirmed item names. The Oak Forest copy took
+   the supplied Oak/Birch Forest name and the Birch Forest copy is gone, so the Current set no longer
+   mirrors the Beta set one for one; both are checked below. */
+const FARMING_DROPS = {
+  "West Mines": ["Coal Ore", "Copper Ingot", "Iron Ingot"],
+  "East Mines": ["Coal Ore", "Copper Ingot", "Iron Ingot"],
+  "Oak/Birch Forest": ["Oak Log"],
+  Farm: ["Allium Flower", "Wheat"]
+};
 const copiedMarkers = [...currentBossSpawns, ...transferredDungeons, ...currentFarmingSpots];
 const copiedSignatures = new Set(copiedMarkers.map(biomeSignature));
 betaBossSpawns.forEach((marker) => {
@@ -197,15 +245,42 @@ betaBossSpawns.forEach((marker) => {
   const removed = marker.title === REMOVED_BOSS.title && atBetaPosition;
   const moved =
     marker.title === MOVED_BOSS.title && marker.coords.x === MOVED_BOSS.fromX && marker.coords.z === MOVED_BOSS.fromZ;
+  const renamed =
+    marker.title === RENAMED_BOSS.betaTitle && marker.coords.x === RENAMED_BOSS.x && marker.coords.z === RENAMED_BOSS.z;
   assert.equal(
     copiedSignatures.has(biomeSignature(marker)),
-    !(removed || moved),
+    !(removed || moved || renamed),
     removed || moved
       ? `${marker.title} at its Beta position (${marker.coords.x}, ${marker.coords.z}) is not copied`
-      : `the Current ${marker.title} copy keeps the Beta title, floor and coordinates`
+      : renamed
+        ? `${marker.title} keeps its Beta title and is copied under the corrected bestiary name`
+        : `the Current ${marker.title} copy keeps the Beta title, floor and coordinates`
   );
 });
+/* Every Beta Dungeon is copied unchanged. The Farming Spots carry the supplied update: the Oak
+   Forest copy takes the Oak/Birch Forest name while keeping the Beta floor and coordinates, and the
+   Birch Forest copy is gone, merged into it, so those two are matched by name and position instead of
+   by an unchanged signature. */
+const RENAMED_FOREST = { betaTitle: "Oak Forest", currentTitle: "Oak/Birch Forest" };
+const REMOVED_FOREST = { title: "Birch Forest", x: 1788, z: 1196 };
 [...betaDungeons, ...betaFarmingSpots].forEach((marker) => {
+  if (marker.title === REMOVED_FOREST.title) {
+    assert.equal(
+      copiedMarkers.filter((candidate) => candidate.title === REMOVED_FOREST.title).length,
+      0,
+      "Current Data ships no Birch Forest farming spot"
+    );
+    return;
+  }
+  if (marker.title === RENAMED_FOREST.betaTitle) {
+    assert.ok(
+      copiedSignatures.has(
+        biomeSignature({ title: RENAMED_FOREST.currentTitle, floor: marker.floor, coords: marker.coords })
+      ),
+      "the Current Oak/Birch Forest keeps the Beta Oak Forest floor and coordinates"
+    );
+    return;
+  }
   assert.ok(
     copiedSignatures.has(biomeSignature(marker)),
     `the Current ${marker.title} copy keeps the Beta title, floor and coordinates`
@@ -243,6 +318,29 @@ assert.equal(
   "the old Albal position is gone from Current Data"
 );
 
+/* --- The corrected boss name --------------------------------------------------
+   The Current copy carries the exact bestiary name so its View Waypoint Info button resolves,
+   Beta-Test Data keeps the spelling it already shipped. */
+const renamedBossCopy = copiedMarkers.find(
+  (marker) =>
+    marker.category === "bossSpawns" && marker.coords.x === RENAMED_BOSS.x && marker.coords.z === RENAMED_BOSS.z
+);
+assert.ok(renamedBossCopy, `the Current copy of the (${RENAMED_BOSS.x}, ${RENAMED_BOSS.z}) boss exists`);
+assert.equal(renamedBossCopy.title, RENAMED_BOSS.currentTitle, "the corrected boss copy uses the bestiary name");
+assert.equal(renamedBossCopy.floor, "floor1", "the corrected boss copy keeps its floor");
+assert.equal(
+  copiedMarkers.filter((marker) => marker.title === RENAMED_BOSS.betaTitle).length,
+  0,
+  "no Current marker keeps the old boss spelling"
+);
+assert.ok(
+  betaBossSpawns.some(
+    (marker) =>
+      marker.title === RENAMED_BOSS.betaTitle && marker.coords.x === RENAMED_BOSS.x && marker.coords.z === RENAMED_BOSS.z
+  ),
+  "Beta-Test Data keeps its own boss spelling"
+);
+
 /* Every copy is Current Data, keeps its marker type, and keeps the Beta metadata (drops,
    description and the underground flag) unless it is one of the three corrected markers. */
 copiedMarkers.forEach((marker) => {
@@ -253,8 +351,22 @@ copiedMarkers.forEach((marker) => {
   assert.ok(["Boss", "Dungeon", "Biome"].includes(marker.type), `${marker.title} keeps its marker type`);
   assert.equal(marker.floor, original ? original.floor : "floor1", `${marker.title} keeps its floor`);
   if (original) {
-    assert.deepEqual(marker.drops, original.drops, `${marker.title} keeps the Beta drops`);
-    assert.equal(marker.description, original.description, `${marker.title} keeps the Beta description`);
+    if (marker.category === "farmingSpots") {
+      /* The five Current farming spots carry the confirmed resource names instead of the Beta
+         wording, so their drops and the description that lists them are checked against those.
+         Array.from copies the VM-realm array into this realm before the comparison. */
+      assert.deepEqual(
+        Array.from(marker.drops),
+        FARMING_DROPS[marker.title],
+        `${marker.title} uses the confirmed resource names`
+      );
+      FARMING_DROPS[marker.title].forEach((resource) => {
+        assert.ok(marker.description.includes(resource), `${marker.title} description names ${resource}`);
+      });
+    } else {
+      assert.deepEqual(marker.drops, original.drops, `${marker.title} keeps the Beta drops`);
+      assert.equal(marker.description, original.description, `${marker.title} keeps the Beta description`);
+    }
     assert.equal(
       marker.underground === true,
       original.underground === true,
@@ -262,6 +374,38 @@ copiedMarkers.forEach((marker) => {
     );
   }
 });
+
+/* The renamed forest keeps everything the Current Oak Forest shipped: its id, category, floor,
+   coordinates, drops, surface placement and description shape. Only the name changed, so the
+   description follows the marker naming convention with the new name. */
+const RENAMED_FOREST_ID = "current-oak-forest";
+const renamedForest = data[RENAMED_FOREST_ID];
+assert.ok(renamedForest, "the Current Oak/Birch Forest farming spot exists under the Oak Forest id");
+assert.equal(renamedForest.title, RENAMED_FOREST.currentTitle, "the renamed forest carries the supplied name");
+assert.equal(renamedForest.category, "farmingSpots", "the renamed forest stays a farming spot");
+assert.equal(renamedForest.floor, "floor1", "the renamed forest keeps its floor");
+assert.deepEqual(
+  { x: renamedForest.coords.x, z: renamedForest.coords.z },
+  { x: 2459, z: 4320 },
+  "the renamed forest keeps the Oak Forest coordinates"
+);
+assert.deepEqual(
+  Array.from(renamedForest.drops),
+  FARMING_DROPS[RENAMED_FOREST.currentTitle],
+  "the renamed forest keeps its drops"
+);
+assert.equal(renamedForest.underground === true, false, "the renamed forest is a surface marker");
+assert.ok(
+  renamedForest.description.startsWith(`${RENAMED_FOREST.currentTitle} — Coordinates X: 2459 Z: 4320.`),
+  "the renamed forest description carries the new name and the unchanged coordinates"
+);
+assert.equal(
+  copiedMarkers.filter(
+    (marker) => marker.category === "farmingSpots" && marker.coords.x === REMOVED_FOREST.x && marker.coords.z === REMOVED_FOREST.z
+  ).length,
+  0,
+  "no farming spot sits at the removed Birch Forest coordinates"
+);
 
 /* --- The Kobold key blacksmith is no longer a dungeon loot-info marker --------
    The entry was supplied as "Kobold Dungeon - Loot Info" in the Dungeon category. It is a Key
@@ -327,7 +471,7 @@ assert.doesNotMatch(
 );
 assert.match(
   readFile("shared/sao-content-translations.js"),
-  /"Key Blacksmith": \["[^"]+", "[^"]+"\]/,
+  /"Key Blacksmith": \["[^"]+", "[^"]+"(?:, "[^"]+")?\]/,
   "the Key Blacksmith label keeps its Spanish and French translation"
 );
 
@@ -336,7 +480,7 @@ assert.match(
    secret accessory blacksmiths the update names carry it. Their names, category, floor and
    coordinates are unchanged, and no other Current waypoint becomes underground. */
 const UNDERGROUND_EQUIPMENT = [
-  { id: "current-secret-accessory-blacksmith-deer-belt", title: "Belt of the Stags", x: 3650, z: 1331 },
+  { id: "current-secret-accessory-blacksmith-deer-belt", title: "Secret Deer Belt Merchant", x: 3650, z: 1331 },
   { id: "current-secret-accessory-blacksmith-leviathan-ring", title: "Ring of the Leviathan", x: 1316, z: 2096 }
 ];
 UNDERGROUND_EQUIPMENT.forEach((expected) => {
@@ -358,8 +502,17 @@ assert.deepEqual(
     .filter((marker) => marker.category === "secretAccessoryBlacksmith" && marker.underground === true)
     .map((marker) => marker.title)
     .sort(),
-  ["Belt of the Stags", "Ring of the Leviathan"],
-  "only the two supplied equipment locations are underground"
+  ["Ring of the Leviathan", "Secret Deer Belt Merchant", "Secret Gelatinous Cloak"],
+  "the three supplied equipment locations are underground"
+);
+/* The Materials Blacksmith category ships two locations, and only the Sewer Reshaper is supplied as
+   an underground one. */
+assert.deepEqual(
+  currentWaypoints
+    .filter((marker) => marker.category === "materialsBlacksmith" && marker.underground === true)
+    .map((marker) => marker.title),
+  ["Sewer Reshaper"],
+  "the Sewer Reshaper is underground and the Cabinetmaker is not"
 );
 
 /* --- The waypoint categories exist in the map's own architecture ------------- */
@@ -381,12 +534,83 @@ assert.match(readFile("Aincrad/Map/maps.js"), /secretAccessoryBlacksmith:\s*fals
   );
   assert.equal(
     (readFile("shared/sao-i18n.js").match(new RegExp(`${category}:\\s*"`, "g")) || []).length,
-    3,
-    `the ${category} label is translated in English, Spanish and French`
+    UI_LANGUAGES.length,
+    `the ${category} label is translated in every supported language`
   );
   assert.match(readFile("shared/sao-color-utils.js"), new RegExp(`${category}:\\s*"#`), `the ${category} category keeps its colour`);
 });
 assert.match(readFile("shared/sao-map-helpers.js"), /secretAccessoryBlacksmith/, "the Secret Accessory Blacksmith category keeps its icon and grouping");
+
+/* --- The categories this Current-Data update adds exist in the map's architecture --------------
+   The Materials Blacksmith, the Equipment Blacksmith and the World Event are declared in the
+   adapter, start disabled in the page state, own a sidebar button with a localized label in every
+   supported language, carry a JourneyMap colour and - for the craftsman categories - the shared
+   craftsman icon and grouping. */
+["materialsBlacksmith", "equipmentBlacksmith", "worldEvents"].forEach((category) => {
+  assert.match(
+    readFile("Aincrad/Map/adapter.js"),
+    new RegExp(`${category}:\\s*true`),
+    `the map adapter declares the ${category} category`
+  );
+  assert.match(
+    readFile("Aincrad/Map/maps.js"),
+    new RegExp(`${category}:\\s*false`),
+    `the ${category} category starts disabled`
+  );
+  assert.match(
+    readFile("Aincrad/Map/maps.html"),
+    new RegExp(`data-category="${category}"`),
+    `the map sidebar carries the ${category} button`
+  );
+  assert.match(
+    readFile("Aincrad/Map/maps.html"),
+    new RegExp(`data-i18n="page\\.maps\\.categories\\.${category}"`),
+    `the ${category} button uses the localized label`
+  );
+  assert.equal(
+    (readFile("shared/sao-i18n.js").match(new RegExp(`${category}:\\s*"`, "g")) || []).length,
+    UI_LANGUAGES.length,
+    `the ${category} label is translated in every supported language`
+  );
+  assert.match(
+    readFile("shared/sao-color-utils.js"),
+    new RegExp(`${category}:\\s*"#`),
+    `the ${category} category keeps its colour`
+  );
+});
+assert.match(
+  readFile("shared/sao-map-helpers.js"),
+  /materialsBlacksmith/,
+  "the Materials Blacksmith category keeps its icon and grouping"
+);
+assert.match(
+  readFile("shared/sao-map-helpers.js"),
+  /equipmentBlacksmith/,
+  "the Equipment Blacksmith category keeps its icon and grouping"
+);
+assert.match(
+  readFile("shared/sao-map-helpers.js"),
+  /worldEvent:/,
+  "the World Event glyph is part of the shared marker icon library"
+);
+
+/* --- The three merchant categories Current Data no longer carries -------------------------------
+   The Accessories Merchant, the Equipment Merchant and the Traveling Merchants have no Current Data
+   waypoint behind them, so they are declared as Beta-only categories: their buttons disappear while
+   Current Data is active and Beta keeps every button and marker. */
+["accessoriesMerchants", "equipmentMerchants", "travelingMerchants"].forEach((category) => {
+  const adapterSource = readFile("Aincrad/Map/adapter.js");
+  assert.equal(
+    (adapterSource.match(new RegExp(`${category}:\\s*true`, "g")) || []).length,
+    2,
+    `the ${category} category stays declared and is listed as Beta-only`
+  );
+  assert.equal(
+    currentWaypoints.filter((marker) => marker.category === category).length,
+    0,
+    `Current Data ships no ${category} waypoint`
+  );
+});
 
 /* --- The CastleMist biome is renamed Castlebrume ------------------------------
    The rename reaches the biome marker of both datasets, the side quest NPC descriptions that name
@@ -438,8 +662,8 @@ assert.doesNotMatch(
 );
 assert.match(
   readFile("shared/sao-content-translations.js"),
-  /Castlebrume: \["[^"]+", "[^"]+"\]/,
-  "the renamed biome keeps its Spanish and French label"
+  /Castlebrume: \["[^"]+", "[^"]+", "[^"]+"\]/,
+  "the renamed biome keeps its Spanish, French and Italian labels"
 );
 
 /* --- The markers are Current Data only --------------------------------------- */

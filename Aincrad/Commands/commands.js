@@ -568,7 +568,7 @@ function initCommandsRuntime() {
     if (status) {
       status.textContent = t("page.commands.statusShown", {
         count: visibleEntries.length,
-        suffix: visibleEntries.length === 1 ? "" : "s",
+        suffix: visibleEntries.length === 1 ? "" : t("ui.common.pluralSuffix"),
         category: categoryLabel
       });
     }

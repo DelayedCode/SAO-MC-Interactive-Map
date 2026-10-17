@@ -1159,20 +1159,10 @@
       >
         <path d="M12 7H2M2 7l4-4M2 7l4 4" />
       </svg>
-      <span class="welcome-language-hint-text">
-        <span class="welcome-language-hint-row"
-          ><span class="welcome-language-hint-lang" aria-hidden="true">EN</span
-          ><span lang="en">Change Language Here!</span></span
-        >
-        <span class="welcome-language-hint-row"
-          ><span class="welcome-language-hint-lang" aria-hidden="true">FR</span
-          ><span lang="fr">Changez de langue ici !</span></span
-        >
-        <span class="welcome-language-hint-row"
-          ><span class="welcome-language-hint-lang" aria-hidden="true">ES</span
-          ><span lang="es">¡Cambia el idioma aquí!</span></span
-        >
-      </span>
+      <!-- The hint rows are generated from the shared language configuration (SAOI18n) so the hint
+           can never drift from the supported languages: each row is one supported language, labelled
+           with that language's own dictionary wording. See renderLanguageHint() below. -->
+      <span class="welcome-language-hint-text"></span>
     </aside>
 
     <div id="discord-overlay" class="overlay" aria-hidden="true">
@@ -1350,12 +1340,9 @@
                 applyTranslations: (root) => i18n?.applyTranslations?.(root),
                 getLanguage: () => i18n?.getLanguage?.() || "en",
                 setLanguage: (nextLanguage) => i18n?.setLanguage?.(nextLanguage),
-                /* Warning button order: English, Français, Español. The available languages still come
-             from SAOI18n.SUPPORTED_LANGUAGES, so the shared language system stays the only source. */
-                getLanguages: () =>
-                  ["en", "fr", "es"].filter((language) =>
-                    (i18n?.SUPPORTED_LANGUAGES || ["en", "es", "fr"]).includes(language)
-                  ),
+                /* The warning's language buttons come from the shared language system, which owns both
+                   the supported list and its user-facing order; this page keeps no copy of either. */
+                getLanguages: () => i18n?.getSupportedLanguages?.() || [],
                 getLanguageLabel: (language) =>
                   i18n?.getLanguageLabel?.(language) || String(language || "").toUpperCase(),
                 /* Makes sure the shared language-picker styles exist before the buttons render. */
@@ -1440,6 +1427,31 @@
           }
         };
 
+        /* The hint rows come from the shared language configuration: every supported language in the
+           site's user-facing order, each labelled with its own dictionary's hint sentence. Neither the
+           language list nor the wording is duplicated in this page. */
+        const renderLanguageHint = () => {
+          const hintText = document.querySelector(".welcome-language-hint-text");
+          if (!hintText || !i18n) return;
+          hintText.replaceChildren();
+          (i18n.getSupportedLanguages?.() || []).forEach((language) => {
+            const row = document.createElement("span");
+            row.className = "welcome-language-hint-row";
+
+            const chip = document.createElement("span");
+            chip.className = "welcome-language-hint-lang";
+            chip.setAttribute("aria-hidden", "true");
+            chip.textContent = String(language).toUpperCase();
+
+            const label = document.createElement("span");
+            label.setAttribute("lang", language);
+            label.textContent = i18n.getLanguageText?.(language, "languageHint") || "";
+
+            row.append(chip, label);
+            hintText.appendChild(row);
+          });
+        };
+
         const syncLanguageHint = () => {
           const hint = document.querySelector(".welcome-language-hint");
           const settingsTrigger = document.querySelector("#sao-settings-anchor .sao-settings-trigger");
@@ -1451,6 +1463,7 @@
 
         if (i18n) {
           i18n.mountSettingsMenu();
+          renderLanguageHint();
           syncLanguageHint();
           markWorldReleaseStates();
           window.addEventListener("resize", syncLanguageHint);
